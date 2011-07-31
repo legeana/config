@@ -1,0 +1,15 @@
+/dev/ttyACM0 115200
+# отключаем сжатие данных
+nobsdcomp
+nodeflate
+# команда для установки соединения  
+connect '/usr/sbin/chat -v -f /etc/ppp/chat/mts'
+noauth
+# автоматическое получение сетевых настроек
+noipdefault
+usepeerdns
+defaultroute
+# необязательно
+debug
+nodetach
+
