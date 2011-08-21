@@ -42,7 +42,9 @@ pacqs(){ pacq -s "$@" }
 pacql(){ pacq -l "$@" }
 pacqi(){ pacq -i "$@" }
 pacs(){ pac --needed -S "$@" }
-pacsuy(){ pacs -uy "$@" }
+pacsu(){ pacs -u "$@" }
+pacsy(){ pacs -y "$@" }
+pacsuy(){ pacsu -y "$@" }
 pacss(){ pacn -Ss "$@" }
 
 cdm(){ mkdir -p "$1" && cd "$1" }

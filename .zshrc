@@ -124,4 +124,5 @@ typeset -U path cdpath fpath manpath
 #zle -N dot
 #bindkey . dot
 
+ulimit -u 4096
 
