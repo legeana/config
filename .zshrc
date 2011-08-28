@@ -35,19 +35,24 @@ zstyle ':completion:*:*:kill:*:processes' list-colors "=(#b) #([0-9]#)*=$color[c
 
 # заголовки и прочее.
 
-precmd() {
-	 [[ -t 1 ]] || return
-	case $TERM in
-	*xterm*|rxvt|(dt|k|E|a)term*) print -Pn "\e]0;[%~] %m\a"	;;
-	screen(-bce|.linux)) print -Pn "\ek[%~]\e\\" && print -Pn "\e]0;[%~] %m (screen)\a" ;;  #заголовок для скрина
+precmd()
+{
+	[[ -t 1 ]] || return
+	case "$TERM" in
+		*xterm*|rxvt|(dt|k|E|a)term*) print -Pn "\e]0;[%~] %m\a"	;;
+		screen(-bce|.linux)) print -Pn "\ek[%~]\e\\" && print -Pn "\e]0;[%~] %m (screen)\a" ;;  #заголовок для скрина
 	esac
+	# end of command
+	echo -ne '\a'
 }
 
-preexec() {
+preexec()
+{
 	[[ -t 1 ]] || return
-	case $TERM in
-	*xterm*|rxvt|(dt|k|E|a)term*) print -Pn "\e]0;<$1> [%~] %m\a" ;;
-	screen(-bce|.linux)) print -Pn "\ek<$1> [%~]\e\\" && print -Pn "\e]0;<$1> [%~] %m (screen)\a" ;; #заголовок для скрина
+	cmd="$( echo "$1" | head -n1 | sed -r 's/^(sudo [^[:space:]]+|[^[:space:]]+).*/\1/' )"
+	case "$TERM" in
+		*xterm*|rxvt|(dt|k|E|a)term*) print -Pn "\e]0;<$cmd> [%~] %m\a" ;;
+		screen(-bce|.linux)) print -Pn "\ek<$cmd> [%~]\e\\" && print -Pn "\e]0;<$cmd> [%~] %m (screen)\a" ;; #заголовок для скрина
 	esac
 }
 
