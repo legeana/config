@@ -37,6 +37,7 @@ alias reload='source /etc/profile && source ~/.zshrc && source ~/.zshenv && reha
 alias rgrep='grep -R'
 alias run-help=man
 alias stat='command stat'
+alias tmux='tmux attach || tmux new'
 alias which-command=whence
 alias zegrep='zgrep -E'
 alias zfgrep='zgrep -F'
