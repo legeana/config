@@ -1,4 +1,6 @@
-set modeline
+if $UID!=0
+	set modeline
+endif
 cmap W w
 cmap Q q
 syntax on
