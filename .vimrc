@@ -1,6 +1,7 @@
 if $UID!=0
 	set modeline
 endif
+set background=dark
 cmap W w
 cmap Q q
 syntax on
