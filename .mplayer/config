@@ -1,0 +1,22 @@
+# Write your default config options here!
+[default]
+msgcolor=yes
+ao=alsa
+#ao=pulse
+zoom=yes
+alang=ja,jp,jpn,Jap
+slang=ru,rus,Rus
+subcp=enca:ru:ISO-8859-1
+ass=yes
+framedrop=yes
+ac=faad,
+[console]
+#really-quiet=yes
+quiet=yes
+vo=fbdev2
+#xy=1280
+#fs=yes
+[x]
+vo=xv
+[deint]
+vf=pp=fd

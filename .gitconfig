@@ -11,4 +11,5 @@
 
 [alias]
 	tree = log --graph --decorate --pretty=oneline --abbrev-commit
+	tpush = push --tags
 
