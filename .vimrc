@@ -34,6 +34,8 @@ set iskeyword=@,48-57,_,192-255
 " задать размер табуляции в четыре пробела
 "set ts=4
 
+set fileencodings=utf-8,ucs-bom,koi8-r,cp1251,latin1
+
 " Tell vim to remember certain things when we exit
 "  '10  :  marks will be remembered for up to 10 previously edited files
 "  "100 :  will save up to 100 lines for each register
