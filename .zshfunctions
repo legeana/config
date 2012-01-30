@@ -1,11 +1,13 @@
-if [ -f /usr/local/etc/zsh/functions ]; then
+if [ -f /usr/local/etc/zsh/functions ]
+then
 	source /usr/local/etc/zsh/functions
 fi
 
 #kill_thumb()
 #{
 #	TO="${1:-5}"
-#	while true; do
+#	while true
+#	do
 #		killall -KILL kio_thumbnail &>/dev/null && date || true
 #		sleep "$TO"
 #	done
@@ -15,7 +17,8 @@ nrg2iso(){ dd bs=1k if="$1" of="$1.iso" skip=300 }
 
 #full_update()
 #{
-#	if [ "$EUID" = "0" ]; then
+#	if [ "$EUID" = "0" ]
+#	then
 #		emerge -DuN world && emerge --depclean && revdep-rebuild && prelink -amR
 #	else
 #		echo 'You are not root!'
@@ -57,12 +60,20 @@ cdr()
 	#rmdir -p "$PPWD"
 	rmdir "$PPWD" || cd -
 }
+cdt()
+{
+	cd "$(mktemp -d)"
+}
 
 mk_header()
 {
 	FILE="$1"
 	OUTPUT="${2:-$(basename "$FILE")}"
 	GUARD="$(echo "$FILE" | tr '/.[[:lower:]]' '__[[:upper:]]')"
+	if [ -e "$OUTPUT" ]
+	then
+		return 1
+	fi
 	printf "#ifndef ${GUARD}\n#define ${GUARD}\n\n" >"$OUTPUT"
 	if [ "$3" ]
 	then
@@ -110,5 +121,10 @@ imgur()
 		curl -# -F "image"=@"$i" -F "key"="4907fcd89e761c6b07eeb8292d5a9b2a" http://imgur.com/api/upload.xml|\
 		grep -Eo '<[a-z_]+>http[^<]+'|sed 's/^<.\|_./\U&/g;s/_/ /;s/<\(.*\)>/\x1B[0;34m\1:\x1B[0m /'
 	done
+}
+
+bgrandom()
+{
+	awsetbg -r ~/Pictures/wallpaper
 }
 
