@@ -2,8 +2,8 @@ if $UID!=0
 	set modeline
 endif
 set background=dark
-cmap W w
-cmap Q q
+"cmap W w
+"cmap Q q
 syntax on
 "set cindent
 set number
@@ -14,11 +14,12 @@ set number
 " по умолчанию - латинская раскладка при поиске
 "set imsearch=0
 " игнорировать регистр при поиске
-set ic
+set ignorecase
+set smartcase
 " подсвечивать поиск
-set hls
+set hlsearch
 " использовать инкрементальный поиск
-set is
+set incsearch
 " ширина текста 
 "set textwidth=70
 " минимальная высота окна пусть будет 0 (по умолчанию - 1)
