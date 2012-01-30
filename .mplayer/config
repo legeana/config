@@ -20,3 +20,13 @@ vo=fbdev2
 vo=xv
 [deint]
 vf=pp=fd
+[laptop]
+framedrop=yes
+hardframedrop=yes
+cache=10000
+cache-min=80
+[audio]
+framedrop=yes
+hardframedrop=yes
+vo=null
+
