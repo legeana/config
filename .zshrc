@@ -62,6 +62,9 @@ typeset -g -A key
 autoload -U url-quote-magic
 zle -N self-insert url-quote-magic
 
+# модуль для переименования файлов
+autoload zmv
+
 # менюшку нам для автокомплита
 zstyle ':completion:*' menu yes select
 
