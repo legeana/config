@@ -1,5 +1,5 @@
 if $UID!=0
-	set modeline
+    set modeline
 endif
 set background=dark
 "cmap W w
@@ -7,8 +7,13 @@ set background=dark
 syntax on
 "set cindent
 set number
+set hidden
+set mouse=a
+set title
+set list
+set listchars=tab:>.,trail:$,extends:#,nbsp:.
 " установить keymap, чтобы по Ctrl+^ переключался на русский и обратно
-"set keymap=russian-jcukenwin 
+"set keymap=russian-jcukenwin
 " по умолчанию - латинская раскладка
 "set iminsert=0
 " по умолчанию - латинская раскладка при поиске
@@ -20,7 +25,7 @@ set smartcase
 set hlsearch
 " использовать инкрементальный поиск
 set incsearch
-" ширина текста 
+" ширина текста
 "set textwidth=70
 " минимальная высота окна пусть будет 0 (по умолчанию - 1)
 set winminheight=0
@@ -32,14 +37,14 @@ set guifont=courier_new:h10:cRUSSIAN
 " настраиваю для работы с русскими словами (чтобы w, b, * понимали
 " русские слова)
 set iskeyword=@,48-57,_,192-255
-" задать размер табуляции в четыре пробела
-"set ts=4
 
 " tabs
 "set tabstop=4
-"set shiftwidth=4
-"set expandtab
-"set smarttab
+" spaces
+set expandtab
+set shiftwidth=4
+set softtabstop=4
+set smarttab
 
 set fileencodings=utf-8,ucs-bom,cp1251,koi8-r,latin1
 
