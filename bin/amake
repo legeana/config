@@ -1,0 +1,225 @@
+#!/bin/bash -e
+langs=()
+makefile="AMakeLists.txt"
+src_dir="."
+bin_dir="."
+make_short_alias="true"
+generate="Makefile"
+
+CFLAGS=('-O2')
+CXXFLAGS=("${CFLAGS[@]}")
+
+# help functions
+#{{{
+_gcc_compile()
+{
+	gcc="$1"
+	in="$2"
+	out="$3"
+	shift 3
+	command "$gcc" -Wall -Wextra -g "$in" -o"$out" "$@"
+}
+
+find_sources()
+{
+	if [ "$#" -eq 0 ]
+	then
+		find_sources "$src_dir"/*"$src_suffix"
+	else
+		sources=("$@")
+	fi
+}
+
+command()
+{
+	if [ "$generate" ]
+	then
+		command=("$@")
+	else
+		"$@"
+	fi
+}
+
+#}}}
+
+# c compiler functions
+#{{{
+c_find_sources()
+{
+	src_suffix=.c
+	bin_suffix=
+	find_sources
+}
+
+c_compile()
+{
+	_gcc_compile gcc "$1" "$2" "${CFLAGS[@]}"
+}
+
+c99_find_sources()
+{
+	c_find_sources "$@"
+}
+
+c99_compile()
+{
+	_gcc_compile gcc "$1" "$2" -std=c99 "${CFLAGS[@]}"
+}
+
+#}}}
+
+# c++ compiler functions
+#{{{
+cxx_find_sources()
+{
+	src_suffix=.cpp
+	bin_suffix=
+	find_sources
+}
+
+cxx_compile()
+{
+	_gcc_compile g++ "$1" "$2" "${CXXFLAGS[@]}"
+}
+
+cxx11_find_sources()
+{
+	cxx_find_sources "$@"
+}
+
+cxx11_compile()
+{
+	_gcc_compile g++ "$1" "$2" -std=c++0x "${CXXFLAGS[@]}"
+}
+#}}}
+
+# java compiler functions
+#{{{
+java_find_sources()
+{
+	src_suffix=.java
+	bin_suffix=.class
+	find_sources
+}
+
+java_compile()
+{
+	command javac -sourcepath "$src_dir" "$1" -d "$bin_dir"
+}
+#}}}
+
+# internal functions
+#{{{
+
+status()
+{
+	set +e
+	echo "$1" >&2
+	shift
+	if "$@"
+	then
+		echo "Succeed" >&2
+	else
+		echo "Failed" >&2
+	fi
+	set -e
+}
+
+add_target()
+{
+	if [ "$bin_dir" = "." ]
+	then
+		out="$(basename "$out")"
+	fi
+	echo "Found target \"$out\" from source \"$in\"" >&2
+	if [ "$make_short_alias" -a "$bin_dir" != "." ]
+	then
+		echo "$(basename "$out" "$bin_suffix"): $out" >>"$generate"
+		echo -e "\t@true" >>"$generate"
+		echo >>"$generate"
+	fi
+	echo "$out: $in $makefile" >>"$generate"
+	"${lang}_compile" "$in" "$out"
+	echo -e "\t@mkdir -p \"$bin_dir\"" >>"$generate"
+	echo -ne "\t" >>"$generate"
+	for cmd in "${command[@]}"
+	do
+		echo -ne " \"$cmd\"" >>"$generate"
+	done
+	echo >>"$generate"
+	echo >>"$generate"
+}
+
+compile()
+{
+	if [ -f "$1" ]
+	then
+		in="$1"
+		out="$bin_dir/$(basename "$in" "$src_suffix")$bin_suffix"
+		targets=("${targets[@]}" "$out")
+		if [ "$generate" ]
+		then
+			add_target
+		else
+			status "Compiling \"$in\" -> \"$out\"" "${lang}_compile" "$in" "$out"
+		fi
+	fi
+}
+
+generate_head()
+{
+	cat <<EOF
+all:
+	@amake
+	@\$(MAKE) _all
+
+EOF
+}
+
+generate_tail()
+{
+	cat <<EOF
+_all: ${targets[@]}
+
+clean:
+	rm -f ${targets[@]}
+
+EOF
+}
+
+compile_all()
+{
+	targets=()
+	sources=()
+	if [ "$generate" ]
+	then
+		generate_head >"$generate"
+	fi
+	for lang in "${langs[@]}"
+	do
+		"${lang}_find_sources"
+		for src in "${sources[@]}"
+		do
+			compile "$src"
+		done
+	done
+	if [ "$generate" ]
+	then
+		generate_tail >>"$generate"
+	fi
+}
+
+#}}}
+
+# execution block
+if [ -f "$makefile" ]
+then
+	. "$makefile"
+	compile_all
+else
+	echo "$makefile was not found" >&2
+	exit 1
+fi
+
+# vim:foldmethod=marker
+

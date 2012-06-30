@@ -1,0 +1,77 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+import os
+from os.path import join, exists, abspath, splitext, isfile, isdir
+import sys
+import argparse
+
+def fileCount(dirs):
+	count = 0
+	for i in dirs:
+		for dirpath, dirnames, filenames in os.walk(i):
+			count+=len(filenames)
+	return count
+
+def generate(src, dst, current=0, size=None):
+	print("{0} {1} {2} {3}".format(src, dst, current, size), file=sys.stderr)
+	dirs = []
+	for d in os.listdir(src):
+		if isdir(join(src, d)):
+			try:
+				dirs+=[int(d)]
+			except:
+				pass
+	dirs = sorted(dirs)
+	# apply TODO
+	_dirs = []
+	for i in dirs:
+		_dirs+=[str(i)]
+	dirs = _dirs
+	# endapply
+	doScan = True
+	if size==None:
+		size = len(str(fileCount(dirs)))
+		src = abspath(src)
+		dst = abspath(dst)
+		if not isdir(dst):
+			os.mkdir(dst)
+		current = 0
+		doScan = False
+	# scan dirs
+	for d in dirs:
+		current = generate(join(src, d), dst, current, size)
+	# endscan
+	# scan files
+	if doScan:
+		files = []
+		for f in os.listdir(src):
+			if isfile(join(src, f)):
+				files+=[f]
+		files = sorted(files)
+		for i in files:
+			print("\t{0}".format(i))
+		for f in files:
+			root, ext = splitext(f)
+			ff = str(current)
+			while len(ff)<size:
+				ff = '0'+ff
+			fdst = join(dst, ff+ext)
+			if exists(fdst):
+				os.unlink(fdst)
+			os.link(join(src, f), fdst)
+			current+=1
+	# endscan
+	return current
+
+if __name__=='__main__':
+	parser = argparse.ArgumentParser(description='File list generator')
+	parser.add_argument('-o', '--output', action='store', dest='dst', help='Output directory')
+	parser.add_argument('-i', '--input', action='store', dest='src', help='Input directory')
+	parser.add_argument('-d', '--default', action='store_true', dest='default', help='Default: input=. and output=all')
+	args = parser.parse_args()
+	if args.default:
+		generate(".", "all")
+	else:
+		generate(args.src, args.dst)
+
