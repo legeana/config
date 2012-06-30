@@ -1,0 +1,13 @@
+#!/bin/sh
+
+sudo pacman -S virtualbox-modules
+sudo rmmod vboxpci
+sudo rmmod vboxnetadp
+sudo rmmod vboxnetflt
+sudo rmmod vboxdrv
+
+sudo modprobe vboxdrv
+sudo modprobe vboxnetflt
+sudo modprobe vboxnetadp
+sudo modprobe vboxpci
+

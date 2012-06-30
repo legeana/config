@@ -1,0 +1,87 @@
+#!/bin/bash -e
+
+dev=("-E" "^/dev/sd[b-z][[:digit:]]*$")
+
+perllib='
+sub mountpoint($)
+{
+	my $dev = $_[0];
+	my $mp = qx/udisks --show-info $dev | egrep "^[[:space:]]*mount paths:"/;
+	chomp $mp;
+	$mp =~ s|^\s*mount paths:\s*(\S*)$|\1|;
+	return $mp;
+}
+sub mounted($)
+{
+	return mountpoint($_[0]) ne "";
+}
+'
+
+on_exit()
+{
+	rm -f "$devs" "$mounted"
+}
+trap on_exit EXIT INT TERM
+
+devs="$(mktemp)"
+mounted="$(mktemp)"
+
+while true
+do
+
+udisks --enumerate-device-files | grep "${dev[@]}" >"$devs"
+
+cat "$devs" | \
+		perl -ne "$perllib"'
+			chomp;
+			print "$_\n";
+			my $mp = mountpoint($_);
+			my $mounted = $mp ne ""?"on":"off";
+			print "$mp\n$mounted\n";' | \
+		xargs -d '\n' dialog --stdout --separate-output --checklist "Mount/Unmount removable devices" 0 0 0 >"$mounted"
+
+perl -e "$perllib"'
+my $devs_fn = $ARGV[0];
+my $mounted_fn = $ARGV[1];
+
+open DEVS, "<", $devs_fn or die $!;
+my @devs_ = <DEVS>;
+chomp(@devs_);
+close DEVS or die $!;
+
+open MOUNTED, "<", $mounted_fn or die $!;
+my @mounted_ = <MOUNTED>;
+chomp(@mounted_);
+close MOUNTED or die $!;
+
+my %mounted = map {$_ => 0} @devs_;
+
+foreach my $mntd (@mounted_)
+{
+	$mounted{$mntd} = 1;
+}
+
+foreach my $dev (@devs_)
+{
+	if ($dev ne "")
+	{
+		if (mounted($dev))
+		{
+			if (!$mounted{$dev})
+			{
+				system("udisks", "--unmount", $dev) and die $!;
+			}
+		}
+		else
+		{
+			if ($mounted{$dev})
+			{
+				system("udisks", "--mount", $dev) and die $!;
+			}
+		}
+	}
+} 
+' "$devs" "$mounted"
+
+done
+
