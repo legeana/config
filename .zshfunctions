@@ -95,7 +95,8 @@ mk_class()
 upfind()
 {
     local OPWD="$PWD"
-    while [[ ! -r $2 -a $PWD != "/" ]]; do
+    while [[ ! -r $2 && $PWD != "/" ]]
+    do
         cd ..
     done
     if [[ -r $2 ]]
