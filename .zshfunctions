@@ -1,39 +1,40 @@
 if [ -f /usr/local/etc/zsh/functions ]
 then
-	source /usr/local/etc/zsh/functions
+    source /usr/local/etc/zsh/functions
 fi
 
 #kill_thumb()
 #{
-#	TO="${1:-5}"
-#	while true
-#	do
-#		killall -KILL kio_thumbnail &>/dev/null && date || true
-#		sleep "$TO"
-#	done
+#    local TO="${1:-5}"
+#    while true
+#    do
+#        killall -KILL kio_thumbnail &>/dev/null && date || true
+#        sleep "$TO"
+#    done
 #}
 
 nrg2iso(){ dd bs=1k if="$1" of="$1.iso" skip=300 }
 
 #full_update()
 #{
-#	if [ "$EUID" = "0" ]
-#	then
-#		emerge -DuN world && emerge --depclean && revdep-rebuild && prelink -amR
-#	else
-#		echo 'You are not root!'
-#		echo 'Trying to use sudo'
-#		sudo sh -c 'emerge -DuN world && emerge --depclean && revdep-rebuild && prelink -amR'
-#	fi
+#    local cmd='emerge -DuN world && emerge --depclean && revdep-rebuild && prelink -amR'
+#    if [[ $EUID = 0 ]]
+#    then
+#        sh -c "$cmd"
+#    else
+#        echo 'You are not root!'
+#        echo 'Trying to use sudo'
+#        sudo sh -c "$cmd"
+#    fi
 #}
 
 pac()
 {
-	if [ "$EUID" = "0" ]; then
-		pacman-color "$@"
-	else
-		sudo pacman-color "$@"
-	fi
+    if [ "$EUID" = "0" ]; then
+        pacman-color "$@"
+    else
+        sudo pacman-color "$@"
+    fi
 }
 pacu(){ pac -U "$@" }
 pacn(){ pacman-color "$@" }
@@ -44,7 +45,7 @@ pacqo(){ pacq -o "$@" }
 pacqs(){ pacq -s "$@" }
 pacql(){ pacq -l "$@" }
 pacqi(){ pacq -i "$@" }
-pacs(){ pac --needed -S "$@" }
+pacs(){ pac --needed -S "$@" && reload }
 pacsu(){ pacs -u "$@" }
 pacsy(){ pacs -y "$@" }
 pacsuy(){ pacsu -y "$@" }
@@ -54,61 +55,60 @@ cdm(){ mkdir -p "$1" && cd "$1" }
 cdu(){ cd .. }
 cdr()
 {
-	PPWD=`pwd`
-	CWD="${1:-..}"
-	cd "${CWD}"
-	#rmdir -p "$PPWD"
-	rmdir "$PPWD" || cd -
+    local PPWD="$PWD"
+    local CWD="${1:-..}"
+    cd "${CWD}"
+    rmdir "$PPWD" || cd "$PPWD"
 }
 cdt()
 {
-	cd "$(mktemp -d)"
+    cd "$(mktemp -d)"
 }
 
 mk_header()
 {
-	FILE="$1"
-	OUTPUT="${2:-$(basename "$FILE")}"
-	GUARD="$(echo "$FILE" | tr '/.[[:lower:]]' '__[[:upper:]]')"
-	if [ -e "$OUTPUT" ]
-	then
-		return 1
-	fi
-	printf "#ifndef ${GUARD}\n#define ${GUARD}\n\n" >"$OUTPUT"
-	if [ "$3" ]
-	then
-		cat "$3" >>"$OUTPUT"
-	fi
-	printf "\n#endif //${GUARD}\n\n" >>"$OUTPUT"
+    local FILE="$1"
+    local OUTPUT="${2:-$(basename "$FILE")}"
+    local GUARD="$(echo "$FILE" | tr '/.[[:lower:]]' '__[[:upper:]]')"
+    if [[ -e $OUTPUT ]]
+    then
+        return 1
+    fi
+    printf "#ifndef ${GUARD}\n#define ${GUARD}\n\n" >"$OUTPUT"
+    if [[ -n $3 ]]
+    then
+        cat "$3" >>"$OUTPUT"
+    fi
+    printf "\n#endif //${GUARD}\n" >>"$OUTPUT"
 }
 
 mk_class()
 {
-	for i
-	do
-		HEADER="$(echo "$i" | tr '[[:lower:]]' '[[:upper:]]')_HPP"
-		printf "#ifndef ${HEADER}\n#define ${HEADER}\n\nclass $i\n{\n};\n\n#endif //${HEADER}\n\n" >"$i.hpp"
-		echo "#include \"$i.hpp\"" >"$i.cpp"
-	done
+    for i
+    do
+        HEADER="$(echo "$i" | tr '[[:lower:]]' '[[:upper:]]')_HPP"
+        printf "#ifndef ${HEADER}\n#define ${HEADER}\n\nclass $i\n{\n};\n\n#endif //${HEADER}\n" >"$i.hpp"
+        echo "#include \"$i.hpp\"" >"$i.cpp"
+    done
 }
 
 upfind()
 {
-	OPWD="$(pwd)"
-	while [ ! -r "$2" -a "$PWD" != "/" ]; do
-		cd ..
-	done
-	if [ -r "$2" ]
-	then
-		echo "$1" | "$SHELL"
-	else
-		NOT_FOUND=1
-	fi
-	cd "$OPWD"
-	if [ "$NOT_FOUND" ]
-	then
-		printf "Unable to find \"%s\"\n" "$2"
-	fi
+    local OPWD="$PWD"
+    while [[ ! -r $2 -a $PWD != "/" ]]; do
+        cd ..
+    done
+    if [[ -r $2 ]]
+    then
+        echo "$1" | "$SHELL"
+    else
+        NOT_FOUND=1
+    fi
+    cd "$OPWD"
+    if [[ -n $NOT_FOUND ]]
+    then
+        printf "Unable to find \"%s\"\n" "$2"
+    fi
 }
 updox(){ upfind doxygen Doxyfile }
 upmake(){ upfind make Makefile }
@@ -116,15 +116,14 @@ upbmake(){ upfind 'make -C build' build }
 
 imgur()
 {
-	for i
-	do
-		curl -# -F "image"=@"$i" -F "key"="4907fcd89e761c6b07eeb8292d5a9b2a" http://imgur.com/api/upload.xml|\
-		grep -Eo '<[a-z_]+>http[^<]+'|sed 's/^<.\|_./\U&/g;s/_/ /;s/<\(.*\)>/\x1B[0;34m\1:\x1B[0m /'
-	done
+    for i
+    do
+        curl -# -F "image"=@"$i" -F "key"="4907fcd89e761c6b07eeb8292d5a9b2a" http://imgur.com/api/upload.xml|\
+        grep -Eo '<[a-z_]+>http[^<]+'|sed 's/^<.\|_./\U&/g;s/_/ /;s/<\(.*\)>/\x1B[0;34m\1:\x1B[0m /'
+    done
 }
 
 bgrandom()
 {
-	awsetbg -r ~/Pictures/wallpaper
+    awsetbg -r ~/Pictures/wallpaper
 }
-

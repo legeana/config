@@ -9,7 +9,7 @@
 #
 
 # THIS FILE IS NOT INTENDED TO BE USED AS /etc/zlogin, NOR WITHOUT EDITING
-return 0	# Remove this line after editing this file as appropriate
+return 0    # Remove this line after editing this file as appropriate
 
 clear
 stty dec new cr0 -tabs

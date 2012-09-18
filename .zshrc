@@ -37,23 +37,34 @@ zstyle ':completion:*:*:kill:*:processes' list-colors "=(#b) #([0-9]#)*=$color[c
 
 precmd()
 {
-	[[ -t 1 ]] || return
-	case "$TERM" in
-		*xterm*|rxvt|(dt|k|E|a)term*) print -Pn "\e]0;[%~] %m\a"	;;
-		screen(-bce|.linux)) print -Pn "\ek[%~]\e\\" && print -Pn "\e]0;[%~] %m (screen)\a" ;;  #заголовок для скрина
-	esac
-	# end of command
-	echo -ne '\a'
+    [[ -t 1 ]] || return
+    case "$TERM" in
+        *xterm*|rxvt|(dt|k|E|a)term*) print -Pn "\e]0;[%~] %m\a"    ;;
+        screen(-bce|.linux)) print -Pn "\ek[%~]\e\\" && print -Pn "\e]0;[%~] %m (screen)\a" ;;
+    esac
+    # end of command
+    echo -ne '\a'
 }
 
 preexec()
 {
-	[[ -t 1 ]] || return
-	cmd="$( echo "$1" | head -n1 | sed -r 's/^(sudo [^[:space:]]+|[^[:space:]]+).*/\1/' )"
-	case "$TERM" in
-		*xterm*|rxvt|(dt|k|E|a)term*) print -Pn "\e]0;<$cmd> [%~] %m\a" ;;
-		screen(-bce|.linux)) print -Pn "\ek<$cmd> [%~]\e\\" && print -Pn "\e]0;<$cmd> [%~] %m (screen)\a" ;; #заголовок для скрина
-	esac
+    [[ -t 1 ]] || return
+    cmd="$( echo "$1" | head -n1 | sed -r 's/^(sudo [^[:space:]]+|[^[:space:]]+).*/\1/' )"
+    case "$TERM" in
+        *xterm*|rxvt|(dt|k|E|a)term*) print -Pn "\e]0;<$cmd> [%~] %m\a" ;;
+        screen(-bce|.linux)) print -Pn "\ek<$cmd> [%~]\e\\" && print -Pn "\e]0;<$cmd> [%~] %m (screen)\a" ;;
+    esac
+}
+
+chpwd()
+{
+    if [[ -d .git ]]
+    then
+        git status
+    elif [[ -d .svn ]]
+    then
+        svn status
+    fi
 }
 
 typeset -g -A key
@@ -93,7 +104,8 @@ unsetopt extendedglob nomatch
 bindkey -e
 # End of lines configured by zsh-newuser-install
 
-if [ -x /usr/bin/dircolors ]; then
+if [[ -x /usr/bin/dircolors ]]
+then
     eval "`dircolors -b`"
 fi
 
@@ -115,22 +127,29 @@ bindkey '^[[1;5C' forward-word
 bindkey '^[[5~' history-search-backward
 bindkey '^[[6~' history-search-forward
 
-if [ -f ~/.zshinputrc ]; then
-	source ~/.zshinputrc
+if [[ -f ~/.zshinputrc ]]
+then
+    source ~/.zshinputrc
 fi
 
 typeset -U path cdpath fpath manpath
 
-#dot() {
-#	if [[ $LBUFFER = *.. ]]; then
-#		LBUFFER+=/..
-#	else
-#		LBUFFER+=.
-#	fi
+#dot()
+#{
+#    if [[ $LBUFFER = *.. ]]
+#    then
+#        LBUFFER+=/..
+#    else
+#       LBUFFER+=.
+#    fi
 #}
 #autoload -U dot
 #zle -N dot
 #bindkey . dot
 
-ulimit -u 4096
+if [[ -d $HOME/bin ]]
+then
+    export PATH="$HOME/bin:$PATH"
+fi
 
+ulimit -u 4096
