@@ -1,15 +1,15 @@
 [user]
-	name = White Lisa
-	email = lisa.rsfp+dev@gmail.com
+    name = White Lisa
+    email = lisa.rsfp+dev@gmail.com
 [merge]
-	tool = vimdiff
+    tool = vimdiff
 [core]
-	editor = vim
-	pager = most
+    editor = vim
+    pager = most
 [color]
-	ui = auto
+    ui = auto
 
 [alias]
-	tree = log --graph --decorate --pretty=oneline --abbrev-commit
-	tpush = push --tags
-
+    tree = log --graph --decorate --pretty=oneline --abbrev-commit
+    tpush = push --tags
+    tpull = pull --tags
