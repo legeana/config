@@ -3,15 +3,18 @@ export EDITOR="vim" PAGER="most"
 export LC_NUMERIC="C"
 
 #case "$TERM" in
-#   *xterm*|rxvt|(dt|k|E|a)term*) TERMTYPE="x";;
-#   *) TERMTYPE="console";;
+#   *xterm*|rxvt|(dt|k|E|a)term*) MPLAYER_PROFILE="x";;
+#   *) MPLAYER_PROFILE="console";;
 #esac
 
 if [[ -n $DISPLAY ]]
 then
-    TERMTYPE="x"
+    MPLAYER_PROFILE="x"
+elif [[ -n $TMUX ]]
+then
+    MPLAYER_PROFILE="audio"
 else
-    TERMTYPE="console"
+    MPLAYER_PROFILE="console"
 fi
 
 if [[ -f ~/.zshaliases ]]
@@ -19,7 +22,7 @@ then
     source ~/.zshaliases
 fi
 
-alias mplayer="mplayer -profile $TERMTYPE"
+alias mplayer="mplayer -profile $MPLAYER_PROFILE"
 
 if [[ -f ~/.zshfunctions ]]
 then
