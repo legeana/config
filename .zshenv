@@ -10,7 +10,7 @@ export LC_NUMERIC="C"
 if [[ -n $DISPLAY ]]
 then
     MPLAYER_PROFILE="x"
-elif [[ -n $TMUX ]]
+elif [[ -n $TMUX || -n $SSH_CLIENT || $TERM = screen ]]
 then
     MPLAYER_PROFILE="audio"
 else
