@@ -1,11 +1,17 @@
 [user]
     name = White Lisa
     email = lisa.rsfp+dev@gmail.com
+
 [merge]
     tool = vimdiff
+
 [core]
     editor = vim
     pager = most
+
+[push]
+    default = current
+
 [color]
     ui = auto
 
