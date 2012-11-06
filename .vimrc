@@ -8,7 +8,7 @@ syntax on
 "set cindent
 set number
 set hidden
-set mouse=a
+"set mouse=a
 set title
 set list
 set listchars=tab:>.,trail:$,extends:#,nbsp:.
