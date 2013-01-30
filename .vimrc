@@ -1,4 +1,4 @@
-if $UID!=0
+if $UID != 0
     set modeline
 endif
 set background=dark
@@ -67,4 +67,3 @@ augroup resCur
   autocmd!
   autocmd BufWinEnter * call ResCur()
 augroup END
-
