@@ -24,6 +24,13 @@ fi
 
 alias mplayer="mplayer -profile $MPLAYER_PROFILE"
 
+if [[ -f /usr/bin/vim && -x /usr/bin/vim ]]
+then
+    alias vi=vim
+else
+    unalias vi
+fi
+
 if [[ -f ~/.zshfunctions ]]
 then
     source ~/.zshfunctions
