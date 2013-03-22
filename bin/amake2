@@ -230,4 +230,3 @@ else
 	echo "$config was not found in the current directory" >&2
 	exit 1
 fi
-
