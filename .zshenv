@@ -31,6 +31,15 @@ else
     unalias vi
 fi
 
+if [[ -x /usr/bin/grc ]]
+then
+    alias grc='grc --colour=auto'
+    alias ping='grc ping'
+    alias last='grc last'
+    alias netstat='grc netstat'
+    alias traceroute='grc traceroute'
+fi
+
 if [[ -f ~/.zshfunctions ]]
 then
     source ~/.zshfunctions
