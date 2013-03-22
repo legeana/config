@@ -1,4 +1,4 @@
-if [ -f /usr/local/etc/zsh/functions ]
+if [[ -f /usr/local/etc/zsh/functions ]]
 then
     source /usr/local/etc/zsh/functions
 fi
@@ -103,7 +103,7 @@ upfind()
     then
         echo "$1" | "$SHELL"
     else
-        NOT_FOUND=1
+        local NOT_FOUND=1
     fi
     cd "$OPWD"
     if [[ -n $NOT_FOUND ]]
