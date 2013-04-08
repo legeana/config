@@ -31,13 +31,13 @@ nrg2iso(){ dd bs=1k if="$1" of="$1.iso" skip=300 }
 pac()
 {
     if [ "$EUID" = "0" ]; then
-        pacman-color "$@"
+        pacman "$@"
     else
-        sudo pacman-color "$@"
+        sudo pacman "$@"
     fi
 }
 pacu(){ pac -U "$@" }
-pacn(){ pacman-color "$@" }
+pacn(){ pacman "$@" }
 pacr(){ pac -R "$@" }
 pacrs(){ pacr -s "$@" }
 pacq(){ pacn -Q "$@" }
