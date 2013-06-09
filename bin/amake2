@@ -11,34 +11,34 @@ JAVAFLAGS=""
 
 java_init()
 {
-	for i in *.java
-	do
-		if [[ -f $i ]]
-		then
-			local target="$(basename "$i" .java).class"
-			new_target_message "$i" "$target"
-			add_targets_build "$target"
-		fi
-	done
+    for i in *.java
+    do
+        if [[ -f $i ]]
+        then
+            local target="$(basename "$i" .java).class"
+            new_target_message "$i" "$target"
+            add_targets_build "$target"
+        fi
+    done
 }
 
 java_generate_head()
 {
-	printf "JAVA=%s\nJAVAFLAGS=%s\n\n" "$JAVA" "$JAVAFLAGS" >>"$makefile"
-	printf "%%.class: %%.java %s\n\t\$(JAVA) \$(JAVAFLAGS) \$<\n\n" "$config" >>"$makefile"
-	printf "java_clean:\n\trm -f *.class\n\n" >>"$makefile"
-	printf ".PHONY: java_clean\n\n" >>"$makefile"
-	add_targets_clean java_clean
+    printf "JAVA=%s\nJAVAFLAGS=%s\n\n" "$JAVA" "$JAVAFLAGS" >>"$makefile"
+    printf "%%.class: %%.java %s\n\t\$(JAVA) \$(JAVAFLAGS) \$<\n\n" "$config" >>"$makefile"
+    printf "java_clean:\n\trm -f *.class\n\n" >>"$makefile"
+    printf ".PHONY: java_clean\n\n" >>"$makefile"
+    add_targets_clean java_clean
 }
 
 java_generate_tail()
 {
-	true
+    true
 }
 
 java_clean()
 {
-	true
+    true
 }
 
 #}}}
@@ -48,38 +48,38 @@ java_clean()
 
 gcc_init()
 {
-	for suff
-	do
-		for i in *"$suff"
-		do
-			if [[ -f $i ]]
-			then
-				local target="$(basename "$i" "$suff")"
-				new_target_message "$i" "$target"
-				add_targets "$target"
-			fi
-		done
-	done
+    for suff
+    do
+        for i in *"$suff"
+        do
+            if [[ -f $i ]]
+            then
+                local target="$(basename "$i" "$suff")"
+                new_target_message "$i" "$target"
+                add_targets "$target"
+            fi
+        done
+    done
 }
 
 gcc_generate_head()
 {
-	local GCCNAME="$1"
-	local GCC="$2"
-	local GCCFLAGSNAME="$3"
-	local GCCFLAGS="$4"
-	printf "%s=%s\n%s=%s\n\n" "$GCCNAME" "$GCC" "$GCCFLAGSNAME" "$GCCFLAGS" >>"$makefile"
-	printf "%%: %%.cpp %s\n\t\$(%s) \$(%s) -o\$@ $<\n\n" "$config" "$GCCNAME" "$GCCFLAGSNAME" >>"$makefile"
+    local GCCNAME="$1"
+    local GCC="$2"
+    local GCCFLAGSNAME="$3"
+    local GCCFLAGS="$4"
+    printf "%s=%s\n%s=%s\n\n" "$GCCNAME" "$GCC" "$GCCFLAGSNAME" "$GCCFLAGS" >>"$makefile"
+    printf "%%: %%.cpp %s\n\t\$(%s) \$(%s) -o\$@ $<\n\n" "$config" "$GCCNAME" "$GCCFLAGSNAME" >>"$makefile"
 }
 
 gcc_generate_tail()
 {
-	true
+    true
 }
 
 gcc_clean()
 {
-	true
+    true
 }
 
 #}}}
@@ -92,22 +92,22 @@ CFLAGS="-g -O0"
 
 cc_init()
 {
-	gcc_init .c
+    gcc_init .c
 }
 
 cc_generate_head()
 {
-	gcc_generate_head CC "$CC" CFLAGS "$CFLAGS"
+    gcc_generate_head CC "$CC" CFLAGS "$CFLAGS"
 }
 
 cc_generate_tail()
 {
-	gcc_generate_tail
+    gcc_generate_tail
 }
 
 cc_clean()
 {
-	gcc_clean
+    gcc_clean
 }
 
 #}}}
@@ -122,40 +122,40 @@ CXX11FLAGS=""
 
 cxx_init()
 {
-	gcc_init .cpp .cxx .cc
+    gcc_init .cpp .cxx .cc
 }
 cxx_generate_head()
 {
-	gcc_generate_head CXX "$CXX" CXXFLAGS "$CXXFLAGS"
+    gcc_generate_head CXX "$CXX" CXXFLAGS "$CXXFLAGS"
 }
 cxx_generate_tail()
 {
-	gcc_generate_tail
+    gcc_generate_tail
 }
 cxx_clean()
 {
-	gcc_clean
+    gcc_clean
 }
 
 cxx11_init()
 {
-	if [[ -z $CXX11FLAGS ]]
-	then
-		CXX11FLAGS="$CXXFLAGS"
-	fi
-	cxx_init
+    if [[ -z $CXX11FLAGS ]]
+    then
+        CXX11FLAGS="$CXXFLAGS"
+    fi
+    cxx_init
 }
 cxx11_generate_head()
 {
-	gcc_generate_head CXX11 "$CXX11" CXX11FLAGS "$CXX11FLAGS"
+    gcc_generate_head CXX11 "$CXX11" CXX11FLAGS "$CXX11FLAGS"
 }
 cxx11_generate_tail()
 {
-	gcc_generate_tail
+    gcc_generate_tail
 }
 cxx11_clean()
 {
-	gcc_clean
+    gcc_clean
 }
 #}}}
 
@@ -164,69 +164,69 @@ cxx11_clean()
 
 new_target_message()
 {
-	local src="$1"
-	local target="$2"
-	printf "Found target \"%s\" from source \"%s\"\n" "$target" "$source" >&2
+    local src="$1"
+    local target="$2"
+    printf "Found target \"%s\" from source \"%s\"\n" "$target" "$source" >&2
 }
 
 add_targets_build()
 {
-	build_targets=("${build_targets[@]}" "$@")
+    build_targets=("${build_targets[@]}" "$@")
 }
 
 add_files_clean()
 {
-	clean_files=("${clean_files[@]}" "$@")
+    clean_files=("${clean_files[@]}" "$@")
 }
 
 add_targets_clean()
 {
-	clean_targets=("${clean[@]}" "$@")
+    clean_targets=("${clean[@]}" "$@")
 }
 
 add_targets()
 {
-	add_targets_build "$@"
-	add_files_clean "$@"
+    add_targets_build "$@"
+    add_files_clean "$@"
 }
 
 generate_head()
 {
-	printf "all:\n\t@ %s\n" "$self" >"$makefile"
-	printf "\t@ \$(MAKE) --directory=. --no-builtin-rules --no-print-directory all_\n\n" >>"$makefile"
-	printf ".PHONY: all\n\n" >>"$makefile"
+    printf "all:\n\t@ %s\n" "$self" >"$makefile"
+    printf "\t@ \$(MAKE) --directory=. --no-builtin-rules --no-print-directory all_\n\n" >>"$makefile"
+    printf ".PHONY: all\n\n" >>"$makefile"
 }
 
 generate()
 {
-	build_targets=()
-	clean_files=()
-	clean_targets=()
-	generate_head
-	for lang in "${langs[@]}"
-	do
-		"${lang}_init"
-		"${lang}_generate_head"
-		"${lang}_generate_tail"
-		"${lang}_clean"
-	done
-	generate_tail
+    build_targets=()
+    clean_files=()
+    clean_targets=()
+    generate_head
+    for lang in "${langs[@]}"
+    do
+        "${lang}_init"
+        "${lang}_generate_head"
+        "${lang}_generate_tail"
+        "${lang}_clean"
+    done
+    generate_tail
 }
 
 generate_tail()
 {
-	printf "all_: %s\n\n" "${build_targets[*]}" >>"$makefile"
-	printf "clean: %s\n\trm -f %s\n\n" "${clean_targets[*]}" "${clean_files[*]}" >>"$makefile"
-	printf ".PHONY: all_ clean\n\n" >>"$makefile"
+    printf "all_: %s\n\n" "${build_targets[*]}" >>"$makefile"
+    printf "clean: %s\n\trm -f %s\n\n" "${clean_targets[*]}" "${clean_files[*]}" >>"$makefile"
+    printf ".PHONY: all_ clean\n\n" >>"$makefile"
 }
 
 #}}}
 
 if [[ -f $config ]]
 then
-	. "$PWD/$config"
-	generate
+    . "$PWD/$config"
+    generate
 else
-	echo "$config was not found in the current directory" >&2
-	exit 1
+    echo "$config was not found in the current directory" >&2
+    exit 1
 fi

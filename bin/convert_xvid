@@ -26,7 +26,7 @@ exec 1<&2
 
 while  getopts "hco:t:s:qb:k:p:m:df:" arg
 do
-        case "$arg" in
+    case "$arg" in
         c) OVCOPTS_V="${OVCOPTS_V}:cartoon";;
         t) THREADS="${OPTARG}";;
         o) OUTPUT="$OPTARG";;
@@ -39,10 +39,10 @@ do
         d) VF="${VF}:${DEINT}";;
         f) FPS="-fps ${OPTARG}" ;;
         h) ;;&
-            ?) printf "Usage: %s: [-c if cartoon (anime)] [-o output] [-t threads] [-s scale] [-q better quality ($DEFOPTS)] [-b bitrate] [-k size_mult [$K_BITRATE]] [-p pass [2]] [-m me_quality [6]] [-d deinterlacer [$DEINT]] [-f FPS]\n" "$0" && exit 1 ;;
-        esac
+        ?) printf "Usage: %s: [-c if cartoon (anime)] [-o output] [-t threads] [-s scale] [-q better quality ($DEFOPTS)] [-b bitrate] [-k size_mult [$K_BITRATE]] [-p pass [2]] [-m me_quality [6]] [-d deinterlacer [$DEINT]] [-f FPS]\n" "$0" && exit 1 ;;
+    esac
 done
-shift "$(echo "$OPTIND" - 1 | bc)"
+shift "$((OPTIND - 1))"
 
 #echo "[debug]: \$@=" "$@"
 

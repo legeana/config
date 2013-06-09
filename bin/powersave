@@ -2,105 +2,105 @@
 
 scsi()
 {
-	for host in /sys/class/scsi_host/*/link_power_management_policy
-	do
-		if [ -f "$host" ]
-		then
-			case "$POWERSAVE"
-			in
-				no) echo max_performance >"$host";;
-				*) echo min_power >"$host";;
-			esac
-		fi
-	done
+    for host in /sys/class/scsi_host/*/link_power_management_policy
+    do
+        if [ -f "$host" ]
+        then
+            case "$POWERSAVE"
+            in
+                no) echo max_performance >"$host";;
+                *) echo min_power >"$host";;
+            esac
+        fi
+    done
 }
 cpu()
 {
-	for cpu in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
-	do
-		if [ -f "$cpu" ]
-		then
-			case "$POWERSAVE"
-			in
-				no) echo conservative > "$cpu";;
-				*) echo powersave > "$cpu";;
-			esac
-		fi
-	done
+    for cpu in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+    do
+        if [ -f "$cpu" ]
+        then
+            case "$POWERSAVE"
+            in
+                no) echo conservative > "$cpu";;
+                *) echo powersave > "$cpu";;
+            esac
+        fi
+    done
 }
 snd_hda_intel()
 {
-	cntl="/sys/module/snd_hda_intel/parameters/power_save"
-	case "$POWERSAVE"
-	in
-		no) echo 0 >"$cntl";;
-		*) echo 10 >"$cntl";;
-	esac
+    cntl="/sys/module/snd_hda_intel/parameters/power_save"
+    case "$POWERSAVE"
+    in
+        no) echo 0 >"$cntl";;
+        *) echo 10 >"$cntl";;
+    esac
 }
 pcie()
 {
-	case "$POWERSAVE"
-	in
-		no) echo performance > /sys/module/pcie_aspm/parameters/policy;;
-		*) echo powersave > /sys/module/pcie_aspm/parameters/policy;;
-	esac
+    case "$POWERSAVE"
+    in
+        no) echo performance > /sys/module/pcie_aspm/parameters/policy;;
+        *) echo powersave > /sys/module/pcie_aspm/parameters/policy;;
+    esac
 }
 dirty_ratio()
 {
-	case "$POWERSAVE"
-	in
-		no)
-			echo 10 > /proc/sys/vm/dirty_ratio
-			echo 5 > /proc/sys/vm/dirty_background_ratio
-			echo 6000 > /proc/sys/vm/dirty_writeback_centisecs
-			;;
-		*)
-			echo 90 > /proc/sys/vm/dirty_ratio
-			echo 1 > /proc/sys/vm/dirty_background_ratio
-			echo 60000 > /proc/sys/vm/dirty_writeback_centisecs
-			;;
-	esac
+    case "$POWERSAVE"
+    in
+        no)
+            echo 10 > /proc/sys/vm/dirty_ratio
+            echo 5 > /proc/sys/vm/dirty_background_ratio
+            echo 6000 > /proc/sys/vm/dirty_writeback_centisecs
+            ;;
+        *)
+            echo 90 > /proc/sys/vm/dirty_ratio
+            echo 1 > /proc/sys/vm/dirty_background_ratio
+            echo 60000 > /proc/sys/vm/dirty_writeback_centisecs
+            ;;
+    esac
 }
 misc()
 {
-	case "$POWERSAVE"
-	in
-		no) rfkill unblock all;;
-		offline) rfkill block all
-			modprobe -r uvcvideo;;
-		*)
-			rfkill unblock wifi
-			rfkill block bluetooth
-			modprobe -r uvcvideo
-			;;
-	esac
+    case "$POWERSAVE"
+    in
+        no) rfkill unblock all;;
+        offline) rfkill block all
+            modprobe -r uvcvideo;;
+        *)
+            rfkill unblock wifi
+            rfkill block bluetooth
+            modprobe -r uvcvideo
+            ;;
+    esac
 }
 
 activate()
 {
-	POWERSAVE="$1"
-	scsi
-	cpu
-	snd_hda_intel
-	dirty_ratio
-	misc
+    POWERSAVE="$1"
+    scsi
+    cpu
+    snd_hda_intel
+    dirty_ratio
+    misc
 }
 
 if on_ac_power
 then
-	echo "max performance"
-	activate no
+    echo "max performance"
+    activate no
 else
-	echo "powersave"
-	if [ "$1" ]
-	then
-		for i
-		do
-			echo "[$i]" >&2
-			activate "$i"
-		done
-	else
-		activate yes
-	fi
+    echo "powersave"
+    if [ "$1" ]
+    then
+        for i
+        do
+            echo "[$i]" >&2
+            activate "$i"
+        done
+    else
+        activate yes
+    fi
 fi
 

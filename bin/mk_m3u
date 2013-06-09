@@ -3,37 +3,37 @@ set -e
 
 get_title()
 {
-	basename "$1"
+    basename "$1"
 }
 
 print_head()
 {
-	echo "#EXTM3U"
+    echo "#EXTM3U"
 }
 
 print_m3u()
 {
-	for i
-	do
-		echo "#EXTINF:,$(get_title "$i")"
-		echo "$i"
-	done
+    for i
+    do
+        echo "#EXTINF:,$(get_title "$i")"
+        echo "$i"
+    done
 }
 
 if [ "$1" = "-a" ]
 then
-	shift
-	print_m3u "$@"
+    shift
+    print_m3u "$@"
 elif [ "$1" = "-c" ]
 then
-	shift
-	print_head
-	for i
-	do
-		tail -n "+2" "$i"
-	done
+    shift
+    print_head
+    for i
+    do
+        tail -n "+2" "$i"
+    done
 else
-	print_head
-	print_m3u "$@"
+    print_head
+    print_m3u "$@"
 fi
 
