@@ -37,6 +37,7 @@ alias mplayer='mplayer -profile x'
 alias pcregrep='pcregrep --color=auto'
 alias reload='source /etc/profile && source ~/.zshrc && source ~/.zshenv && rehash'
 alias rgrep='grep -R'
+alias rplayer='mplayer -loop 0 -shuffle'
 alias run-help=man
 alias stat='command stat'
 alias sudo='nocorrect sudo'
