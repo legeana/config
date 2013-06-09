@@ -152,4 +152,7 @@ then
     export PATH="$HOME/bin:$PATH"
 fi
 
+export GOPATH="$HOME/.go"
+export PATH="$GOPATH/bin:$PATH"
+
 ulimit -u 4096
