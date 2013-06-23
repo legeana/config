@@ -44,6 +44,7 @@ alias stat='command stat'
 alias sudo='nocorrect sudo'
 alias tmux='tmux attach || (cd && tmux new)'
 alias which-command=whence
+alias yakuake_show='qdbus org.kde.yakuake /yakuake/MainWindow_1 show'
 alias zegrep='zgrep -E'
 alias zfgrep='zgrep -F'
 alias zgrep='zgrep --color=auto'
