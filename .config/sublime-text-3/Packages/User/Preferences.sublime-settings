@@ -1,0 +1,10 @@
+{
+	"spell_check": true,
+	"fallback_encoding": "cp1251",
+	"default_line_ending": "unix",
+	"translate_tabs_to_spaces": true,
+    "ignored_packages":
+    [
+        // "Vintage"
+    ]
+}
