@@ -1,0 +1,11 @@
+{
+    "fmt_tab_indent": false,
+    "fmt_tab_width": 4,
+    "lint_filter": [
+        "gs.flag.parse",
+        "gs.types",
+    ],
+    "autocomplete_tests": true,
+    "autocomplete_builtins": true,
+    "autocomplete_closures": true,
+}
