@@ -1,5 +1,6 @@
 {
 	"default_line_ending": "unix",
+	"detect_indentation": false,
 	"ensure_newline_at_eof_on_save": true,
 	"fallback_encoding": "cp1251",
 	"highlight_line": true,
