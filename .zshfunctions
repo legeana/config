@@ -128,3 +128,20 @@ bgrandom()
 {
     awsetbg -r ~/Pictures/wallpaper
 }
+
+vcat()
+{
+    local i
+    for i
+    do
+        local lines="$(wc -l < "$i")"
+        if (( lines <= 1 ))
+        then
+            echo "$i: $(cat "$i")"
+        else
+            echo "{{{[$i]"
+            cat "$i"
+            echo "}}}[$i]"
+        fi
+    done
+}
