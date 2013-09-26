@@ -150,3 +150,8 @@ git-version()
 {
     echo $(git rev-list --count HEAD).$(git rev-parse --short HEAD)
 }
+
+yakuake-show()
+{
+    qdbus-qt4 org.kde.yakuake /yakuake/MainWindow_1 show
+}
