@@ -1,0 +1,57 @@
+#!/bin/bash -e
+
+config="$(dirname "$(readlink -f "$0")")"
+
+prefix="$config"
+suffix=""
+while [[ $prefix != $HOME ]]
+do
+    suffix="$(basename "$prefix")"
+    prefix="$(dirname "$prefix")"
+done
+
+safeln()
+{
+    if [[ -e ${2:-Need to specify destination} ]]
+    then
+        if [[ -h $2 ]]
+        then
+            rm "$2"
+        else
+            echo "Unable to override: $2" >&2 && exit 1
+        fi
+    fi
+    ln -s "$1" "$2"
+}
+
+install()
+{
+    for i
+    do
+        safeln "$i" "$HOME/$(basename "$i")"
+    done
+}
+
+cinstall()
+{
+    for i
+    do
+        install "$suffix/$i"
+    done
+}
+
+cd "$prefix"
+
+install \
+    "$suffix/.z"* \
+
+cinstall \
+    bin \
+    .config \
+    .gdbinit \
+    .gitconfig \
+    .mplayer \
+    .tmux.conf \
+    .vimrc \
+    .Xdefaults \
+    .yaourtrc \
