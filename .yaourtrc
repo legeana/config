@@ -1,0 +1,2 @@
+EXPORT=1
+EXPORTDIR="$HOME/builder/pkg"
