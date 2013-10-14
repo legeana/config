@@ -147,11 +147,7 @@ typeset -U path cdpath fpath manpath
 #zle -N dot
 #bindkey . dot
 
-if [[ -d $HOME/bin || -L $HOME/bin ]]
-then
-    export PATH="$HOME/bin:$PATH"
-fi
-
+export PATH="$HOME/bin:$PATH"
 export GOPATH="$HOME/.go"
 export PATH="$GOPATH/bin:$PATH"
 
