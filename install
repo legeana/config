@@ -2,6 +2,14 @@
 
 config="$(dirname "$(readlink -f "$0")")"
 
+# note: for backward compatibility entries should not be removed
+# new file locations should be added to front
+install_files=(
+    "$config/.install"
+)
+
+current_install_file="${install_files[0]}"
+
 prefix="$config"
 suffix=""
 while [[ $prefix != $HOME ]]
@@ -24,11 +32,26 @@ safeln()
     ln -s "$1" "$2"
 }
 
+saferm()
+{
+    for i
+    do
+        if [[ -h $i ]]
+        then
+            rm -f "$i"
+        else
+            echo "Unable to remove: $2" >&2 && exit 1
+        fi
+    done
+}
+
 install()
 {
     for i
     do
-        safeln "$i" "$HOME/$(basename "$i")"
+        fname="$(basename "$i")"
+        safeln "$i" "$HOME/$fname"
+        echo "$fname" >>"$current_install_file"
     done
 }
 
@@ -40,18 +63,59 @@ cinstall()
     done
 }
 
+uninstall()
+{
+    for f in "${install_files[@]}"
+    do
+        if [[ -e $f ]]
+        then
+            if [[ -f $f ]]
+            then
+                while read line
+                do
+                    if [[ -n $line ]]
+                    then
+                        saferm "$line"
+                    fi
+                done <"$f"
+                rm -f "$f"
+            else
+                echo "Invalid file type: $f" >&2 && exit 1
+            fi
+        fi
+    done
+}
+
 cd "$prefix"
 
-install \
-    "$suffix/.z"* \
+only_uninstall=""
 
-cinstall \
-    bin \
-    .config \
-    .gdbinit \
-    .gitconfig \
-    .mplayer \
-    .tmux.conf \
-    .vimrc \
-    .Xdefaults \
-    .yaourtrc \
+while getopts "uh" arg
+do
+    case "$arg" in
+        u) only_uninstall="1";;
+        h) ;;&
+        ?) printf "Usage: %s: [-u only uninstall]\n" "$0" 1>&2 && exit 1;;
+    esac
+done
+shift "$((OPTIND - 1))"
+
+uninstall
+
+if [[ -z $only_uninstall ]]
+then
+    install \
+        "$suffix/.z"* \
+
+    cinstall \
+        bin \
+        .config \
+        .gdbinit \
+        .gitconfig \
+        .mplayer \
+        .tmux.conf \
+        .vimrc \
+        .Xdefaults \
+        .yaourtrc \
+
+fi
