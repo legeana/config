@@ -40,7 +40,7 @@ saferm()
         then
             rm -f "$i"
         else
-            echo "Unable to remove: $2" >&2 && exit 1
+            echo "Unable to remove: $2" >&2 # not fatal
         fi
     done
 }
