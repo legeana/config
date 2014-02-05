@@ -49,6 +49,8 @@ set shiftwidth=4
 set softtabstop=4
 set smarttab
 
+set spell
+
 set fileencodings=utf-8,ucs-bom,cp1251,koi8-r,latin1
 
 " Tell vim to remember certain things when we exit
