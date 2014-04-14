@@ -23,7 +23,6 @@ alias emacs='emacs -nw'
 alias fbi='fbi -a'
 alias feh='feh --scale-down'
 alias fgrep='grep -F'
-alias git-push-to-all='echo -n lex-pc cs github | parallel -d " " git push "{}"'
 alias globurl='noglob urlglobber '
 alias grep='grep --color=auto'
 alias jailer='jailer /etc/jailer.conf'
@@ -42,7 +41,7 @@ alias rplayer='mplayer -loop 0 -shuffle'
 alias run-help=man
 alias stat='command stat'
 alias sudo='nocorrect sudo'
-alias tmux='tmux attach || (cd && tmux new)'
+alias vi=vim
 alias which-command=whence
 alias yakuake_show='qdbus org.kde.yakuake /yakuake/MainWindow_1 show'
 alias zegrep='zgrep -E'

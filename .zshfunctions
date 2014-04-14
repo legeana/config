@@ -155,3 +155,34 @@ yakuake-show()
 {
     qdbus-qt4 org.kde.yakuake /yakuake/MainWindow_1 show
 }
+
+tmux()
+{
+    local session="default"
+    command tmux attach -t "$session" || (cd && command tmux new-session -s "$session")
+}
+
+rtorrent-attach()
+{
+    command tmux attach -t rt
+}
+
+git-push-to-all()
+{
+    git remote | parallel git push "{}"
+}
+
+git-force-push-to-all()
+{
+    local h="$(git log HEAD^..HEAD --pretty='%H')"
+    local hs="$(git log HEAD^..HEAD --pretty='%h')"
+    local h_
+    echo -n "Enter hash to force push: "
+    read h_
+    if [[ $h_ != $h && $h_ != $hs ]]
+    then
+        echo "Hash mismatch" >&2
+        return 1
+    fi
+    git remote | parallel git push -f "{}"
+}
