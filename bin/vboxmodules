@@ -1,6 +1,6 @@
 #!/bin/sh
 
-sudo pacman -S virtualbox-modules
+sudo pacman -S virtualbox-host-modules
 sudo rmmod vboxpci
 sudo rmmod vboxnetadp
 sudo rmmod vboxnetflt
