@@ -113,6 +113,7 @@ then
         .gdbinit \
         .gitconfig \
         .mplayer \
+        .parallel \
         .tmux.conf \
         .vimrc \
         .Xdefaults \
