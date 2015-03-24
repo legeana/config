@@ -1,14 +1,4 @@
-# загружаем дефолтный профиль оболочки
-source /etc/profile
-
-# Установка атрибутов доступа для вновь создаваемых файлов
-umask 022
-
-# Use hard limits, except for a smaller stack and no core dumps
-unlimit
-limit stack 8192
-limit core 0
-limit -s
+export ZSH_LOADED="$ZSH_LOADED:USER_RC"
 
 # Autoload zsh modules when they are referenced
 zmodload -a zsh/stat stat
@@ -33,7 +23,7 @@ zstyle ':completion:*:functions' ignored-patterns '_*'
 
 zstyle ':completion:*:*:kill:*:processes' list-colors "=(#b) #([0-9]#)*=$color[cyan]=$color[red]"
 
-# заголовки и прочее.
+# Headers etc...
 
 precmd()
 {
@@ -69,29 +59,19 @@ chpwd()
 
 typeset -g -A key
 
-# экранируем спецсимволы в url, например &, ?, ~ и так далее
+# Escape URLs
 autoload -U url-quote-magic
 zle -N self-insert url-quote-magic
 
-# модуль для переименования файлов
+# Smart renaming
 autoload zmv
 
-# менюшку нам для автокомплита
+# Autocomplete menu
 zstyle ':completion:*' menu yes select
 
-# Позволяем разворачивать сокращенный ввод, к примеру cd /u/sh в /usr/share
-autoload -U compinit && compinit
+# Expand /u/sh into /usr/share
+autoload -Uz compinit && compinit
 
-# The following lines were added by compinstall
-
-#zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
-#zstyle ':completion:*' completer _expand _complete _ignored _approximate
-#zstyle ':completion:*' completer _expand
-#zstyle ':completion:*' completer _complete _ignored
-#zstyle :compinstall filename '/home/lex/.zshrc'
-
-autoload -Uz compinit
-compinit
 # End of lines added by compinstall
 # Lines configured by zsh-newuser-install
 HISTFILE=~/.histfile
@@ -102,7 +82,6 @@ setopt appendhistory autocd beep notify hist_verify histignoredups correctall ig
 #setopt histignorealldups histignorespace
 unsetopt extendedglob nomatch
 bindkey -e
-# End of lines configured by zsh-newuser-install
 
 if [[ -x /usr/bin/dircolors ]]
 then
@@ -113,14 +92,9 @@ fi
 #promptinit
 #prompt suse
 
-#non-colorful
-#export PROMPT='%(!..%n@)%m:%~%(!.#.$) '
-#export RPROMPT='%? %U%T%u %U%w%u'
-#export SPROMPT='zsh: Заменить '\''%R'\'' на '\''%r'\'' ? [Yes/No/Abort/Edit] '
-#colorful
 export PROMPT='%(!..%F{magenta}%n%f@)%F{cyan}%m%f:%~%(?.%F{green}.%F{red})%(!.#.$)%f '
 export RPROMPT='%(?.%F{green}.%F{red})%?%f %F{cyan}%U%T%u %U%w%u%f'
-export SPROMPT='zsh: Заменить '\''%F{red}%R%f'\'' на '\''%F{green}%r%f'\'' ? [%F{green}Yes%f/%U%F{red}No%f%u/Abort/%F{blue}Edit%f] '
+export SPROMPT='zsh: Replace '\''%F{red}%R%f'\'' by '\''%F{green}%r%f'\'' ? [%F{green}Yes%f/%U%F{red}No%f%u/Abort/%F{blue}Edit%f] '
 
 bindkey '^[[1;5D' backward-word
 bindkey '^[[1;5C' forward-word
@@ -134,21 +108,42 @@ fi
 
 typeset -U path cdpath fpath manpath
 
-#dot()
-#{
-#    if [[ $LBUFFER = *.. ]]
-#    then
-#        LBUFFER+=/..
-#    else
-#       LBUFFER+=.
-#    fi
-#}
-#autoload -U dot
-#zle -N dot
-#bindkey . dot
+if [[ -n $DISPLAY ]]
+then
+    MPLAYER_PROFILE="x"
+elif [[ -n $TMUX || -n $SSH_CLIENT || $TERM = screen ]]
+then
+    MPLAYER_PROFILE="audio"
+else
+    MPLAYER_PROFILE="console"
+fi
 
-export PATH="$HOME/bin:$PATH"
-export GOPATH="$HOME/.go"
-export PATH="$GOPATH/bin:$PATH"
+if [[ -f ~/.zshaliases ]]
+then
+    source ~/.zshaliases
+fi
 
-ulimit -u 4096
+alias mplayer="mplayer -profile $MPLAYER_PROFILE"
+
+if [[ -f /usr/bin/vim && -x /usr/bin/vim ]]
+then
+    alias vi=vim
+else
+    unalias vi
+fi
+
+if [[ -x /usr/bin/grc ]]
+then
+    alias grc='grc --colour=auto'
+    alias ping='grc ping'
+    alias last='grc last'
+    alias netstat='grc netstat'
+    alias traceroute='grc traceroute'
+fi
+
+if [[ -f ~/.zshfunctions ]]
+then
+    source ~/.zshfunctions
+fi
+
+export ZSHRC_LOADED=1

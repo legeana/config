@@ -50,6 +50,8 @@ pacsu(){ pacs -u "$@" }
 pacsy(){ pacs -y "$@" }
 pacsuy(){ pacsu -y "$@" }
 pacss(){ pacn -Ss "$@" }
+pacsuw() { pacsu --noconfirm -w "$@" }
+pacsuwy() { pacsuw -y "$@" }
 
 cdm(){ mkdir -p "$1" && cd "$1" }
 cdu(){ cd .. }
@@ -156,15 +158,21 @@ yakuake-show()
     qdbus-qt4 org.kde.yakuake /yakuake/MainWindow_1 show
 }
 
-tmux()
+tm()
 {
-    local session="default"
-    command tmux attach -t "$session" || (cd && command tmux new-session -s "$session")
+    local session="${1:-default}"
+    tmux attach -t "$session" || (cd && command tmux new-session -s "$session")
+}
+
+tmc()
+{
+    local session="${1:-default}"
+    tmux new -s "$session"
 }
 
 rtorrent-attach()
 {
-    command tmux attach -t rt
+    tmux attach -t rt
 }
 
 git-push-to-all()
