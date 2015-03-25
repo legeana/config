@@ -1,3 +1,5 @@
+# Interactive shell settings
+
 export ZSH_LOADED="$ZSH_LOADED:USER_RC"
 
 # Autoload zsh modules when they are referenced
@@ -22,42 +24,6 @@ zstyle ':completion:*:*:(^rm):*:*files' ignored-patterns '*?.o' '*?.c~''*?.old' 
 zstyle ':completion:*:functions' ignored-patterns '_*'
 
 zstyle ':completion:*:*:kill:*:processes' list-colors "=(#b) #([0-9]#)*=$color[cyan]=$color[red]"
-
-# Headers etc...
-
-precmd()
-{
-    [[ -t 1 ]] || return
-    case "$TERM" in
-        *xterm*|rxvt|(dt|k|E|a)term*) print -Pn "\e]0;[%~] %m\a"    ;;
-        screen(-bce|.linux)) print -Pn "\ek[%~]\e\\" && print -Pn "\e]0;[%~] %m (screen)\a" ;;
-    esac
-    # end of command
-    echo -ne '\a'
-}
-
-preexec()
-{
-    [[ -t 1 ]] || return
-    local cmd="$( echo "$1" | head -n1 | sed -r 's/^(sudo [^[:space:]]+|[^[:space:]]+).*/\1/' )"
-    case "$TERM" in
-        *xterm*|rxvt|(dt|k|E|a)term*) print -Pn "\e]0;<$cmd> [%~] %m\a" ;;
-        screen(-bce|.linux)) print -Pn "\ek<$cmd> [%~]\e\\" && print -Pn "\e]0;<$cmd> [%~] %m (screen)\a" ;;
-    esac
-}
-
-chpwd()
-{
-    if [[ -d .git ]]
-    then
-        git status
-    elif [[ -d .svn ]]
-    then
-        svn status
-    fi
-}
-
-typeset -g -A key
 
 # Escape URLs
 autoload -U url-quote-magic
@@ -88,25 +54,24 @@ then
     eval "`dircolors -b`"
 fi
 
-#autoload -U promptinit
-#promptinit
-#prompt suse
-
 export PROMPT='%(!..%F{magenta}%n%f@)%F{cyan}%m%f:%~%(?.%F{green}.%F{red})%(!.#.$)%f '
 export RPROMPT='%(?.%F{green}.%F{red})%?%f %F{cyan}%U%T%u %U%w%u%f'
 export SPROMPT='zsh: Replace '\''%F{red}%R%f'\'' by '\''%F{green}%r%f'\'' ? [%F{green}Yes%f/%U%F{red}No%f%u/Abort/%F{blue}Edit%f] '
-
-bindkey '^[[1;5D' backward-word
-bindkey '^[[1;5C' forward-word
-bindkey '^[[5~' history-search-backward
-bindkey '^[[6~' history-search-forward
 
 if [[ -f ~/.zshinputrc ]]
 then
     source ~/.zshinputrc
 fi
 
-typeset -U path cdpath fpath manpath
+if [[ -f ~/.zshaliases ]]
+then
+    source ~/.zshaliases
+fi
+
+if [[ -f ~/.zshlocalaliases ]]
+then
+    source ~/.zshlocalaliases
+fi
 
 if [[ -n $DISPLAY ]]
 then
@@ -117,33 +82,44 @@ then
 else
     MPLAYER_PROFILE="console"
 fi
-
-if [[ -f ~/.zshaliases ]]
-then
-    source ~/.zshaliases
-fi
-
 alias mplayer="mplayer -profile $MPLAYER_PROFILE"
 
-if [[ -f /usr/bin/vim && -x /usr/bin/vim ]]
+if vim --version &>/dev/null
 then
     alias vi=vim
 else
     unalias vi
 fi
 
+grc_commands=(
+    last
+    netstat
+    ping
+    traceroute
+)
 if [[ -x /usr/bin/grc ]]
 then
     alias grc='grc --colour=auto'
-    alias ping='grc ping'
-    alias last='grc last'
-    alias netstat='grc netstat'
-    alias traceroute='grc traceroute'
+    for cmd in "${grc_commands[@]}"
+    do
+        alias "$cmd"="grc $cmd"
+    done
+else
+    unalias grc
+    for cmd in "${grc_commands[@]}"
+    do
+        unalias "$cmd"
+    done
 fi
 
 if [[ -f ~/.zshfunctions ]]
 then
     source ~/.zshfunctions
+fi
+
+if [[ -f ~/.zshlocalrc ]]
+then
+    source ~/.zshlocalrc
 fi
 
 export ZSHRC_LOADED=1

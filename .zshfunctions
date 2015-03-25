@@ -1,32 +1,49 @@
-if [[ -f /usr/local/etc/zsh/functions ]]
-then
-    source /usr/local/etc/zsh/functions
-fi
+precmd()
+{
+    [[ -t 1 ]] || return
+    case "$TERM" in
+        *xterm*|rxvt|(dt|k|E|a)term*) print -Pn "\e]0;[%~] %m\a"    ;;
+        screen(-bce|.linux)) print -Pn "\ek[%~]\e\\" && print -Pn "\e]0;[%~] %m (screen)\a" ;;
+    esac
+    # end of command
+    echo -ne '\a'
+}
 
-#kill_thumb()
-#{
-#    local TO="${1:-5}"
-#    while true
-#    do
-#        killall -KILL kio_thumbnail &>/dev/null && date || true
-#        sleep "$TO"
-#    done
-#}
+preexec()
+{
+    [[ -t 1 ]] || return
+    local cmd="$( echo "$1" | head -n1 | sed -r 's/^(sudo [^[:space:]]+|[^[:space:]]+).*/\1/' )"
+    case "$TERM" in
+        *xterm*|rxvt|(dt|k|E|a)term*) print -Pn "\e]0;<$cmd> [%~] %m\a" ;;
+        screen(-bce|.linux)) print -Pn "\ek<$cmd> [%~]\e\\" && print -Pn "\e]0;<$cmd> [%~] %m (screen)\a" ;;
+    esac
+}
+
+chpwd()
+{
+    if [[ -d .git ]]
+    then
+        git status
+    elif [[ -d .svn ]]
+    then
+        svn status
+    fi
+}
 
 nrg2iso(){ dd bs=1k if="$1" of="$1.iso" skip=300 }
 
-#full_update()
-#{
-#    local cmd='emerge -DuN world && emerge --depclean && revdep-rebuild && prelink -amR'
-#    if [[ $EUID = 0 ]]
-#    then
-#        sh -c "$cmd"
-#    else
-#        echo 'You are not root!'
-#        echo 'Trying to use sudo'
-#        sudo sh -c "$cmd"
-#    fi
-#}
+update-gentoo()
+{
+    local cmd='emerge -DuN world && emerge --depclean && revdep-rebuild && prelink -amR'
+    if [[ $EUID = 0 ]]
+    then
+        sh -c "$cmd"
+    else
+        echo 'You are not root!'
+        echo 'Trying to use sudo'
+        sudo "$SHELL" -c "$cmd"
+    fi
+}
 
 pac()
 {
@@ -96,14 +113,17 @@ mk_class()
 
 upfind()
 {
+    local path="$1"
+    shift
+
     local OPWD="$PWD"
-    while [[ ! -r $2 && $PWD != "/" ]]
+    while [[ ! -r $path && $PWD != "/" ]]
     do
         cd ..
     done
-    if [[ -r $2 ]]
+    if [[ -r $path ]]
     then
-        echo "$1" | "$SHELL"
+        "$@"
     else
         local NOT_FOUND=1
     fi
@@ -113,16 +133,16 @@ upfind()
         printf "Unable to find \"%s\"\n" "$2"
     fi
 }
-updox(){ upfind doxygen Doxyfile }
-upmake(){ upfind make Makefile }
-upbmake(){ upfind 'make -C build' build }
+updox(){ upfind Doxyfile doxygen "$@" }
+upmake(){ upfind Makefile make "$@" }
+upbmake(){ upfind build make -C build "$@" }
 
 imgur()
 {
     for i
     do
-        curl -# -F "image"=@"$i" -F "key"="4907fcd89e761c6b07eeb8292d5a9b2a" http://imgur.com/api/upload.xml|\
-        grep -Eo '<[a-z_]+>http[^<]+'|sed 's/^<.\|_./\U&/g;s/_/ /;s/<\(.*\)>/\x1B[0;34m\1:\x1B[0m /'
+        curl -# -F "image"=@"$i" -F "key"="4907fcd89e761c6b07eeb8292d5a9b2a" http://imgur.com/api/upload.xml |
+            grep -Eo '<[a-z_]+>http[^<]+'|sed 's/^<.\|_./\U&/g;s/_/ /;s/<\(.*\)>/\x1B[0;34m\1:\x1B[0m /'
     done
 }
 
@@ -194,3 +214,8 @@ git-force-push-to-all()
     fi
     git remote | parallel git push -f "{}"
 }
+
+if [[ -f ~/.zshlocalfunctions ]]
+then
+    source ~/.zshlocalfunctions
+fi
