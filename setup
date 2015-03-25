@@ -109,7 +109,7 @@ then
     install \
         "$suffix/.z"* \
 
-    if [[ -d $suffix/$HOST ]]
+    if [[ -d $suffix/$(hostname) ]]
     then
         install \
             "$suffix/local/$(hostname)/.z"* \
