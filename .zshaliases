@@ -41,7 +41,6 @@ alias pcregrep='pcregrep --color=auto'
 alias ping='grc ping'
 alias psc='ps xawf -eo pid,user,cgroup,args'
 alias rabbitmqctl='sudo -u rabbitmq rabbitmqctl'
-alias reload='source /etc/profile && source ~/.zshrc && source ~/.zshenv && rehash'
 alias rgrep='grep -R'
 alias rplayer='mplayer -loop 0 -shuffle'
 alias run-help=man
