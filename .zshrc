@@ -88,7 +88,7 @@ if vim --version &>/dev/null
 then
     alias vi=vim
 else
-    unalias vi
+    unalias vi &>/dev/null
 fi
 
 grc_commands=(
@@ -105,10 +105,10 @@ then
         alias "$cmd"="grc $cmd"
     done
 else
-    unalias grc
+    unalias grc &>/dev/null
     for cmd in "${grc_commands[@]}"
     do
-        unalias "$cmd"
+        unalias "$cmd" &>/dev/null
     done
 fi
 
