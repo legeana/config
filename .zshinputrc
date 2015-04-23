@@ -27,7 +27,4 @@ bindkey "\eOF" end-of-line
 bindkey "\e[H" beginning-of-line
 bindkey "\e[F" end-of-line
 
-if [[ -f ~/.zshlocalinputrc ]]
-then
-    source ~/.zshlocalinputrc
-fi
+try_source ~/.zshlocalinputrc

@@ -26,9 +26,20 @@ limit -s
 export EDITOR="vim" PAGER="most"
 export LC_NUMERIC="C"
 
-if [[ -f ~/.zshlocalenv ]]
-then
-    source ~/.zshlocalenv
-fi
+# Note: one of the very basic functions,
+# must be available in every configuration file.
+try_source()
+{
+    local i
+    for i
+    do
+        if [[ -f $i ]]
+        then
+            source "$i"
+        fi
+    done
+}
+
+try_source ~/.zshlocalenv
 
 export ZSHENV_LOADED=1

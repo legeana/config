@@ -30,18 +30,6 @@ chpwd()
     fi
 }
 
-try_source()
-{
-    local i
-    for i
-    do
-        if [[ -f $i ]]
-        then
-            source "$i"
-        fi
-    done
-}
-
 reload()
 {
     try_source ~/.zshenv
@@ -242,7 +230,4 @@ git-force-push-to-all()
     git remote | parallel git push -f "{}"
 }
 
-if [[ -f ~/.zshlocalfunctions ]]
-then
-    source ~/.zshlocalfunctions
-fi
+try_source ~/.zshlocalfunctions

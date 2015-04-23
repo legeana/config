@@ -112,14 +112,7 @@ else
     done
 fi
 
-if [[ -f ~/.zshfunctions ]]
-then
-    source ~/.zshfunctions
-fi
-
-if [[ -f ~/.zshlocalrc ]]
-then
-    source ~/.zshlocalrc
-fi
+try_source ~/.zshfunctions
+try_source ~/.zshlocalrc
 
 export ZSHRC_LOADED=1
