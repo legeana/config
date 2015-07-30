@@ -49,6 +49,10 @@ set shiftwidth=4
 set softtabstop=4
 set smarttab
 
+" Google style
+autocmd Filetype cpp setlocal shiftwidth=2 softtabstop=2
+autocmd Filetype proto setlocal shiftwidth=2 softtabstop=2
+
 set spell
 
 set fileencodings=utf-8,ucs-bom,cp1251,koi8-r,latin1
