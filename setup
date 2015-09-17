@@ -96,7 +96,6 @@ while getopts "uh" arg
 do
     case "$arg" in
         u) only_uninstall="1";;
-        h) ;;&
         ?) printf "Usage: %s: [-u only uninstall]\n" "$0" 1>&2 && exit 1;;
     esac
 done
