@@ -1,0 +1,3 @@
+function cdu
+    cd ..
+end
