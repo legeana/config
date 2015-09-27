@@ -1,5 +1,3 @@
-source ~/.fishlocalrc
-
 for file in ~/.config/fish/aliases/*.fish
     source $file
 end
@@ -40,3 +38,5 @@ end
 function mplayer
     command mplayer -profile "$MPLAYER_PROFILE" $argv
 end
+
+source ~/.fishlocalrc
