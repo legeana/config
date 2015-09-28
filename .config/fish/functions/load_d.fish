@@ -1,5 +1,7 @@
 function load_d
-    for file in $argv[1]/*.fish
-        source $file
+    for dir in $argv
+        for file in $dir/*.fish
+            source $file
+        end
     end
 end
