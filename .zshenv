@@ -13,6 +13,7 @@ export GOPATH="$HOME/.go"
 typeset -U path cdpath fpath manpath
 path=("$HOME/bin" $path)
 path=("$GOPATH/bin" $path)
+#${GOPATH//://bin:}/bin
 
 umask 022
 
@@ -25,6 +26,8 @@ limit -s
 
 export EDITOR="vim" PAGER="most"
 export LC_NUMERIC="C"
+
+export GO15VENDOREXPERIMENT=1
 
 # Note: one of the very basic functions,
 # must be available in every configuration file.
