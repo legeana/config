@@ -1,3 +1,3 @@
-set -ge EDITOR vim
-set -ge PAGER most
-set -ge LC_NUMERIC C
+set -gx EDITOR vim
+set -gx PAGER most
+set -gx LC_NUMERIC C
