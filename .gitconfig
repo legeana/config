@@ -19,3 +19,6 @@
     tree = log --graph --decorate --pretty=oneline --abbrev-commit
     tpush = push --tags
     tpull = pull --tags
+
+[url "git@github.com:"]
+    pushInsteadOf = https://github.com/
