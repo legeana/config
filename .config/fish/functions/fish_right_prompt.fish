@@ -1,5 +1,5 @@
 function fish_right_prompt -d "Write out the right prompt"
-    set -l external_status "$status"
+    set -l external_status $status
     switch "$external_status"
     case 0
         set_color green
