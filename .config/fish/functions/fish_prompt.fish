@@ -34,5 +34,4 @@ function fish_prompt --description 'Write out the prompt'
         ':' \
         (prompt_pwd) \
         (set_color $color_status) "$suffix " (set_color normal)
-    #set status "$external_status"
 end
