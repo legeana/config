@@ -23,7 +23,7 @@ function fbi
 end
 
 function feh
-    feh --scale-down $argv
+    command feh --scale-down $argv
 end
 
 function rplayer
