@@ -17,3 +17,7 @@ end
 function lsa
     ls -Al $argv
 end
+
+function lsd
+    lsa -d $argv
+end
