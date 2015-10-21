@@ -1,5 +1,5 @@
 {
-    "fmt_tab_indent": false,
+    "fmt_tab_indent": true,
     "fmt_tab_width": 4,
     "lint_filter": [
         "gs.flag.parse",
