@@ -10,7 +10,15 @@ function fish_right_prompt -d "Write out the right prompt"
     case '*'
         set_color red
     end
-    echo -s -n $external_status ' '
+    echo -s -n $external_status
+    if [ $external_status -gt 128 ]
+        set -l external_signal (math "$external_status-128")
+        if [ $external_signal -le 64 ]
+            set -l external_signame (kill -l $external_signal)
+            echo -s -n "($external_signal $external_signame)"
+        end
+    end
+    echo -s -n ' '
     set_color magenta
     echo -s -n {$external_cmd_duration}ms ' '
     set_color cyan
