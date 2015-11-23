@@ -14,7 +14,7 @@ function fish_right_prompt -d "Write out the right prompt"
     if [ $external_status -gt 128 ]
         set -l external_signal (math "$external_status-128")
         if [ $external_signal -le 64 ]
-            set -l external_signame (kill -l $external_signal)
+            set -l external_signame (kill --list=$external_signal)
             echo -s -n "($external_signal $external_signame)"
         end
     end
