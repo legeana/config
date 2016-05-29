@@ -1,3 +1,3 @@
 load_d ~/.config/fish/aliases
 load_d ~/.config/fish/config.d
-source ~/.fishlocalrc
+load_f ~/.fishlocalrc
