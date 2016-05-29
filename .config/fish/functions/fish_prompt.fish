@@ -33,5 +33,6 @@ function fish_prompt --description 'Write out the prompt'
         (set_color cyan) "$__fish_prompt_hostname" (set_color normal) \
         ':' \
         (prompt_pwd) \
+        (__fish_git_prompt) \
         (set_color $color_status) "$suffix " (set_color normal)
 end
