@@ -1,3 +1,3 @@
-add_to_path /usr/local/opt/*/libexec/gnubin
+set _list /usr/local/opt/*/libexec/gnubin; add_to_path $_list
 add_to_path /usr/local/sbin
-add_to_list MANPATH /usr/local/opt/*/libexec/gnuman
+set _list /usr/local/opt/*/libexec/gnuman; add_to_manpath $_list
