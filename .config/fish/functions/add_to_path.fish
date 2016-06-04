@@ -1,3 +1,3 @@
 function add_to_path
-    add_to_list PATH $argv
+    add_path_to_list PATH $argv
 end
