@@ -1,7 +1,11 @@
 if command --search pacman >/dev/null
     if command --search pacaur >/dev/null
         function pac
-            pacaur $argv
+            if [ (id -u) = 0 ]
+                sudo -u $SUDO_USER pacaur $argv
+            else
+                pacaur $argv
+            end
         end
         function pacn
             pacaur $argv
