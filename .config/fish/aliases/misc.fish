@@ -33,7 +33,3 @@ end
 function psc
     ps xawf -eo pid,user,cgroup,args $argv
 end
-
-function rabbitmqctl
-    sudo -u rabbitmq rabbitmqctl $argv
-end
