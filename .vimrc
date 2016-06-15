@@ -54,6 +54,8 @@ autocmd Filetype cpp setlocal shiftwidth=2 softtabstop=2
 autocmd Filetype proto setlocal shiftwidth=2 softtabstop=2
 
 set spell
+hi clear SpellBad
+hi SpellBad cterm=underline ctermfg=red
 
 set fileencodings=utf-8,ucs-bom,cp1251,koi8-r,latin1
 
