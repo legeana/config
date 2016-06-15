@@ -20,7 +20,7 @@ class ConfGenLoader(BaseLoader):
         mtime = getmtime(path)
         with open(path) as f:
             source = f.read()
-        return source, path, lambda: mtime==getmtime(path)
+        return source, path, lambda: mtime == getmtime(path)
 
 
 if __name__=='__main__':
