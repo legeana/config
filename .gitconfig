@@ -1,6 +1,5 @@
-[user]
-    name = Lisa White
-    email = lisa.rsfp+dev@gmail.com
+[include]
+    path = ~/.gitconfig-user
 
 [merge]
     tool = vimdiff
@@ -22,3 +21,6 @@
 
 [url "git@github.com:"]
     pushInsteadOf = https://github.com/
+
+[url "git@gist.github.com:"]
+    pushInsteadOf = https://gist.github.com/

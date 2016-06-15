@@ -110,6 +110,7 @@ then
         .config \
         .gdbinit \
         .gitconfig \
+        .gitconfig-user \
         .mplayer \
         .parallel \
         .tmux.conf \
