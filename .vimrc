@@ -78,3 +78,9 @@ augroup resCur
   autocmd!
   autocmd BufWinEnter * call ResCur()
 augroup END
+
+function! MyRetab()
+    set tabstop=4
+    retab
+    execute '%s/ \+$//gc'
+endfunction
