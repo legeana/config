@@ -1,0 +1,12 @@
+BasedOnStyle: Google
+#BasedOnStyle: Chromium
+#NamespaceIndentation: None
+#BinPackArguments: false
+#BinPackParameters: false
+Standard: Cpp11
+PointerAlignment: Right
+#AllowShortIfStatementsOnASingleLine: false
+#AllowShortLoopsOnASingleLine: false
+#AllowShortFunctionsOnASingleLine: All
+#AllowShortFunctionsOnASingleLine: Inline
+#AllowShortFunctionsOnASingleLine: Inline
