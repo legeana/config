@@ -103,6 +103,7 @@ update()
     new_master="$(cat .git/refs/heads/master)"
     if [[ $old_master != $new_master ]]
     then
+        echo "Found update: $old_master -> $new_master, restarting..." >&2
         exec "$cfgroot/setup" -d "$@"
     fi
 }
