@@ -1,17 +1,17 @@
 #!/bin/bash -e
 
 cd "$(dirname "$0")"
-config="$PWD"
+cfgroot="$PWD"
 
 # note: for backward compatibility entries should not be removed
 # new file locations should be added to front
 install_files=(
-    "$config/.install"
+    "$cfgroot/.install"
 )
 
 current_install_file="${install_files[0]}"
 
-prefix="$config"
+prefix="$cfgroot"
 suffix=""
 while [[ $prefix != $HOME ]]
 do
@@ -89,18 +89,43 @@ uninstall()
     done
 }
 
+update()
+{
+    cd "$cfgroot"
+    echo "Updating $cfgroot" >&2
+    old_master="$(cat .git/refs/heads/master)"
+    git fetch
+    if ! git pull --ff-only
+    then
+        echo "Failed to update, manual intervention is required!" >&2
+        exit 1
+    fi
+    new_master="$(cat .git/refs/heads/master)"
+    if [[ $old_master != $new_master ]]
+    then
+        exec "$cfgroot/setup" -d "$@"
+    fi
+}
+
 cd "$prefix"
 
+skip_update=""
 only_uninstall=""
 
-while getopts "uh" arg
+while getopts "duh" arg
 do
     case "$arg" in
-        u) only_uninstall="1";;
-        ?) printf "Usage: %s: [-u only uninstall]\n" "$0" 1>&2 && exit 1;;
+        d) skip_update=1 ;;
+        u) only_uninstall=1 ;;
+        ?) printf "Usage: %s: [-u only uninstall]\n" "$0" 1>&2 && exit 1 ;;
     esac
 done
 shift "$((OPTIND - 1))"
+
+if [[ -z $skip_update ]]
+then
+    update
+fi
 
 uninstall
 
