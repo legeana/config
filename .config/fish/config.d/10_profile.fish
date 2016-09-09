@@ -4,10 +4,10 @@ env -i HOME=$HOME sh -l -c 'source /etc/profile ; printenv' | \
     sed -e '/^PWD=/d;
             /^SHLVL=/d;
             /^_/d;
-            /PATH/s/:/ /g;
             s/"/\\"/g;
             s/\\\\/\\\\/g;
             s/\(^[^=]*\)=\(.*\)$/\1 "\2"/;
+            /PATH/s/:/" "/g;
             s/^/set -gx /' | \
     source
 
