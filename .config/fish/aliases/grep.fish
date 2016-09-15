@@ -11,5 +11,5 @@ function fgrep
 end
 
 function pcregrep
-    pcregrep --color=auto $argv
+    command pcregrep --color=auto $argv
 end
