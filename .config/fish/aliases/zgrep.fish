@@ -1,19 +1,15 @@
-function zgrep
+function zgrep --wraps=zgrep
     command zgrep --color=auto $argv
 end
 
-function zegrep
+function zegrep --wraps=zgrep
     zgrep -E $argv
 end
 
-function zfgrep
+function zfgrep --wraps=zgrep
     zgrep -F $argv
 end
 
-function zrgrep
+function zrgrep --wraps=zgrep
     zgrep -R $argv
-end
-
-function pcregrep
-    pcregrep --color=auto $argv
 end

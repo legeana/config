@@ -1,23 +1,23 @@
-function ls
+function ls --wraps=ls
     command ls --color=auto --human-readable $argv
 end
 
-function la
+function la --wraps=ls
     ls -A $argv
 end
 
-function ll
+function ll --wraps=ls
     ls -l $argv
 end
 
-function lls
+function lls --wraps=ls
     ls --color=always --human-readable $argv
 end
 
-function lsa
+function lsa --wraps=ls
     ls -Al $argv
 end
 
-function lsd
+function lsd --wraps=ls
     lsa -d $argv
 end

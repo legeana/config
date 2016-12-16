@@ -1,8 +1,8 @@
-function assh
+function assh --wraps=ssh
     ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $argv
 end
 
-function df
+function df --wraps=df
     command df -h $argv
 end
 
@@ -10,23 +10,23 @@ function dirf
     find . -type d | sed -e "s/[^-][^\/]*\//  |/g" -e "s/|\([^ ]\)/|-\1/" $argv
 end
 
-function du
+function du --wraps=du
     command du -sh $argv
 end
 
-function emacs
+function emacs --wraps=emacs
     command emacs -nw
 end
 
-function fbi
+function fbi --wraps=fbi
     fbi -a $argv
 end
 
-function feh
+function feh --wraps=feh
     command feh --scale-down $argv
 end
 
-function rplayer
+function rplayer --wraps=mplayer
     mplayer -loop 0 -shuffle $argv
 end
 
