@@ -136,7 +136,10 @@ then
     cinstall \
         bin \
         .clang-format \
-        .config/fish \
+        .config/fish/aliases \
+        .config/fish/config.d \
+        .config/fish/config.fish \
+        .config/fish/functions \
         .config/htop \
         .config/mc \
         .config/sublime-text-3 \
