@@ -61,7 +61,8 @@ cinstall()
 {
     for i
     do
-        install "$suffix/$i"
+        safeln "$cfgroot/$i" "$HOME/$i"
+        echo "$HOME/$i" >>"$current_install_file"
     done
 }
 
@@ -135,7 +136,12 @@ then
     cinstall \
         bin \
         .clang-format \
-        .config \
+        .config/fish \
+        .config/htop \
+        .config/mc \
+        .config/sublime-text-3 \
+        .config/user-dirs.dirs \
+        .config/user-dirs.locale \
         .gdbinit \
         .gitconfig \
         .gitconfig-user \
