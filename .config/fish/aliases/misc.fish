@@ -19,7 +19,7 @@ function emacs --wraps=emacs
 end
 
 function fbi --wraps=fbi
-    fbi -a $argv
+    command fbi -a $argv
 end
 
 function feh --wraps=feh
@@ -32,4 +32,8 @@ end
 
 function psc
     ps xawf -eo pid,user,cgroup,args $argv
+end
+
+function most
+    command most -w
 end
