@@ -82,4 +82,9 @@ if command --search pacman >/dev/null
     function pacsuwy
         pacsuw -y $argv
     end
+
+    function packeys
+        pacsy
+        pacs archlinux-keyring
+    end
 end
