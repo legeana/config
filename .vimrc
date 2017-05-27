@@ -45,6 +45,12 @@ set shiftwidth=4
 set softtabstop=4
 set smarttab
 
+" i3 arrows
+noremap ; l
+noremap l k
+noremap k j
+noremap j h
+
 " Google style
 autocmd Filetype cpp setlocal shiftwidth=2 softtabstop=2
 autocmd Filetype proto setlocal shiftwidth=2 softtabstop=2
