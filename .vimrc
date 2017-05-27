@@ -54,6 +54,8 @@ noremap j h
 " Google style
 autocmd Filetype cpp setlocal shiftwidth=2 softtabstop=2
 autocmd Filetype proto setlocal shiftwidth=2 softtabstop=2
+autocmd Filetype python setlocal shiftwidth=2 softtabstop=2
+autocmd Filetype go setlocal noexpandtab shiftwidth=4 tabstop=4 softtabstop=4
 
 set spell
 hi clear SpellBad
