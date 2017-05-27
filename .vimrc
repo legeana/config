@@ -18,15 +18,11 @@ set listchars=tab:>.,trail:$,extends:#,nbsp:.
 "set iminsert=0
 " по умолчанию - латинская раскладка при поиске
 "set imsearch=0
-" игнорировать регистр при поиске
 set ignorecase
 set smartcase
-" подсвечивать поиск
 set hlsearch
-" использовать инкрементальный поиск
 set incsearch
-" ширина текста
-"set textwidth=70
+"set textwidth=80
 " минимальная высота окна пусть будет 0 (по умолчанию - 1)
 set winminheight=0
 " всегда делать активное окно максимального размера
