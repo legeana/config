@@ -4,7 +4,7 @@ function fish_prompt --description 'Write out the prompt'
     if [ (count $__fish_prompt_cmd_duration) -eq 0 ]
         set __fish_prompt_cmd_duration 0
     end
-    set -g __fish_prompt_cmd (string replace -r '^(\w+)(\s.*)?$' '$1' $history[1])
+    set -g __fish_prompt_cmd (string replace -r '^([^ ]*/)?([^/ ]+)(\s.*)?$' '$2' $history[1])
 
     # Just calculate this once, to save a few cycles when displaying the prompt
     if not set -q __fish_prompt_hostname
