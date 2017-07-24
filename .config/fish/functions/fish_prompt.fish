@@ -88,8 +88,7 @@ function __fish_prompt_pwd
 end
 
 function __fish_prompt_context
-    echo -s -n (set_color red)'❯'(set_color yellow)'❯'(set_color green)'❯ '(set_color normal)
-    #echo -s -n $PWD
+    echo -s -n (set_color red)'>'(set_color yellow)'>'(set_color green)'> '(set_color normal)
     __fish_prompt_pwd
     __fish_git_prompt
     echo
