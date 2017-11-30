@@ -1,4 +1,11 @@
 if command --search pacman >/dev/null
+    function pacorig
+        if [ (id -u) = 0 ]
+            pacman $argv
+        else
+            sudo pacman $argv
+        end
+    end
     if command --search pacaur >/dev/null
         function pac
             if [ (id -u) = 0 ]
@@ -7,7 +14,7 @@ if command --search pacman >/dev/null
                 pacaur $argv
             end
         end
-        function pacn
+        function pacuser
             pacaur $argv
         end
     else
@@ -18,7 +25,7 @@ if command --search pacman >/dev/null
                 sudo pacman $argv
             end
         end
-        function pacn
+        function pacuser
             pacman $argv
         end
     end
@@ -36,7 +43,7 @@ if command --search pacman >/dev/null
     end
 
     function pacq
-        pacn -Q $argv
+        pacuser -Q $argv
     end
 
     function pacqo
@@ -72,11 +79,11 @@ if command --search pacman >/dev/null
     end
 
     function pacss
-        pacn -Ss $argv
+        pacuser -Ss $argv
     end
 
     function pacsuw
-        pacsu --noconfirm -w $argv
+        pacorig --needed -Suw $argv
     end
 
     function pacsuwy
