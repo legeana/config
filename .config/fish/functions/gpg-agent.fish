@@ -3,5 +3,4 @@ function gpg-agent --description 'Run gpg-agent'
     gpg-connect-agent /bye
     set -xg SSH_AUTH_SOCK (gpgconf --list-dirs agent-ssh-socket)
     gpg-connect-agent updatestartuptty /bye
-    ssh-add-if-necessary
 end
