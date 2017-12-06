@@ -4,10 +4,6 @@
 [merge]
     tool = vimdiff
 
-[core]
-    editor = vim
-    pager = most
-
 [push]
     default = current
 
