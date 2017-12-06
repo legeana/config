@@ -1,3 +1,5 @@
+must-have-command ip
+
 function ip --wraps=ip
     command ip $fish_ip_args $argv
 end
