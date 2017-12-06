@@ -1,4 +1,4 @@
-if command ls --version ^/dev/null
+if command ls --version >/dev/null ^&1
     function ls --wraps=ls
         command ls --color=auto --human-readable $argv
     end
