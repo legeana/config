@@ -1,32 +1,13 @@
 if command ls --version >/dev/null ^&1
-    function ls --wraps=ls
-        command ls --color=auto --human-readable $argv
-    end
-    function lls --wraps=ls
-        ls --color=always --human-readable $argv
-    end
+    alias ls='ls --color=auto --human-readable'
+    alias lls='ls --color=always --human-readable'
 else
     # Assuming BSD/OSX version
-    function ls --wraps=ls
-        command ls -G $argv
-    end
-    function lls --wraps=ls
-        ls -G -h $argv
-    end
+    alias ls='ls -G'
+    alias lls='ls -G -h'
 end
 
-function la --wraps=ls
-    ls -A $argv
-end
-
-function ll --wraps=ls
-    ls -l $argv
-end
-
-function lsa --wraps=ls
-    ls -Al $argv
-end
-
-function lsd --wraps=ls
-    lsa -d $argv
-end
+alias la='ls -A'
+alias ll='ls -l'
+alias lsa='ls -Al'
+alias lsd='lsa -d'

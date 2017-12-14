@@ -1,94 +1,41 @@
 if command --search pacman >/dev/null
-    function pacorig
-        if [ (id -u) = 0 ]
-            pacman $argv
-        else
-            sudo pacman $argv
-        end
+    if [ (id -u) = 0 ]
+        alias pacorig='pacman'
+    else
+        alias pacorig='sudo pacman'
     end
     if command --search pacaur >/dev/null
-        function pac
-            if [ (id -u) = 0 ]
-                sudo -u $SUDO_USER pacaur $argv
-            else
-                pacaur $argv
-            end
+        if [ (id -u) = 0 ]
+            alias pac='sudo -u '$SUDO_USER' pacaur'
+        else
+            alias pac='pacaur'
         end
-        function pacuser
-            pacaur $argv
-        end
+        alias pacuser='pacaur'
     else
-        function pac
-            if [ (id -u) = 0 ]
-                pacman $argv
-            else
-                sudo pacman $argv
-            end
+        if [ (id -u) = 0 ]
+            alias pac='pacman'
+        else
+            alias pac='sudo pacman'
         end
-        function pacuser
-            pacman $argv
-        end
+        alias pacuser='pacman'
     end
 
-    function pacu
-        pac -U $argv
-    end
-
-    function pacr
-        pac -R $argv
-    end
-
-    function pacrs
-        pacr -s $argv
-    end
-
-    function pacq
-        pacuser -Q $argv
-    end
-
-    function pacqo
-        pacq -o $argv
-    end
-
-    function pacqs
-        pacq -s $argv
-    end
-
-    function pacql
-        pacq -l $argv
-    end
-
-    function pacqi
-        pacq -i $argv
-    end
-
-    function pacs
-        pac --needed -S $argv
-    end
-
-    function pacsu
-        pacs -u $argv
-    end
-
-    function pacsy
-        pacs -y $argv
-    end
-
-    function pacsuy
-        pacsu -y $argv
-    end
-
-    function pacss
-        pacuser -Ss $argv
-    end
-
-    function pacsuw
-        pacorig --needed -Suw $argv
-    end
-
-    function pacsuwy
-        pacsuw -y $argv
-    end
+    alias pacu='pac -U'
+    alias pacr='pac -R'
+    alias pacrs='pacr -s'
+    alias pacq='pacuser -Q'
+    alias pacqo='pacq -o'
+    alias pacqs='pacq -s'
+    alias pacql='pacq -l'
+    alias pacqi='pacq -i'
+    alias pacs='pac --needed -S'
+    alias pacsu='pacs -u'
+    alias pacsy='pacs -y'
+    alias pacsuy='pacsu -y'
+    alias pacss='pacuser -Ss'
+    alias pacsuw='pacorig --needed -Suw'
+    alias pacsuwy='pacsuw -y'
+    alias pack='pacman-key'
 
     function packeys
         pacsy

@@ -1,15 +1,4 @@
-function grep --wraps=grep
-    command grep --color=auto $argv
-end
-
-function egrep --wraps=grep
-    grep -E $argv
-end
-
-function fgrep --wraps=grep
-    grep -F $argv
-end
-
-function pcregrep --wraps=grep
-    command pcregrep --color=auto $argv
-end
+alias grep='grep --color=auto'
+alias egrep='grep -E'
+alias fgrep='grep -F'
+alias pcregrep='pcregrep --color=auto'
