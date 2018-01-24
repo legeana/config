@@ -33,6 +33,7 @@ if command --search pacman >/dev/null
     alias pacsy='pacs -y'
     alias pacsuy='pacsu -y'
     alias pacss='pacuser -Ss'
+    alias pacsc='pacs -c'
     alias pacsuw='pacorig --needed -Suw'
     alias pacsuwy='pacsuw -y'
     alias pack='pacman-key'
