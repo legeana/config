@@ -228,8 +228,11 @@ class GPG:
       argv += '--%s=%s' % (key.replace('_', '-'), value)
     return argv
 
-  def _run_output(self, *args, **kwargs):
+  def _check_output(self, *args, **kwargs):
     return subprocess.check_output(self._argv(*args, **kwargs))
+
+  def _check_utf8(self, *args, **kwargs):
+    return self._check_output(*args, **kwargs).decode('utf8')
 
   def import_keys(self, data):
     with subprocess.Popen(self._argv('--import'),
@@ -249,16 +252,14 @@ class GPG:
     return self._list_keys()
 
   def _list_keys(self, *args):
-    out = self._run_output('--list-keys',
-                           '--with-colons',
-                           *args).decode('utf8')
+    out = self._check_utf8('--list-keys', '--with-colons', *args)
     p = Parser()
     for line in out.split('\n'):
       p.parse(line)
     return p.keys()
 
   def export_ssh_key(self, fp):
-    return self._run_output('--export-ssh-key', fp + '!').decode('utf8').strip()
+    return self._check_utf8('--export-ssh-key', fp + '!').strip()
 
 
 def is_not_token(token):
