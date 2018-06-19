@@ -39,20 +39,34 @@ function fish_prompt --description 'Write out the prompt'
     __fish_prompt_input
 end
 
+function __fish_prompt_sep
+    if test $COLUMNS -gt $argv[1]
+        echo -n ' '
+    else
+        echo
+    end
+end
+
 function __fish_prompt_info
+    set -g __fish_prompt_info_threshold 50
     __fish_prompt_hostinfo
-    echo -n ' '
+    __fish_prompt_sep $__fish_prompt_info_threshold
     __fish_prompt_date
-    echo -n ' '
+    __fish_prompt_sep $__fish_prompt_info_threshold
     __fish_prompt_result
+    set -e __fish_prompt_info_threshold
     echo
 end
 
 function __fish_prompt_date
     set_color -o brblue
-    echo -n '['
+    if test $COLUMNS -gt $__fish_prompt_info_threshold
+        echo -n '['
+    end
     echo -s -n (date "+%H:%M %a %d")
-    echo -n ']'
+    if test $COLUMNS -gt $__fish_prompt_info_threshold
+        echo -n ']'
+    end
     set_color normal
 end
 
@@ -87,11 +101,22 @@ function __fish_prompt_pwd
     echo -n (string replace -r '^'"$HOME"'($|/)' '~$1' $PWD)
 end
 
+function __filter_color_codes
+    string replace --regex '\x1B\[[0-9;]*[JKmsu]' '' $argv
+end
+
 function __fish_prompt_context
-    echo -s -n (set_color red)'>'(set_color yellow)'>'(set_color green)'> '(set_color normal)
-    __fish_prompt_pwd
-    __fish_git_prompt
-    echo
+    set -l indent (set_color red)'>'(set_color yellow)'>'(set_color green)'> '(set_color normal)
+    set -l pwd (__fish_prompt_pwd)
+    set -l git (__fish_git_prompt)
+    set -l length (string length (__filter_color_codes "$indent$pwd$git"))
+    echo -n $indent
+    if test $COLUMNS -lt $length
+        echo -n (prompt_pwd)
+    else
+        echo -n $pwd
+    end
+    echo $git
 end
 
 function __fish_prompt_input
