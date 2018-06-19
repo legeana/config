@@ -1,4 +1,5 @@
 function fish_prompt --description 'Write out the prompt'
+    __fish_prompt_profile begin
     set -g __fish_prompt_status $status
     set -g __fish_prompt_cmd_duration $CMD_DURATION
     if [ (count $__fish_prompt_cmd_duration) -eq 0 ]
@@ -33,9 +34,18 @@ function fish_prompt --description 'Write out the prompt'
         set -g __fish_prompt_color red
     end
 
+    __fish_prompt_profile pre
     __fish_prompt_info
-    __fish_prompt_context
+    __fish_prompt_profile info
+    __fish_prompt_context  # TODO optimize git prompt
+    __fish_prompt_profile context
     __fish_prompt_input
+end
+
+function __fish_prompt_profile
+    if set --query __fish_prompt_profile_enabled
+        printf '%10s %s\n' "<$argv[1]>" (date '+%s.%N')
+    end
 end
 
 function __fish_prompt_cmd_saver --on-event fish_postexec
