@@ -1,11 +1,14 @@
 function fish_prompt --description 'Write out the prompt'
-    __fish_prompt_profile begin
+    # Save these values at the very beginning of the prompt.
+    # Do not attempt to measure performance of this code since it's trivial
+    # and measurements will change $status and $CMD_DURATION.
     set -g __fish_prompt_status $status
     set -g __fish_prompt_cmd_duration $CMD_DURATION
     if [ (count $__fish_prompt_cmd_duration) -eq 0 ]
         set __fish_prompt_cmd_duration 0
     end
 
+    __fish_prompt_profile begin
     # Just calculate this once, to save a few cycles when displaying the prompt
     if not set -q __fish_prompt_hostname
         set -g __fish_prompt_hostname (hostname | cut -d . -f 1)
