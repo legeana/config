@@ -5,6 +5,6 @@ function ip --wraps=ip
 end
 
 set -g fish_ip_args
-if command ip -color -V >/dev/null ^&1
+if command ip -color -V >/dev/null 2>&1
     set fish_ip_args $fish_ip_args -color
 end

@@ -1,4 +1,4 @@
-if command ls --version >/dev/null ^&1
+if command ls --version >/dev/null 2>&1
     alias ls='ls --color=auto --human-readable'
     alias lls='ls --color=always --human-readable'
 else

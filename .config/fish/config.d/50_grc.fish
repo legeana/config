@@ -5,7 +5,7 @@ begin
         ping \
         traceroute
 
-    if which grc >/dev/null ^&1
+    if which grc >/dev/null 2>&1
         function grc
             command grc --colour=auto $argv
         end
