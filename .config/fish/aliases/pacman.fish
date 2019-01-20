@@ -4,13 +4,13 @@ if command --search pacman >/dev/null
     else
         alias pacorig='sudo pacman'
     end
-    if command --search pacaur >/dev/null
+    if command --search yay >/dev/null
         if [ (id -u) = 0 ]
-            alias pac='sudo -u '$SUDO_USER' pacaur'
+            alias pac='sudo -u '$SUDO_USER' yay'
         else
-            alias pac='pacaur'
+            alias pac='yay'
         end
-        alias pacuser='pacaur'
+        alias pacuser='yay'
     else
         if [ (id -u) = 0 ]
             alias pac='pacman'
