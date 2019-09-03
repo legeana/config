@@ -13,18 +13,14 @@ current_install_file="${install_files[0]}"
 
 prefix="$cfgroot"
 suffix=""
-while [[ $prefix != $HOME ]]
-do
+while [[ $prefix != $HOME ]]; do
     suffix="$(basename "$prefix")"
     prefix="$(dirname "$prefix")"
 done
 
-safeln()
-{
-    if [[ -e ${2:-Need to specify destination} ]]
-    then
-        if [[ -h $2 ]]
-        then
+function safeln {
+    if [[ -e ${2:-Need to specify destination} ]]; then
+        if [[ -h $2 ]]; then
             rm "$2"
         else
             echo "Unable to override: $2" >&2 && exit 1
@@ -34,13 +30,10 @@ safeln()
     ln -vs "$1" "$2"
 }
 
-saferm()
-{
+function saferm {
     local i
-    for i
-    do
-        if [[ -h $i ]]
-        then
+    for i; do
+        if [[ -h $i ]]; then
             rm -vf "$i"
         else
             echo "Unable to remove: $i" >&2 # not fatal
@@ -48,36 +41,27 @@ saferm()
     done
 }
 
-install()
-{
-    for i
-    do
+function install {
+    for i; do
         local fname="$(basename "$i")"
         safeln "$i" "$HOME/$fname"
         echo "$fname" >>"$current_install_file"
     done
 }
 
-cinstall()
-{
-    for i
-    do
+function cinstall {
+    for i; do
         safeln "$cfgroot/$i" "$HOME/$i"
         echo "$HOME/$i" >>"$current_install_file"
     done
 }
 
-uninstall()
-{
+function uninstall {
     local f
-    for f in "${install_files[@]}"
-    do
-        if [[ -e $f ]]
-        then
-            if [[ -f $f ]]
-            then
-                while read line
-                do
+    for f in "${install_files[@]}"; do
+        if [[ -e $f ]]; then
+            if [[ -f $f ]]; then
+                while read line; do
                     if [[ -n $line ]]
                     then
                         saferm "$line"
@@ -91,20 +75,17 @@ uninstall()
     done
 }
 
-update()
-{
+function update {
     cd "$cfgroot"
     echo "Updating $cfgroot" >&2
     old_master="$(cat .git/refs/heads/master)"
     git fetch
-    if ! git pull --ff-only
-    then
+    if ! git pull --ff-only; then
         echo "Failed to update, manual intervention is required!" >&2
         exit 1
     fi
     new_master="$(cat .git/refs/heads/master)"
-    if [[ $old_master != $new_master ]]
-    then
+    if [[ $old_master != $new_master ]]; then
         echo "Found update: $old_master -> $new_master, restarting..." >&2
         exec "$cfgroot/setup" -d "$@"
     fi
@@ -115,8 +96,7 @@ cd "$prefix"
 skip_update=""
 only_uninstall=""
 
-while getopts "duh" arg
-do
+while getopts "duh" arg; do
     case "$arg" in
         d) skip_update=1 ;;
         u) only_uninstall=1 ;;
@@ -125,15 +105,13 @@ do
 done
 shift "$((OPTIND - 1))"
 
-if [[ -z $skip_update ]]
-then
+if [[ -z $skip_update ]]; then
     update "$@"
 fi
 
 uninstall
 
-if [[ -z $only_uninstall ]]
-then
+if [[ -z $only_uninstall ]]; then
     cinstall \
         bin \
         .clang-format \
