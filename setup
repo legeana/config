@@ -35,9 +35,27 @@ function saferm {
     done
 }
 
+function installed {
+    local file="$1"
+    local line
+    if [[ ! -f $current_install_file ]]; then
+        return 1
+    fi
+    while read line; do
+        if [[ $file = $line ]]; then
+            return 0
+        fi
+    done < "$current_install_file"
+    return 1
+}
+
 function install {
     local src="$1"
     local dst="$2"
+    if installed "$dst"; then
+        echo "Overwriting previously installed $dst" >&2
+        saferm "$dst"
+    fi
     if safeln "$src" "$dst"; then
         echo "$dst" >>"$current_install_file"
     fi
