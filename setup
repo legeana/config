@@ -35,13 +35,19 @@ function saferm {
     done
 }
 
+function install {
+    local src="$1"
+    local dst="$2"
+    if safeln "$src" "$dst"; then
+        echo "$dst" >>"$current_install_file"
+    fi
+}
+
 function minstall {
     local manifest="$1"
     local base="$(dirname "$manifest")"
     while read file; do
-        if safeln "$base/$file" "$HOME/$file"; then
-            echo "$HOME/$file" >>"$current_install_file"
-        fi
+        install "$base/$file" "$HOME/$file"
     done < "$manifest"
 }
 
