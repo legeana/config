@@ -36,8 +36,8 @@ function saferm {
 }
 
 function minstall {
-    local base="$1"
-    local manifest="$2"
+    local manifest="$1"
+    local base="$(dirname "$manifest")"
     while read file; do
         safeln "$base/$file" "$HOME/$file"
         echo "$HOME/$file" >>"$current_install_file"
@@ -100,4 +100,4 @@ if [[ $only_uninstall ]]; then
     exit
 fi
 
-minstall "$baseroot" "$baseroot/MANIFEST"
+minstall "$baseroot/MANIFEST"
