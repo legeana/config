@@ -50,11 +50,13 @@ function install {
     done
 }
 
-function cinstall {
-    for i; do
-        safeln "$baseroot/$i" "$HOME/$i"
-        echo "$HOME/$i" >>"$current_install_file"
-    done
+function minstall {
+    local base="$1"
+    local manifest="$2"
+    while read file; do
+        safeln "$base/$file" "$HOME/$file"
+        echo "$HOME/$file" >>"$current_install_file"
+    done < "$manifest"
 }
 
 function uninstall {
@@ -113,27 +115,5 @@ fi
 uninstall
 
 if [[ -z $only_uninstall ]]; then
-    cinstall \
-        bin \
-        .clang-format \
-        .config/fish/aliases \
-        .config/fish/config.d \
-        .config/fish/config.fish \
-        .config/fish/functions \
-        .config/fish/plugins \
-        .config/htop \
-        .config/mc \
-        .config/sublime-text-3 \
-        .config/user-dirs.dirs \
-        .config/user-dirs.locale \
-        .gdbinit \
-        .gitconfig \
-        .gitconfig-user \
-        .mplayer \
-        .parallel \
-        .tmux.conf \
-        .vimrc \
-        .Xdefaults \
-        .yaourtrc \
-
+    minstall "$baseroot" "$baseroot/MANIFEST"
 fi
