@@ -2,7 +2,6 @@
 
 cd "$(dirname "$0")"
 cfgroot="$PWD"
-baseroot="$PWD/base"
 
 # note: for backward compatibility entries should not be removed
 # new file locations should be added to front
@@ -130,4 +129,6 @@ if [[ $only_uninstall ]]; then
     exit
 fi
 
-minstall "$baseroot/MANIFEST"
+minstall \
+    "$cfgroot/base/MANIFEST" \
+    "$cfgroot/local/MANIFEST"
