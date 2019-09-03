@@ -2,6 +2,7 @@
 
 cd "$(dirname "$0")"
 cfgroot="$PWD"
+baseroot="$PWD/base"
 
 # note: for backward compatibility entries should not be removed
 # new file locations should be added to front
@@ -11,7 +12,7 @@ install_files=(
 
 current_install_file="${install_files[0]}"
 
-prefix="$cfgroot"
+prefix="$baseroot"
 suffix=""
 while [[ $prefix != $HOME ]]; do
     suffix="$(basename "$prefix")"
@@ -51,7 +52,7 @@ function install {
 
 function cinstall {
     for i; do
-        safeln "$cfgroot/$i" "$HOME/$i"
+        safeln "$baseroot/$i" "$HOME/$i"
         echo "$HOME/$i" >>"$current_install_file"
     done
 }
