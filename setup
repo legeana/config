@@ -62,11 +62,16 @@ function install {
 }
 
 function minstall {
-    local manifest="$1"
-    local base="$(dirname "$manifest")"
-    while read file; do
-        install "$base/$file" "$HOME/$file"
-    done < "$manifest"
+    local manifest
+    for manifest; do
+        if [[ ! -f $manifest ]]; then
+            continue
+        fi
+        local base="$(dirname "$manifest")"
+        while read file; do
+            install "$base/$file" "$HOME/$file"
+        done < "$manifest"
+    done
 }
 
 function uninstall {
