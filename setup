@@ -12,13 +12,6 @@ install_files=(
 
 current_install_file="${install_files[0]}"
 
-prefix="$baseroot"
-suffix=""
-while [[ $prefix != $HOME ]]; do
-    suffix="$(basename "$prefix")"
-    prefix="$(dirname "$prefix")"
-done
-
 function safeln {
     if [[ -e ${2:-Need to specify destination} ]]; then
         if [[ -h $2 ]]; then
@@ -39,14 +32,6 @@ function saferm {
         else
             echo "Unable to remove: $i" >&2 # not fatal
         fi
-    done
-}
-
-function install {
-    for i; do
-        local fname="$(basename "$i")"
-        safeln "$i" "$HOME/$fname"
-        echo "$fname" >>"$current_install_file"
     done
 }
 
@@ -93,8 +78,6 @@ function update {
         exec "$cfgroot/setup" -d "$@"
     fi
 }
-
-cd "$prefix"
 
 skip_update=""
 only_uninstall=""
