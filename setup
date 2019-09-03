@@ -58,7 +58,7 @@ function uninstall {
             if [[ -n $line ]]; then
                 saferm "$line"
             fi
-        done <"$f"
+        done < <(tac "$f")
         rm -f "$f"
     done
 }
