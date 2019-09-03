@@ -14,11 +14,11 @@ current_install_file="${install_files[0]}"
 
 function safeln {
     if [[ -e ${2:-Need to specify destination} ]]; then
-        if [[ -h $2 ]]; then
-            rm "$2"
-        else
-            echo "Unable to override: $2" >&2 && exit 1
+        if [[ ! -h $2 ]]; then
+            echo "Unable to override: $2" >&2
+            exit 1
         fi
+        rm "$2"
     fi
     mkdir -p "$(dirname "$2")"
     ln -vs "$1" "$2"
@@ -27,11 +27,11 @@ function safeln {
 function saferm {
     local i
     for i; do
-        if [[ -h $i ]]; then
-            rm -vf "$i"
-        else
-            echo "Unable to remove: $i" >&2 # not fatal
+        if [[ ! -h $i ]]; then
+            echo "Unable to remove: $i" >&2
+            continue
         fi
+        rm -vf "$i"
     done
 }
 
@@ -47,19 +47,19 @@ function minstall {
 function uninstall {
     local f
     for f in "${install_files[@]}"; do
-        if [[ -e $f ]]; then
-            if [[ -f $f ]]; then
-                while read line; do
-                    if [[ -n $line ]]
-                    then
-                        saferm "$line"
-                    fi
-                done <"$f"
-                rm -f "$f"
-            else
-                echo "Invalid file type: $f" >&2 && exit 1
-            fi
+        if [[ ! -e $f ]]; then
+            continue
         fi
+        if [[ ! -f $f ]]; then
+            echo "Invalid file type: $f" >&2
+            exit 1
+        fi
+        while read line; do
+            if [[ -n $line ]]; then
+                saferm "$line"
+            fi
+        done <"$f"
+        rm -f "$f"
     done
 }
 
@@ -96,7 +96,8 @@ if [[ -z $skip_update && -z $only_uninstall ]]; then
 fi
 
 uninstall
-
-if [[ -z $only_uninstall ]]; then
-    minstall "$baseroot" "$baseroot/MANIFEST"
+if [[ $only_uninstall ]]; then
+    exit
 fi
+
+minstall "$baseroot" "$baseroot/MANIFEST"
