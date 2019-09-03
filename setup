@@ -16,7 +16,7 @@ function safeln {
     if [[ -e ${2:-Need to specify destination} ]]; then
         if [[ ! -h $2 ]]; then
             echo "Unable to override: $2" >&2
-            exit 1
+            return 1
         fi
         rm "$2"
     fi
@@ -39,8 +39,9 @@ function minstall {
     local manifest="$1"
     local base="$(dirname "$manifest")"
     while read file; do
-        safeln "$base/$file" "$HOME/$file"
-        echo "$HOME/$file" >>"$current_install_file"
+        if safeln "$base/$file" "$HOME/$file"; then
+            echo "$HOME/$file" >>"$current_install_file"
+        fi
     done < "$manifest"
 }
 
