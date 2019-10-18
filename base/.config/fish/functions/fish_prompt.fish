@@ -71,10 +71,14 @@ end
 
 function __fish_prompt_info
     set -g __fish_prompt_info_threshold 50
-    __fish_prompt_hostinfo
-    __fish_prompt_sep $__fish_prompt_info_threshold
-    __fish_prompt_date
-    __fish_prompt_sep $__fish_prompt_info_threshold
+    if ! set -q fish_prompt_info_modules
+        set -g fish_prompt_info_modules hostinfo date
+    end
+    for module in $fish_prompt_info_modules
+        if eval "__fish_prompt_$module"
+            __fish_prompt_sep $__fish_prompt_info_threshold
+        end
+    end
     __fish_prompt_result
     set -e __fish_prompt_info_threshold
     echo
