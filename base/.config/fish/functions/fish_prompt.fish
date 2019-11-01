@@ -134,7 +134,7 @@ end
 function __fish_prompt_context
     set -l indent (set_color red)'>'(set_color yellow)'>'(set_color green)'> '(set_color normal)
     set -l pwd (__fish_prompt_pwd)
-    set -l git (__fish_git_prompt)
+    set -l git (__fish_prompt_git)
     set -l length (string length (__filter_color_codes "$indent$pwd$git"))
     echo -n $indent
     if test $COLUMNS -lt $length
@@ -143,6 +143,12 @@ function __fish_prompt_context
         echo -n $pwd
     end
     echo $git
+end
+
+function __fish_prompt_git
+    if is_local_filesystem $PWD
+        __fish_git_prompt
+    end
 end
 
 function __fish_prompt_input
