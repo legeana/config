@@ -1,3 +1,3 @@
 EXPORT=1
-EXPORTDIR="$HOME/builder/pkg"
-TMPDIR="$HOME/builder/tmp"
+EXPORTDIR="$HOME/.yaourt-export-pkg"
+TMPDIR="$HOME/.yaourt-tmp"
