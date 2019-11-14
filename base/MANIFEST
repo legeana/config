@@ -7,7 +7,11 @@ bin
 .config/fish/plugins
 .config/htop
 .config/mc
-.config/sublime-text-3
+.config/sublime-text-3/Packages/User/GoSublime-Go.sublime-settings
+.config/sublime-text-3/Packages/User/GoSublime.sublime-settings
+.config/sublime-text-3/Packages/User/C++.sublime-settings
+.config/sublime-text-3/Packages/User/Protobuf.sublime-settings
+.config/sublime-text-3/Packages/User/Preferences.sublime-settings
 .config/user-dirs.dirs
 .config/user-dirs.locale
 .gdbinit
