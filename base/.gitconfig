@@ -20,3 +20,6 @@
 
 [url "git@gist.github.com:"]
     pushInsteadOf = https://gist.github.com/
+
+[url "ssh://aur@aur.archlinux.org/"]
+    pushInsteadOf = https://aur.archlinux.org/
