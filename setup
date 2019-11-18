@@ -92,19 +92,27 @@ function uninstall {
     done
 }
 
-function update {
-    cd "$cfgroot"
-    echo "Updating $cfgroot" >&2
-    old_master="$(cat .git/refs/heads/master)"
-    git fetch
-    if ! git pull --ff-only; then
-        echo "Failed to update, manual intervention is required!" >&2
+function update_git {
+    local dir="$1"
+    echo "Updating $dir" >&2
+    git --work-tree="$dir" fetch
+    if ! git --work-tree="$dir" pull --ff-only; then
+        echo "Failed to update $dir, manual intervention is required!" >&2
         exit 1
     fi
+}
+
+function update {
+    cd "$cfgroot"
+    old_master="$(cat .git/refs/heads/master)"
+    update_git "$cfgroot"
     new_master="$(cat .git/refs/heads/master)"
     if [[ $old_master != $new_master ]]; then
         echo "Found update: $old_master -> $new_master, restarting..." >&2
         exec "$cfgroot/setup" -d "$@"
+    fi
+    if [[ -d "$cfgroot/local/.git" ]]; then
+        update_git "$cfgroot/local"
     fi
 }
 
