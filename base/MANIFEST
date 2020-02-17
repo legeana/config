@@ -7,6 +7,7 @@ bin
 .config/fish/plugins
 .config/htop
 .config/mc
+.config/nvim
 .config/sublime-text-3/Packages/User/GoSublime-Go.sublime-settings
 .config/sublime-text-3/Packages/User/GoSublime.sublime-settings
 .config/sublime-text-3/Packages/User/C++.sublime-settings
