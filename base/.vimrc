@@ -58,8 +58,6 @@ set spell
 hi clear SpellBad
 hi SpellBad cterm=underline ctermfg=red
 
-set fileencodings=utf-8,ucs-bom,cp1251,koi8-r,latin1
-
 function! ResCur()
   if line("'\"") <= line("$")
     normal! g`"
