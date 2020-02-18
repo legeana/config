@@ -34,9 +34,6 @@ set guifont=courier_new:h10:cRUSSIAN
 " русские слова)
 set iskeyword=@,48-57,_,192-255
 
-" encryption
-set cryptmethod=blowfish
-
 " tabs
 "set tabstop=4
 " spaces

@@ -21,6 +21,7 @@ bin
 .mplayer
 .parallel
 .tmux.conf
+.vim
 .vimrc
 .Xdefaults
 .yaourtrc
