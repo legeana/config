@@ -1,0 +1,41 @@
+#!/usr/bin/python3
+
+custom = {
+  '0': 'zero',
+  '1': 'one',
+  '2': 'two',
+  '3': 'three',
+  '4': 'four',
+  '5': 'five',
+  '6': 'six',
+  '7': 'seven',
+  '8': 'eight',
+  '9': 'nine',
+  '!': 'exclamation',
+  '#': 'hash',
+  '*': 'asterisk',
+  '?': 'question',
+  '-': 'heavy_minus_sign',
+  '+': 'heavy_plus_sign',
+  '$': 'heavy_dollar_sign',
+}
+
+
+while True:
+  try:
+    s = input()
+  except EOFError:
+    break
+  r = []
+  for c in s:
+    if c.lower() in 'abcdefghijklmnopqrstuvwxyz':
+      r.append(':regional_indicator_')
+      r.append(c.lower())
+      r.append(': ')
+    elif c in custom:
+      r.append(':')
+      r.append(custom[c])
+      r.append(': ')
+    else:
+      r.append(c)
+  print(''.join(r))
