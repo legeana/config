@@ -2,7 +2,6 @@ set runtimepath+=$HOME/.config/nvim
 
 set background=dark
 syntax on
-set hidden
 "set mouse=a
 set notitle
 " минимальная высота окна пусть будет 0 (по умолчанию - 1)
