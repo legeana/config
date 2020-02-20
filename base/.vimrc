@@ -12,12 +12,6 @@ set notitle
 "set keymap=russian-jcukenwin
 " по умолчанию - латинская раскладка
 "set iminsert=0
-" по умолчанию - латинская раскладка при поиске
-"set imsearch=0
-set ignorecase
-set smartcase
-set hlsearch
-set incsearch
 "set textwidth=80
 " минимальная высота окна пусть будет 0 (по умолчанию - 1)
 set winminheight=0
