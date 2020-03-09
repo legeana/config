@@ -1,6 +1,5 @@
 set runtimepath+=$HOME/.config/nvim
 
-set background=dark
 syntax on
 "set mouse=a
 set notitle
