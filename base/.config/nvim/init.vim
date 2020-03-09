@@ -1,8 +1,3 @@
-if filereadable(expand('~/.config/nvim/before.vim'))
-    source ~/.config/nvim/before.vim
-endif
-
-call autoplug#begin('~/.config/nvim-plugins')
-Plug 'sheerun/vim-polyglot'
-Plug 'tpope/vim-sensible'
-call autoplug#end()
+for s:third_party in expand('~/.config/nvim/third_party/**/*.vim', 0, 1)
+    execute 'source ' . fnameescape(s:third_party)
+endfor
