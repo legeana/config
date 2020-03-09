@@ -1,3 +1,2 @@
 set runtimepath+=$HOME/.config/nvim
-
-syntax on
+source $HOME/.config/nvim/init.vim
