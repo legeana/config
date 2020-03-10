@@ -1,7 +1,9 @@
 CDN
 acl
 appcontext
+args
 config
+configs
 css
 django
 endblock
@@ -31,6 +33,9 @@ oneof
 params
 proto
 proto2
+protobuf
+py
+rpc
 runtimepath
 sharding
 spellfile
@@ -38,6 +43,7 @@ stylesheet
 teardown
 timestamp
 tmux
+util
 vendored
 vimrc
 vimscript
