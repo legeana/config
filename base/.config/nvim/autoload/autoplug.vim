@@ -16,7 +16,6 @@ function! autoplug#begin(...)
     if !filereadable(autoload_plug_path)
         call s:fetch(s:plug_url, autoload_plug_path)
         execute 'source ' . fnameescape(autoload_plug_path)
-        echo fnameescape(autoload_plug_path)
         "autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
         let g:autoplug_install = 1
     endif
