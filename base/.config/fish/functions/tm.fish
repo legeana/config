@@ -5,3 +5,5 @@ function tm
     end
     tmux attach -t $session ; or tmux new-session -s $session -c $HOME
 end
+
+complete --command=tm --no-files --arguments='(tmux list-sessions -F "#{session_name}")'
