@@ -1,7 +1,9 @@
 CDN
 acl
+apache
 appcontext
 args
+auth
 config
 configs
 css
@@ -21,6 +23,7 @@ fn
 frontend
 ftplugin
 github
+gpg
 hardcoded
 hdd
 hotspotting
@@ -36,6 +39,7 @@ legeana
 libsonnet
 localhost
 md
+mesonbuild
 no_teardown
 nvim
 oneof
@@ -47,8 +51,10 @@ py
 rpc
 runtimepath
 setUpModule
+sha
 sharding
 spellfile
+srcdir
 ssd
 stylesheet
 teardown
@@ -57,8 +63,11 @@ tmp
 tmpdir
 tmux
 ttl
+tty
+txt
 util
 vendored
 vimrc
 vimscript
 wrapweb
+www
