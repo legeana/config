@@ -3,6 +3,7 @@ set spelllang=en
 set spellfile=$HOME/.config/nvim/spell/en.utf-8.add
 hi clear SpellBad
 hi SpellBad cterm=underline ctermfg=red
+set spellcapcheck=
 
 function! s:regen()
     let spellfiles = split(&spellfile, ',')
