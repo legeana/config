@@ -11,6 +11,8 @@ dir
 dirs
 django
 endblock
+endblock
+endif
 endif
 etag
 etags
@@ -32,6 +34,7 @@ init
 javascript
 javascript
 js
+json
 jsonnet
 jvm
 legeana
@@ -42,7 +45,9 @@ md
 mesonbuild
 no_teardown
 nvim
+onclick
 oneof
+param
 params
 proto
 proto2
@@ -50,6 +55,8 @@ protobuf
 py
 rpc
 runtimepath
+serializer
+serializers
 setUpModule
 sha
 sharding
@@ -65,7 +72,10 @@ tmux
 ttl
 tty
 txt
+url
+utc
 util
+utils
 vendored
 vimrc
 vimscript
