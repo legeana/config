@@ -6,11 +6,13 @@ from os.path import abspath, join
 from pprint import pprint, pformat
 import subprocess
 import tempfile
+import urllib.parse
 
 
 KEYBASETOKEN = 'auto-keybase-pgp'
 GNUPGTOKEN = 'auto-gnupg-'
 GNUPGULTIMATE = 'auto-gnupg-ultimate'
+GITHUBTOKEN = 'auto-github-'
 
 
 @enum.unique
@@ -282,7 +284,10 @@ def filter_keys(f, add=None, path=get_authorized_keys()):
             tmpfile.write(line)
         if add is not None:
           for line in add:
-            tmpfile.write(line)
+            if line:
+              tmpfile.write(line)
+              if not line.endswith('\n'):
+                tmpfile.write('\n')
         tmpfile.close()
       os.rename(tmpfile.name, path)  # must be last action
     except Exception:
@@ -334,6 +339,33 @@ def export_ultimate():
   filter_keys(f=is_not_token(GNUPGULTIMATE), add=sshkeys)
 
 
+def get_github_user() -> str:
+  import git
+  config = git.Repo(os.path.join(os.getenv('HOME'), 'config'))
+  config_origin = config.remote('origin')
+  for url in config.remote('origin').urls:
+    purl = urllib.parse.urlparse(url)
+    if purl.netloc != 'github.com':
+      continue
+    components = purl.path.split('/', 2)
+    if len(components) >= 2:
+      if components[0] != '':
+        continue
+      return components[1]
+  raise RuntimeError('Unable to identify github user, '
+                     'do you have ~/config installed?')
+
+
+def export_github():
+  import github
+  user = get_github_user()
+  sshkeys = []
+  for key in github.Github().get_user(user).get_keys():
+    sshkeys.append('{key} {token}{user}@github.com'.format(
+        key=key.key, token=GITHUBTOKEN, user=user))
+  filter_keys(f=is_not_token(GITHUBTOKEN), add=sshkeys)
+
+
 def try_do(f, *args, **kwargs):
   try:
     f(*args, **kwargs)
@@ -345,6 +377,7 @@ def try_do(f, *args, **kwargs):
 def main():
   try_do(export_keybase)
   try_do(export_ultimate)
+  try_do(export_github)
 
 
 if __name__ == '__main__':
