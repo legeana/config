@@ -32,12 +32,14 @@ dir
 dirs
 django
 docstring
+docstring
 docstrings
 editorconfig
 endblock
 endblock
 endif
 endif
+env
 eq
 etag
 etags
@@ -50,6 +52,7 @@ flaskutil
 fn
 frontend
 ftplugin
+func
 getattr
 github
 githubdb
@@ -73,6 +76,7 @@ js
 json
 jsonnet
 jvm
+kwargs
 legeana
 legeana
 letsencrypt
@@ -83,6 +87,7 @@ mesonbuild
 mesonwrap
 metaclass
 mixin
+mkdir
 namedtuple
 nginx
 no_teardown
@@ -97,10 +102,12 @@ paren
 pem
 png
 pragma
+pragma
 proto
 proto2
 protobuf
 py
+pylint
 pylint
 python2
 python3
@@ -122,6 +129,7 @@ srv
 ssd
 staticmethod
 str
+str
 stylesheet
 sys
 teardown
@@ -135,6 +143,7 @@ ttl
 tty
 txt
 ui
+uname
 unix
 url
 urllib
