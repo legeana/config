@@ -13,8 +13,6 @@ complete --command=tm --no-files --arguments='(tmux list-sessions -F "#{session_
 # The functions below operate under the assumption that tmux will not be used
 # by more than one user simultaneously. The last connection wins.
 
-# TODO GPG_TTY forwarding
-
 set -g _TM_TMP "$HOME/.tmux-tmp"
 
 function _tm_forward_socket --no-scope-shadowing -a session -a env
