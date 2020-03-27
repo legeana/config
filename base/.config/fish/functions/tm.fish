@@ -15,6 +15,17 @@ complete --command=tm --no-files --arguments='(tmux list-sessions -F "#{session_
 
 set -g _TM_TMP "$HOME/.tmux-tmp"
 
+function _tm_cleanup
+    for f in "$_TM_TMP/"*
+        if ! test -L $f
+            continue
+        end
+        if ! test -e $f
+            rm -f $f
+        end
+    end
+end
+
 function _tm_forward_socket --no-scope-shadowing -a session -a env
     mkdir -p -m 700 "$_TM_TMP"
     set path "$_TM_TMP/$USER.$session.$env"
@@ -27,6 +38,7 @@ function _tm_forward_socket --no-scope-shadowing -a session -a env
 end
 
 function _tm_forward --no-scope-shadowing -a session
+    _tm_cleanup
     _tm_forward_socket $session SSH_AUTH_SOCK
     _tm_forward_socket $session FWD_SSH_AUTH_SOCK
 end
