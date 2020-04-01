@@ -4,6 +4,7 @@ TODO
 abc
 abstractproperty
 acl
+acls
 apache
 apache2
 api
@@ -114,6 +115,7 @@ python3
 rdiv
 rebase
 reenable
+rollout
 rpc
 runtimepath
 serializer
@@ -141,6 +143,7 @@ tmux
 travis
 ttl
 tty
+turndown
 txt
 ui
 uname
@@ -164,4 +167,5 @@ wrapdb
 wrapfile
 wrapweb
 www
+xargs
 yml
