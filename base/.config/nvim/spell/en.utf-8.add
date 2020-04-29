@@ -16,6 +16,7 @@ async
 attr
 auth
 basestring
+blackbox
 bool
 builtins
 classmethod
@@ -50,6 +51,7 @@ faq
 filesystem
 filetypes
 flaskutil
+fmt
 fn
 frontend
 ftplugin
@@ -113,6 +115,7 @@ pylint
 python2
 python3
 rdiv
+readonly
 rebase
 reenable
 rollout
@@ -136,6 +139,7 @@ stylesheet
 sys
 teardown
 tempfile
+textproto
 timestamp
 tmp
 tmpdir
@@ -163,6 +167,8 @@ whitelist
 whitelisted
 whitespace
 wildcard
+wildcard
+wildcards
 wrapdb
 wrapfile
 wrapweb
