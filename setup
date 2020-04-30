@@ -111,9 +111,11 @@ function update {
         echo "Found update: $old_master -> $new_master, restarting..." >&2
         exec "$cfgroot/setup" -d "$@"
     fi
-    if [[ -d "$cfgroot/local/.git" ]]; then
-        update_git "$cfgroot/local"
-    fi
+    for overlay in "$cfgroot/overlay.d/"*; do
+        if [[ -d "$overlay/.git" ]]; then
+            update_git "$overlay"
+        fi
+    done
 }
 
 skip_update=""
@@ -139,4 +141,4 @@ fi
 
 minstall \
     "$cfgroot/base/MANIFEST" \
-    "$cfgroot/local/MANIFEST"
+    "$cfgroot/overlay.d/"*"/MANIFEST"
