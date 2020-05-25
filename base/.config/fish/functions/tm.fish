@@ -26,19 +26,21 @@ function _tm_cleanup
     end
 end
 
-function _tm_forward_socket --no-scope-shadowing -a session -a env
+function _tm_forward_socket --no-scope-shadowing -a session -a env -a value
     mkdir -p -m 700 "$_TM_TMP"
     set path "$_TM_TMP/$USER.$session.$env"
-    if ! set -q $env || ! test -S $$env
-        rm -f $path
-    else
-        ln -snf -- $$env $path
-    end
+    ln -snf -- $$env $path
     set --append env_overrides "$env=$path"
 end
 
 function _tm_forward --no-scope-shadowing -a session
     _tm_cleanup
-    _tm_forward_socket $session SSH_AUTH_SOCK
-    _tm_forward_socket $session FWD_SSH_AUTH_SOCK
+    # Restore FWD_SSH_AUTH_SOCK and forward it as SSH_AUTH_SOCK if possible.
+    # FWD_SSH_AUTH_SOCK if set points to the original agent socket.
+    set --append env_overrides --unset=FWD_SSH_AUTH_SOCK
+    if ! set -q FWD_SSH_AUTH_SOCK || ! test -S $FWD_SSH_AUTH_SOCK
+        _tm_forward_socket $session SSH_AUTH_SOCK $SSH_AUTH_SOCK
+    else
+        _tm_forward_socket $session SSH_AUTH_SOCK $FWD_SSH_AUTH_SOCK
+    end
 end
