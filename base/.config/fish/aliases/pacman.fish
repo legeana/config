@@ -1,8 +1,10 @@
 if command --search pacman >/dev/null
     if [ (id -u) = 0 ]
         alias pacorig='pacman'
+        alias pack='pacman-key'
     else
         alias pacorig='sudo pacman'
+        alias pack='sudo pacman-key'
     end
     if command --search yay >/dev/null
         if [ (id -u) = 0 ]
@@ -36,7 +38,6 @@ if command --search pacman >/dev/null
     alias pacsc='pacs -c'
     alias pacsuw='pacorig --needed -Suw'
     alias pacsuwy='pacsuw -y'
-    alias pack='pacman-key'
 
     function packeys
         pacsy
