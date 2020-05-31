@@ -36,7 +36,7 @@ if command --search pacman >/dev/null
     alias pacsuy='pacsu -y'
     alias pacss='pacuser -Ss'
     alias pacsc='pacs -c'
-    alias pacsuw='pacorig --needed -Suw'
+    alias pacsuw='pacorig --needed --noconfirm -Suw'
     alias pacsuwy='pacsuw -y'
 
     function packeys
