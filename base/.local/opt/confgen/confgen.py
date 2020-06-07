@@ -5,20 +5,32 @@ import os
 import pathlib
 import sys
 
-from jinja2 import BaseLoader, Environment, PackageLoader
+from jinja2 import BaseLoader, Environment, PackageLoader, TemplateNotFound
 
 GEN_SFX = '.gen'
+STD_PREFIX = 'std/'
+STD_TEMPLATES = pathlib.Path(__file__).parent.absolute() / 'templates'
 
 
 class ConfGenLoader(BaseLoader):
 
   def __init__(self, path):
     self._path = path
+    if STD_TEMPLATES.is_dir():
+      self._std = STD_TEMPLATES
+    else:
+      self._std = None
+
+  @staticmethod
+  def _resolve(template, *search):
+    for root in search:
+      path = root / template
+      if path.is_file():
+        return path
+    raise TemplateNotFound(template)
 
   def get_source(self, environment, template):
-    path = self._path / template
-    if not path.is_file():
-      raise TemplateNotFound(template)
+    path = self._resolve(template, self._path, self._std)
     mtime = path.stat().st_mtime
     with open(path) as f:
       source = f.read()
