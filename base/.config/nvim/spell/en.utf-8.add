@@ -42,6 +42,7 @@ cwd
 darwin
 dataclass
 dataclasses
+dhcp
 dicts
 dir
 dirs
@@ -110,6 +111,8 @@ legeana
 legeana
 letsencrypt
 libsonnet
+linode
+linodes
 linux
 loadavg
 localhost
@@ -118,6 +121,7 @@ mesonbuild
 mesondefine
 mesonwrap
 metaclass
+minecraft
 mixin
 mkdir
 namedtuple
@@ -181,6 +185,7 @@ sudo
 sys
 syscalls
 sysinfo
+systemd
 tcp
 teardown
 tempfile
