@@ -21,6 +21,8 @@ bin
 .local/opt/confgen
 .mplayer
 .parallel
+.ssh/config
+.ssh/config.d
 .tmux.conf
 .vim
 .vimrc
