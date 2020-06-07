@@ -16,7 +16,7 @@ class ConfGenLoader(BaseLoader):
     self._path = path
 
   def get_source(self, environment, template):
-    path = pathlib.Path(self._path) / template
+    path = self._path / template
     if not path.is_file():
       raise TemplateNotFound(template)
     mtime = path.stat().st_mtime
@@ -46,5 +46,5 @@ def main():
           out.write(templ.render())
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
   main()
