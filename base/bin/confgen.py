@@ -1,11 +1,13 @@
 #!/usr/bin/python3
 
-import sys
-import os
 import json
-from os.path import join, exists, getmtime
+import os
+import pathlib
+import sys
 
 from jinja2 import BaseLoader, Environment, PackageLoader
+
+GEN_SFX = '.gen'
 
 
 class ConfGenLoader(BaseLoader):
@@ -14,32 +16,34 @@ class ConfGenLoader(BaseLoader):
     self._path = path
 
   def get_source(self, environment, template):
-    path = join(self._path, template)
-    if not exists(path):
+    path = pathlib.Path(self._path) / template
+    if not path.is_file():
       raise TemplateNotFound(template)
-    mtime = getmtime(path)
+    mtime = path.stat().st_mtime
     with open(path) as f:
       source = f.read()
-    return source, path, lambda: mtime == getmtime(path)
+    return source, path, lambda: mtime == pathlib.Path(path).stat().st_mtime
 
 
 def main():
-  cwd = os.getcwd()
-  templates = join(cwd, '.confgen')
-  generate = join(cwd, '.confgen', 'generate.json')
-  if not exists(templates):
-    print('Create "{}" directory in order to use ConfGen'.format(templates))
-    sys.exit(2)
-  if not exists(generate):
-    print('Create "{}" file in order to use ConfGen'.format(generate))
-    sys.exit(3)
+  cwd = pathlib.Path.cwd()
+  templates = cwd / '.confgen'
+  if not templates.is_dir():
+    sys.exit(f'Create {templates!r} directory in order to use ConfGen')
   env = Environment(loader=ConfGenLoader(templates))
-  with open(generate) as gen:
-    generate = json.load(gen)
-  for i in generate:
-    templ = env.get_template(i)
-    with open(i, "w") as f:
-      print(templ.render(), file=f)
+  for root, dirs, files in os.walk(templates):
+    root = pathlib.Path(root)
+    relroot = root.relative_to(templates)
+    outroot = cwd / relroot
+    outroot.mkdir(parents=True, exist_ok=True)
+    for tmpl in files:
+      tmpl = pathlib.Path(tmpl)
+      if tmpl.suffix == GEN_SFX:
+        templ = env.get_template(str(relroot / tmpl))
+        tout = outroot / tmpl.stem
+        with open(tout, mode='w') as out:
+          print(f'Writing {tout}')
+          out.write(templ.render())
 
 
 if __name__=='__main__':
