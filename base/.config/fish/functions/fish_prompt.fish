@@ -14,14 +14,8 @@ function fish_prompt --description 'Write out the prompt'
         set -g __fish_prompt_hostname (hostname | cut -d . -f 1)
     end
 
-    set -g __fish_prompt_signal 0
-    set -g __fish_prompt_signame ""
-    if [ $__fish_prompt_status -gt 128 ]
-        set -g __fish_prompt_signal (math "$__fish_prompt_status-128")
-        if [ $__fish_prompt_signal -le 64 ]
-            set -g __fish_prompt_signame (kill --list=$__fish_prompt_signal)
-        end
-    end
+    __fish_prompt_signal
+    __fish_prompt_profile signal
 
     switch $USER
     case root toor
@@ -43,6 +37,18 @@ function fish_prompt --description 'Write out the prompt'
     __fish_prompt_context  # TODO optimize git prompt
     __fish_prompt_profile context
     __fish_prompt_input
+end
+
+set -g __fish_prompt_signals (string split ' ' (kill -l))
+function __fish_prompt_signal
+    set signum 0
+    set -g __fish_prompt_signame ""
+    if [ $__fish_prompt_status -gt 128 ]
+        set signum (math $__fish_prompt_status - 128)
+        if [ 1 -le $signum ] && [ $signum -le (count $__fish_prompt_signals) ]
+            set -g __fish_prompt_signame $__fish_prompt_signals[$signum]
+        end
+    end
 end
 
 function __fish_prompt_profile
