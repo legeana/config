@@ -56,7 +56,7 @@ function __fish_prompt_cmd_saver --on-event fish_postexec
         set -l arg $argv[1]
         # Use quoted substitution since commands may return multiple tokens.
         set -l arg (string replace \n ' ' "$arg")
-        set -l arg (string replace -r '^(\S+)\s.*$' '$1' "$arg")
+        set -l arg (string replace -r '^\s*(\S+)\s.*$' '$1' "$arg")
         set -g __fish_prompt_cmd (string replace -r '^([^ ]*/)?([^/ ]+)(\s.*)?$' '$2' $arg)
     end
 end
