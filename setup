@@ -1,144 +1,204 @@
-#!/bin/bash -e
+#!/usr/bin/env python3
 
-cd "$(dirname "$0")"
-cfgroot="$PWD"
+import argparse
+import os
+import pathlib
+import subprocess
+import sys
 
-# note: for backward compatibility entries should not be removed
-# new file locations should be added to front
-install_files=(
-    "$cfgroot/.install"
-)
+SELF = pathlib.Path(__file__).absolute()
+ROOT = SELF.parent
+OVERLAYS = ROOT / 'overlay.d'
+INSTALL = ROOT / '.install'
+BASE = ROOT / 'base'
 
-current_install_file="${install_files[0]}"
 
-function safeln {
-    if [[ -e ${2:-Need to specify destination} ]]; then
-        if [[ ! -h $2 ]]; then
-            echo "Unable to override: $2" >&2
-            return 1
-        fi
-        rm "$2"
-    fi
-    mkdir -p "$(dirname "$2")"
-    ln -vs "$1" "$2"
-}
+def log(*args, **kwargs):
+  print(*args, **kwargs, file=sys.stderr)
 
-function saferm {
-    local i
-    for i; do
-        if [[ ! -h $i ]]; then
-            echo "Unable to remove: $i" >&2
-            continue
-        fi
-        rm -vf "$i"
-    done
-}
 
-function installed {
-    local file="$1"
-    local line
-    if [[ ! -f $current_install_file ]]; then
-        return 1
-    fi
-    while read line; do
-        if [[ $file = $line ]]; then
-            return 0
-        fi
-    done < "$current_install_file"
-    return 1
-}
+def update(plugin: pathlib.Path) -> bool:
+  gitdir = plugin / '.git'
+  if not gitdir.is_dir():
+    return False
+  ref = gitdir / 'refs' / 'heads' / 'master'
+  with open(ref) as f:
+    old_ref = f.read()
+  log(f'Updating {str(plugin)}')
+  try:
+    subprocess.check_call(['git', f'--work-tree={str(plugin)}', 'pull', '--ff-only'])
+  except CalledProcessError:
+    sys.exit(f'Failed to update {str(plugin)}, manual intervention is required!')
+  with open(ref) as f:
+    new_ref = f.read()
+  if old_ref != new_ref:
+    return True
 
-function install {
-    local src="$1"
-    local dst="$2"
-    if installed "$dst"; then
-        echo "Overwriting previously installed $dst" >&2
-        saferm "$dst"
-    fi
-    if safeln "$src" "$dst"; then
-        echo "$dst" >>"$current_install_file"
-    fi
-}
 
-function minstall {
-    local manifest
-    for manifest; do
-        if [[ ! -f $manifest ]]; then
-            continue
-        fi
-        local base="$(dirname "$manifest")"
-        while read file; do
-            install "$base/$file" "$HOME/$file"
-        done < "$manifest"
-    done
-}
+def update_root():
+  if update(ROOT):
+    os.execv(SELF, sys.argv + ['--no-update-root'])
 
-function uninstall {
-    local f
-    for f in "${install_files[@]}"; do
-        if [[ ! -e $f ]]; then
-            continue
-        fi
-        if [[ ! -f $f ]]; then
-            echo "Invalid file type: $f" >&2
-            exit 1
-        fi
-        while read line; do
-            if [[ -n $line ]]; then
-                saferm "$line"
-            fi
-        done < <(tac "$f")
-        rm -f "$f"
-    done
-}
 
-function update_git {
-    local dir="$1"
-    echo "Updating $dir" >&2
-    git --work-tree="$dir" fetch
-    if ! git --work-tree="$dir" pull --ff-only; then
-        echo "Failed to update $dir, manual intervention is required!" >&2
-        exit 1
-    fi
-}
+def update_overlays():
+  for overlay in sorted(OVERLAYS.iterdir()):
+    if not overlay.is_dir():
+      continue
+    update(overlay)
 
-function update {
-    cd "$cfgroot"
-    old_master="$(cat .git/refs/heads/master)"
-    update_git "$cfgroot"
-    new_master="$(cat .git/refs/heads/master)"
-    if [[ $old_master != $new_master ]]; then
-        echo "Found update: $old_master -> $new_master, restarting..." >&2
-        exec "$cfgroot/setup" -d "$@"
-    fi
-    for overlay in "$cfgroot/overlay.d/"*; do
-        if [[ -d "$overlay/.git" ]]; then
-            update_git "$overlay"
-        fi
-    done
-}
 
-skip_update=""
-only_uninstall=""
+class InstalledDatabase:
 
-while getopts "duh" arg; do
-    case "$arg" in
-        d) skip_update=1 ;;
-        u) only_uninstall=1 ;;
-        ?) printf "Usage: %s: [-u only uninstall]\n" "$0" 1>&2 && exit 1 ;;
-    esac
-done
-shift "$((OPTIND - 1))"
+  def __init__(self):
+    self._entries = []
 
-if [[ -z $skip_update && -z $only_uninstall ]]; then
-    update "$@"
-fi
+  @classmethod
+  def load_from(cls, path):
+    inst = cls()
+    try:
+      with open(path) as f:
+        for line in f:
+          inst._add_line(line.strip())
+    except FileNotFoundError:
+      pass
+    return inst
 
-uninstall
-if [[ $only_uninstall ]]; then
-    exit
-fi
+  def _add_line(self, line):
+    self.add(line)
 
-minstall \
-    "$cfgroot/base/MANIFEST" \
-    "$cfgroot/overlay.d/"*"/MANIFEST"
+  def write(self, fp):
+    for item in sorted(self._entries):
+      self.write_line(fp, item)
+
+  def write_file(self, path):
+    with open(path, 'w') as f:
+      self.write(f)
+
+  @classmethod
+  def write_item(cls, fp, item) -> None:
+    fp.write(str(item))
+    fp.write('\n')
+
+  def add(self, item: pathlib.Path) -> None:
+    self._entries.append(str(item))
+
+  def clear(self) -> None:
+    self._entries.clear()
+
+  def __contains__(self, item):
+    return str(item) in self._entries
+
+  def __iter__(self):
+    return map(pathlib.Path, self._entries)
+
+  def __reversed__(self):
+    return map(pathlib.Path, reversed(self._entries))
+
+  def __bool__(self):
+    return bool(self._entries)
+
+
+class SyncInstalledDatabase(InstalledDatabase):
+
+  def __init__(self, path: pathlib.Path):
+    super().__init__()
+    self._path = path
+
+  def add(self, item: pathlib.Path) -> None:
+    if item in self:
+      return
+    mode = 'a' if self else 'w'
+    super().add(item)
+    with open(self._path, mode) as f:
+      self.write_item(f, item)
+
+
+class Manifest:
+
+  def __init__(self, root: pathlib.Path):
+    self._root = root
+    self._entries = []
+
+  @classmethod
+  def load_from(cls, path):
+    inst = cls(path)
+    with open(path / 'MANIFEST') as f:
+      for line in f:
+        inst._add_line(line.strip())
+    return inst
+
+  def _add_line(self, line):
+    self._entries.append(line)
+
+  def __iter__(self):
+    for entry in self._entries:
+      yield self._root / entry, pathlib.Path.home() / entry
+
+
+class Installer:
+
+  def __init__(self):
+    self._old_db = InstalledDatabase.load_from(INSTALL)
+    self._db = SyncInstalledDatabase(INSTALL)
+
+  def uninstall(self):
+    for link in reversed(self._old_db):
+      if not link.is_symlink():
+        log(f'Unable to remove {str(link)}')
+        continue
+      try:
+        link.unlink()
+        log(f'Removed {str(link)}')
+      except FileNotFoundError:
+        # TODO missing_ok=True, python-3.8+
+        pass
+    try:
+      INSTALL.unlink()
+      # TODO missing_ok=True, python-3.8+
+    except FileNotFoundError:
+      pass
+
+  def install(self):
+    self._install(BASE)
+    for overlay in sorted(OVERLAYS.iterdir()):
+      if not overlay.is_dir():
+        continue
+      self._install(overlay)
+
+  def _install(self, path):
+    log(f'\nLoading {str(path)}')
+    try:
+      manifest = Manifest.load_from(path)
+    except FileNotFoundError:
+      log(f'No MANIFEST in {str(path)}')
+      return
+    for src, dst in manifest:
+      if dst.exists():
+        if not dst.is_symlink():
+          log(f'Unable to overwrite {str(dst)}')
+        dst.unlink()
+      dst.parent.mkdir(parents=True, exist_ok=True)
+      dst.symlink_to(src)
+      self._db.add(dst)
+      log(f'{str(src)} -> {str(dst)}')
+
+
+def main():
+  parser = argparse.ArgumentParser(description='Synchronized configuration setup')
+  parser.add_argument('--no-update-root', action='store_false', dest='update_root')
+  parser.add_argument('--no-update', '-d', action='store_false', dest='update')
+  parser.add_argument('--uninstall', '-u', action='store_true', dest='uninstall_only')
+  args = parser.parse_args()
+  if args.update and not args.uninstall_only:
+    if args.update_root:
+      update_root()
+    update_overlays()
+  installer = Installer()
+  installer.uninstall()
+  if args.uninstall_only:
+    sys.exit()
+  installer.install()
+
+
+if __name__ == '__main__':
+  main()
