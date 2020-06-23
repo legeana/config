@@ -176,6 +176,7 @@ class Installer:
       if dst.exists():
         if not dst.is_symlink():
           log(f'Unable to overwrite {str(dst)}')
+          continue
         dst.unlink()
       dst.parent.mkdir(parents=True, exist_ok=True)
       dst.symlink_to(src)
