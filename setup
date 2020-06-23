@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import asyncio
 import os
 import pathlib
 import subprocess
@@ -17,16 +18,24 @@ def log(*args, **kwargs):
   print(*args, **kwargs, file=sys.stderr)
 
 
-def update(plugin: pathlib.Path) -> bool:
+async def check(*args, **kwargs):
+  process = await asyncio.create_subprocess_exec(*args, **kwargs)
+  retcode = await process.wait()
+  if retcode:
+    raise subprocess.CalledProcessError(
+        retcode, args, output=None, stderr=None)
+
+
+async def update(plugin: pathlib.Path) -> bool:
   gitdir = plugin / '.git'
   if not gitdir.is_dir():
     return False
   ref = gitdir / 'refs' / 'heads' / 'master'
   with open(ref) as f:
     old_ref = f.read()
-  log(f'Updating {str(plugin)}')
+  log(f'Updating {str(plugin)}')  # TODO combine output from check()
   try:
-    subprocess.check_call(['git', f'--work-tree={str(plugin)}', 'pull', '--ff-only'])
+    await check('git', f'--work-tree={str(plugin)}', 'pull', '--ff-only')
   except CalledProcessError:
     sys.exit(f'Failed to update {str(plugin)}, manual intervention is required!')
   with open(ref) as f:
@@ -35,16 +44,14 @@ def update(plugin: pathlib.Path) -> bool:
     return True
 
 
-def update_root():
-  if update(ROOT):
-    os.execv(SELF, sys.argv + ['--no-update-root'])
-
-
-def update_overlays():
-  for overlay in sorted(OVERLAYS.iterdir()):
-    if not overlay.is_dir():
-      continue
-    update(overlay)
+async def update_all() -> bool:
+  script_updated = asyncio.create_task(update(ROOT))
+  overlays = [
+      update(overlay) for overlay in OVERLAYS.iterdir()
+      if overlay.is_dir()
+  ]
+  await asyncio.gather(*overlays)
+  return await script_updated
 
 
 class InstalledDatabase:
@@ -184,16 +191,15 @@ class Installer:
       log(f'{str(src)} -> {str(dst)}')
 
 
-def main():
+async def main():
   parser = argparse.ArgumentParser(description='Synchronized configuration setup')
-  parser.add_argument('--no-update-root', action='store_false', dest='update_root')
   parser.add_argument('--no-update', '-d', action='store_false', dest='update')
   parser.add_argument('--uninstall', '-u', action='store_true', dest='uninstall_only')
   args = parser.parse_args()
   if args.update and not args.uninstall_only:
-    if args.update_root:
-      update_root()
-    update_overlays()
+    if await update_all():
+      log(f'Updated {str(SELF)}, restarting')
+      os.execv(SELF, sys.argv + ['--no-update'])
   installer = Installer()
   installer.uninstall()
   if args.uninstall_only:
@@ -202,4 +208,4 @@ def main():
 
 
 if __name__ == '__main__':
-  main()
+  asyncio.run(main())
