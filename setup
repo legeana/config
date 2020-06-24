@@ -2,6 +2,7 @@
 
 import argparse
 import asyncio
+import dataclasses
 import os
 import pathlib
 import subprocess
@@ -131,6 +132,24 @@ class SyncInstalledDatabase(InstalledDatabase):
       self.write_item(f, item)
 
 
+@dataclasses.dataclass
+class SymlinkEntry:
+
+  src: str
+  dst: str
+
+  def __call__(self, db: InstalledDatabase) -> None:
+    if self.dst.exists():
+      if not self.dst.is_symlink():
+        log(f'Unable to overwrite {str(self.dst)}')
+        return
+      self.dst.unlink()
+    self.dst.parent.mkdir(parents=True, exist_ok=True)
+    self.dst.symlink_to(self.src)
+    db.add(self.dst)
+    log(f'{str(self.src)} -> {str(self.dst)}')
+
+
 class Manifest:
 
   def __init__(self, root: pathlib.Path):
@@ -146,11 +165,13 @@ class Manifest:
     return inst
 
   def _add_line(self, line):
-    self._entries.append(line)
+    self._entries.append(
+        SymlinkEntry(self._root / line,
+                     pathlib.Path.home() / line))
 
-  def __iter__(self):
+  def __call__(self, db: InstalledDatabase) -> None:
     for entry in self._entries:
-      yield self._root / entry, pathlib.Path.home() / entry
+      entry(db)
 
 
 class Installer:
@@ -190,16 +211,7 @@ class Installer:
     except FileNotFoundError:
       log(f'No MANIFEST in {str(path)}')
       return
-    for src, dst in manifest:
-      if dst.exists():
-        if not dst.is_symlink():
-          log(f'Unable to overwrite {str(dst)}')
-          continue
-        dst.unlink()
-      dst.parent.mkdir(parents=True, exist_ok=True)
-      dst.symlink_to(src)
-      self._db.add(dst)
-      log(f'{str(src)} -> {str(dst)}')
+    manifest(self._db)
 
 
 async def main():
