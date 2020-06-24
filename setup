@@ -46,8 +46,9 @@ async def update(plugin: pathlib.Path) -> bool:
     output = await check_output(
         'git', f'--work-tree={str(plugin)}', 'pull', '--ff-only')
     log(f'Updated {str(plugin)}: {output.decode().strip()}')
-  except subprocess.CalledProcessError:
-    sys.exit(f'Failed to update {str(plugin)}, manual intervention is required!')
+  except subprocess.CalledProcessError as e:
+    sys.exit(f'Failed to update {str(plugin)}, manual intervention is required!\n'
+             f'{e.stdout.decode().strip()}')
   with open(ref) as f:
     new_ref = f.read()
   if old_ref != new_ref:
