@@ -5,6 +5,7 @@ import asyncio
 import dataclasses
 import os
 import pathlib
+import shutil
 import subprocess
 import sys
 
@@ -133,20 +134,35 @@ class SyncInstalledDatabase(InstalledDatabase):
 
 
 @dataclasses.dataclass
-class SymlinkEntry:
+class FileEntry:
 
   src: str
   dst: str
 
+
+class SymlinkEntry(FileEntry):
+
   def __call__(self, db: InstalledDatabase) -> None:
     if self.dst.exists():
       if not self.dst.is_symlink():
-        log(f'Unable to overwrite {str(self.dst)}')
+        log(f'Symlink: unable to overwrite {str(self.dst)}')
         return
       self.dst.unlink()
     self.dst.parent.mkdir(parents=True, exist_ok=True)
     self.dst.symlink_to(self.src)
     db.add(self.dst)
+    log(f'{str(self.src)} -> {str(self.dst)}')
+
+
+class CopyEntry(FileEntry):
+
+  def __call__(self, db: InstalledDatabase) -> None:
+    if self.dst.exists():
+      log(f'Copy: skipping already existing {str(self.dst)}')
+      return
+    self.dst.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(self.src, self.dst)
+    # do not record this file in the deletion database to prevent data loss
     log(f'{str(self.src)} -> {str(self.dst)}')
 
 
@@ -161,13 +177,31 @@ class Manifest:
     inst = cls(path)
     with open(path / 'MANIFEST') as f:
       for line in f:
-        inst._add_line(line.strip())
+        inst._add_line(line)
     return inst
 
   def _add_line(self, line):
-    self._entries.append(
-        SymlinkEntry(self._root / line,
-                     pathlib.Path.home() / line))
+    line = line.strip()
+    if not line:
+        return
+    parts = line.split(maxsplit=1)
+    if len(parts) == 1:
+      self._entries.append(
+          SymlinkEntry(self._root / parts[0],
+                       pathlib.Path.home() / parts[0]))
+    else:
+      assert len(parts) == 2
+      command, path = parts
+      if command == 'symlink':
+        self._entries.append(
+            SymlinkEntry(self._root / path,
+                         pathlib.Path.home() / path))
+      elif command == 'copy':
+        self._entries.append(
+            CopyEntry(self._root / path,
+                      pathlib.Path.home() / path))
+      else:
+        sys.exit(f'{self._root}/MANIFEST: unknown entry type {command}')
 
   def __call__(self, db: InstalledDatabase) -> None:
     for entry in self._entries:
@@ -187,10 +221,16 @@ class Installer:
         continue
       try:
         link.unlink()
-        log(f'Removed {str(link)}')
+        log(f'Removed symlink {str(link)}')
       except FileNotFoundError:
         # TODO missing_ok=True, python-3.8+
         pass
+      for parent in link.parents:
+        try:
+          parent.rmdir()
+          log(f'Removed empty directory {str(parent)}')
+        except OSError:
+          break
     try:
       INSTALL.unlink()
       # TODO missing_ok=True, python-3.8+
