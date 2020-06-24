@@ -18,12 +18,19 @@ def log(*args, **kwargs):
   print(*args, **kwargs, file=sys.stderr)
 
 
-async def check(*args, **kwargs):
+async def run(*args, **kwargs) -> subprocess.CompletedProcess:
   process = await asyncio.create_subprocess_exec(*args, **kwargs)
+  stdout, stderr = await process.communicate()
   retcode = await process.wait()
-  if retcode:
-    raise subprocess.CalledProcessError(
-        retcode, args, output=None, stderr=None)
+  return subprocess.CompletedProcess(args, retcode, stdout, stderr)
+
+
+async def check_output(*args, **kwargs) -> bytes:
+  kwargs['stdout'] = subprocess.PIPE
+  kwargs['stderr'] = subprocess.STDOUT
+  ret = await run(*args, **kwargs)
+  ret.check_returncode()
+  return ret.stdout
 
 
 async def update(plugin: pathlib.Path) -> bool:
@@ -33,10 +40,11 @@ async def update(plugin: pathlib.Path) -> bool:
   ref = gitdir / 'refs' / 'heads' / 'master'
   with open(ref) as f:
     old_ref = f.read()
-  log(f'Updating {str(plugin)}')  # TODO combine output from check()
   try:
-    await check('git', f'--work-tree={str(plugin)}', 'pull', '--ff-only')
-  except CalledProcessError:
+    output = await check_output(
+        'git', f'--work-tree={str(plugin)}', 'pull', '--ff-only')
+    log(f'Updated {str(plugin)}: {output.decode().strip()}')
+  except subprocess.CalledProcessError:
     sys.exit(f'Failed to update {str(plugin)}, manual intervention is required!')
   with open(ref) as f:
     new_ref = f.read()
@@ -45,13 +53,16 @@ async def update(plugin: pathlib.Path) -> bool:
 
 
 async def update_all() -> bool:
+  log('Updating...')
   script_updated = asyncio.create_task(update(ROOT))
   overlays = [
       update(overlay) for overlay in OVERLAYS.iterdir()
       if overlay.is_dir()
   ]
   await asyncio.gather(*overlays)
-  return await script_updated
+  ret = await script_updated
+  log()
+  return ret
 
 
 class InstalledDatabase:
