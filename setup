@@ -57,15 +57,17 @@ async def update(plugin: pathlib.Path) -> bool:
 
 async def update_all() -> bool:
   log('Updating...')
-  script_updated = asyncio.create_task(update(ROOT))
-  overlays = [
+  updates = [update(ROOT)] + [
       update(overlay) for overlay in OVERLAYS.iterdir()
       if overlay.is_dir()
   ]
-  await asyncio.gather(*overlays)
-  ret = await script_updated
+  update_results = await asyncio.gather(*updates, return_exceptions=False)
   log()
-  return ret
+  assert len(updates) == len(update_results)
+  for res in update_results:
+    if isinstance(res, BaseException):
+      raise res
+  return update_results[0]
 
 
 class InstalledDatabase:
