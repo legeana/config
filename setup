@@ -180,25 +180,23 @@ class Manifest:
   def __init__(self, root: pathlib.Path):
     self._root = root
     self._entries = []
-
-  @classmethod
-  def load_from(cls, path):
-    inst = cls(path)
-    with open(path / 'MANIFEST') as f:
+    with open(root / 'MANIFEST') as f:
       for line in f:
-        inst._add_line(line)
-    return inst
+        self._add_line(line)
 
   def _add_line(self, line):
     line = line.strip()
-    if not line:
-        return
+    if not line or line.startswith('#'):
+      return
     parts = line.split(maxsplit=1)
     if len(parts) == 2:
       command, path = parts
     else:
       assert len(parts) == 1
       command, path = 'symlink', parts[0]
+    self._add_command(command, pathlib.Path(path))
+
+  def _add_command(self, command: str, path: pathlib.Path) -> None:
     if command == 'symlink':
       self._entries.append(SymlinkEntry(self._root / path, path))
     elif command == 'copy':
@@ -250,7 +248,7 @@ class Installer:
   def _install(self, path):
     log(f'\nLoading {str(path)}')
     try:
-      manifest = Manifest.load_from(path)
+      manifest = Manifest(path)
     except FileNotFoundError:
       log(f'No MANIFEST in {str(path)}')
       return
