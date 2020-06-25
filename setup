@@ -5,6 +5,7 @@ import asyncio
 import dataclasses
 import os
 import pathlib
+import shlex
 import shutil
 import subprocess
 import sys
@@ -42,12 +43,15 @@ async def update(plugin: pathlib.Path) -> bool:
   ref = gitdir / 'refs' / 'heads' / 'master'
   with open(ref) as f:
     old_ref = f.read()
+  args = ['git', '-C', str(plugin), 'pull', '--ff-only']
   try:
-    output = await check_output(
-        'git', '-C', str(plugin), 'pull', '--ff-only')
+    output = await check_output(*args)
     log(f'Updated {str(plugin)}: {output.decode().strip()}')
   except subprocess.CalledProcessError as e:
+    # TODO use shlex.join(), python-3.8+
+    command = ' '.join(shlex.quote(arg) for arg in args)
     sys.exit(f'Failed to update {str(plugin)}, manual intervention is required!\n'
+             f'$ {command}\n'
              f'{e.stdout.decode().strip()}')
   with open(ref) as f:
     new_ref = f.read()
