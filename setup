@@ -177,8 +177,9 @@ class CopyEntry(FileEntry):
 
 class Manifest:
 
-  def __init__(self, root: pathlib.Path):
+  def __init__(self, root: pathlib.Path, prefix: pathlib.Path = pathlib.Path()):
     self._root = root
+    self._prefix = prefix
     self._entries = []
     with open(root / 'MANIFEST') as f:
       for line in f:
@@ -201,12 +202,14 @@ class Manifest:
       self._entries.append(SymlinkEntry(self._root / path, path))
     elif command == 'copy':
       self._entries.append(CopyEntry(self._root / path, path))
+    elif command == 'subdir':
+      self._entries.append(Manifest(self._root / path, self._prefix / path))
     else:
       sys.exit(f'{self._root}/MANIFEST: unknown entry type {command}')
 
   def __call__(self, db: InstalledDatabase, prefix: pathlib.Path) -> None:
     for entry in self._entries:
-      entry(db, prefix)
+      entry(db, prefix / self._prefix)
 
 
 class Installer:

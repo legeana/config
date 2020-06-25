@@ -1,23 +1,16 @@
+subdir .config/fish
+subdir .config/sublime-text-3
+subdir .local/opt
+
 bin
 .clang-format
-.config/fish/aliases
-.config/fish/config.d
-.config/fish/config.fish
-.config/fish/functions
-.config/fish/plugins
 .config/mc
 .config/nvim
-.config/sublime-text-3/Packages/User/C++.sublime-settings
-.config/sublime-text-3/Packages/User/GoSublime-Go.sublime-settings
-.config/sublime-text-3/Packages/User/GoSublime.sublime-settings
-.config/sublime-text-3/Packages/User/Preferences.sublime-settings
-.config/sublime-text-3/Packages/User/Protobuf.sublime-settings
 .config/user-dirs.dirs
 .config/user-dirs.locale
 .gdbinit
 .gitconfig
 .gitconfig-user
-.local/opt/confgen
 .mplayer
 .parallel
 .ssh/config
