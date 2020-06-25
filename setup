@@ -149,28 +149,30 @@ class FileEntry:
 
 class SymlinkEntry(FileEntry):
 
-  def __call__(self, db: InstalledDatabase) -> None:
-    if self.dst.exists():
-      if not self.dst.is_symlink():
-        log(f'Symlink: unable to overwrite {str(self.dst)}')
+  def __call__(self, db: InstalledDatabase, prefix: pathlib.Path) -> None:
+    dst = prefix / self.dst
+    if dst.exists():
+      if not dst.is_symlink():
+        log(f'Symlink: unable to overwrite {str(dst)}')
         return
-      self.dst.unlink()
-    self.dst.parent.mkdir(parents=True, exist_ok=True)
-    self.dst.symlink_to(self.src)
-    db.add(self.dst)
-    log(f'{str(self.src)} -> {str(self.dst)}')
+      dst.unlink()
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    dst.symlink_to(self.src)
+    db.add(dst)
+    log(f'{str(self.src)} -> {str(dst)}')
 
 
 class CopyEntry(FileEntry):
 
-  def __call__(self, db: InstalledDatabase) -> None:
-    if self.dst.exists():
-      log(f'Copy: skipping already existing {str(self.dst)}')
+  def __call__(self, db: InstalledDatabase, prefix: pathlib.Path) -> None:
+    dst = prefix / self.dst
+    if dst.exists():
+      log(f'Copy: skipping already existing {str(dst)}')
       return
-    self.dst.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(self.src, self.dst)
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(self.src, dst)
     # do not record this file in the deletion database to prevent data loss
-    log(f'{str(self.src)} -> {str(self.dst)}')
+    log(f'{str(self.src)} -> {str(dst)}')
 
 
 class Manifest:
@@ -192,27 +194,21 @@ class Manifest:
     if not line:
         return
     parts = line.split(maxsplit=1)
-    if len(parts) == 1:
-      self._entries.append(
-          SymlinkEntry(self._root / parts[0],
-                       pathlib.Path.home() / parts[0]))
-    else:
-      assert len(parts) == 2
+    if len(parts) == 2:
       command, path = parts
-      if command == 'symlink':
-        self._entries.append(
-            SymlinkEntry(self._root / path,
-                         pathlib.Path.home() / path))
-      elif command == 'copy':
-        self._entries.append(
-            CopyEntry(self._root / path,
-                      pathlib.Path.home() / path))
-      else:
-        sys.exit(f'{self._root}/MANIFEST: unknown entry type {command}')
+    else:
+      assert len(parts) == 1
+      command, path = 'symlink', parts[0]
+    if command == 'symlink':
+      self._entries.append(SymlinkEntry(self._root / path, path))
+    elif command == 'copy':
+      self._entries.append(CopyEntry(self._root / path, path))
+    else:
+      sys.exit(f'{self._root}/MANIFEST: unknown entry type {command}')
 
-  def __call__(self, db: InstalledDatabase) -> None:
+  def __call__(self, db: InstalledDatabase, prefix: pathlib.Path) -> None:
     for entry in self._entries:
-      entry(db)
+      entry(db, prefix)
 
 
 class Installer:
@@ -258,7 +254,7 @@ class Installer:
     except FileNotFoundError:
       log(f'No MANIFEST in {str(path)}')
       return
-    manifest(self._db)
+    manifest(self._db, pathlib.Path.home())
 
 
 async def main():
