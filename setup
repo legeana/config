@@ -149,30 +149,28 @@ class FileEntry:
 
 class SymlinkEntry(FileEntry):
 
-  def __call__(self, db: InstalledDatabase, prefix: pathlib.Path) -> None:
-    dst = prefix / self.dst
-    if dst.exists():
-      if not dst.is_symlink():
-        log(f'Symlink: unable to overwrite {str(dst)}')
+  def __call__(self, db: InstalledDatabase) -> None:
+    if self.dst.exists():
+      if not self.dst.is_symlink():
+        log(f'Symlink: unable to overwrite {str(self.dst)}')
         return
-      dst.unlink()
-    dst.parent.mkdir(parents=True, exist_ok=True)
-    dst.symlink_to(self.src)
-    db.add(dst)
-    log(f'{str(self.src)} -> {str(dst)}')
+      self.dst.unlink()
+    self.dst.parent.mkdir(parents=True, exist_ok=True)
+    self.dst.symlink_to(self.src)
+    db.add(self.dst)
+    log(f'{str(self.src)} -> {str(self.dst)}')
 
 
 class CopyEntry(FileEntry):
 
-  def __call__(self, db: InstalledDatabase, prefix: pathlib.Path) -> None:
-    dst = prefix / self.dst
-    if dst.exists():
-      log(f'Copy: skipping already existing {str(dst)}')
+  def __call__(self, db: InstalledDatabase) -> None:
+    if self.dst.exists():
+      log(f'Copy: skipping already existing {str(self.dst)}')
       return
-    dst.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(self.src, dst)
+    self.dst.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(self.src, self.dst)
     # do not record this file in the deletion database to prevent data loss
-    log(f'{str(self.src)} -> {str(dst)}')
+    log(f'{str(self.src)} -> {str(self.dst)}')
 
 
 class Manifest:
@@ -199,17 +197,17 @@ class Manifest:
 
   def _add_command(self, command: str, path: pathlib.Path) -> None:
     if command == 'symlink':
-      self._entries.append(SymlinkEntry(self._root / path, path))
+      self._entries.append(SymlinkEntry(self._root / path, self._prefix / path))
     elif command == 'copy':
-      self._entries.append(CopyEntry(self._root / path, path))
+      self._entries.append(CopyEntry(self._root / path, self._prefix / path))
     elif command == 'subdir':
       self._entries.append(Manifest(self._root / path, self._prefix / path))
     else:
       sys.exit(f'{self._root}/MANIFEST: unknown entry type {command}')
 
-  def __call__(self, db: InstalledDatabase, prefix: pathlib.Path) -> None:
+  def __call__(self, db: InstalledDatabase) -> None:
     for entry in self._entries:
-      entry(db, prefix / self._prefix)
+      entry(db)
 
 
 class Installer:
@@ -251,11 +249,11 @@ class Installer:
   def _install(self, path):
     log(f'\nLoading {str(path)}')
     try:
-      manifest = Manifest(path)
+      manifest = Manifest(path, pathlib.Path.home())
     except FileNotFoundError:
       log(f'No MANIFEST in {str(path)}')
       return
-    manifest(self._db, pathlib.Path.home())
+    manifest(self._db)
 
 
 async def main():
