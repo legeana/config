@@ -16,7 +16,7 @@ bin
 .ssh/config
 .ssh/config.d
 .tmux.conf
-.vim
+.vim/plugin
 .vimrc
 .Xdefaults
 .yaourtrc
