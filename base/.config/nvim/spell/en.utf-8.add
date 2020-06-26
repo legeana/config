@@ -84,6 +84,8 @@ dns
 docstring
 docstrings
 dsa
+dst
+dstdir
 editorconfig
 eg
 endblock
@@ -166,6 +168,7 @@ no_teardown
 nvim
 nyc
 oct
+ok
 onclick
 oneof
 openssh
@@ -220,6 +223,7 @@ stdin
 stdout
 str
 stylesheet
+subdir
 sudo
 sys
 syscalls
