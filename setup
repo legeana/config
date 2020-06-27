@@ -9,6 +9,7 @@ import shlex
 import shutil
 import subprocess
 import sys
+from typing import List
 
 SELF = pathlib.Path(__file__).absolute()
 ROOT = SELF.parent
@@ -173,29 +174,41 @@ class CopyEntry(FileEntry):
     log(f'{str(self.src)} -> {str(self.dst)}')
 
 
+class ManifestError(Exception):
+  pass
+
+
 class Manifest:
 
   def __init__(self, root: pathlib.Path, prefix: pathlib.Path = pathlib.Path()):
     self._root = root
     self._prefix = prefix
     self._entries = []
-    with open(root / 'MANIFEST') as f:
-      for line in f:
-        self._add_line(line)
+    manifest_path = root / 'MANIFEST'
+    with open(manifest_path) as f:
+      for lineno, line in enumerate(f, 1):
+        try:
+          self._add_line(line)
+        except ManifestError as e:
+          sys.exit(f'{manifest_path}:{lineno}: {e}')
 
   def _add_line(self, line):
-    line = line.strip()
-    if not line or line.startswith('#'):
+    if line.startswith('#'):
       return
-    parts = line.split(maxsplit=1)
-    if len(parts) == 2:
-      command, path = parts
+    parts = shlex.split(line)
+    if not parts:
+      return
+    if len(parts) == 0:
+      return
+    elif len(parts) == 1:
+      self._add_command('symlink', parts)
     else:
-      assert len(parts) == 1
-      command, path = 'symlink', parts[0]
-    self._add_command(command, pathlib.Path(path))
+      self._add_command(parts[0], parts[1:])
 
-  def _add_command(self, command: str, path: pathlib.Path) -> None:
+  def _add_command(self, command: str, args: List[str]) -> None:
+    if len(args) != 1:
+      raise ManifestError(f'{command} supports only 1 argument, got {len(args)}')
+    path = pathlib.Path(args[0])
     if command == 'symlink':
       self._entries.append(SymlinkEntry(self._root / path, self._prefix / path))
     elif command == 'copy':
