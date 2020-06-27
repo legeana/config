@@ -1,10 +1,10 @@
 subdir .config/fish
+subdir .config/nvim
 subdir .config/sublime-text-3
 subdir .local/opt
 
 bin
 .clang-format
-.config/nvim
 .config/user-dirs.dirs
 .config/user-dirs.locale
 .gdbinit

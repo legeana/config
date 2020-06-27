@@ -1,0 +1,7 @@
+autoload
+ftdetect
+ftplugin
+init.vim
+plugin
+spell
+third_party
