@@ -147,8 +147,10 @@ keepalive
 keybase
 kwargs
 legeana
+len
 letsencrypt
 libsonnet
+lineno
 linode
 linodes
 linux
@@ -214,6 +216,7 @@ setUpModule
 sha
 sha1
 sharding
+shlex
 spellfile
 src
 srcdir
