@@ -4,7 +4,6 @@ subdir .local/opt
 
 bin
 .clang-format
-.config/mc
 .config/nvim
 .config/user-dirs.dirs
 .config/user-dirs.locale
