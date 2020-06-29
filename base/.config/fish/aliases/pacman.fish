@@ -8,11 +8,11 @@ if command --search pacman >/dev/null
     end
     if command --search yay >/dev/null
         if [ (id -u) = 0 ]
-            alias pac='sudo -u '$SUDO_USER' yay'
+            alias pac='sudo -u '$SUDO_USER' yay --sudoloop'
         else
-            alias pac='yay'
+            alias pac='yay --sudoloop'
         end
-        alias pacuser='yay'
+        alias pacuser='yay --sudoloop'
     else
         if [ (id -u) = 0 ]
             alias pac='pacman'
