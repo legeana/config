@@ -15,6 +15,7 @@ FIXME
 ForwardAgent
 ForwardX11
 ForwardX11Trusted
+GPIO
 GlobalKnownHostsFile
 HashKnownHosts
 HostbasedAuthentication
@@ -35,6 +36,7 @@ ServerAliveCountMax
 ServerAliveInterval
 StrictHostKeyChecking
 TODO
+VCC
 abc
 abstractproperty
 acl
@@ -114,6 +116,7 @@ github
 githubdb
 gitignore
 gpg
+gpiozero
 gz
 hardcoded
 hdd
