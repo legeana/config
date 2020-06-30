@@ -73,11 +73,13 @@ confgen
 config
 configs
 const
+cpp
 css
 cwd
 darwin
 dataclass
 dataclasses
+dep
 dhcp
 dicts
 dir
