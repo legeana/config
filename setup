@@ -145,7 +145,7 @@ class SyncInstalledDatabase(InstalledDatabase):
 class Entry(abc.ABC):
 
   @abc.abstractmethod
-  def __call__(self, db: InstalledDatabase) -> None:
+  def install(self, db: InstalledDatabase) -> None:
     pass
 
 
@@ -158,7 +158,7 @@ class FileEntry(Entry):
 
 class SymlinkEntry(FileEntry):
 
-  def __call__(self, db: InstalledDatabase) -> None:
+  def install(self, db: InstalledDatabase) -> None:
     if self.dst.exists():
       if not self.dst.is_symlink():
         log(f'Symlink: unable to overwrite {str(self.dst)}')
@@ -172,7 +172,7 @@ class SymlinkEntry(FileEntry):
 
 class CopyEntry(FileEntry):
 
-  def __call__(self, db: InstalledDatabase) -> None:
+  def install(self, db: InstalledDatabase) -> None:
     if self.dst.exists():
       log(f'Copy: skipping already existing {str(self.dst)}')
       return
@@ -295,9 +295,9 @@ class Manifest(Entry):
       raise ParserError(f'{command} is not supported by {type(self)}')
     self._entries.append(parser.parse(command, args))
 
-  def __call__(self, db: InstalledDatabase) -> None:
+  def install(self, db: InstalledDatabase) -> None:
     for entry in self._entries:
-      entry(db)
+      entry.install(db)
 
 
 class Installer:
@@ -343,7 +343,7 @@ class Installer:
     except FileNotFoundError:
       log(f'No MANIFEST in {str(path)}')
       return
-    manifest(self._db)
+    manifest.install(self._db)
 
 
 async def main():
