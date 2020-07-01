@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import abc
 import argparse
 import asyncio
 import dataclasses
@@ -141,8 +142,15 @@ class SyncInstalledDatabase(InstalledDatabase):
       self.write_item(f, item)
 
 
+class Entry(abc.ABC):
+
+  @abc.abstractmethod
+  def __call__(self, db: InstalledDatabase) -> None:
+    pass
+
+
 @dataclasses.dataclass
-class FileEntry:
+class FileEntry(Entry):
 
   src: str
   dst: str
@@ -178,7 +186,7 @@ class ManifestError(Exception):
   pass
 
 
-class Manifest:
+class Manifest(Entry):
 
   def __init__(self, root: pathlib.Path, prefix: pathlib.Path = pathlib.Path()):
     self._root = root
