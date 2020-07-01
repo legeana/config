@@ -10,7 +10,7 @@ import shlex
 import shutil
 import subprocess
 import sys
-from typing import Collection, Dict, List
+from typing import Callable, Collection, Dict, List
 
 SELF = pathlib.Path(__file__).absolute()
 ROOT = SELF.parent
@@ -141,10 +141,13 @@ class SyncInstalledDatabase(InstalledDatabase):
       self.write_item(f, item)
 
 
+PathRecorder = Callable[[pathlib.Path], None]
+
+
 class Entry(abc.ABC):
 
   @abc.abstractmethod
-  def install(self, db: InstalledDatabase) -> None:
+  def install(self, record: PathRecorder) -> None:
     pass
 
   def post_install(self) -> None:
@@ -161,7 +164,7 @@ class FileEntry(Entry):
 
 class SymlinkEntry(FileEntry):
 
-  def install(self, db: InstalledDatabase) -> None:
+  def install(self, record: PathRecorder) -> None:
     if self.dst.exists():
       if not self.dst.is_symlink():
         log(f'Symlink: unable to overwrite {str(self.dst)}')
@@ -169,13 +172,14 @@ class SymlinkEntry(FileEntry):
       self.dst.unlink()
     self.dst.parent.mkdir(parents=True, exist_ok=True)
     self.dst.symlink_to(self.src)
-    db.add(self.dst)
+    record(self.dst)
     log(f'{str(self.src)} -> {str(self.dst)}')
 
 
 class CopyEntry(FileEntry):
 
-  def install(self, db: InstalledDatabase) -> None:
+  def install(self, record: PathRecorder) -> None:
+    del record  # unused
     if self.dst.exists():
       log(f'Copy: skipping already existing {str(self.dst)}')
       return
@@ -187,8 +191,8 @@ class CopyEntry(FileEntry):
 
 class PostInstallHook(Entry):
 
-  def install(self, db: InstalledDatabase) -> None:
-    pass  # unused
+  def install(self, record: PathRecorder) -> None:
+    del record  # unused
 
   @abc.abstractmethod
   def post_install(self) -> None:
@@ -331,9 +335,9 @@ class Manifest(Entry):
       raise ParserError(f'{command} is not supported by {type(self)}')
     self._entries.append(parser.parse(command, args))
 
-  def install(self, db: InstalledDatabase) -> None:
+  def install(self, record: PathRecorder) -> None:
     for entry in self._entries:
-      entry.install(db)
+      entry.install(record)
 
   def post_install(self) -> None:
     for entry in self._entries:
@@ -387,7 +391,7 @@ class Installer:
   def install(self):
     for manifest in self._load_manifests():
       log(f'\nInstalling from {str(manifest.root)}')
-      manifest.install(self._db)
+      manifest.install(self._db.add)
 
   def post_install(self):
     for manifest in self._load_manifests():
