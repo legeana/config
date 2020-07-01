@@ -10,7 +10,7 @@ import shlex
 import shutil
 import subprocess
 import sys
-from typing import Container, List
+from typing import Collection, Dict, List
 
 SELF = pathlib.Path(__file__).absolute()
 ROOT = SELF.parent
@@ -57,8 +57,7 @@ async def update(plugin: pathlib.Path) -> bool:
              f'{e.stdout.decode().strip()}')
   with open(ref) as f:
     new_ref = f.read()
-  if old_ref != new_ref:
-    return True
+  return old_ref != new_ref
 
 
 async def update_all() -> bool:
@@ -156,8 +155,8 @@ class Entry(abc.ABC):
 @dataclasses.dataclass
 class FileEntry(Entry):
 
-  src: str
-  dst: str
+  src: pathlib.Path
+  dst: pathlib.Path
 
 
 class SymlinkEntry(FileEntry):
@@ -218,7 +217,7 @@ class Parser(abc.ABC):
 
   @property
   @abc.abstractmethod
-  def supported_commands(self) -> Container[str]:
+  def supported_commands(self) -> Collection[str]:
     return []
 
   def check_supported(self, command: str) -> None:
@@ -246,7 +245,7 @@ class SinglePathParser(Parser):
 class SymlinkParser(SinglePathParser):
 
   @property
-  def supported_commands(self) -> Container[str]:
+  def supported_commands(self) -> Collection[str]:
     return ['symlink']
 
   def parse_single_path(self, command: str, path: pathlib.Path) -> Entry:
@@ -257,7 +256,7 @@ class SymlinkParser(SinglePathParser):
 class CopyParser(SinglePathParser):
 
   @property
-  def supported_commands(self) -> Container[str]:
+  def supported_commands(self) -> Collection[str]:
     return ['copy']
 
   def parse_single_path(self, command: str, path: pathlib.Path) -> Entry:
@@ -268,7 +267,7 @@ class CopyParser(SinglePathParser):
 class ManifestParser(SinglePathParser):
 
   @property
-  def supported_commands(self) -> Container[str]:
+  def supported_commands(self) -> Collection[str]:
     return ['subdir']
 
   def parse_single_path(self, command: str, path: pathlib.Path) -> Entry:
@@ -279,7 +278,7 @@ class ManifestParser(SinglePathParser):
 class ExecPostHookParser(Parser):
 
   @property
-  def supported_commands(self) -> Container[str]:
+  def supported_commands(self) -> Collection[str]:
     return ['post_install_exec']
 
   def parse(self, command: str, args: List[str]) -> Entry:
@@ -291,7 +290,7 @@ class Manifest(Entry):
 
   def __init__(self, root: pathlib.Path, prefix: pathlib.Path = pathlib.Path()):
     self.root = root
-    self._entries = []
+    self._entries: List[Entry] = []
     manifest_path = root / 'MANIFEST'
     self._register_parsers(
         ManifestParser(root=root, prefix=prefix),
@@ -307,7 +306,7 @@ class Manifest(Entry):
           sys.exit(f'{manifest_path}:{lineno}: {e}')
 
   def _register_parsers(self, *parsers: Parser) -> None:
-    self._parsers = dict()
+    self._parsers: Dict[str, Parser] = dict()
     for parser in parsers:
       for command in parser.supported_commands:
         assert command not in self._parsers
