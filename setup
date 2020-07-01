@@ -255,6 +255,7 @@ class ManifestParser(SinglePathParser):
 class Manifest(Entry):
 
   def __init__(self, root: pathlib.Path, prefix: pathlib.Path = pathlib.Path()):
+    self.root = root
     self._entries = []
     manifest_path = root / 'MANIFEST'
     self._register_parsers(
@@ -305,6 +306,7 @@ class Installer:
   def __init__(self):
     self._old_db = InstalledDatabase.load_from(INSTALL)
     self._db = SyncInstalledDatabase(INSTALL)
+    self._manifests = None  # lazy loading
 
   def uninstall(self):
     for link in reversed(self._old_db):
@@ -329,21 +331,24 @@ class Installer:
     except FileNotFoundError:
       pass
 
-  def install(self):
-    self._install(BASE)
-    for overlay in sorted(OVERLAYS.iterdir()):
-      if not overlay.is_dir():
+  def _load_manifests(self):
+    if self._manifests is not None:
+      return self._manifests
+    self._manifests = []
+    for path in [BASE] + sorted(OVERLAYS.iterdir()):
+      if not path.is_dir():
         continue
-      self._install(overlay)
+      try:
+        self._manifests.append(Manifest(path, pathlib.Path.home()))
+      except FileNotFoundError as e:
+        log(f'Unable to load MANIFEST in {str(path)}: {e}')
+        continue
+    return self._manifests
 
-  def _install(self, path):
-    log(f'\nLoading {str(path)}')
-    try:
-      manifest = Manifest(path, pathlib.Path.home())
-    except FileNotFoundError:
-      log(f'No MANIFEST in {str(path)}')
-      return
-    manifest.install(self._db)
+  def install(self):
+    for manifest in self._load_manifests():
+      log(f'\nInstalling from {str(manifest.root)}')
+      manifest.install(self._db)
 
 
 async def main():
