@@ -182,7 +182,7 @@ class CopyEntry(FileEntry):
     log(f'{str(self.src)} -> {str(self.dst)}')
 
 
-class ManifestError(Exception):
+class ParserError(Exception):
   pass
 
 
@@ -197,7 +197,7 @@ class Manifest(Entry):
       for lineno, line in enumerate(f, 1):
         try:
           self._add_line(line)
-        except ManifestError as e:
+        except ParserError as e:
           sys.exit(f'{manifest_path}:{lineno}: {e}')
 
   def _add_line(self, line):
@@ -215,7 +215,7 @@ class Manifest(Entry):
 
   def _add_command(self, command: str, args: List[str]) -> None:
     if len(args) != 1:
-      raise ManifestError(f'{command} supports only 1 argument, got {len(args)}')
+      raise ParserError(f'{command} supports only 1 argument, got {len(args)}')
     path = pathlib.Path(args[0])
     if command == 'symlink':
       self._entries.append(SymlinkEntry(self._root / path, self._prefix / path))
