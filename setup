@@ -10,7 +10,7 @@ import shlex
 import shutil
 import subprocess
 import sys
-from typing import List
+from typing import Container, List
 
 SELF = pathlib.Path(__file__).absolute()
 ROOT = SELF.parent
@@ -186,19 +186,95 @@ class ParserError(Exception):
   pass
 
 
+@dataclasses.dataclass
+class Parser(abc.ABC):
+
+  root: pathlib.Path
+  prefix: pathlib.Path
+
+  @property
+  @abc.abstractmethod
+  def supported_commands(self) -> Container[str]:
+    return []
+
+  def check_supported(self, command: str) -> None:
+    if command not in self.supported_commands:
+      raise ParserError(f'{command} is not supported by {type(self)}')
+
+  @abc.abstractmethod
+  def parse(self, command: str, args: List[str]) -> Entry:
+    pass
+
+
+class SinglePathParser(Parser):
+
+  def parse(self, command: str, args: List[str]) -> Entry:
+    self.check_supported(command)
+    if len(args) != 1:
+      raise ParserError(f'{command} supports only 1 argument, got {len(args)}')
+    return self.parse_single_path(command, pathlib.Path(args[0]))
+
+  @abc.abstractmethod
+  def parse_single_path(self, command: str, path: pathlib.Path) -> Entry:
+    pass
+
+
+class SymlinkParser(SinglePathParser):
+
+  @property
+  def supported_commands(self) -> Container[str]:
+    return ['symlink']
+
+  def parse_single_path(self, command: str, path: pathlib.Path) -> Entry:
+    del command  # unused
+    return SymlinkEntry(self.root / path, self.prefix / path)
+
+
+class CopyParser(SinglePathParser):
+
+  @property
+  def supported_commands(self) -> Container[str]:
+    return ['copy']
+
+  def parse_single_path(self, command: str, path: pathlib.Path) -> Entry:
+    del command  # unused
+    return CopyEntry(self.root / path, self.prefix / path)
+
+
+class ManifestParser(SinglePathParser):
+
+  @property
+  def supported_commands(self) -> Container[str]:
+    return ['subdir']
+
+  def parse_single_path(self, command: str, path: pathlib.Path) -> Entry:
+    del command  # unused
+    return Manifest(self.root / path, self.prefix / path)
+
+
 class Manifest(Entry):
 
   def __init__(self, root: pathlib.Path, prefix: pathlib.Path = pathlib.Path()):
-    self._root = root
-    self._prefix = prefix
     self._entries = []
     manifest_path = root / 'MANIFEST'
+    self._register_parsers(
+        ManifestParser(root=root, prefix=prefix),
+        SymlinkParser(root=root, prefix=prefix),
+        CopyParser(root=root, prefix=prefix),
+    )
     with open(manifest_path) as f:
       for lineno, line in enumerate(f, 1):
         try:
           self._add_line(line)
         except ParserError as e:
           sys.exit(f'{manifest_path}:{lineno}: {e}')
+
+  def _register_parsers(self, *parsers: Parser) -> None:
+    self._parsers = dict()
+    for parser in parsers:
+      for command in parser.supported_commands:
+        assert command not in self._parsers
+        self._parsers[command] = parser
 
   def _add_line(self, line):
     if line.startswith('#'):
@@ -214,17 +290,10 @@ class Manifest(Entry):
       self._add_command(parts[0], parts[1:])
 
   def _add_command(self, command: str, args: List[str]) -> None:
-    if len(args) != 1:
-      raise ParserError(f'{command} supports only 1 argument, got {len(args)}')
-    path = pathlib.Path(args[0])
-    if command == 'symlink':
-      self._entries.append(SymlinkEntry(self._root / path, self._prefix / path))
-    elif command == 'copy':
-      self._entries.append(CopyEntry(self._root / path, self._prefix / path))
-    elif command == 'subdir':
-      self._entries.append(Manifest(self._root / path, self._prefix / path))
-    else:
-      sys.exit(f'{self._root}/MANIFEST: unknown entry type {command}')
+    parser = self._parsers.get(command)
+    if parser is None:
+      raise ParserError(f'{command} is not supported by {type(self)}')
+    self._entries.append(parser.parse(command, args))
 
   def __call__(self, db: InstalledDatabase) -> None:
     for entry in self._entries:
