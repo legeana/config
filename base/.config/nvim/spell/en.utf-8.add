@@ -79,6 +79,7 @@ cwd
 darwin
 dataclass
 dataclasses
+debuggability
 dep
 dhcp
 dicts
@@ -269,6 +270,7 @@ utf
 util
 utils
 uwsgi
+variadic
 vendored
 vimrc
 vimscript
