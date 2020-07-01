@@ -5,3 +5,5 @@ init.vim
 plugin
 spell
 third_party
+
+post_install_exec vim -c RegenSpellFiles -c q

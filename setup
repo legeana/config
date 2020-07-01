@@ -148,6 +148,10 @@ class Entry(abc.ABC):
   def install(self, db: InstalledDatabase) -> None:
     pass
 
+  def post_install(self) -> None:
+    """Post install hook."""
+    pass
+
 
 @dataclasses.dataclass
 class FileEntry(Entry):
@@ -180,6 +184,26 @@ class CopyEntry(FileEntry):
     shutil.copy2(self.src, self.dst)
     # do not record this file in the deletion database to prevent data loss
     log(f'{str(self.src)} -> {str(self.dst)}')
+
+
+class PostInstallHook(Entry):
+
+  def install(self, db: InstalledDatabase) -> None:
+    pass  # unused
+
+  @abc.abstractmethod
+  def post_install(self) -> None:
+    pass
+
+
+@dataclasses.dataclass
+class ExecPostHook(PostInstallHook):
+
+  args: List[str]
+
+  def post_install(self) -> None:
+    print(f'$ {" ".join(shlex.quote(arg) for arg in self.args)}')
+    subprocess.check_call(self.args)
 
 
 class ParserError(Exception):
@@ -252,6 +276,17 @@ class ManifestParser(SinglePathParser):
     return Manifest(self.root / path, self.prefix / path)
 
 
+class ExecPostHookParser(Parser):
+
+  @property
+  def supported_commands(self) -> Container[str]:
+    return ['post_install_exec']
+
+  def parse(self, command: str, args: List[str]) -> Entry:
+    self.check_supported(command)
+    return ExecPostHook(args)
+
+
 class Manifest(Entry):
 
   def __init__(self, root: pathlib.Path, prefix: pathlib.Path = pathlib.Path()):
@@ -262,6 +297,7 @@ class Manifest(Entry):
         ManifestParser(root=root, prefix=prefix),
         SymlinkParser(root=root, prefix=prefix),
         CopyParser(root=root, prefix=prefix),
+        ExecPostHookParser(root=root, prefix=prefix),
     )
     with open(manifest_path) as f:
       for lineno, line in enumerate(f, 1):
@@ -299,6 +335,10 @@ class Manifest(Entry):
   def install(self, db: InstalledDatabase) -> None:
     for entry in self._entries:
       entry.install(db)
+
+  def post_install(self) -> None:
+    for entry in self._entries:
+      entry.post_install()
 
 
 class Installer:
@@ -350,6 +390,11 @@ class Installer:
       log(f'\nInstalling from {str(manifest.root)}')
       manifest.install(self._db)
 
+  def post_install(self):
+    for manifest in self._load_manifests():
+      log(f'\nRunning post install from {str(manifest.root)}')
+      manifest.post_install()
+
 
 async def main():
   parser = argparse.ArgumentParser(description='Synchronized configuration setup')
@@ -365,6 +410,7 @@ async def main():
   if args.uninstall_only:
     sys.exit()
   installer.install()
+  installer.post_install()
 
 
 if __name__ == '__main__':
