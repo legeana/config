@@ -23,6 +23,7 @@ IDEs
 IPv4
 IPv6
 IdentityFile
+MRO
 NoHostAuthenticationForLocalhost
 NumberOfPasswordPrompts
 PasswordAuthentication
@@ -92,6 +93,7 @@ docstrings
 dsa
 dst
 dstdir
+dunder
 editorconfig
 eg
 endblock
@@ -114,6 +116,8 @@ frontend
 ftdetect
 ftplugin
 func
+functools
+ge
 getattr
 github
 githubdb
@@ -142,6 +146,7 @@ ipc
 ipv4
 ipv6
 iter
+iterable
 itertools
 javascript
 jinja2
@@ -163,6 +168,7 @@ linux
 loadavg
 localhost
 localtime
+lt
 md
 mesonbuild
 mesondefine
@@ -174,6 +180,7 @@ mixin
 mkdir
 namedtuple
 nasm
+ne
 netrwhist
 nginx
 no_teardown
@@ -190,9 +197,11 @@ pacman
 param
 params
 paren
+parens
 passwd
 pathlib
 pem
+pikaconfig
 png
 pragma
 procfs
@@ -209,6 +218,7 @@ readonly
 rebase
 recv
 reenable
+repr
 rollout
 rpc
 rsa
