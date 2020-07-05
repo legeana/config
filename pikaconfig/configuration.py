@@ -183,7 +183,7 @@ class Manifest(Entry):
         assert command not in self._parsers
         self._parsers[command] = parser
 
-  def _add_line(self, line):
+  def _add_line(self, line) -> None:
     if line.startswith('#'):
       return
     parts = shlex.split(line)

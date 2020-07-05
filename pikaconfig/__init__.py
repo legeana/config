@@ -6,6 +6,7 @@ import pathlib
 import shlex
 import subprocess
 import sys
+from typing import Iterable
 
 from . import configuration
 from . import database
@@ -77,7 +78,7 @@ class Installer:
     self._db = database.SyncInstalledDatabase(INSTALL)
     self._manifests = None  # lazy loading
 
-  def uninstall(self):
+  def uninstall(self) -> None:
     for link in reversed(self._old_db):
       if not link.is_symlink():
         logging.error(f'Unable to remove {str(link)}')
@@ -100,7 +101,7 @@ class Installer:
     except FileNotFoundError:
       pass
 
-  def _load_manifests(self):
+  def _load_manifests(self) -> Iterable[configuration.Manifest]:
     if self._manifests is not None:
       return self._manifests
     self._manifests = []
