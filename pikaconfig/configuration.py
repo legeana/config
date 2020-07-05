@@ -11,6 +11,10 @@ from typing import Callable, Collection, Dict, List
 PathRecorder = Callable[[pathlib.Path], None]
 
 
+class ParserError(Exception):
+  pass
+
+
 class Entry(abc.ABC):
 
   @abc.abstractmethod
@@ -22,40 +26,6 @@ class Entry(abc.ABC):
     pass
 
 
-@dataclasses.dataclass
-class FileEntry(Entry):
-
-  src: pathlib.Path
-  dst: pathlib.Path
-
-
-class SymlinkEntry(FileEntry):
-
-  def install(self, record: PathRecorder) -> None:
-    if self.dst.exists():
-      if not self.dst.is_symlink():
-        logging.error(f'Symlink: unable to overwrite {str(self.dst)}')
-        return
-      self.dst.unlink()
-    self.dst.parent.mkdir(parents=True, exist_ok=True)
-    self.dst.symlink_to(self.src)
-    record(self.dst)
-    logging.info(f'{str(self.src)} -> {str(self.dst)}')
-
-
-class CopyEntry(FileEntry):
-
-  def install(self, record: PathRecorder) -> None:
-    del record  # unused
-    if self.dst.exists():
-      logging.info(f'Copy: skipping already existing {str(self.dst)}')
-      return
-    self.dst.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(self.src, self.dst)
-    # do not record this file in the deletion database to prevent data loss
-    logging.info(f'{str(self.src)} -> {str(self.dst)}')
-
-
 class PostInstallHook(Entry):
 
   def install(self, record: PathRecorder) -> None:
@@ -64,20 +34,6 @@ class PostInstallHook(Entry):
   @abc.abstractmethod
   def post_install(self) -> None:
     pass
-
-
-@dataclasses.dataclass
-class ExecPostHook(PostInstallHook):
-
-  args: List[str]
-
-  def post_install(self) -> None:
-    logging.info(f'$ {" ".join(shlex.quote(arg) for arg in self.args)}')
-    subprocess.check_call(self.args)
-
-
-class ParserError(Exception):
-  pass
 
 
 @dataclasses.dataclass
@@ -113,6 +69,27 @@ class SinglePathParser(Parser):
     pass
 
 
+@dataclasses.dataclass
+class FileEntry(Entry):
+
+  src: pathlib.Path
+  dst: pathlib.Path
+
+
+class SymlinkEntry(FileEntry):
+
+  def install(self, record: PathRecorder) -> None:
+    if self.dst.exists():
+      if not self.dst.is_symlink():
+        logging.error(f'Symlink: unable to overwrite {str(self.dst)}')
+        return
+      self.dst.unlink()
+    self.dst.parent.mkdir(parents=True, exist_ok=True)
+    self.dst.symlink_to(self.src)
+    record(self.dst)
+    logging.info(f'{str(self.src)} -> {str(self.dst)}')
+
+
 class SymlinkParser(SinglePathParser):
 
   @property
@@ -122,6 +99,19 @@ class SymlinkParser(SinglePathParser):
   def parse_single_path(self, command: str, path: pathlib.Path) -> Entry:
     del command  # unused
     return SymlinkEntry(self.root / path, self.prefix / path)
+
+
+class CopyEntry(FileEntry):
+
+  def install(self, record: PathRecorder) -> None:
+    del record  # unused
+    if self.dst.exists():
+      logging.info(f'Copy: skipping already existing {str(self.dst)}')
+      return
+    self.dst.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(self.src, self.dst)
+    # do not record this file in the deletion database to prevent data loss
+    logging.info(f'{str(self.src)} -> {str(self.dst)}')
 
 
 class CopyParser(SinglePathParser):
@@ -135,15 +125,14 @@ class CopyParser(SinglePathParser):
     return CopyEntry(self.root / path, self.prefix / path)
 
 
-class ManifestParser(SinglePathParser):
+@dataclasses.dataclass
+class ExecPostHook(PostInstallHook):
 
-  @property
-  def supported_commands(self) -> Collection[str]:
-    return ['subdir']
+  args: List[str]
 
-  def parse_single_path(self, command: str, path: pathlib.Path) -> Entry:
-    del command  # unused
-    return Manifest(self.root / path, self.prefix / path)
+  def post_install(self) -> None:
+    logging.info(f'$ {" ".join(shlex.quote(arg) for arg in self.args)}')
+    subprocess.check_call(self.args)
 
 
 class ExecPostHookParser(Parser):
@@ -209,3 +198,14 @@ class Manifest(Entry):
   def post_install(self) -> None:
     for entry in self._entries:
       entry.post_install()
+
+
+class ManifestParser(SinglePathParser):
+
+  @property
+  def supported_commands(self) -> Collection[str]:
+    return ['subdir']
+
+  def parse_single_path(self, command: str, path: pathlib.Path) -> Entry:
+    del command  # unused
+    return Manifest(self.root / path, self.prefix / path)
