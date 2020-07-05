@@ -1,4 +1,3 @@
-import abc
 import dataclasses
 import logging
 import pathlib
@@ -15,11 +14,10 @@ class ParserError(Exception):
   pass
 
 
-class Entry(abc.ABC):
+class Entry:
 
-  @abc.abstractmethod
   def install(self, record: PathRecorder) -> None:
-    pass
+    raise NotImplementedError
 
   def post_install(self) -> None:
     """Post install hook."""
@@ -31,29 +29,26 @@ class PostInstallHook(Entry):
   def install(self, record: PathRecorder) -> None:
     del record  # unused
 
-  @abc.abstractmethod
   def post_install(self) -> None:
-    pass
+    raise NotImplementedError
 
 
 @dataclasses.dataclass
-class Parser(abc.ABC):
+class Parser:
 
   root: pathlib.Path
   prefix: pathlib.Path
 
   @property
-  @abc.abstractmethod
   def supported_commands(self) -> Collection[str]:
-    return []
+    raise NotImplementedError
 
   def check_supported(self, command: str) -> None:
     if command not in self.supported_commands:
       raise ParserError(f'{command} is not supported by {type(self)}')
 
-  @abc.abstractmethod
   def parse(self, command: str, args: List[str]) -> Entry:
-    pass
+    raise NotImplementedError
 
 
 class SinglePathParser(Parser):
@@ -64,9 +59,8 @@ class SinglePathParser(Parser):
       raise ParserError(f'{command} supports only 1 argument, got {len(args)}')
     return self.parse_single_path(command, pathlib.Path(args[0]))
 
-  @abc.abstractmethod
   def parse_single_path(self, command: str, path: pathlib.Path) -> Entry:
-    pass
+    raise NotImplementedError
 
 
 @dataclasses.dataclass
