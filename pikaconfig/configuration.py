@@ -1,5 +1,6 @@
 import abc
 import dataclasses
+import logging
 import pathlib
 import shlex
 import shutil
@@ -8,10 +9,6 @@ import sys
 from typing import Callable, Collection, Dict, List
 
 PathRecorder = Callable[[pathlib.Path], None]
-
-
-def log(*args, **kwargs):
-  print(*args, **kwargs, file=sys.stderr)
 
 
 class Entry(abc.ABC):
@@ -37,13 +34,13 @@ class SymlinkEntry(FileEntry):
   def install(self, record: PathRecorder) -> None:
     if self.dst.exists():
       if not self.dst.is_symlink():
-        log(f'Symlink: unable to overwrite {str(self.dst)}')
+        logging.error(f'Symlink: unable to overwrite {str(self.dst)}')
         return
       self.dst.unlink()
     self.dst.parent.mkdir(parents=True, exist_ok=True)
     self.dst.symlink_to(self.src)
     record(self.dst)
-    log(f'{str(self.src)} -> {str(self.dst)}')
+    logging.info(f'{str(self.src)} -> {str(self.dst)}')
 
 
 class CopyEntry(FileEntry):
@@ -51,12 +48,12 @@ class CopyEntry(FileEntry):
   def install(self, record: PathRecorder) -> None:
     del record  # unused
     if self.dst.exists():
-      log(f'Copy: skipping already existing {str(self.dst)}')
+      logging.info(f'Copy: skipping already existing {str(self.dst)}')
       return
     self.dst.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(self.src, self.dst)
     # do not record this file in the deletion database to prevent data loss
-    log(f'{str(self.src)} -> {str(self.dst)}')
+    logging.info(f'{str(self.src)} -> {str(self.dst)}')
 
 
 class PostInstallHook(Entry):
@@ -75,7 +72,7 @@ class ExecPostHook(PostInstallHook):
   args: List[str]
 
   def post_install(self) -> None:
-    print(f'$ {" ".join(shlex.quote(arg) for arg in self.args)}')
+    logging.info(f'$ {" ".join(shlex.quote(arg) for arg in self.args)}')
     subprocess.check_call(self.args)
 
 

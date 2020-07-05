@@ -1,5 +1,6 @@
 import argparse
 import asyncio
+import logging
 import os
 import pathlib
 import shlex
@@ -8,16 +9,13 @@ import sys
 
 from . import configuration
 from . import database
+from . import logconfig
 
 SELF = pathlib.Path(sys.argv[0]).absolute()
 ROOT = SELF.parent
 OVERLAYS = ROOT / 'overlay.d'
 INSTALL = ROOT / '.install'
 BASE = ROOT / 'base'
-
-
-def log(*args, **kwargs):
-  print(*args, **kwargs, file=sys.stderr)
 
 
 async def run(*args, **kwargs) -> subprocess.CompletedProcess:
@@ -45,7 +43,7 @@ async def update(plugin: pathlib.Path) -> bool:
   args = ['git', '-C', str(plugin), 'pull', '--ff-only']
   try:
     output = await check_output(*args)
-    log(f'Updated {str(plugin)}: {output.decode().strip()}')
+    logging.info(f'Updated {str(plugin)}: {output.decode().strip()}')
   except subprocess.CalledProcessError as e:
     # TODO use shlex.join(), python-3.8+
     command = ' '.join(shlex.quote(arg) for arg in args)
@@ -58,13 +56,13 @@ async def update(plugin: pathlib.Path) -> bool:
 
 
 async def update_all() -> bool:
-  log('Updating...')
+  logging.info('Updating...')
   updates = [update(ROOT)] + [
       update(overlay) for overlay in OVERLAYS.iterdir()
       if overlay.is_dir()
   ]
   update_results = await asyncio.gather(*updates, return_exceptions=False)
-  log()
+  logging.info('')
   assert len(updates) == len(update_results)
   for res in update_results:
     if isinstance(res, BaseException):
@@ -82,18 +80,18 @@ class Installer:
   def uninstall(self):
     for link in reversed(self._old_db):
       if not link.is_symlink():
-        log(f'Unable to remove {str(link)}')
+        logging.error(f'Unable to remove {str(link)}')
         continue
       try:
         link.unlink()
-        log(f'Removed symlink {str(link)}')
+        logging.info(f'Removed symlink {str(link)}')
       except FileNotFoundError:
         # TODO missing_ok=True, python-3.8+
         pass
       for parent in link.parents:
         try:
           parent.rmdir()
-          log(f'Removed empty directory {str(parent)}')
+          logging.info(f'Removed empty directory {str(parent)}')
         except OSError:
           break
     try:
@@ -112,29 +110,30 @@ class Installer:
       try:
         self._manifests.append(configuration.Manifest(path, pathlib.Path.home()))
       except FileNotFoundError as e:
-        log(f'Unable to load MANIFEST in {str(path)}: {e}')
+        logging.error(f'Unable to load MANIFEST in {str(path)}: {e}')
         continue
     return self._manifests
 
-  def install(self):
+  def install(self) -> None:
     for manifest in self._load_manifests():
-      log(f'\nInstalling from {str(manifest.root)}')
+      logging.info(f'\nInstalling from {str(manifest.root)}')
       manifest.install(self._db.add)
 
-  def post_install(self):
+  def post_install(self) -> None:
     for manifest in self._load_manifests():
-      log(f'\nRunning post install from {str(manifest.root)}')
+      logging.info(f'\nRunning post install from {str(manifest.root)}')
       manifest.post_install()
 
 
 async def asyncio_main():
+  logconfig.init()
   parser = argparse.ArgumentParser(description='Synchronized configuration setup')
   parser.add_argument('--no-update', '-d', action='store_false', dest='update')
   parser.add_argument('--uninstall', '-u', action='store_true', dest='uninstall_only')
   args = parser.parse_args()
   if args.update and not args.uninstall_only:
     if await update_all():
-      log(f'Updated {str(SELF)}, restarting')
+      logging.info(f'Updated {str(SELF)}, restarting')
       os.execv(SELF, sys.argv + ['--no-update'])
   installer = Installer()
   installer.uninstall()
