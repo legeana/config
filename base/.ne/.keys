@@ -1,0 +1,3 @@
+# backspace and delete
+KEY 0x7f BS
+KEY 0x115 DC

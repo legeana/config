@@ -11,6 +11,7 @@ bin
 .gitconfig
 .gitconfig-user
 .mplayer
+.ne
 .parallel
 .ssh/config
 .ssh/config.d
