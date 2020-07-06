@@ -89,6 +89,27 @@ class FileEntry(Entry):
   dst: pathlib.Path
 
 
+@dataclasses.dataclass
+class SystemCommandEntry(SystemSetupEntry):
+
+  args: List[str]
+
+  def system_setup(self) -> None:
+    # TODO implement a confirmation
+    _verbose_check_call('sudo', *self.args)
+
+
+class SystemCommandParser(Parser):
+
+  def parse(self, command: str, args: List[str]) -> Entry:
+    self.check_supported(command)
+    return SystemCommandEntry(args=args)
+
+  @property
+  def supported_commands(self) -> Collection[str]:
+    return ['sudo']
+
+
 class AnyPackageEntry(SystemSetupEntry):
 
   def __init__(self, entries):
@@ -238,6 +259,7 @@ class Manifest(Entry):
     manifest_path = root / 'MANIFEST'
     self._register_parsers(
         ManifestParser(root=root, prefix=prefix),
+        SystemCommandParser(root=root, prefix=prefix),
         AnyPackageParser(root=root, prefix=prefix),
         PacmanPackageParser(root=root, prefix=prefix),
         AptPackageParser(root=root, prefix=prefix),
