@@ -7,6 +7,8 @@ import subprocess
 import sys
 from typing import Callable, Collection, Dict, List
 
+from . import system
+
 PathRecorder = Callable[[pathlib.Path], None]
 
 
@@ -16,11 +18,23 @@ class ParserError(Exception):
 
 class Entry:
 
+  def install_system_packages(self) -> None:
+    pass
+
   def install(self, record: PathRecorder) -> None:
     raise NotImplementedError
 
   def post_install(self) -> None:
     """Post install hook."""
+    pass
+
+
+class SystemPackageEntry(Entry):
+
+  def install_system_packages(self) -> None:
+    raise NotImplementedError
+
+  def install(self, record: PathRecorder) -> None:
     pass
 
 
@@ -68,6 +82,82 @@ class FileEntry(Entry):
 
   src: pathlib.Path
   dst: pathlib.Path
+
+
+class AnyPackageEntry(SystemPackageEntry):
+
+  def __init__(self, entries):
+    self._entries = entries
+
+  def install_system_packages(self) -> None:
+    for entry in self._entries:
+      entry.install_system_packages()
+
+
+class AnyPackageParser(Parser):
+
+  def parse(self, command: str, args: List[str]) -> Entry:
+    self.check_supported(command)
+    sysid = system.OsRelease.from_etc().id
+    entries = [
+        cls(args) for cls in [PacmanPackageEntry, AptPackageEntry]
+        if sysid in cls.DISTROS
+    ]
+    return AnyPackageEntry(entries)
+
+  @property
+  def supported_commands(self) -> Collection[str]:
+    return ['install_system_package']
+
+
+@dataclasses.dataclass
+class PacmanPackageEntry(AnyPackageEntry):
+
+  DISTROS = ['arch']
+  names: List[str]
+
+  def install_system_packages(self) -> None:
+    if system.OsRelease.from_etc().id not in self.DISTROS:
+      return
+    args = ['sudo', 'pacman', '-S', '--'] + self.names
+    logging.info(f'$ {" ".join(shlex.quote(arg) for arg in args)}')
+    subprocess.check_call(args)
+
+
+class PacmanPackageParser(Parser):
+
+  def parse(self, command: str, args: List[str]) -> Entry:
+    self.check_supported(command)
+    return PacmanPackageEntry(args)
+
+  @property
+  def supported_commands(self) -> Collection[str]:
+    return ['install_pacman_package']
+
+
+@dataclasses.dataclass
+class AptPackageEntry(AnyPackageEntry):
+
+  DISTROS = ['debian', 'ubuntu']
+  names: List[str]
+
+  def install_system_packages(self) -> None:
+    if system.OsRelease.from_etc().id not in self.DISTROS:
+      return
+    args = ['sudo', 'apt', 'install', '--'] + self.names
+    logging.info(f'$ {" ".join(shlex.quote(arg) for arg in args)}')
+    subprocess.check_call(args)
+
+
+class AptPackageParser(Parser):
+
+  def parse(self, command: str, args: List[str]) -> Entry:
+    self.check_supported(command)
+    return AptPackageEntry(args)
+
+  @property
+  def supported_commands(self) -> Collection[str]:
+    return ['install_apt_package']
 
 
 class SymlinkEntry(FileEntry):
@@ -148,6 +238,9 @@ class Manifest(Entry):
     manifest_path = root / 'MANIFEST'
     self._register_parsers(
         ManifestParser(root=root, prefix=prefix),
+        AnyPackageParser(root=root, prefix=prefix),
+        PacmanPackageParser(root=root, prefix=prefix),
+        AptPackageParser(root=root, prefix=prefix),
         SymlinkParser(root=root, prefix=prefix),
         CopyParser(root=root, prefix=prefix),
         ExecPostHookParser(root=root, prefix=prefix),
@@ -184,6 +277,10 @@ class Manifest(Entry):
     if parser is None:
       raise ParserError(f'{command} is not supported by {type(self)}')
     self._entries.append(parser.parse(command, args))
+
+  def install_system_packages(self) -> None:
+    for entry in self._entries:
+      entry.install_system_packages()
 
   def install(self, record: PathRecorder) -> None:
     for entry in self._entries:
