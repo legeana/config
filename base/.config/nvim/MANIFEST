@@ -6,4 +6,5 @@ plugin
 spell
 third_party
 
+install_system_package vim neovim
 post_install_exec vim -c RegenSpellFiles -c q

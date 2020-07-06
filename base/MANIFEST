@@ -22,3 +22,4 @@ bin
 .yaourtrc
 
 copy .config/htop/htoprc
+install_system_package htop

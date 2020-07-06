@@ -3,3 +3,5 @@ config.d
 config.fish
 functions
 plugins
+
+install_system_package fish
