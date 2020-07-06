@@ -12,6 +12,11 @@ from . import system
 PathRecorder = Callable[[pathlib.Path], None]
 
 
+def _verbose_check_call(*args) -> None:
+  logging.info(f'$ {" ".join(shlex.quote(arg) for arg in args)}')
+  subprocess.check_call(args)
+
+
 class ParserError(Exception):
   pass
 
@@ -119,9 +124,7 @@ class PacmanPackageEntry(SystemSetupEntry):
   def system_setup(self) -> None:
     if system.OsRelease.from_etc().id not in self.DISTROS:
       return
-    args = ['sudo', 'pacman', '-S', '--'] + self.names
-    logging.info(f'$ {" ".join(shlex.quote(arg) for arg in args)}')
-    subprocess.check_call(args)
+    _verbose_check_call('sudo', 'pacman', '-S', '--', *self.names)
 
 
 class PacmanPackageParser(Parser):
@@ -144,9 +147,7 @@ class AptPackageEntry(SystemSetupEntry):
   def system_setup(self) -> None:
     if system.OsRelease.from_etc().id not in self.DISTROS:
       return
-    args = ['sudo', 'apt', 'install', '--'] + self.names
-    logging.info(f'$ {" ".join(shlex.quote(arg) for arg in args)}')
-    subprocess.check_call(args)
+    _verbose_check_call('sudo', 'apt', 'install', '--', *self.names)
 
 
 class AptPackageParser(Parser):
@@ -215,8 +216,7 @@ class ExecPostHook(PostInstallHook):
   args: List[str]
 
   def post_install(self) -> None:
-    logging.info(f'$ {" ".join(shlex.quote(arg) for arg in self.args)}')
-    subprocess.check_call(self.args)
+    _verbose_check_call(*self.args)
 
 
 class ExecPostHookParser(Parser):
