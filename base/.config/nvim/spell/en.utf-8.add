@@ -80,6 +80,7 @@ cwd
 darwin
 dataclass
 dataclasses
+debian
 debuggability
 dep
 dhcp
@@ -132,6 +133,7 @@ hostnames
 hotspotting
 hpp
 href
+htop
 ico
 idiv
 inet
@@ -178,9 +180,11 @@ minecraft
 mitm
 mixin
 mkdir
+mypy
 namedtuple
 nasm
 ne
+neovim
 netrwhist
 nginx
 no_teardown
