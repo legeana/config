@@ -29,7 +29,7 @@ class Entry:
     pass
 
 
-class SystemPackageEntry(Entry):
+class SystemSetupEntry(Entry):
 
   def system_setup(self) -> None:
     raise NotImplementedError
@@ -84,7 +84,7 @@ class FileEntry(Entry):
   dst: pathlib.Path
 
 
-class AnyPackageEntry(SystemPackageEntry):
+class AnyPackageEntry(SystemSetupEntry):
 
   def __init__(self, entries):
     self._entries = entries
@@ -111,7 +111,7 @@ class AnyPackageParser(Parser):
 
 
 @dataclasses.dataclass
-class PacmanPackageEntry(AnyPackageEntry):
+class PacmanPackageEntry(SystemSetupEntry):
 
   DISTROS = ['arch']
   names: List[str]
@@ -136,7 +136,7 @@ class PacmanPackageParser(Parser):
 
 
 @dataclasses.dataclass
-class AptPackageEntry(AnyPackageEntry):
+class AptPackageEntry(SystemSetupEntry):
 
   DISTROS = ['debian', 'ubuntu']
   names: List[str]
