@@ -18,7 +18,7 @@ class ParserError(Exception):
 
 class Entry:
 
-  def install_system_packages(self) -> None:
+  def system_setup(self) -> None:
     pass
 
   def install(self, record: PathRecorder) -> None:
@@ -31,7 +31,7 @@ class Entry:
 
 class SystemPackageEntry(Entry):
 
-  def install_system_packages(self) -> None:
+  def system_setup(self) -> None:
     raise NotImplementedError
 
   def install(self, record: PathRecorder) -> None:
@@ -89,9 +89,9 @@ class AnyPackageEntry(SystemPackageEntry):
   def __init__(self, entries):
     self._entries = entries
 
-  def install_system_packages(self) -> None:
+  def system_setup(self) -> None:
     for entry in self._entries:
-      entry.install_system_packages()
+      entry.system_setup()
 
 
 class AnyPackageParser(Parser):
@@ -116,7 +116,7 @@ class PacmanPackageEntry(AnyPackageEntry):
   DISTROS = ['arch']
   names: List[str]
 
-  def install_system_packages(self) -> None:
+  def system_setup(self) -> None:
     if system.OsRelease.from_etc().id not in self.DISTROS:
       return
     args = ['sudo', 'pacman', '-S', '--'] + self.names
@@ -141,7 +141,7 @@ class AptPackageEntry(AnyPackageEntry):
   DISTROS = ['debian', 'ubuntu']
   names: List[str]
 
-  def install_system_packages(self) -> None:
+  def system_setup(self) -> None:
     if system.OsRelease.from_etc().id not in self.DISTROS:
       return
     args = ['sudo', 'apt', 'install', '--'] + self.names
@@ -278,9 +278,9 @@ class Manifest(Entry):
       raise ParserError(f'{command} is not supported by {type(self)}')
     self._entries.append(parser.parse(command, args))
 
-  def install_system_packages(self) -> None:
+  def system_setup(self) -> None:
     for entry in self._entries:
-      entry.install_system_packages()
+      entry.system_setup()
 
   def install(self, record: PathRecorder) -> None:
     for entry in self._entries:

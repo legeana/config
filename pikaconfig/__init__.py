@@ -115,10 +115,10 @@ class Installer:
         continue
     return self._manifests
 
-  def install_packages(self) -> None:
+  def system_setup(self) -> None:
     for manifest in self._load_manifests():
       logging.info(f'\nInstalling packages from {str(manifest.root)}')
-      manifest.install_system_packages()
+      manifest.system_setup()
 
   def install(self) -> None:
     for manifest in self._load_manifests():
@@ -136,16 +136,16 @@ async def asyncio_main():
   parser = argparse.ArgumentParser(description='Synchronized configuration setup')
   parser.add_argument('--no-update', '-d', action='store_false', dest='update')
   parser.add_argument('--uninstall', '-u', action='store_true', dest='uninstall_only')
-  parser.add_argument('--install-packages', action='store_true',
-                      help='Execute all package installation commands')
+  parser.add_argument('--system', '-s', action='store_true', dest='system_setup',
+                      help='Execute system level commands such as package installation')
   args = parser.parse_args()
   if args.update and not args.uninstall_only:
     if await update_all():
       logging.info(f'Updated {str(SELF)}, restarting')
       os.execv(SELF, sys.argv + ['--no-update'])
   installer = Installer()
-  if args.install_packages:
-    installer.install_packages()
+  if args.system_setup:
+    installer.system_setup()
     sys.exit()
   installer.uninstall()
   if args.uninstall_only:
