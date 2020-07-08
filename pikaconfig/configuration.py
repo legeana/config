@@ -52,11 +52,7 @@ class PostInstallHook(Entry):
     raise NotImplementedError
 
 
-@dataclasses.dataclass
 class Parser:
-
-  root: pathlib.Path
-  prefix: pathlib.Path
 
   @property
   def supported_commands(self) -> Collection[str]:
@@ -70,7 +66,11 @@ class Parser:
     raise NotImplementedError
 
 
+@dataclasses.dataclass
 class SinglePathParser(Parser):
+
+  root: pathlib.Path
+  prefix: pathlib.Path
 
   def parse(self, command: str, args: List[str]) -> Entry:
     self.check_supported(command)
@@ -258,13 +258,13 @@ class Manifest(Entry):
     self._path = root / 'MANIFEST'
     self._register_parsers(
         ManifestParser(root=root, prefix=prefix),
-        SystemCommandParser(root=root, prefix=prefix),
-        AnyPackageParser(root=root, prefix=prefix),
-        PacmanPackageParser(root=root, prefix=prefix),
-        AptPackageParser(root=root, prefix=prefix),
+        SystemCommandParser(),
+        AnyPackageParser(),
+        PacmanPackageParser(),
+        AptPackageParser(),
         SymlinkParser(root=root, prefix=prefix),
         CopyParser(root=root, prefix=prefix),
-        ExecPostHookParser(root=root, prefix=prefix),
+        ExecPostHookParser(),
     )
     with open(self._path) as f:
       for lineno, line in enumerate(f, 1):
