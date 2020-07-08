@@ -66,6 +66,26 @@ class Parser:
     raise NotImplementedError
 
 
+class CombinedParser(Parser):
+
+  def __init__(self, *parsers):
+    self._parsers: Dict[str, Parser] = dict()
+    for parser in parsers:
+      for command in parser.supported_commands:
+        assert command not in self._parsers
+        self._parsers[command] = parser
+
+  @property
+  def supported_commands(self) -> Collection[str]:
+    return self._parsers.keys()
+
+  def parse(self, command: str, args: List[str]) -> Entry:
+    parser = self._parsers.get(command)
+    if parser is None:
+      raise ParserError(f'{command} is not supported by {type(self)}')
+    return parser.parse(command, args)
+
+
 @dataclasses.dataclass
 class SinglePathParser(Parser):
 
@@ -256,7 +276,7 @@ class Manifest(Entry):
   def __init__(self, root: pathlib.Path, prefix: pathlib.Path = pathlib.Path()):
     self._entries: List[Entry] = []
     self._path = root / 'MANIFEST'
-    self._register_parsers(
+    self._parsers = CombinedParser(
         ManifestParser(root=root, prefix=prefix),
         SystemCommandParser(),
         AnyPackageParser(),
@@ -276,13 +296,6 @@ class Manifest(Entry):
   def __str__(self) -> str:
     return str(self._path)
 
-  def _register_parsers(self, *parsers: Parser) -> None:
-    self._parsers: Dict[str, Parser] = dict()
-    for parser in parsers:
-      for command in parser.supported_commands:
-        assert command not in self._parsers
-        self._parsers[command] = parser
-
   def _add_line(self, line) -> None:
     if line.startswith('#'):
       return
@@ -297,10 +310,8 @@ class Manifest(Entry):
       self._add_command(parts[0], parts[1:])
 
   def _add_command(self, command: str, args: List[str]) -> None:
-    parser = self._parsers.get(command)
-    if parser is None:
-      raise ParserError(f'{command} is not supported by {type(self)}')
-    self._entries.append(parser.parse(command, args))
+    parser = self._parsers.parse(command, args)
+    self._entries.append(parser)
 
   def system_setup(self) -> None:
     for entry in self._entries:
