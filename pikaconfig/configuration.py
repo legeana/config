@@ -254,9 +254,8 @@ class ExecPostHookParser(Parser):
 class Manifest(Entry):
 
   def __init__(self, root: pathlib.Path, prefix: pathlib.Path = pathlib.Path()):
-    self.root = root
     self._entries: List[Entry] = []
-    manifest_path = root / 'MANIFEST'
+    self._path = root / 'MANIFEST'
     self._register_parsers(
         ManifestParser(root=root, prefix=prefix),
         SystemCommandParser(root=root, prefix=prefix),
@@ -267,12 +266,15 @@ class Manifest(Entry):
         CopyParser(root=root, prefix=prefix),
         ExecPostHookParser(root=root, prefix=prefix),
     )
-    with open(manifest_path) as f:
+    with open(self._path) as f:
       for lineno, line in enumerate(f, 1):
         try:
           self._add_line(line)
         except ParserError as e:
-          sys.exit(f'{manifest_path}:{lineno}: {e}')
+          sys.exit(f'{self}:{lineno}: {e}')
+
+  def __str__(self) -> str:
+    return str(self._path)
 
   def _register_parsers(self, *parsers: Parser) -> None:
     self._parsers: Dict[str, Parser] = dict()
