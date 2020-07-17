@@ -1,3 +1,4 @@
+ACLs
 AddressFamily
 BatchMode
 CASignatureAlgorithms
@@ -82,6 +83,7 @@ confgen
 config
 configs
 const
+contrib
 cpp
 css
 cwd
@@ -187,6 +189,7 @@ md
 mesonbuild
 mesondefine
 mesonwrap
+messagediff
 metaclass
 minecraft
 mitm
@@ -227,6 +230,7 @@ procfs
 proto
 proto2
 protobuf
+protos
 py
 py3status
 pycache
@@ -242,7 +246,9 @@ repr
 rollout
 rpc
 rsa
+runfiles
 runtimepath
+safehtml
 sdk
 sendmsg
 serializer
@@ -318,5 +324,7 @@ wrapweb
 www
 x11
 xargs
+xsrf
+xsrftoken
 yml
 youtube
