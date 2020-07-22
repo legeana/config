@@ -28,6 +28,7 @@ builtins
 cdn
 classmethod
 cli
+clis
 cls
 cmake
 cmake
@@ -43,11 +44,13 @@ cpp
 css
 cwd
 darwin
+datacenter
 dataclass
 dataclasses
 debian
 debuggability
 dep
+devtools
 dhcp
 dicts
 dir
@@ -57,10 +60,12 @@ django
 dns
 docstring
 docstrings
+dremel
 dsa
 dst
 dstdir
 dunder
+ecommerce
 editorconfig
 eg
 endblock
@@ -259,6 +264,7 @@ ui
 uname
 unicode
 unix
+unregister
 url
 urllib
 usr
