@@ -5,6 +5,7 @@ acls
 addr
 alloc
 alnum
+alsologtostderr
 apache
 api
 appcontext
@@ -42,6 +43,7 @@ configs
 const
 contrib
 cpp
+creds
 css
 cwd
 darwin
@@ -50,6 +52,8 @@ dataclass
 dataclasses
 debian
 debuggability
+denylist
+denylisted
 dep
 devtools
 dhcp
@@ -62,6 +66,7 @@ dns
 docstring
 docstrings
 dremel
+dryrun
 dsa
 dst
 dstdir
@@ -148,6 +153,8 @@ linux
 loadavg
 localhost
 localtime
+loglevel
+logtostderr
 lt
 md
 mesonbuild
@@ -170,6 +177,9 @@ ne
 neovim
 netrwhist
 nginx
+nodryrun
+nonprod
+noparent
 nospell
 num
 nvim
@@ -204,11 +214,13 @@ py
 py3status
 pycache
 pylint
+ratelimit
 rdiv
 readonly
 rebase
 recv
 reenable
+refactorings
 regen
 repr
 rollout
@@ -254,6 +266,8 @@ taskwarrior
 tcp
 teardown
 tempfile
+tetris
+textpb
 textproto
 threadpool
 timestamp
