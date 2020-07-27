@@ -9,6 +9,7 @@ alsologtostderr
 apache
 api
 appcontext
+archlinux
 arg
 args
 ascii
@@ -44,6 +45,7 @@ const
 contrib
 cpp
 creds
+cronjob
 css
 cwd
 darwin
@@ -180,8 +182,10 @@ neovim
 netrwhist
 nginx
 nodryrun
+nonblocking
 nonprod
 noparent
+noreply
 nospell
 num
 nvim
@@ -208,11 +212,13 @@ pid
 pikaconfig
 png
 pragma
+precompute
 procfs
 proto
 protobuf
 protos
 pubkey
+pusheen
 py
 py3status
 pycache
@@ -260,12 +266,14 @@ str
 struct
 stylesheet
 subdir
+subpartition
 sudo
 sys
 syscalls
 sysinfo
 systemd
 taskd
+taskless
 taskrc
 taskwarrior
 tcp
@@ -274,8 +282,11 @@ tempfile
 tetris
 textpb
 textproto
+tgif
 threadpool
+timeseries
 timestamp
+timestep
 tmp
 tmpdir
 tmpl
@@ -303,6 +314,8 @@ uwsgi
 variadic
 vcc
 vendored
+videogames
+vimdiff
 vimrc
 vimscript
 vlan
