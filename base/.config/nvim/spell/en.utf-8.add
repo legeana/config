@@ -76,6 +76,7 @@ editorconfig
 eg
 endblock
 endif
+endswith
 env
 eof
 eq
@@ -87,6 +88,7 @@ faq
 fdpass
 filesystem
 filetypes
+fixup
 flaskutil
 fmt
 fn
@@ -188,6 +190,7 @@ oct
 ok
 omg
 onclick
+oneline
 oneof
 openssh
 orgmode
@@ -240,6 +243,7 @@ sha
 sha1
 sharding
 shlex
+shutil
 solarized
 spellfile
 spellfiles
@@ -247,6 +251,7 @@ src
 srcdir
 srv
 ssd
+startswith
 staticmethod
 stderr
 stdin
