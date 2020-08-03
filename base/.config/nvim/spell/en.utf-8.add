@@ -11,7 +11,9 @@ api
 appcontext
 archlinux
 arg
+argparse
 args
+argv
 ascii
 async
 asyncio
@@ -22,6 +24,7 @@ autoload
 autoplug
 backend
 backends
+basename
 basestring
 blackbox
 blackhole
@@ -40,6 +43,7 @@ cmp
 conf
 confgen
 config
+configparser
 configs
 const
 contrib
@@ -52,6 +56,7 @@ darwin
 datacenter
 dataclass
 dataclasses
+datetime
 debian
 debuggability
 denylist
@@ -61,6 +66,7 @@ devtools
 dhcp
 dicts
 dir
+dirname
 dirs
 dists
 django
@@ -96,6 +102,7 @@ fmt
 fn
 foreach
 frontend
+frozenset
 ftdetect
 ftplugin
 func
@@ -103,18 +110,23 @@ functools
 ge
 getattr
 getopt
+getvalue
 gigasecond
 gitconfig
 github
 githubdb
 gitignore
+gitutils
 gpg
 gpio
 gpiozero
 gz
 hardcoded
+hasattr
 hashbang
+hashlib
 hdd
+hexsha
 homedir
 hostbased
 hostname
@@ -133,6 +145,8 @@ inotify
 inthe
 io
 ipc
+isinstance
+issuecomment
 iter
 iterable
 itertools
@@ -213,6 +227,7 @@ pikaconfig
 png
 pragma
 precompute
+prefill
 procfs
 proto
 protobuf
@@ -245,6 +260,7 @@ serializer
 serializers
 setUp
 setUpModule
+setattr
 sha
 sha1
 sharding
@@ -292,6 +308,7 @@ tmpdir
 tmpl
 tmux
 toolchain
+traceback
 travis
 ttl
 tty
@@ -300,11 +317,14 @@ txt
 udp
 ui
 uname
+uncommenting
 unicode
+unittest
 unix
 unregister
 url
 urllib
+useragent
 usr
 utc
 utf
