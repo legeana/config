@@ -1,0 +1,8 @@
+#!/bin/bash -e
+if [[ -e .git ]]; then
+    echo '.git already exists!' >&2
+    exit 1
+fi
+
+git init
+git commit --allow-empty --message 'Initial commit'
