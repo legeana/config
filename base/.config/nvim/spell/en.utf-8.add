@@ -34,6 +34,7 @@ blackhole
 bool
 bsd
 builtins
+buylist
 cdn
 certtool
 chdir
@@ -52,6 +53,7 @@ config
 configparser
 configs
 const
+contextlib
 contrib
 cpp
 creds
@@ -66,6 +68,7 @@ dataclasses
 datetime
 debian
 debuggability
+dedent
 defs
 denylist
 denylisted
@@ -247,6 +250,7 @@ pathlib
 pem
 pid
 pikaconfig
+pkgbuild
 pki
 pkill
 png
@@ -299,8 +303,12 @@ sharding
 shlex
 shutil
 solarized
+spanielbot
 spellfile
 spellfiles
+sqlalchemy
+sqlengine
+sqlite
 src
 srcdir
 srcs
@@ -323,7 +331,9 @@ sudo
 sys
 syscalls
 sysinfo
+systemctl
 systemd
+tablename
 taskd
 taskdctl
 taskless
@@ -337,6 +347,7 @@ testdata
 tetris
 textpb
 textproto
+textwrap
 tgif
 threadpool
 timeseries
