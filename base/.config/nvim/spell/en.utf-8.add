@@ -32,6 +32,7 @@ bool
 bsd
 builtins
 cdn
+certtool
 classmethod
 cli
 clis
@@ -49,6 +50,7 @@ const
 contrib
 cpp
 creds
+crl
 cronjob
 css
 cwd
@@ -117,6 +119,7 @@ github
 githubdb
 gitignore
 gitutils
+gnutls
 gpg
 gpio
 gpiozero
@@ -144,6 +147,7 @@ inode
 inotify
 inthe
 io
+ip
 ipc
 isinstance
 issuecomment
@@ -181,6 +185,7 @@ mesonwrap
 messagediff
 metaclass
 minecraft
+mit
 mitm
 mixin
 mkdir
@@ -210,6 +215,7 @@ omg
 onclick
 oneline
 oneof
+opensource
 openssh
 orgmode
 os
@@ -224,6 +230,7 @@ pathlib
 pem
 pid
 pikaconfig
+pki
 png
 pragma
 precompute
@@ -289,8 +296,10 @@ syscalls
 sysinfo
 systemd
 taskd
+taskdctl
 taskless
 taskrc
+taskserver
 taskwarrior
 tcp
 teardown
