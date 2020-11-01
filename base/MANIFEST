@@ -1,5 +1,6 @@
 subdir .config/fish
 subdir .config/nvim
+subdir .config/nvim-local
 subdir .config/sublime-text-3
 subdir .local/opt
 
