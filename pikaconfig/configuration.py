@@ -142,11 +142,19 @@ class AnyPackageEntry(SystemSetupEntry):
 
 class AnyPackageParser(Parser):
 
+  @property
+  def _package_managers(self) -> List[SystemSetupEntry]:
+    return [
+        PacmanPackageEntry,
+        AptPackageEntry,
+        BrewPackageEntry,
+    ]
+
   def parse(self, command: str, args: List[str]) -> Entry:
     self.check_supported(command)
     sysid = system.os_id()
     entries = [
-        cls(args) for cls in [PacmanPackageEntry, AptPackageEntry]
+        cls(args) for cls in self._package_managers
         if sysid in cls.DISTROS
     ]
     return AnyPackageEntry(entries)
@@ -200,6 +208,29 @@ class AptPackageParser(Parser):
   @property
   def supported_commands(self) -> Collection[str]:
     return ['install_apt_package']
+
+
+@dataclasses.dataclass
+class BrewPackageEntry(SystemSetupEntry):
+
+  DISTROS = ['darwin']
+  names: List[str]
+
+  def system_setup(self) -> None:
+    if system.os_id() not in self.DISTROS:
+      return
+    _verbose_check_call('brew', 'install', '--', *self.names)
+
+
+class BrewPackageParser(Parser):
+
+  def parse(self, command: str, args: List[str]) -> Entry:
+    self.check_supported(command)
+    return BrewPackageEntry(args)
+
+  @property
+  def supported_commands(self) -> Collection[str]:
+    return ['install_brew_package']
 
 
 class SymlinkEntry(FileEntry):
@@ -282,6 +313,7 @@ class Manifest(Entry):
         AnyPackageParser(),
         PacmanPackageParser(),
         AptPackageParser(),
+        BrewPackageParser(),
         SymlinkParser(root=root, prefix=prefix),
         CopyParser(root=root, prefix=prefix),
         ExecPostHookParser(),
