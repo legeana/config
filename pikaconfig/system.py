@@ -1,5 +1,6 @@
 import dataclasses
 import shlex
+import sys
 
 _SYSTEM_PATH = '/etc/os-release'
 _SYSTEM_OS_RELEASE = None
@@ -44,3 +45,9 @@ class OsRelease:
     if _SYSTEM_OS_RELEASE is None:
       _SYSTEM_OS_RELEASE = cls.from_file(_SYSTEM_PATH)
     return _SYSTEM_OS_RELEASE
+
+
+def os_id() -> str:
+  if sys.platform.startswith('darwin'):
+    return 'darwin'
+  return OsRelease.from_etc().id

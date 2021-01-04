@@ -144,7 +144,7 @@ class AnyPackageParser(Parser):
 
   def parse(self, command: str, args: List[str]) -> Entry:
     self.check_supported(command)
-    sysid = system.OsRelease.from_etc().id
+    sysid = system.os_id()
     entries = [
         cls(args) for cls in [PacmanPackageEntry, AptPackageEntry]
         if sysid in cls.DISTROS
@@ -163,7 +163,7 @@ class PacmanPackageEntry(SystemSetupEntry):
   names: List[str]
 
   def system_setup(self) -> None:
-    if system.OsRelease.from_etc().id not in self.DISTROS:
+    if system.os_id() not in self.DISTROS:
       return
     _verbose_check_call('sudo', 'pacman', '-S', '--', *self.names)
 
@@ -186,7 +186,7 @@ class AptPackageEntry(SystemSetupEntry):
   names: List[str]
 
   def system_setup(self) -> None:
-    if system.OsRelease.from_etc().id not in self.DISTROS:
+    if system.os_id() not in self.DISTROS:
       return
     _verbose_check_call('sudo', 'apt', 'install', '--', *self.names)
 
