@@ -1,3 +1,8 @@
-ssl_certificate /etc/letsencrypt/live/{{server_name}}/fullchain.pem;
-ssl_certificate_key /etc/letsencrypt/live/{{server_name}}/privkey.pem;
-include /etc/letsencrypt/options-ssl-nginx.conf;
+{% with %}
+    {% if server_cert_name is not defined %}
+        {% set server_cert_name = server_name %}
+    {% endif %}
+    ssl_certificate /etc/letsencrypt/live/{{server_cert_name}}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{server_cert_name}}/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+{% endwith %}
