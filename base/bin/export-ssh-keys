@@ -66,7 +66,7 @@ class Tokens:
   def expiration_date(self):
     return self._get(7)
 
-  # 8 Ceritificate S/N
+  # 8 Certificate S/N
 
   def owner_trust(self):
     return self._get(9)
