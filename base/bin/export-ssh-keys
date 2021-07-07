@@ -7,12 +7,14 @@ from pprint import pprint, pformat
 import subprocess
 import tempfile
 import urllib.parse
+import urllib.request
 
 
 KEYBASETOKEN = 'auto-keybase-pgp'
 GNUPGTOKEN = 'auto-gnupg-'
 GNUPGULTIMATE = 'auto-gnupg-ultimate'
 GITHUBTOKEN = 'auto-github-'
+GITLABTOKEN = 'auto-gitlab-'
 
 
 @enum.unique
@@ -356,14 +358,25 @@ def get_github_user() -> str:
                      'do you have ~/config installed?')
 
 
+def export_keys_api(url: str, token: str) -> None:
+  with urllib.request.urlopen(url, timeout=30) as f:
+    keys = f.read().decode('utf8').split('\n')
+  sshkeys = [f'{key} {token}' for key in keys]
+  filter_keys(f=is_not_token(token), add=sshkeys)
+
+
 def export_github():
-  import github
   user = get_github_user()
-  sshkeys = []
-  for key in github.Github().get_user(user).get_keys():
-    sshkeys.append('{key} {token}{user}@github.com'.format(
-        key=key.key, token=GITHUBTOKEN, user=user))
-  filter_keys(f=is_not_token(GITHUBTOKEN), add=sshkeys)
+  token = f'{GITHUBTOKEN}{user}@github.com'
+  export_keys_api(url=f'https://github.com/{user}.keys', token=token)
+
+
+def export_gitlab():
+  # FIXME: This is unsafe for many people, a config file should be used instead.
+  # Assume that github and gitlab users are the same.
+  user = get_github_user()
+  token = f'{GITLABTOKEN}{user}@gitlab.com'
+  export_keys_api(url=f'https://gitlab.com/{user}.keys', token=token)
 
 
 def try_do(f, *args, **kwargs):
@@ -378,6 +391,7 @@ def main():
   try_do(export_keybase)
   try_do(export_ultimate)
   try_do(export_github)
+  try_do(export_gitlab)
 
 
 if __name__ == '__main__':
