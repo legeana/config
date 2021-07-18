@@ -9,6 +9,7 @@ import urllib.parse
 import urllib.request
 
 from pika_ssh_sync import gpgutil
+from pika_ssh_sync import keysutil
 
 
 KEYBASETOKEN = 'auto-keybase-pgp'
@@ -18,35 +19,13 @@ GITHUBTOKEN = 'auto-github-'
 GITLABTOKEN = 'auto-gitlab-'
 
 
-def is_not_token(token):
-  def matcher(key):
-    return token not in key
-  return matcher
-
-
-def get_authorized_keys():
-  return join(os.getenv('HOME'), '.ssh', 'authorized_keys')
-
-
-def filter_keys(f, add=None, path=get_authorized_keys()):
-  with tempfile.NamedTemporaryFile(mode='w', prefix=abspath(path),
-                                   delete=False) as tmpfile:
-    try:
-      with open(path, 'r') as inp:
-        for line in inp:
-          if f(line):
-            tmpfile.write(line)
-        if add is not None:
-          for line in add:
-            if line:
-              tmpfile.write(line)
-              if not line.endswith('\n'):
-                tmpfile.write('\n')
-        tmpfile.close()
-      os.rename(tmpfile.name, path)  # must be last action
-    except Exception:
-      os.unlink(tmpfile.name)
-      raise
+def filter_keys(f, add=None):
+  authorized_keys = keysutil.AuthorizedKeys.load()
+  # remove old entries first as f will match add[...]
+  authorized_keys.filter(f)
+  if add is not None:
+    authorized_keys.extend(add)
+  authorized_keys.save()
 
 
 def make_ssh_keys(key, token, ssh_exporter):
@@ -71,7 +50,7 @@ def export_keybase():
     sshkeys = []
     for key in gpg.list_keys():
       sshkeys.extend(make_ssh_keys(key, KEYBASETOKEN, gpg.export_ssh_key))
-    filter_keys(f=is_not_token(KEYBASETOKEN), add=sshkeys)
+    filter_keys(f=keysutil.is_not_token(KEYBASETOKEN), add=sshkeys)
 
 
 def export_gpg(fingerprint):
@@ -81,7 +60,7 @@ def export_gpg(fingerprint):
   key = gpg.list_key(fingerprint)
   if key:
     sshkeys.extend(make_ssh_keys(key, token, gpg.export_ssh_key))
-  filter_keys(f=is_not_token(token), add=sshkeys)
+  filter_keys(f=keysutil.is_not_token(token), add=sshkeys)
 
 
 def export_ultimate():
@@ -90,7 +69,7 @@ def export_ultimate():
   for key in gpg.list_keys():
     if 'u' in key.owner_trust:
       sshkeys.extend(make_ssh_keys(key, GNUPGULTIMATE, gpg.export_ssh_key))
-  filter_keys(f=is_not_token(GNUPGULTIMATE), add=sshkeys)
+  filter_keys(f=keysutil.is_not_token(GNUPGULTIMATE), add=sshkeys)
 
 
 def get_github_user() -> str:
@@ -114,7 +93,7 @@ def export_keys_api(url: str, token: str) -> None:
   with urllib.request.urlopen(url, timeout=30) as f:
     keys = f.read().decode('utf8').split('\n')
   sshkeys = [f'{key} {token}' for key in keys]
-  filter_keys(f=is_not_token(token), add=sshkeys)
+  filter_keys(f=keysutil.is_not_token(token), add=sshkeys)
 
 
 def export_github():

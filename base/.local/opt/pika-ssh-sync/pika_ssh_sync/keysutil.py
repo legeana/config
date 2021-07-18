@@ -1,0 +1,55 @@
+import os
+import pathlib
+import tempfile
+from typing import Callable, Iterable, List
+
+FilterFunction = Callable[[str], bool]
+
+
+def _authorized_keys_path() -> pathlib.Path:
+  return pathlib.Path.home() / '.ssh' / 'authorized_keys'
+
+
+class AuthorizedKeys:
+
+  _lines: List[str]
+
+  def __init__(self):
+    self._lines = []
+
+  @classmethod
+  def load(cls) -> 'AuthorizedKeys':
+    keys = cls()
+    with open(_authorized_keys_path(), 'r') as inp:
+      keys.extend(inp.readlines())
+    return keys
+
+  def save(self) -> None:
+    path = _authorized_keys_path()
+    with tempfile.NamedTemporaryFile(
+        mode='w', prefix=str(path), delete=False) as tmpfile:
+      try:
+        for line in self._lines:
+          tmpfile.write(line)
+          if not line.endswith('\n'):
+            tmpfile.write('\n')
+        tmpfile.close()
+        os.rename(tmpfile.name, path)  # must be the last action
+      except:
+        os.unlink(tmpfile.name)
+        raise
+
+  def append(self, line: str) -> None:
+    self._lines.append(line.strip('\n'))
+
+  def extend(self, lines: Iterable[str]) -> None:
+    self._lines.extend(line.strip('\n') for line in lines)
+
+  def filter(self, function: FilterFunction) -> None:
+    self._lines = [line for line in self._lines if function(line)]
+
+
+def is_not_token(token: str) -> FilterFunction:
+  def matcher(key):
+    return token not in key
+  return matcher
