@@ -1,2 +1,2 @@
-export-ssh-keys.service
-export-ssh-keys.timer
+pika-ssh-sync.service
+pika-ssh-sync.timer

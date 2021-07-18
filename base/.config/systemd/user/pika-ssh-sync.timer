@@ -1,5 +1,5 @@
 [Unit]
-Description=Run export-ssh-keys.service every 30 minutes
+Description=Run %N.service every 30 minutes
 
 [Timer]
 OnBootSec=30min

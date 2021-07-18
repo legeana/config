@@ -1,9 +1,0 @@
-[Unit]
-Description=Update SSH keys
-
-[Service]
-Type=oneshot
-ExecStart=%h/bin/export-ssh-keys
-
-[Install]
-WantedBy=default.target

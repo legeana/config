@@ -1,0 +1,9 @@
+[Unit]
+Description=Sync SSH keys
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/opt/pika-ssh-sync/pika-ssh-sync
+
+[Install]
+WantedBy=default.target
