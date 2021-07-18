@@ -40,10 +40,13 @@ class AuthorizedKeys:
         raise
 
   def append(self, line: str) -> None:
-    self._lines.append(line.strip('\n'))
+    line = line.strip('\n')
+    if line:
+      self._lines.append(line)
 
   def extend(self, lines: Iterable[str]) -> None:
-    self._lines.extend(line.strip('\n') for line in lines)
+    for line in lines:
+      self.append(line)
 
   def filter(self, function: FilterFunction) -> None:
     self._lines = [line for line in self._lines if function(line)]
