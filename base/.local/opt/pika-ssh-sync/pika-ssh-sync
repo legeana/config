@@ -73,7 +73,7 @@ def export_ultimate():
 
 
 def get_github_user() -> str:
-  import git
+  import git  # type: ignore
   config = git.Repo(os.path.join(os.getenv('HOME'), 'config'))
   config_origin = config.remote('origin')
   for url in config.remote('origin').urls:
