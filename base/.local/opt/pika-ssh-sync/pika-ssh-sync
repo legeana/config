@@ -8,15 +8,13 @@ from typing import Callable, Iterable, List
 import urllib.parse
 import urllib.request
 
+from pika_ssh_sync import config
 from pika_ssh_sync import gpgutil
 from pika_ssh_sync import keysutil
 
 
-KEYBASETOKEN = 'auto-keybase-pgp'
-GNUPGTOKEN = 'auto-gnupg-'
-GNUPGULTIMATE = 'auto-gnupg-ultimate'
-GITHUBTOKEN = 'auto-github-'
-GITLABTOKEN = 'auto-gitlab-'
+def make_token(name: str) -> str:
+  return f'auto-pika-ssh-sync::{name}'
 
 
 def make_ssh_keys(
@@ -35,75 +33,52 @@ def make_ssh_keys(
         fp=subkey.fingerprint)
 
 
-def export_keybase(authorized_keys: keysutil.AuthorizedKeys) -> None:
+def export_keybase(
+    authorized_keys: keysutil.AuthorizedKeys,
+    cfg: config.KeybaseEntry) -> None:
+  token = make_token(cfg.name)
   with tempfile.TemporaryDirectory() as tmpdir:
     gpg = gpgutil.GPG(gnupghome=tmpdir)
     pubkey = subprocess.check_output(['keybase', 'pgp', 'export'])
     gpg.import_keys(pubkey)
     sshkeys: List[str] = []
     for key in gpg.list_keys():
-      sshkeys.extend(make_ssh_keys(key, KEYBASETOKEN, gpg.export_ssh_key))
-    authorized_keys.replace(keysutil.is_not_token(KEYBASETOKEN), sshkeys)
+      sshkeys.extend(make_ssh_keys(key, token, gpg.export_ssh_key))
+    authorized_keys.replace(keysutil.is_not_token(token), sshkeys)
 
 
-def export_gpg(authorized_keys: keysutil.AuthorizedKeys, fingerprint: str) -> None:
-  token = GNUPGTOKEN + fingerprint
+def export_gpg(
+    authorized_keys: keysutil.AuthorizedKeys,
+    cfg: config.GPGKeyEntry) -> None:
+  token = make_token(cfg.name)
   gpg = gpgutil.GPG()
   sshkeys: List[str] = []
-  key = gpg.list_key(fingerprint)
+  key = gpg.list_key(cfg.fingerprint)
   if key:
     sshkeys.extend(make_ssh_keys(key, token, gpg.export_ssh_key))
   authorized_keys.replace(keysutil.is_not_token(token), sshkeys)
 
 
-def export_ultimate(authorized_keys: keysutil.AuthorizedKeys) -> None:
+def export_ultimate(
+    authorized_keys: keysutil.AuthorizedKeys,
+    cfg: config.GPGUltimateEntry) -> None:
+  token = make_token(cfg.name)
   gpg = gpgutil.GPG()
   sshkeys: List[str] = []
   for key in gpg.list_keys():
     if 'u' in key.owner_trust:
-      sshkeys.extend(make_ssh_keys(key, GNUPGULTIMATE, gpg.export_ssh_key))
-  authorized_keys.replace(keysutil.is_not_token(GNUPGULTIMATE), sshkeys)
-
-
-def get_github_user() -> str:
-  import git  # type: ignore
-  config = git.Repo(str(pathlib.Path.home() / 'config'))
-  config_origin = config.remote('origin')
-  for url in config.remote('origin').urls:
-    purl = urllib.parse.urlparse(url)
-    if purl.netloc != 'github.com':
-      continue
-    components = purl.path.split('/', 2)
-    if len(components) >= 2:
-      if components[0] != '':
-        continue
-      return components[1]
-  raise RuntimeError('Unable to identify github user, '
-                     'do you have ~/config installed?')
-
-
-def export_keys_api(
-    authorized_keys: keysutil.AuthorizedKeys, url: str, token: str) -> None:
-  with urllib.request.urlopen(url, timeout=30) as f:
-    keys = f.read().decode('utf8').split('\n')
-  sshkeys = [f'{key} {token}' for key in keys]
+      sshkeys.extend(make_ssh_keys(key, token, gpg.export_ssh_key))
   authorized_keys.replace(keysutil.is_not_token(token), sshkeys)
 
 
-def export_github(authorized_keys: keysutil.AuthorizedKeys) -> None:
-  user = get_github_user()
-  token = f'{GITHUBTOKEN}{user}@github.com'
-  export_keys_api(
-      authorized_keys, url=f'https://github.com/{user}.keys', token=token)
-
-
-def export_gitlab(authorized_keys: keysutil.AuthorizedKeys) -> None:
-  # FIXME: This is unsafe for many people, a config file should be used instead.
-  # Assume that github and gitlab users are the same.
-  user = get_github_user()
-  token = f'{GITLABTOKEN}{user}@gitlab.com'
-  export_keys_api(
-      authorized_keys, url=f'https://gitlab.com/{user}.keys', token=token)
+def export_keys_api(
+    authorized_keys: keysutil.AuthorizedKeys,
+    cfg: config.KeysAPIEntry) -> None:
+  token = make_token(cfg.name)
+  with urllib.request.urlopen(cfg.url, timeout=30) as f:
+    keys = f.read().decode('utf8').split('\n')
+  sshkeys = [f'{key} {token}' for key in keys]
+  authorized_keys.replace(keysutil.is_not_token(token), sshkeys)
 
 
 def try_do(f, *args, **kwargs):
@@ -114,12 +89,25 @@ def try_do(f, *args, **kwargs):
     print(e)
 
 
+def dispatch(entry: config.Entry, authorized_keys: keysutil.AuthorizedKeys) -> None:
+  if isinstance(entry, config.KeysAPIEntry):
+    try_do(export_keys_api, authorized_keys, entry)
+  elif isinstance(entry, config.GPGKeyEntry):
+    try_do(export_gpg, authorized_keys, entry)
+  elif isinstance(entry, config.GPGUltimateEntry):
+    try_do(export_ultimate, authorized_keys, entry)
+  elif isinstance(entry, config.KeybaseEntry):
+    try_do(export_keybase, authorized_keys, entry)
+  else:
+    raise ValueError(
+        f'Unknown entry type {type(entry)} in [{entry.name}]: {entry}')
+
+
 def main():
   authorized_keys = keysutil.AuthorizedKeys.load()
-  try_do(export_keybase, authorized_keys)
-  try_do(export_ultimate, authorized_keys)
-  try_do(export_github, authorized_keys)
-  try_do(export_gitlab, authorized_keys)
+  cfg = config.Config.load()
+  for entry in cfg.entries:
+    dispatch(entry, authorized_keys)
   authorized_keys.save()
 
 
