@@ -88,17 +88,9 @@ class KeyTokens:
     return self._tokens.get(12)
 
 
-class DictRepr:
-
-  def _drepr(self):
-    return dict()
-
-  def __repr__(self) -> str:
-    return pprint.pformat(self._drepr())
-
-
 @dataclasses.dataclass
-class BaseKey(DictRepr):
+class BaseKey:
+
   fingerprint: str = ''
   validity: str = ''
   length: str = ''
@@ -109,34 +101,15 @@ class BaseKey(DictRepr):
   owner_trust: str = ''
   capabilities: str = ''
 
-  def _drepr(self):
-    d = super(BaseKey, self)._drepr()
-    for attr in ['fingerprint',
-                 'validity',
-                 'length',
-                 'algo',
-                 'key_id',
-                 'creation_date',
-                 'expiration_date',
-                 'owner_trust']:
-      d[attr] = getattr(self, attr)
-    return d
-
 
 @dataclasses.dataclass
 class Key(BaseKey):
+
   subkeys: List['SubKey'] = dataclasses.field(default_factory=list)
   uids: List['Uid'] = dataclasses.field(default_factory=list)
 
-  def _drepr(self):
-    d = super(Key, self)._drepr()
-    d['subkeys'] = list(map(lambda x: x._drepr(), self.subkeys))
-    d['uids'] = list(map(lambda x: x._drepr(), self.uids))
-    return d
-
 
 class SubKey(BaseKey):
-  pass
 
   def bad(self):
     for v in 'idren':
@@ -146,15 +119,10 @@ class SubKey(BaseKey):
 
 
 @dataclasses.dataclass
-class Uid(DictRepr):
+class Uid:
+
   name: str
   validity: str
-
-  def _drepr(self):
-    d = super(Uid, self)._drepr()
-    d['name'] = self.name
-    d['validity'] = self.validity
-    return d
 
 
 class Parser:
