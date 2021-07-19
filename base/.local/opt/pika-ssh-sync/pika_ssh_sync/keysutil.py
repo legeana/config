@@ -51,6 +51,11 @@ class AuthorizedKeys:
   def filter(self, function: FilterFunction) -> None:
     self._lines = [line for line in self._lines if function(line)]
 
+  def replace(self, function: FilterFunction, lines: Iterable[str]) -> None:
+    # remove old entries first as function will match lines
+    self.filter(function)
+    self.extend(lines)
+
 
 def is_not_token(token: str) -> FilterFunction:
   def matcher(key):

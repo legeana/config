@@ -20,10 +20,7 @@ GITLABTOKEN = 'auto-gitlab-'
 
 def filter_keys(f, add=None):
   authorized_keys = keysutil.AuthorizedKeys.load()
-  # remove old entries first as f will match add[...]
-  authorized_keys.filter(f)
-  if add is not None:
-    authorized_keys.extend(add)
+  authorized_keys.replace(f, add)
   authorized_keys.save()
 
 
