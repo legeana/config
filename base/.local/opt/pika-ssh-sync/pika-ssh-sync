@@ -19,12 +19,6 @@ GITHUBTOKEN = 'auto-github-'
 GITLABTOKEN = 'auto-gitlab-'
 
 
-def filter_keys(f: keysutil.FilterFunction, add: Iterable[str]) -> None:
-  authorized_keys = keysutil.AuthorizedKeys.load()
-  authorized_keys.replace(f, add)
-  authorized_keys.save()
-
-
 def make_ssh_keys(
     key: gpgutil.Key, token: str, ssh_exporter: Callable[[str], str]
 ) -> Iterable[str]:
@@ -41,7 +35,7 @@ def make_ssh_keys(
         fp=subkey.fingerprint)
 
 
-def export_keybase() -> None:
+def export_keybase(authorized_keys: keysutil.AuthorizedKeys) -> None:
   with tempfile.TemporaryDirectory() as tmpdir:
     gpg = gpgutil.GPG(gnupghome=tmpdir)
     pubkey = subprocess.check_output(['keybase', 'pgp', 'export'])
@@ -49,26 +43,26 @@ def export_keybase() -> None:
     sshkeys: List[str] = []
     for key in gpg.list_keys():
       sshkeys.extend(make_ssh_keys(key, KEYBASETOKEN, gpg.export_ssh_key))
-    filter_keys(f=keysutil.is_not_token(KEYBASETOKEN), add=sshkeys)
+    authorized_keys.replace(keysutil.is_not_token(KEYBASETOKEN), sshkeys)
 
 
-def export_gpg(fingerprint: str) -> None:
+def export_gpg(authorized_keys: keysutil.AuthorizedKeys, fingerprint: str) -> None:
   token = GNUPGTOKEN + fingerprint
   gpg = gpgutil.GPG()
   sshkeys: List[str] = []
   key = gpg.list_key(fingerprint)
   if key:
     sshkeys.extend(make_ssh_keys(key, token, gpg.export_ssh_key))
-  filter_keys(f=keysutil.is_not_token(token), add=sshkeys)
+  authorized_keys.replace(keysutil.is_not_token(token), sshkeys)
 
 
-def export_ultimate() -> None:
+def export_ultimate(authorized_keys: keysutil.AuthorizedKeys) -> None:
   gpg = gpgutil.GPG()
   sshkeys: List[str] = []
   for key in gpg.list_keys():
     if 'u' in key.owner_trust:
       sshkeys.extend(make_ssh_keys(key, GNUPGULTIMATE, gpg.export_ssh_key))
-  filter_keys(f=keysutil.is_not_token(GNUPGULTIMATE), add=sshkeys)
+  authorized_keys.replace(keysutil.is_not_token(GNUPGULTIMATE), sshkeys)
 
 
 def get_github_user() -> str:
@@ -88,25 +82,28 @@ def get_github_user() -> str:
                      'do you have ~/config installed?')
 
 
-def export_keys_api(url: str, token: str) -> None:
+def export_keys_api(
+    authorized_keys: keysutil.AuthorizedKeys, url: str, token: str) -> None:
   with urllib.request.urlopen(url, timeout=30) as f:
     keys = f.read().decode('utf8').split('\n')
   sshkeys = [f'{key} {token}' for key in keys]
-  filter_keys(f=keysutil.is_not_token(token), add=sshkeys)
+  authorized_keys.replace(keysutil.is_not_token(token), sshkeys)
 
 
-def export_github() -> None:
+def export_github(authorized_keys: keysutil.AuthorizedKeys) -> None:
   user = get_github_user()
   token = f'{GITHUBTOKEN}{user}@github.com'
-  export_keys_api(url=f'https://github.com/{user}.keys', token=token)
+  export_keys_api(
+      authorized_keys, url=f'https://github.com/{user}.keys', token=token)
 
 
-def export_gitlab() -> None:
+def export_gitlab(authorized_keys: keysutil.AuthorizedKeys) -> None:
   # FIXME: This is unsafe for many people, a config file should be used instead.
   # Assume that github and gitlab users are the same.
   user = get_github_user()
   token = f'{GITLABTOKEN}{user}@gitlab.com'
-  export_keys_api(url=f'https://gitlab.com/{user}.keys', token=token)
+  export_keys_api(
+      authorized_keys, url=f'https://gitlab.com/{user}.keys', token=token)
 
 
 def try_do(f, *args, **kwargs):
@@ -118,10 +115,12 @@ def try_do(f, *args, **kwargs):
 
 
 def main():
-  try_do(export_keybase)
-  try_do(export_ultimate)
-  try_do(export_github)
-  try_do(export_gitlab)
+  authorized_keys = keysutil.AuthorizedKeys.load()
+  try_do(export_keybase, authorized_keys)
+  try_do(export_ultimate, authorized_keys)
+  try_do(export_github, authorized_keys)
+  try_do(export_gitlab, authorized_keys)
+  authorized_keys.save()
 
 
 if __name__ == '__main__':

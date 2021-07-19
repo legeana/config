@@ -1,3 +1,4 @@
+import copy
 import os
 import pathlib
 import tempfile
@@ -52,9 +53,20 @@ class AuthorizedKeys:
     self._lines = [line for line in self._lines if function(line)]
 
   def replace(self, function: FilterFunction, lines: Iterable[str]) -> None:
-    # remove old entries first as function will match lines
-    self.filter(function)
-    self.extend(lines)
+    """Replace entries that do not match function with lines.
+
+    If this method raises the object is unchanged.
+    """
+    # run the code below as a transaction
+    try:
+      new = copy.deepcopy(self)
+      # remove old entries first as function will match lines
+      new.filter(function)
+      new.extend(lines)
+      # transaction is complete, replace self with new
+      self._lines = new._lines
+    except:
+      raise
 
 
 def is_not_token(token: str) -> FilterFunction:
