@@ -1,8 +1,7 @@
 #!/usr/bin/python3
 
 import os
-from os.path import abspath, join
-from pprint import pprint, pformat
+import pathlib
 import subprocess
 import tempfile
 import urllib.parse
@@ -74,7 +73,7 @@ def export_ultimate():
 
 def get_github_user() -> str:
   import git  # type: ignore
-  config = git.Repo(os.path.join(os.getenv('HOME'), 'config'))
+  config = git.Repo(str(pathlib.Path.home() / 'config'))
   config_origin = config.remote('origin')
   for url in config.remote('origin').urls:
     purl = urllib.parse.urlparse(url)
