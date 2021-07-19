@@ -23,7 +23,7 @@ class Algorithm(enum.Enum):
   KEYGRIP = 13 # Existing key
 
 
-class Tokens:
+class _Tokens:
 
   _tokens: List[str]
 
@@ -39,11 +39,11 @@ class Tokens:
     return self.get(1)
 
 
-class KeyTokens:
+class _KeyTokens:
 
-  _tokens: Tokens
+  _tokens: _Tokens
 
-  def __init__(self, tokens: Tokens):
+  def __init__(self, tokens: _Tokens):
     self._tokens = tokens
 
   def type(self) -> str:
@@ -125,7 +125,7 @@ class Uid:
   validity: str
 
 
-class Parser:
+class _Parser:
 
   _keys: List[Key]
   _key: Optional[Key] = None
@@ -135,21 +135,21 @@ class Parser:
     self._keys = []
 
   def parse(self, line) -> None:
-    tokens = Tokens(line)
+    tokens = _Tokens(line)
     if not tokens: return
     if tokens.type() in {'pub', 'sec'}:
-      self._parse_key(KeyTokens(tokens))
+      self._parse_key(_KeyTokens(tokens))
     elif tokens.type() in {'sub', 'ssb'}:
-      self._parse_subkey(KeyTokens(tokens))
+      self._parse_subkey(_KeyTokens(tokens))
     elif tokens.type() in {'uid'}:
-      self._parse_uid(KeyTokens(tokens))
+      self._parse_uid(_KeyTokens(tokens))
     elif tokens.type() in {'fpr'}:
-      self._parse_fpr(KeyTokens(tokens))
+      self._parse_fpr(_KeyTokens(tokens))
 
   def keys(self) -> List[Key]:
     return self._keys
 
-  def _fill_key(self, key, tokens: KeyTokens) -> None:
+  def _fill_key(self, key, tokens: _KeyTokens) -> None:
     key.validity = tokens.validity()
     key.length = tokens.length()
     key.key_id = tokens.key_id()
@@ -158,25 +158,25 @@ class Parser:
     key.owner_trust = tokens.owner_trust()
     key.capabilities = tokens.capabilities()
 
-  def _parse_key(self, tokens: KeyTokens) -> None:
+  def _parse_key(self, tokens: _KeyTokens) -> None:
     self._key = Key()
     self._subkey = None
     self._keys.append(self._key)
     self._fill_key(self._key, tokens)
 
-  def _parse_fpr(self, tokens: KeyTokens) -> None:
+  def _parse_fpr(self, tokens: _KeyTokens) -> None:
     if self._subkey:
       self._subkey.fingerprint = tokens.user_id()
     elif self._key:
       self._key.fingerprint = tokens.user_id()
 
-  def _parse_subkey(self, tokens: KeyTokens) -> None:
+  def _parse_subkey(self, tokens: _KeyTokens) -> None:
     if not self._key: return
     self._subkey = SubKey()
     self._key.subkeys.append(self._subkey)
     self._fill_key(self._subkey, tokens)
 
-  def _parse_uid(self, tokens: KeyTokens) -> None:
+  def _parse_uid(self, tokens: _KeyTokens) -> None:
     self._subkey = None
     uid = Uid(name=tokens.user_id(), validity=tokens.validity())
     assert self._key is not None
@@ -228,7 +228,7 @@ class GPG:
 
   def _list_keys(self, *args) -> List[Key]:
     out = self._check_utf8('--list-keys', '--with-colons', *args)
-    p = Parser()
+    p = _Parser()
     for line in out.split('\n'):
       p.parse(line)
     return p.keys()
