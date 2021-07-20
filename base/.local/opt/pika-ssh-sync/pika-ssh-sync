@@ -12,9 +12,11 @@ from pika_ssh_sync import config
 from pika_ssh_sync import gpgutil
 from pika_ssh_sync import keysutil
 
+_AUTO_TOKEN_PREFIX = 'auto-pika-ssh-sync::'
+
 
 def make_token(name: str) -> str:
-  return f'auto-pika-ssh-sync::{name}'
+  return _AUTO_TOKEN_PREFIX + name
 
 
 def make_ssh_keys(
@@ -108,6 +110,12 @@ def main():
   cfg = config.Config.load()
   for entry in cfg.entries:
     dispatch(entry, authorized_keys)
+  if cfg.entries:
+    # only clean up old entries if the list is non-empty
+    # in case the config file is corrupt or not found
+    authorized_keys.filter(keysutil.is_tokens_except(
+        tokens=(make_token(e.name) for e in cfg.entries),
+        exception=_AUTO_TOKEN_PREFIX))
   authorized_keys.save()
 
 

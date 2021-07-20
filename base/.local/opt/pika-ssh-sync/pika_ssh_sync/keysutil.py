@@ -70,6 +70,17 @@ class AuthorizedKeys:
 
 
 def is_not_token(token: str) -> FilterFunction:
-  def matcher(key):
+  def matcher(key: str) -> bool:
     return token not in key
+  return matcher
+
+
+def is_tokens_except(tokens: Iterable[str], exception: str) -> FilterFunction:
+  token_list = list(tokens)
+  def matcher(key: str) -> bool:
+    if any(token in key for token in token_list):
+      return True
+    if exception in key:
+      return False
+    return True
   return matcher
