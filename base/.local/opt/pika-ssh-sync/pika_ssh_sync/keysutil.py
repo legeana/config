@@ -29,6 +29,7 @@ class AuthorizedKeys:
     path = _authorized_keys_path()
     with tempfile.NamedTemporaryFile(
         mode='w', prefix=str(path), delete=False) as tmpfile:
+      # TODO make sure permissions are correct
       try:
         for line in self._lines:
           tmpfile.write(line)
