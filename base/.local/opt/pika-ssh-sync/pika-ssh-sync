@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import argparse
 import os
 import pathlib
 import subprocess
@@ -106,6 +107,11 @@ def dispatch(entry: config.Entry, authorized_keys: keysutil.AuthorizedKeys) -> N
 
 
 def main():
+  parser = argparse.ArgumentParser(description='Pika SSH authorized_keys sync')
+  parser.add_argument('--print', action='store_true',
+                      help=('Print generated authorized_keys file '
+                            'instead of saving'))
+  args = parser.parse_args()
   authorized_keys = keysutil.AuthorizedKeys.load()
   cfg = config.Config.load()
   for entry in cfg.entries:
@@ -116,7 +122,10 @@ def main():
     authorized_keys.filter(keysutil.is_tokens_except(
         tokens=(make_token(e.name) for e in cfg.entries),
         exception=_AUTO_TOKEN_PREFIX))
-  authorized_keys.save()
+  if args.print:
+    authorized_keys.print()
+  else:
+    authorized_keys.save()
 
 
 if __name__ == '__main__':

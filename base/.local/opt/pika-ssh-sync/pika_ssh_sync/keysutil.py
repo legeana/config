@@ -1,8 +1,9 @@
 import copy
 import os
 import pathlib
+import sys
 import tempfile
-from typing import Callable, Iterable, List
+from typing import Callable, Iterable, IO, List, Optional
 
 FilterFunction = Callable[[str], bool]
 
@@ -31,15 +32,20 @@ class AuthorizedKeys:
         mode='w', prefix=str(path), delete=False) as tmpfile:
       # TODO make sure permissions are correct
       try:
-        for line in self._lines:
-          tmpfile.write(line)
-          if not line.endswith('\n'):
-            tmpfile.write('\n')
+        self.print(tmpfile)
         tmpfile.close()
         os.rename(tmpfile.name, path)  # must be the last action
       except:
         os.unlink(tmpfile.name)
         raise
+
+  def print(self, file: Optional[IO[str]] = None) -> None:
+    if file is None:
+      file = sys.stdout
+    for line in self._lines:
+      file.write(line)
+      if not line.endswith('\n'):
+        file.write('\n')
 
   def append(self, line: str) -> None:
     line = line.strip('\n')
