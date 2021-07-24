@@ -79,8 +79,8 @@ def export_keys_api(
     cfg: config.KeysAPIEntry) -> None:
   token = make_token(cfg.name)
   with urllib.request.urlopen(cfg.url, timeout=30) as f:
-    keys = f.read().decode('utf8').split('\n')
-  sshkeys = [f'{key} {token}' for key in keys]
+    keys = (key.strip() for key in f.read().decode('utf8').split('\n'))
+  sshkeys = [f'{key} {token}' for key in keys if key]
   authorized_keys.replace(keysutil.is_not_token(token), sshkeys)
 
 
