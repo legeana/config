@@ -330,7 +330,7 @@ class ExecPostHookParser(Parser):
 
 class Manifest(Entry):
 
-  def __init__(self, root: pathlib.Path, prefix: pathlib.Path = pathlib.Path()):
+  def __init__(self, root: pathlib.Path, prefix: pathlib.Path):
     self._entries: List[Entry] = []
     self._path = root / 'MANIFEST'
     self._parsers = CombinedParser(
