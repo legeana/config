@@ -5,7 +5,7 @@ import shlex
 import shutil
 import subprocess
 import sys
-from typing import Callable, Collection, Dict, List
+from typing import Callable, Collection, Dict, List, Type
 
 from . import system
 
@@ -35,6 +35,11 @@ class Entry:
 
 
 class SystemSetupEntry(Entry):
+
+  DISTROS: List[str] = []
+
+  def __init__(self, args: List[str]):
+    raise NotImplementedError
 
   def system_setup(self) -> None:
     raise NotImplementedError
@@ -143,7 +148,7 @@ class AnyPackageEntry(SystemSetupEntry):
 class AnyPackageParser(Parser):
 
   @property
-  def _package_managers(self) -> List[SystemSetupEntry]:
+  def _package_managers(self) -> List[Type[SystemSetupEntry]]:
     return [
         PacmanPackageEntry,
         AptPackageEntry,
