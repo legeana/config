@@ -17,6 +17,18 @@ def _verbose_check_call(*args) -> None:
   subprocess.check_call(args)
 
 
+class Prefix:
+
+  def __init__(self, prefix: pathlib.Path):
+    self._prefix = prefix
+
+  def set(self, prefix: pathlib.Path) -> None:
+    self._prefix = prefix
+
+  def get(self) -> pathlib.Path:
+    return self._prefix
+
+
 class ParserError(Exception):
   pass
 
@@ -95,7 +107,7 @@ class CombinedParser(Parser):
 class SinglePathParser(Parser):
 
   root: pathlib.Path
-  prefix: pathlib.Path
+  prefix: Prefix
 
   def parse(self, command: str, args: List[str]) -> Entry:
     self.check_supported(command)
@@ -281,7 +293,7 @@ class SymlinkParser(SinglePathParser):
 
   def parse_single_path(self, command: str, path: pathlib.Path) -> Entry:
     del command  # unused
-    return SymlinkEntry(self.root / path, self.prefix / path)
+    return SymlinkEntry(self.root / path, self.prefix.get() / path)
 
 
 class CopyEntry(FileEntry):
@@ -305,7 +317,7 @@ class CopyParser(SinglePathParser):
 
   def parse_single_path(self, command: str, path: pathlib.Path) -> Entry:
     del command  # unused
-    return CopyEntry(self.root / path, self.prefix / path)
+    return CopyEntry(self.root / path, self.prefix.get() / path)
 
 
 @dataclasses.dataclass
@@ -328,21 +340,45 @@ class ExecPostHookParser(Parser):
     return ExecPostHook(args)
 
 
+@dataclasses.dataclass
+class SetPrefixEntry(Entry):
+
+  prefix: pathlib.Path
+
+  def install(self, record: PathRecorder) -> None:
+    del record  # unused
+    # noop
+
+
+class SetPrefixParser(SinglePathParser):
+
+  @property
+  def supported_commands(self) -> Collection[str]:
+    return ['prefix']
+
+  def parse_single_path(self, command: str, path: pathlib.Path) -> Entry:
+    del command  # unused
+    self.prefix.set(self.prefix.get() / path.expanduser())
+    return SetPrefixEntry(prefix=path)
+
+
 class Manifest(Entry):
 
   def __init__(self, root: pathlib.Path, prefix: pathlib.Path):
     self._entries: List[Entry] = []
     self._path = root / 'MANIFEST'
+    self._prefix = Prefix(prefix)
     self._parsers = CombinedParser(
-        ManifestParser(root=root, prefix=prefix),
+        ManifestParser(root=root, prefix=self._prefix),
+        SetPrefixParser(root=root, prefix=self._prefix),
         SystemCommandParser(),
         AnyPackageParser(),
         PacmanPackageParser(),
         AptPackageParser(),
         BrewPackageParser(),
         PipPackageParser(),
-        SymlinkParser(root=root, prefix=prefix),
-        CopyParser(root=root, prefix=prefix),
+        SymlinkParser(root=root, prefix=self._prefix),
+        CopyParser(root=root, prefix=self._prefix),
         ExecPostHookParser(),
     )
     with open(self._path) as f:
@@ -393,4 +429,4 @@ class ManifestParser(SinglePathParser):
 
   def parse_single_path(self, command: str, path: pathlib.Path) -> Entry:
     del command  # unused
-    return Manifest(self.root / path, self.prefix / path)
+    return Manifest(self.root / path, self.prefix.get() / path)
