@@ -238,6 +238,27 @@ class BrewPackageParser(Parser):
     return ['install_brew_package']
 
 
+@dataclasses.dataclass
+class PipPackageEntry(SystemSetupEntry):
+
+  names: List[str]
+
+  def system_setup(self) -> None:
+    # system check is not necessary because pip is cross platform
+    _verbose_check_call('pip', 'install', '--user', '--', *self.names)
+
+
+class PipPackageParser(Parser):
+
+  def parse(self, command: str, args: List[str]) -> Entry:
+    self.check_supported(command)
+    return PipPackageEntry(args)
+
+  @property
+  def supported_commands(self) -> Collection[str]:
+    return ['install_pip_user_package']
+
+
 class SymlinkEntry(FileEntry):
 
   def install(self, record: PathRecorder) -> None:
@@ -319,6 +340,7 @@ class Manifest(Entry):
         PacmanPackageParser(),
         AptPackageParser(),
         BrewPackageParser(),
+        PipPackageParser(),
         SymlinkParser(root=root, prefix=prefix),
         CopyParser(root=root, prefix=prefix),
         ExecPostHookParser(),
