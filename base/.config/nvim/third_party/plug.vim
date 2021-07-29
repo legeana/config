@@ -1,6 +1,7 @@
 call autoplug#begin('~/.config/nvim-plugins')
 Plug 'tpope/vim-sensible'
 Plug 'editorconfig/editorconfig-vim'
+Plug 'machakann/vim-highlightedyank'
 Plug 'kamykn/spelunker.vim'
 call autoplug#end()
 
