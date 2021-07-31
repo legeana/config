@@ -1,5 +1,4 @@
 .clang-format
-.config/plasma-workspace/env/kde-i3.sh
 .config/user-dirs.dirs
 .config/user-dirs.locale
 .gdbinit

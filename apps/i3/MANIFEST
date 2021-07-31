@@ -1,0 +1,2 @@
+prefix ~/.config/plasma-workspace/env
+symlink kde-i3.sh
