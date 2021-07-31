@@ -1,3 +1,5 @@
+prefix ~/.config/fish
+
 aliases
 config.d
 config.fish
