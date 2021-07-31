@@ -16,6 +16,9 @@
     tpull = pull --tags
     amend = commit --amend
 
+[init]
+    defaultBranch = master
+
 [url "git@github.com:"]
     pushInsteadOf = https://github.com/
 
@@ -24,5 +27,3 @@
 
 [url "ssh://aur@aur.archlinux.org/"]
     pushInsteadOf = https://aur.archlinux.org/
-[init]
-	defaultBranch = master
