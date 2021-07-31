@@ -7,8 +7,6 @@
 .gitconfig-user
 .ne
 .parallel
-.ssh/config
-.ssh/config.d
 .tmux.conf
 .yaourtrc
 

@@ -1,0 +1,6 @@
+prefix ~/.ssh
+symlink config
+symlink config.d/gpg-agent-fix
+
+prefix ~/.local/bin
+symlink gpg-agent-fix
