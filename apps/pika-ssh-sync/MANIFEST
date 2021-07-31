@@ -1,0 +1,9 @@
+prefix ~/.local/opt
+symlink pika-ssh-sync
+
+prefix ~/.config
+symlink pika-ssh-sync.ini
+
+prefix ~/.config/systemd
+symlink pika-ssh-sync.service
+symlink pika-ssh-sync.timer

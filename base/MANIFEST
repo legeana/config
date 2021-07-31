@@ -2,12 +2,9 @@ subdir .config/fish
 subdir .config/nvim
 subdir .config/nvim-local
 subdir .config/sublime-text-3
-subdir .config/systemd
-subdir .local/opt
 
 bin
 .clang-format
-.config/pika-ssh-sync.ini
 .config/plasma-workspace/env/kde-i3.sh
 .config/user-dirs.dirs
 .config/user-dirs.locale
