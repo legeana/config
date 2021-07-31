@@ -1,18 +1,17 @@
 #!/usr/bin/python3
 
-import json
 import os
 import pathlib
 import sys
 
-from jinja2 import BaseLoader, Environment, PackageLoader, TemplateNotFound
+import jinja2
 
 GEN_SFX = '.gen'
 STD_PREFIX = 'std/'
 STD_TEMPLATES = pathlib.Path(__file__).parent.absolute() / 'templates'
 
 
-class ConfGenLoader(BaseLoader):
+class ConfGenLoader(jinja2.BaseLoader):
 
   def __init__(self, path):
     self._path = path
@@ -27,7 +26,7 @@ class ConfGenLoader(BaseLoader):
       path = root / template
       if path.is_file():
         return path
-    raise TemplateNotFound(template)
+    raise jinja2.TemplateNotFound(template)
 
   def get_source(self, environment, template):
     path = self._resolve(template, self._path, self._std)
@@ -41,8 +40,8 @@ def main():
   cwd = pathlib.Path.cwd()
   templates = cwd / '.confgen'
   if not templates.is_dir():
-    sys.exit(f'Create {templates!r} directory in order to use ConfGen')
-  env = Environment(loader=ConfGenLoader(templates))
+    sys.exit(f'Create {str(templates)!r} directory in order to use ConfGen')
+  env = jinja2.Environment(loader=ConfGenLoader(templates))
   for root, dirs, files in os.walk(templates):
     root = pathlib.Path(root)
     relroot = root.relative_to(templates)
