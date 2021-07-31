@@ -17,6 +17,7 @@ ROOT = SELF.parent
 OVERLAYS = ROOT / 'overlay.d'
 INSTALL = ROOT / '.install'
 BASE = ROOT / 'base'
+APPS = ROOT / 'apps'
 
 
 async def run(*args, **kwargs) -> subprocess.CompletedProcess:
@@ -105,7 +106,8 @@ class Installer:
     if self._manifests is not None:
       return self._manifests
     self._manifests = []
-    for path in [BASE] + sorted(OVERLAYS.iterdir()):
+    paths = [BASE] + sorted(APPS.iterdir()) + sorted(OVERLAYS.iterdir())
+    for path in paths:
       if not path.is_dir():
         continue
       try:
