@@ -1,4 +1,0 @@
-#!/bin/sh
-shift
-exec perl -ple "$@"
-#exec cat
