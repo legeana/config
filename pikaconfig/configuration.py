@@ -5,16 +5,25 @@ import shlex
 import shutil
 import subprocess
 import sys
-from typing import Callable, Collection, Dict, List, Type
+from typing import Callable, Collection, Dict, List, Optional, Type
 
 from . import system
 
 PathRecorder = Callable[[pathlib.Path], None]
 
 
-def _verbose_check_call(*args) -> None:
-  logging.info(f'$ {" ".join(shlex.quote(arg) for arg in args)}')
-  subprocess.check_call(args)
+def _pretty_cwd(cwd: pathlib.Path) -> pathlib.Path:
+  home = pathlib.Path.home()
+  if home in cwd.parents:
+    return pathlib.Path('~') / cwd.relative_to(home)
+  return cwd
+
+
+def _verbose_check_call(*args, cwd: Optional[pathlib.Path] = None) -> None:
+  pwd = '' if cwd is None else f'[{_pretty_cwd(cwd)}] '
+  command = f'$ {" ".join(shlex.quote(arg) for arg in args)}'
+  logging.info(pwd + command)
+  subprocess.check_call(args, cwd=cwd)
 
 
 class Prefix:
@@ -323,13 +332,18 @@ class CopyParser(SinglePathParser):
 @dataclasses.dataclass
 class ExecPostHook(PostInstallHook):
 
+  cwd: pathlib.Path
   args: List[str]
 
   def post_install(self) -> None:
-    _verbose_check_call(*self.args)
+    _verbose_check_call(*self.args, cwd=self.cwd)
 
 
+@dataclasses.dataclass
 class ExecPostHookParser(Parser):
+
+  root: pathlib.Path
+  prefix: Prefix
 
   @property
   def supported_commands(self) -> Collection[str]:
@@ -337,7 +351,7 @@ class ExecPostHookParser(Parser):
 
   def parse(self, command: str, args: List[str]) -> Entry:
     self.check_supported(command)
-    return ExecPostHook(args)
+    return ExecPostHook(cwd=self.prefix.get(), args=args)
 
 
 @dataclasses.dataclass
@@ -379,7 +393,7 @@ class Manifest(Entry):
         PipPackageParser(),
         SymlinkParser(root=root, prefix=self._prefix),
         CopyParser(root=root, prefix=self._prefix),
-        ExecPostHookParser(),
+        ExecPostHookParser(root=root, prefix=self._prefix),
     )
     with open(self._path) as f:
       for lineno, line in enumerate(f, 1):
