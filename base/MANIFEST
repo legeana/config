@@ -10,7 +10,6 @@
 .ssh/config
 .ssh/config.d
 .tmux.conf
-.Xdefaults
 .yaourtrc
 
 copy .config/htop/htoprc
