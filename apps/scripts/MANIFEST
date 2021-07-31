@@ -1,0 +1,8 @@
+prefix ~/.local/bin
+
+discord-emojification
+git-new
+gpg-agent-fix
+gpg-batch
+grub-update
+swap
