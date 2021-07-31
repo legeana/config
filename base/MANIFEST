@@ -1,5 +1,3 @@
-subdir .config/nvim
-subdir .config/nvim-local
 subdir .config/sublime-text-3
 
 bin
@@ -16,8 +14,6 @@ bin
 .ssh/config
 .ssh/config.d
 .tmux.conf
-.vim/plugin
-.vimrc
 .Xdefaults
 .yaourtrc
 

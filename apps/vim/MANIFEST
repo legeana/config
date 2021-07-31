@@ -1,0 +1,4 @@
+symlink .vimrc
+symlink .vim/plugin
+
+subdir xdg_config_home
