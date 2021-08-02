@@ -3,21 +3,13 @@ import logging
 import pathlib
 import shlex
 import shutil
-import subprocess
 import sys
-from typing import Callable, Collection, Dict, List, Optional, Type
+from typing import Callable, Collection, Dict, List, Type
 
 from . import system
 from . import util
 
 PathRecorder = Callable[[pathlib.Path], None]
-
-
-def _verbose_check_call(*args, cwd: Optional[pathlib.Path] = None) -> None:
-  pwd = '' if cwd is None else f'[{util.format_path(cwd)}] '
-  command = f'$ {" ".join(shlex.quote(arg) for arg in args)}'
-  logging.info(pwd + command)
-  subprocess.check_call(args, cwd=cwd)
 
 
 class Prefix:
@@ -136,7 +128,7 @@ class SystemCommandEntry(SystemSetupEntry):
 
   def system_setup(self) -> None:
     # TODO implement a confirmation
-    _verbose_check_call('sudo', *self.args)
+    util.verbose_check_call('sudo', *self.args)
 
 
 class SystemCommandParser(Parser):
@@ -193,7 +185,7 @@ class PacmanPackageEntry(SystemSetupEntry):
   def system_setup(self) -> None:
     if system.os_id() not in self.DISTROS:
       return
-    _verbose_check_call('sudo', 'pacman', '-S', '--', *self.names)
+    util.verbose_check_call('sudo', 'pacman', '-S', '--', *self.names)
 
 
 class PacmanPackageParser(Parser):
@@ -216,7 +208,7 @@ class AptPackageEntry(SystemSetupEntry):
   def system_setup(self) -> None:
     if system.os_id() not in self.DISTROS:
       return
-    _verbose_check_call('sudo', 'apt', 'install', '--', *self.names)
+    util.verbose_check_call('sudo', 'apt', 'install', '--', *self.names)
 
 
 class AptPackageParser(Parser):
@@ -239,7 +231,7 @@ class BrewPackageEntry(SystemSetupEntry):
   def system_setup(self) -> None:
     if system.os_id() not in self.DISTROS:
       return
-    _verbose_check_call('brew', 'install', '--', *self.names)
+    util.verbose_check_call('brew', 'install', '--', *self.names)
 
 
 class BrewPackageParser(Parser):
@@ -260,7 +252,7 @@ class PipPackageEntry(SystemSetupEntry):
 
   def system_setup(self) -> None:
     # system check is not necessary because pip is cross platform
-    _verbose_check_call('pip', 'install', '--user', '--', *self.names)
+    util.verbose_check_call('pip', 'install', '--user', '--', *self.names)
 
 
 class PipPackageParser(Parser):
@@ -330,7 +322,7 @@ class ExecPostHook(PostInstallHook):
   args: List[str]
 
   def post_install(self) -> None:
-    _verbose_check_call(*self.args, cwd=self.cwd)
+    util.verbose_check_call(*self.args, cwd=self.cwd)
 
 
 @dataclasses.dataclass
