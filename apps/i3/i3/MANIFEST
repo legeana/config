@@ -1,0 +1,3 @@
+symlink .confgen/base
+symlink .confgen/config.gen
+post_install_exec confgen.py
