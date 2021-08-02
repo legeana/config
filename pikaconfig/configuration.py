@@ -7,17 +7,9 @@ import sys
 from typing import Collection, Dict, List
 
 from . import entry
+from . import post_install_hook
 from . import system_entry
 from . import util
-
-
-class PostInstallHook(entry.Entry):
-
-  def install(self, record: entry.PathRecorder) -> None:
-    del record  # unused
-
-  def post_install(self) -> None:
-    raise NotImplementedError
 
 
 class CombinedParser(entry.Parser):
@@ -114,31 +106,6 @@ class CopyParser(SinglePathParser):
 
 
 @dataclasses.dataclass
-class ExecPostHook(PostInstallHook):
-
-  cwd: pathlib.Path
-  args: List[str]
-
-  def post_install(self) -> None:
-    util.verbose_check_call(*self.args, cwd=self.cwd)
-
-
-@dataclasses.dataclass
-class ExecPostHookParser(entry.Parser):
-
-  root: pathlib.Path
-  prefix: entry.Prefix
-
-  @property
-  def supported_commands(self) -> Collection[str]:
-    return ['post_install_exec']
-
-  def parse(self, command: str, args: List[str]) -> entry.Entry:
-    self.check_supported(command)
-    return ExecPostHook(cwd=self.prefix.current, args=args)
-
-
-@dataclasses.dataclass
 class SetPrefixEntry(entry.Entry):
 
   prefix: pathlib.Path
@@ -181,7 +148,7 @@ class Manifest(entry.Entry):
         system_entry.PipPackageParser(),
         SymlinkParser(root=root, prefix=self._prefix),
         CopyParser(root=root, prefix=self._prefix),
-        ExecPostHookParser(root=root, prefix=self._prefix),
+        post_install_hook.ExecPostHookParser(root=root, prefix=self._prefix),
     )
     with open(self._path) as f:
       for lineno, line in enumerate(f, 1):
