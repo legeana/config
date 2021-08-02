@@ -11,6 +11,7 @@ from typing import Iterable
 from . import configuration
 from . import database
 from . import logconfig
+from . import util
 
 SELF = pathlib.Path(sys.argv[0]).absolute()
 ROOT = SELF.parent
@@ -45,11 +46,11 @@ async def update(plugin: pathlib.Path) -> bool:
   args = ['git', '-C', str(plugin), 'pull', '--ff-only']
   try:
     output = await check_output(*args)
-    logging.info(f'Updated {str(plugin)}: {output.decode().strip()}')
+    logging.info(f'Updated {util.format_path(plugin)}: {output.decode().strip()}')
   except subprocess.CalledProcessError as e:
     # TODO use shlex.join(), python-3.8+
     command = ' '.join(shlex.quote(arg) for arg in args)
-    sys.exit(f'Failed to update {str(plugin)}, manual intervention is required!\n'
+    sys.exit(f'Failed to update {util.format_path(plugin)}, manual intervention is required!\n'
              f'$ {command}\n'
              f'{e.stdout.decode().strip()}')
   with open(ref) as f:
@@ -82,18 +83,18 @@ class Installer:
   def uninstall(self) -> None:
     for link in reversed(self._old_db):
       if not link.is_symlink():
-        logging.error(f'Unable to remove {str(link)}')
+        logging.error(f'Unable to remove {util.format_path(link)}')
         continue
       try:
         link.unlink()
-        logging.info(f'Removed symlink {str(link)}')
+        logging.info(f'Removed symlink {util.format_path(link)}')
       except FileNotFoundError:
         # TODO missing_ok=True, python-3.8+
         pass
       for parent in link.parents:
         try:
           parent.rmdir()
-          logging.info(f'Removed empty directory {str(parent)}')
+          logging.info(f'Removed empty directory {util.format_path(parent)}')
         except OSError:
           break
     try:
@@ -113,7 +114,7 @@ class Installer:
       try:
         self._manifests.append(configuration.Manifest(path, pathlib.Path.home()))
       except FileNotFoundError as e:
-        logging.error(f'Unable to load MANIFEST in {str(path)}: {e}')
+        logging.error(f'Unable to load MANIFEST in {util.format_path(path)}: {e}')
         continue
     return self._manifests
 
@@ -143,7 +144,7 @@ async def asyncio_main():
   args = parser.parse_args()
   if args.update and not args.uninstall_only:
     if await update_all():
-      logging.info(f'Updated {str(SELF)}, restarting')
+      logging.info(f'Updated {util.format_path(SELF)}, restarting')
       os.execv(SELF, sys.argv + ['--no-update'])
   installer = Installer()
   if args.system_setup:

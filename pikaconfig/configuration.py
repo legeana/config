@@ -8,19 +8,13 @@ import sys
 from typing import Callable, Collection, Dict, List, Optional, Type
 
 from . import system
+from . import util
 
 PathRecorder = Callable[[pathlib.Path], None]
 
 
-def _pretty_cwd(cwd: pathlib.Path) -> pathlib.Path:
-  home = pathlib.Path.home()
-  if home in cwd.parents:
-    return pathlib.Path('~') / cwd.relative_to(home)
-  return cwd
-
-
 def _verbose_check_call(*args, cwd: Optional[pathlib.Path] = None) -> None:
-  pwd = '' if cwd is None else f'[{_pretty_cwd(cwd)}] '
+  pwd = '' if cwd is None else f'[{util.format_path(cwd)}] '
   command = f'$ {" ".join(shlex.quote(arg) for arg in args)}'
   logging.info(pwd + command)
   subprocess.check_call(args, cwd=cwd)
@@ -285,13 +279,13 @@ class SymlinkEntry(FileEntry):
   def install(self, record: PathRecorder) -> None:
     if self.dst.exists():
       if not self.dst.is_symlink():
-        logging.error(f'Symlink: unable to overwrite {str(self.dst)}')
+        logging.error(f'Symlink: unable to overwrite {util.format_path(self.dst)}')
         return
       self.dst.unlink()
     self.dst.parent.mkdir(parents=True, exist_ok=True)
     self.dst.symlink_to(self.src)
     record(self.dst)
-    logging.info(f'{str(self.src)} -> {str(self.dst)}')
+    logging.info(f'{util.format_path(self.src)} -> {util.format_path(self.dst)}')
 
 
 class SymlinkParser(SinglePathParser):
@@ -310,12 +304,12 @@ class CopyEntry(FileEntry):
   def install(self, record: PathRecorder) -> None:
     del record  # unused
     if self.dst.exists():
-      logging.info(f'Copy: skipping already existing {str(self.dst)}')
+      logging.info(f'Copy: skipping already existing {util.format_path(self.dst)}')
       return
     self.dst.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(self.src, self.dst)
     # do not record this file in the deletion database to prevent data loss
-    logging.info(f'{str(self.src)} -> {str(self.dst)}')
+    logging.info(f'{util.format_path(self.src)} -> {util.format_path(self.dst)}')
 
 
 class CopyParser(SinglePathParser):
@@ -403,7 +397,7 @@ class Manifest(Entry):
           sys.exit(f'{self}:{lineno}: {e}')
 
   def __str__(self) -> str:
-    return str(self._path)
+    return util.format_path(self._path)
 
   def _add_line(self, line) -> None:
     if line.startswith('#'):
