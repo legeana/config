@@ -74,6 +74,7 @@ class Manifest(entry.Entry):
         system_entry.PipPackageParser(),
         file_entry.SymlinkParser(root=root, prefix=self._prefix),
         file_entry.CopyParser(root=root, prefix=self._prefix),
+        file_entry.OutputFileParser(root=root, prefix=self._prefix),
         post_install_hook.ExecPostHookParser(root=root, prefix=self._prefix),
     )
     with open(self._path) as f:

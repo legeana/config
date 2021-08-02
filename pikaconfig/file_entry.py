@@ -1,4 +1,6 @@
+import base64
 import dataclasses
+import hashlib
 import logging
 import pathlib
 import shutil
@@ -78,3 +80,46 @@ class CopyParser(SinglePathParser):
   def parse_single_path(self, command: str, path: pathlib.Path) -> entry.Entry:
     del command  # unused
     return CopyEntry(self.root / path, self.prefix.current / path)
+
+
+def _path_hash(path: pathlib.Path) -> str:
+  data = str(path).encode('utf-8')
+  h = hashlib.sha256(data)
+  return base64.urlsafe_b64encode(h.digest()).decode('utf-8')
+
+
+@dataclasses.dataclass
+class OutputFileEntry(entry.Entry):
+  """OutputFileEntry registers an auto-generated file.
+
+  It is not safe to automatically delete a configuration file.
+  There is nothing worse than losing a configuration accidentally,
+  because of this pikaconfig only deletes symlinks.
+  However this does not solve the problem of automatically generated files
+  that can be left behind if configuration is uninstalled.
+  This entry allows a user to register a file as a generated output.
+  pikaconfig will still not remove the date, instead it will pre-create
+  a symlink to a pikaconfig-owned location. That file will not be removed
+  either, but at least it's not left in the middle of the directory tree.
+  """
+
+  dst: pathlib.Path
+
+  def install(self, record: entry.PathRecorder) -> None:
+    pika_state = pathlib.Path.home() / '.local' / 'state' / 'pikaconfig'
+    output_state = pika_state / 'output'
+    output_state.mkdir(parents=True, exist_ok=True)
+    src = output_state / _path_hash(self.dst)
+    symlink_entry = SymlinkEntry(src=src, dst=self.dst)
+    symlink_entry.install(record)
+
+
+class OutputFileParser(SinglePathParser):
+
+  @property
+  def supported_commands(self) -> Collection[str]:
+    return ['output_file']
+
+  def parse_single_path(self, command: str, path: pathlib.Path) -> entry.Entry:
+    del command  # unused
+    return OutputFileEntry(self.prefix.current / path)
