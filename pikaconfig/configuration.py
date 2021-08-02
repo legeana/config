@@ -14,16 +14,28 @@ PathRecorder = Callable[[pathlib.Path], None]
 
 class Prefix:
 
-  _prefix: pathlib.Path
+  _base: pathlib.Path
+  _current: pathlib.Path
 
-  def __init__(self, prefix: pathlib.Path):
-    self._prefix = prefix
+  def __init__(self, base: pathlib.Path):
+    self._base = base
+    self._current = base
 
-  def set(self, prefix: pathlib.Path) -> None:
-    self._prefix = prefix
+  @property
+  def base(self) -> pathlib.Path:
+    """Base value inherited from the parent.
 
-  def get(self) -> pathlib.Path:
-    return self._prefix
+    Represents current MANIFEST before any overrides took place."""
+    return self._base
+
+  @property
+  def current(self) -> pathlib.Path:
+    """Value equal to the base or provided by the user."""
+    return self._current
+
+  @current.setter
+  def current(self, path: pathlib.Path) -> None:
+    self._current = path
 
 
 class ParserError(Exception):
@@ -290,7 +302,7 @@ class SymlinkParser(SinglePathParser):
 
   def parse_single_path(self, command: str, path: pathlib.Path) -> Entry:
     del command  # unused
-    return SymlinkEntry(self.root / path, self.prefix.get() / path)
+    return SymlinkEntry(self.root / path, self.prefix.current / path)
 
 
 class CopyEntry(FileEntry):
@@ -314,7 +326,7 @@ class CopyParser(SinglePathParser):
 
   def parse_single_path(self, command: str, path: pathlib.Path) -> Entry:
     del command  # unused
-    return CopyEntry(self.root / path, self.prefix.get() / path)
+    return CopyEntry(self.root / path, self.prefix.current / path)
 
 
 @dataclasses.dataclass
@@ -339,7 +351,7 @@ class ExecPostHookParser(Parser):
 
   def parse(self, command: str, args: List[str]) -> Entry:
     self.check_supported(command)
-    return ExecPostHook(cwd=self.prefix.get(), args=args)
+    return ExecPostHook(cwd=self.prefix.current, args=args)
 
 
 @dataclasses.dataclass
@@ -360,7 +372,11 @@ class SetPrefixParser(SinglePathParser):
 
   def parse_single_path(self, command: str, path: pathlib.Path) -> Entry:
     del command  # unused
-    self.prefix.set(self.prefix.get() / path.expanduser())
+    # It is important to set prefix relative to the base value
+    # inherited from parent prefix plus current directory.
+    # 'prefix' command should always set prefix
+    # relative to the current directory.
+    self.prefix.current = self.prefix.base / path.expanduser()
     return SetPrefixEntry(prefix=path)
 
 
@@ -431,4 +447,4 @@ class ManifestParser(SinglePathParser):
 
   def parse_single_path(self, command: str, path: pathlib.Path) -> Entry:
     del command  # unused
-    return Manifest(self.root / path, self.prefix.get() / path)
+    return Manifest(self.root / path, self.prefix.current / path)
