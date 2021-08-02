@@ -120,17 +120,17 @@ class Installer:
 
   def system_setup(self) -> None:
     for manifest in self._load_manifests():
-      logging.info(f'\nInstalling packages from {str(manifest)}')
+      logging.info(f'\nInstalling packages from {manifest}')
       manifest.system_setup()
 
   def install(self) -> None:
     for manifest in self._load_manifests():
-      logging.info(f'\nInstalling from {str(manifest)}')
+      logging.info(f'\nInstalling from {manifest}')
       manifest.install(self._db.add)
 
   def post_install(self) -> None:
     for manifest in self._load_manifests():
-      logging.info(f'\nRunning post install from {str(manifest)}')
+      logging.info(f'\nRunning post install from {manifest}')
       manifest.post_install()
 
 
