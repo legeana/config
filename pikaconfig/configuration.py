@@ -4,58 +4,14 @@ import pathlib
 import shlex
 import shutil
 import sys
-from typing import Callable, Collection, Dict, List, Type
+from typing import Collection, Dict, List, Type
 
+from . import entry
 from . import system
 from . import util
 
-PathRecorder = Callable[[pathlib.Path], None]
 
-
-class Prefix:
-
-  _base: pathlib.Path
-  _current: pathlib.Path
-
-  def __init__(self, base: pathlib.Path):
-    self._base = base
-    self._current = base
-
-  @property
-  def base(self) -> pathlib.Path:
-    """Base value inherited from the parent.
-
-    Represents current MANIFEST before any overrides took place."""
-    return self._base
-
-  @property
-  def current(self) -> pathlib.Path:
-    """Value equal to the base or provided by the user."""
-    return self._current
-
-  @current.setter
-  def current(self, path: pathlib.Path) -> None:
-    self._current = path
-
-
-class ParserError(Exception):
-  pass
-
-
-class Entry:
-
-  def system_setup(self) -> None:
-    pass
-
-  def install(self, record: PathRecorder) -> None:
-    raise NotImplementedError
-
-  def post_install(self) -> None:
-    """Post install hook."""
-    pass
-
-
-class SystemSetupEntry(Entry):
+class SystemSetupEntry(entry.Entry):
 
   DISTROS: List[str] = []
 
@@ -65,34 +21,20 @@ class SystemSetupEntry(Entry):
   def system_setup(self) -> None:
     raise NotImplementedError
 
-  def install(self, record: PathRecorder) -> None:
+  def install(self, record: entry.PathRecorder) -> None:
     pass
 
 
-class PostInstallHook(Entry):
+class PostInstallHook(entry.Entry):
 
-  def install(self, record: PathRecorder) -> None:
+  def install(self, record: entry.PathRecorder) -> None:
     del record  # unused
 
   def post_install(self) -> None:
     raise NotImplementedError
 
 
-class Parser:
-
-  @property
-  def supported_commands(self) -> Collection[str]:
-    raise NotImplementedError
-
-  def check_supported(self, command: str) -> None:
-    if command not in self.supported_commands:
-      raise ParserError(f'{command} is not supported by {type(self)}')
-
-  def parse(self, command: str, args: List[str]) -> Entry:
-    raise NotImplementedError
-
-
-class CombinedParser(Parser):
+class CombinedParser(entry.Parser):
 
   def __init__(self, *parsers):
     self._parsers: Dict[str, Parser] = dict()
@@ -105,31 +47,32 @@ class CombinedParser(Parser):
   def supported_commands(self) -> Collection[str]:
     return self._parsers.keys()
 
-  def parse(self, command: str, args: List[str]) -> Entry:
+  def parse(self, command: str, args: List[str]) -> entry.Entry:
     parser = self._parsers.get(command)
     if parser is None:
-      raise ParserError(f'{command} is not supported by {type(self)}')
+      raise entry.ParserError(f'{command} is not supported by {type(self)}')
     return parser.parse(command, args)
 
 
 @dataclasses.dataclass
-class SinglePathParser(Parser):
+class SinglePathParser(entry.Parser):
 
   root: pathlib.Path
-  prefix: Prefix
+  prefix: entry.Prefix
 
-  def parse(self, command: str, args: List[str]) -> Entry:
+  def parse(self, command: str, args: List[str]) -> entry.Entry:
     self.check_supported(command)
     if len(args) != 1:
-      raise ParserError(f'{command} supports only 1 argument, got {len(args)}')
+      raise entry.ParserError(
+          f'{command} supports only 1 argument, got {len(args)}')
     return self.parse_single_path(command, pathlib.Path(args[0]))
 
-  def parse_single_path(self, command: str, path: pathlib.Path) -> Entry:
+  def parse_single_path(self, command: str, path: pathlib.Path) -> entry.Entry:
     raise NotImplementedError
 
 
 @dataclasses.dataclass
-class FileEntry(Entry):
+class FileEntry(entry.Entry):
 
   src: pathlib.Path
   dst: pathlib.Path
@@ -145,9 +88,9 @@ class SystemCommandEntry(SystemSetupEntry):
     util.verbose_check_call('sudo', *self.args)
 
 
-class SystemCommandParser(Parser):
+class SystemCommandParser(entry.Parser):
 
-  def parse(self, command: str, args: List[str]) -> Entry:
+  def parse(self, command: str, args: List[str]) -> entry.Entry:
     self.check_supported(command)
     return SystemCommandEntry(args=args)
 
@@ -166,7 +109,7 @@ class AnyPackageEntry(SystemSetupEntry):
       entry.system_setup()
 
 
-class AnyPackageParser(Parser):
+class AnyPackageParser(entry.Parser):
 
   @property
   def _package_managers(self) -> List[Type[SystemSetupEntry]]:
@@ -176,7 +119,7 @@ class AnyPackageParser(Parser):
         BrewPackageEntry,
     ]
 
-  def parse(self, command: str, args: List[str]) -> Entry:
+  def parse(self, command: str, args: List[str]) -> entry.Entry:
     self.check_supported(command)
     sysid = system.os_id()
     entries = [
@@ -202,9 +145,9 @@ class PacmanPackageEntry(SystemSetupEntry):
     util.verbose_check_call('sudo', 'pacman', '-S', '--', *self.names)
 
 
-class PacmanPackageParser(Parser):
+class PacmanPackageParser(entry.Parser):
 
-  def parse(self, command: str, args: List[str]) -> Entry:
+  def parse(self, command: str, args: List[str]) -> entry.Entry:
     self.check_supported(command)
     return PacmanPackageEntry(args)
 
@@ -225,9 +168,9 @@ class AptPackageEntry(SystemSetupEntry):
     util.verbose_check_call('sudo', 'apt', 'install', '--', *self.names)
 
 
-class AptPackageParser(Parser):
+class AptPackageParser(entry.Parser):
 
-  def parse(self, command: str, args: List[str]) -> Entry:
+  def parse(self, command: str, args: List[str]) -> entry.Entry:
     self.check_supported(command)
     return AptPackageEntry(args)
 
@@ -248,9 +191,9 @@ class BrewPackageEntry(SystemSetupEntry):
     util.verbose_check_call('brew', 'install', '--', *self.names)
 
 
-class BrewPackageParser(Parser):
+class BrewPackageParser(entry.Parser):
 
-  def parse(self, command: str, args: List[str]) -> Entry:
+  def parse(self, command: str, args: List[str]) -> entry.Entry:
     self.check_supported(command)
     return BrewPackageEntry(args)
 
@@ -269,9 +212,9 @@ class PipPackageEntry(SystemSetupEntry):
     util.verbose_check_call('pip', 'install', '--user', '--', *self.names)
 
 
-class PipPackageParser(Parser):
+class PipPackageParser(entry.Parser):
 
-  def parse(self, command: str, args: List[str]) -> Entry:
+  def parse(self, command: str, args: List[str]) -> entry.Entry:
     self.check_supported(command)
     return PipPackageEntry(args)
 
@@ -282,7 +225,7 @@ class PipPackageParser(Parser):
 
 class SymlinkEntry(FileEntry):
 
-  def install(self, record: PathRecorder) -> None:
+  def install(self, record: entry.PathRecorder) -> None:
     if self.dst.exists():
       if not self.dst.is_symlink():
         logging.error(f'Symlink: unable to overwrite {util.format_path(self.dst)}')
@@ -300,14 +243,14 @@ class SymlinkParser(SinglePathParser):
   def supported_commands(self) -> Collection[str]:
     return ['symlink']
 
-  def parse_single_path(self, command: str, path: pathlib.Path) -> Entry:
+  def parse_single_path(self, command: str, path: pathlib.Path) -> entry.Entry:
     del command  # unused
     return SymlinkEntry(self.root / path, self.prefix.current / path)
 
 
 class CopyEntry(FileEntry):
 
-  def install(self, record: PathRecorder) -> None:
+  def install(self, record: entry.PathRecorder) -> None:
     del record  # unused
     if self.dst.exists():
       logging.info(f'Copy: skipping already existing {util.format_path(self.dst)}')
@@ -324,7 +267,7 @@ class CopyParser(SinglePathParser):
   def supported_commands(self) -> Collection[str]:
     return ['copy']
 
-  def parse_single_path(self, command: str, path: pathlib.Path) -> Entry:
+  def parse_single_path(self, command: str, path: pathlib.Path) -> entry.Entry:
     del command  # unused
     return CopyEntry(self.root / path, self.prefix.current / path)
 
@@ -340,26 +283,26 @@ class ExecPostHook(PostInstallHook):
 
 
 @dataclasses.dataclass
-class ExecPostHookParser(Parser):
+class ExecPostHookParser(entry.Parser):
 
   root: pathlib.Path
-  prefix: Prefix
+  prefix: entry.Prefix
 
   @property
   def supported_commands(self) -> Collection[str]:
     return ['post_install_exec']
 
-  def parse(self, command: str, args: List[str]) -> Entry:
+  def parse(self, command: str, args: List[str]) -> entry.Entry:
     self.check_supported(command)
     return ExecPostHook(cwd=self.prefix.current, args=args)
 
 
 @dataclasses.dataclass
-class SetPrefixEntry(Entry):
+class SetPrefixEntry(entry.Entry):
 
   prefix: pathlib.Path
 
-  def install(self, record: PathRecorder) -> None:
+  def install(self, record: entry.PathRecorder) -> None:
     del record  # unused
     # noop
 
@@ -370,7 +313,7 @@ class SetPrefixParser(SinglePathParser):
   def supported_commands(self) -> Collection[str]:
     return ['prefix']
 
-  def parse_single_path(self, command: str, path: pathlib.Path) -> Entry:
+  def parse_single_path(self, command: str, path: pathlib.Path) -> entry.Entry:
     del command  # unused
     # It is important to set prefix relative to the base value
     # inherited from parent prefix plus current directory.
@@ -380,12 +323,12 @@ class SetPrefixParser(SinglePathParser):
     return SetPrefixEntry(prefix=path)
 
 
-class Manifest(Entry):
+class Manifest(entry.Entry):
 
   def __init__(self, root: pathlib.Path, prefix: pathlib.Path):
-    self._entries: List[Entry] = []
+    self._entries: List[entry.Entry] = []
     self._path = root / 'MANIFEST'
-    self._prefix = Prefix(prefix)
+    self._prefix = entry.Prefix(prefix)
     self._parsers = CombinedParser(
         ManifestParser(root=root, prefix=self._prefix),
         SetPrefixParser(root=root, prefix=self._prefix),
@@ -403,7 +346,7 @@ class Manifest(Entry):
       for lineno, line in enumerate(f, 1):
         try:
           self._add_line(line)
-        except ParserError as e:
+        except entry.ParserError as e:
           sys.exit(f'{self}:{lineno}: {e}')
 
   def __str__(self) -> str:
@@ -430,7 +373,7 @@ class Manifest(Entry):
     for entry in self._entries:
       entry.system_setup()
 
-  def install(self, record: PathRecorder) -> None:
+  def install(self, record: entry.PathRecorder) -> None:
     for entry in self._entries:
       entry.install(record)
 
@@ -445,6 +388,6 @@ class ManifestParser(SinglePathParser):
   def supported_commands(self) -> Collection[str]:
     return ['subdir']
 
-  def parse_single_path(self, command: str, path: pathlib.Path) -> Entry:
+  def parse_single_path(self, command: str, path: pathlib.Path) -> entry.Entry:
     del command  # unused
     return Manifest(self.root / path, self.prefix.current / path)
