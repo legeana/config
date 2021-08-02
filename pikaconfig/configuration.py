@@ -14,6 +14,8 @@ PathRecorder = Callable[[pathlib.Path], None]
 
 class Prefix:
 
+  _prefix: pathlib.Path
+
   def __init__(self, prefix: pathlib.Path):
     self._prefix = prefix
 
