@@ -8,6 +8,7 @@ from . import entry
 from . import local_state
 from . import util
 
+
 @dataclasses.dataclass
 class SinglePathParser(entry.Parser):
 
