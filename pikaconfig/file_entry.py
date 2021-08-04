@@ -1,12 +1,11 @@
-import base64
 import dataclasses
-import hashlib
 import logging
 import pathlib
 import shutil
 from typing import Collection, List
 
 from . import entry
+from . import local_state
 from . import util
 
 @dataclasses.dataclass
@@ -82,12 +81,6 @@ class CopyParser(SinglePathParser):
     return CopyEntry(self.root / path, self.prefix.current / path)
 
 
-def _path_hash(path: pathlib.Path) -> str:
-  data = str(path).encode('utf-8')
-  h = hashlib.sha256(data)
-  return base64.urlsafe_b64encode(h.digest()).decode('utf-8')
-
-
 @dataclasses.dataclass
 class OutputFileEntry(entry.Entry):
   """OutputFileEntry registers an auto-generated file.
@@ -106,12 +99,8 @@ class OutputFileEntry(entry.Entry):
   dst: pathlib.Path
 
   def install(self, record: entry.PathRecorder) -> None:
-    pika_state = pathlib.Path.home() / '.local' / 'state' / 'pikaconfig'
-    output_state = pika_state / 'output'
-    output_state.mkdir(parents=True, exist_ok=True)
-    src = output_state / _path_hash(self.dst)
-    symlink_entry = SymlinkEntry(src=src, dst=self.dst)
-    symlink_entry.install(record)
+    src = local_state.make_state(self.dst)
+    SymlinkEntry(src=src, dst=self.dst).install(record)
 
 
 class OutputFileParser(SinglePathParser):
