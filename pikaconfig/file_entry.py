@@ -9,6 +9,20 @@ from . import local_state
 from . import util
 
 
+def _make_symlink(src: pathlib.Path, dst: pathlib.Path,
+                  record: entry.PathRecorder) -> None:
+  if dst.exists():
+    if not dst.is_symlink():
+      logging.error(f'Symlink: unable to overwrite {util.format_path(dst)}')
+      return
+    dst.unlink()
+  dst.parent.mkdir(parents=True, exist_ok=True)
+  dst.symlink_to(src)
+  record(dst)
+  logging.info(f'{util.format_path(src)} -> {util.format_path(dst)}')
+
+
+
 @dataclasses.dataclass
 class SinglePathParser(entry.Parser):
 
@@ -36,15 +50,7 @@ class FileEntry(entry.Entry):
 class SymlinkEntry(FileEntry):
 
   def install(self, record: entry.PathRecorder) -> None:
-    if self.dst.exists():
-      if not self.dst.is_symlink():
-        logging.error(f'Symlink: unable to overwrite {util.format_path(self.dst)}')
-        return
-      self.dst.unlink()
-    self.dst.parent.mkdir(parents=True, exist_ok=True)
-    self.dst.symlink_to(self.src)
-    record(self.dst)
-    logging.info(f'{util.format_path(self.src)} -> {util.format_path(self.dst)}')
+    _make_symlink(src=self.src, dst=self.dst, record=record)
 
 
 class SymlinkParser(SinglePathParser):
@@ -101,7 +107,7 @@ class OutputFileEntry(entry.Entry):
 
   def install(self, record: entry.PathRecorder) -> None:
     src = local_state.make_state(self.dst)
-    SymlinkEntry(src=src, dst=self.dst).install(record)
+    _make_symlink(src=src, dst=self.dst, record=record)
 
 
 class OutputFileParser(SinglePathParser):
