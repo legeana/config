@@ -67,14 +67,14 @@ class SymlinkParser(SinglePathParser):
 class CopyEntry(FileEntry):
 
   def install(self, record: entry.PathRecorder) -> None:
-    del record  # unused
-    if self.dst.exists():
-      logging.info(f'Copy: skipping already existing {util.format_path(self.dst)}')
+    state = local_state.make_state(self.dst)
+    _make_symlink(src=state, dst=self.dst, record=record)
+    if state.exists():
+      logging.info(f'Copy: skipping already existing state '
+                   f'for {util.format_path(self.dst)}')
       return
-    self.dst.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(self.src, self.dst)
-    # do not record this file in the deletion database to prevent data loss
-    logging.info(f'{util.format_path(self.src)} -> {util.format_path(self.dst)}')
+    shutil.copy2(self.src, state)
+    logging.info(f'{util.format_path(self.src)} -> {util.format_path(state)}')
 
 
 class CopyParser(SinglePathParser):
