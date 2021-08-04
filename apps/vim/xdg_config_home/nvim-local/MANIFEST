@@ -1,1 +1,2 @@
 copy spell/en.utf-8.add
+output_file spell/en.utf-8.add.spl
