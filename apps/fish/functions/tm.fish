@@ -29,7 +29,11 @@ end
 function _tm_forward_socket --no-scope-shadowing -a session -a env -a value
     mkdir -p -m 700 "$_TM_TMP"
     set path "$_TM_TMP/$USER.$session.$env"
-    ln -snf -- $$env $path
+    set dst $$env
+    if ! test -e $$env
+        set dst /dev/null
+    end
+    ln -snf -- $dst $path
     set --append env_overrides "$env=$path"
 end
 
