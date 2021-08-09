@@ -13,7 +13,7 @@ complete --command=tm --no-files --arguments='(tmux list-sessions -F "#{session_
 # The functions below operate under the assumption that tmux will not be used
 # by more than one user simultaneously. The last connection wins.
 
-set -g _TM_TMP "$HOME/.tmux-tmp"
+set -g _TM_TMP "$HOME/.local/state/tmux-ssh-agent"
 
 function _tm_cleanup
     for f in "$_TM_TMP/"*
