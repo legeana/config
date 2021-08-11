@@ -15,6 +15,7 @@ mode "resize" {
         # Return to default mode
         Return mode "default"
         Escape mode "default"
+        $mod+r mode "default"
     }
 }
 bindsym --to-code $mod+r mode "resize"
