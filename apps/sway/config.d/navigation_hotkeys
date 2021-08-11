@@ -1,0 +1,15 @@
+# Move your focus around
+bindsym --to-code {
+    $mod+$left focus left
+    $mod+$down focus down
+    $mod+$up focus up
+    $mod+$right focus right
+}
+
+# Move the focused window with the same, but add Shift
+bindsym --to-code {
+    $mod+Shift+$left move left
+    $mod+Shift+$down move down
+    $mod+Shift+$up move up
+    $mod+Shift+$right move right
+}

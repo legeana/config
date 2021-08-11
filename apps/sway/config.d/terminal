@@ -1,0 +1,2 @@
+# Start a terminal
+bindsym --to-code $mod+Return exec $term

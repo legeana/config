@@ -1,0 +1,25 @@
+prefix ~/.config/sway
+symlink config
+
+config-vars.d/directions
+config-vars.d/menu
+config-vars.d/mod
+config-vars.d/terminal
+config-vars.d/workspaces
+
+config.d/input
+config.d/keyboard
+config.d/launch
+config.d/navigation_hotkeys
+config.d/scratchpad
+config.d/sway_hotkeys
+config.d/touchpad
+config.d/bar
+config.d/workspaces
+config.d/idle
+config.d/terminal
+config.d/output
+config.d/floating_hotkeys
+config.d/resize_mode
+config.d/wallpaper
+config.d/layout_hotkeys
