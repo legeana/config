@@ -1,6 +1,7 @@
 prefix ~/.config/sway
 symlink config
 
+config-vars.d/browser
 config-vars.d/directions
 config-vars.d/menu
 config-vars.d/mod
@@ -8,6 +9,7 @@ config-vars.d/terminal
 config-vars.d/workspaces
 
 config.d/boss_mode
+config.d/browser
 config.d/input
 config.d/keyboard
 config.d/launch
