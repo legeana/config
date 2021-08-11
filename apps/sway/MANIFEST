@@ -10,6 +10,7 @@ config-vars.d/workspaces
 config.d/input
 config.d/keyboard
 config.d/launch
+config.d/layout
 config.d/navigation_hotkeys
 config.d/scratchpad
 config.d/sway_hotkeys
