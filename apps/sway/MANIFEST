@@ -3,6 +3,7 @@ symlink config
 
 config-vars.d/browser
 config-vars.d/directions
+config-vars.d/idle
 config-vars.d/menu
 config-vars.d/mod
 config-vars.d/terminal
