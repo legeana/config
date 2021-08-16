@@ -28,3 +28,6 @@ config.d/floating_hotkeys
 config.d/resize_mode
 config.d/wallpaper
 config.d/layout_hotkeys
+
+prefix ~/.local/bin
+symlink start-sway

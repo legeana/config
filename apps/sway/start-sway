@@ -1,0 +1,4 @@
+#!/bin/sh -e
+
+export XDG_SESSION_TYPE=wayland
+exec with-environment-d ssh-agent dbus-launch --exit-with-session sway
