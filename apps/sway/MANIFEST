@@ -23,6 +23,7 @@ config.d/navigation_hotkeys
 config.d/notifications
 config.d/output
 config.d/resize_mode
+config.d/screenshot
 config.d/scratchpad
 config.d/sway_hotkeys
 config.d/terminal
