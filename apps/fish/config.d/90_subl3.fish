@@ -1,3 +1,3 @@
-if which subl >/dev/null 2>&1; and not which subl3 >/dev/null 2>&1
+if command -q subl; and not command -q subl3
     alias subl3 subl
 end

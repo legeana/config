@@ -1,6 +1,6 @@
-if which nvim >/dev/null
+if command -q nvim
     alias vi=nvim
     alias vim=nvim
-else if which vim >/dev/null
+else if command -q vim
     alias vi=vim
 end
