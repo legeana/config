@@ -22,7 +22,7 @@ class ExecPostHook(PostInstallHook):
   args: List[str]
 
   def post_install(self) -> None:
-    util.verbose_check_call(*self.args, cwd=self.cwd)
+    util.verbose_check_user_call(*self.args, cwd=self.cwd)
 
 
 @dataclasses.dataclass

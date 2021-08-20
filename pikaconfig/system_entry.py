@@ -27,7 +27,7 @@ class SystemCommandEntry(SystemSetupEntry):
 
   def system_setup(self) -> None:
     # TODO implement a confirmation
-    util.verbose_check_call('sudo', *self.args)
+    util.verbose_check_user_call('sudo', *self.args)
 
 
 class SystemCommandParser(entry.Parser):
