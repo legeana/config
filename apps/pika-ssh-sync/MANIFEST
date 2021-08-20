@@ -4,6 +4,6 @@ symlink pika-ssh-sync
 prefix ~/.config
 symlink pika-ssh-sync.ini
 
-prefix ~/.config/systemd
+prefix ~/.config/systemd/user
 symlink pika-ssh-sync.service
 symlink pika-ssh-sync.timer
