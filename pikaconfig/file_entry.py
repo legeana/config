@@ -1,5 +1,6 @@
 import dataclasses
 import logging
+import os
 import pathlib
 import shutil
 from typing import Collection, List
@@ -62,6 +63,27 @@ class SymlinkParser(SinglePathParser):
   def parse_single_path(self, command: str, path: pathlib.Path) -> entry.Entry:
     del command  # unused
     return SymlinkEntry(self.root / path, self.prefix.current / path)
+
+
+@dataclasses.dataclass
+class SymlinkTreeEntry(FileEntry):
+
+  def install(self, record: entry.PathRecorder) -> None:
+    for root, _, files in os.walk(self.src):
+      dstroot = self.dst / pathlib.Path(root).relative_to(self.src)
+      for f in files:
+        _make_symlink(src=self.src / f, dst=dstroot / f, record=record)
+
+
+class SymlinkTreeParser(SinglePathParser):
+
+  @property
+  def supported_commands(self) -> Collection[str]:
+    return ['symlink_tree']
+
+  def parse_single_path(self, command: str, path: pathlib.Path) -> entry.Entry:
+    del command  # unused
+    return SymlinkTreeEntry(self.root / path, self.prefix.current / path)
 
 
 class CopyEntry(FileEntry):

@@ -73,6 +73,7 @@ class Manifest(entry.Entry):
         system_entry.BrewPackageParser(),
         system_entry.PipPackageParser(),
         file_entry.SymlinkParser(root=root, prefix=self._prefix),
+        file_entry.SymlinkTreeParser(root=root, prefix=self._prefix),
         file_entry.CopyParser(root=root, prefix=self._prefix),
         file_entry.OutputFileParser(root=root, prefix=self._prefix),
         file_entry.CatGlobParser(root=root, prefix=self._prefix),
