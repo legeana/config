@@ -1,35 +1,7 @@
 prefix ~/.config/sway
 symlink config
-
-config-vars.d/browser
-config-vars.d/directions
-config-vars.d/idle
-config-vars.d/menu
-config-vars.d/mod
-config-vars.d/terminal
-config-vars.d/workspaces
-
-config.d/bar
-config.d/boss_mode
-config.d/browser
-config.d/floating_hotkeys
-config.d/idle
-config.d/input
-config.d/keyboard
-config.d/launch
-config.d/layout
-config.d/layout_hotkeys
-config.d/navigation_hotkeys
-config.d/notifications
-config.d/output
-config.d/resize_mode
-config.d/screenshot
-config.d/scratchpad
-config.d/sway_hotkeys
-config.d/terminal
-config.d/touchpad
-config.d/wallpaper
-config.d/workspaces
+symlink_tree config-vars.d
+symlink_tree config.d
 
 prefix ~/.local/bin
 symlink start-sway
