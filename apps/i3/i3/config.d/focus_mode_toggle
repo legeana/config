@@ -1,0 +1,2 @@
+# change focus between tiling / floating windows
+bindsym $super+space focus mode_toggle

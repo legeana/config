@@ -1,0 +1,2 @@
+# disable mouse resizing
+bindsym --border button1 nop

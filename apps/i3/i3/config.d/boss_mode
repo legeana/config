@@ -1,0 +1,6 @@
+mode "boss-mode" {
+    bindsym space kill
+    bindsym Escape mode "default"
+}
+
+bindsym $mod+Shift+p mode "boss-mode"

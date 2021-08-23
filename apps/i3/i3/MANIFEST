@@ -1,4 +1,4 @@
-symlink .confgen/base
-symlink .confgen/config.gen
-post_install_exec ~/.local/opt/confgen/confgen.py
-output_file config
+symlink .header
+symlink_tree config-vars.d
+symlink_tree config.d
+cat_glob_into config .header config-vars.d/* config.d/*

@@ -1,0 +1,2 @@
+bindsym $mod+h split h
+bindsym $mod+v split v
