@@ -119,3 +119,47 @@ class OutputFileParser(SinglePathParser):
   def parse_single_path(self, command: str, path: pathlib.Path) -> entry.Entry:
     del command  # unused
     return OutputFileEntry(self.prefix.current / path)
+
+
+@dataclasses.dataclass
+class CatGlobEntry(OutputFileEntry):
+
+  prefix: pathlib.Path
+  globs: List[str]
+
+  def install(self, record: entry.PathRecorder) -> None:
+    super().install(record)
+
+  def post_install(self) -> None:
+    if not self.dst.is_symlink():
+      logging.error(f'{util.format_path(self.dst)} is not a symlink')
+      return
+    inputs: List[pathlib.Path] = []
+    with self.dst.open('w') as out:
+      for glob in self.globs:
+        for src in sorted(self.prefix.glob(glob)):
+          inputs.append(src)
+          with open(src) as inp:
+            shutil.copyfileobj(inp, out)
+    inputs_formatted = ', '.join(util.format_path(p) for p in inputs)
+    logging.info(f'{util.format_path(self.dst)} <- [{inputs_formatted}]')
+
+
+@dataclasses.dataclass
+class CatGlobParser(entry.Parser):
+
+  root: pathlib.Path
+  prefix: entry.Prefix
+
+  @property
+  def supported_commands(self) -> Collection[str]:
+    return ['cat_glob_into']
+
+  def parse(self, command: str, args: List[str]) -> entry.Entry:
+    self.check_supported(command)
+    if len(args) < 1:
+      raise entry.ParserError(
+          f'{command} requires at least 1 argument, got {len(args)}')
+    return CatGlobEntry(dst=self.prefix.current / args[0],
+                        prefix=self.prefix.current,
+                        globs=args[1:])
