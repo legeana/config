@@ -135,13 +135,15 @@ class Installer:
 
 
 async def asyncio_main():
-  logconfig.init()
   parser = argparse.ArgumentParser(description='Synchronized configuration setup')
   parser.add_argument('--no-update', '-d', action='store_false', dest='update')
   parser.add_argument('--uninstall', '-u', action='store_true', dest='uninstall_only')
   parser.add_argument('--system', '-s', action='store_true', dest='system_setup',
                       help='Execute system level commands such as package installation')
+  parser.add_argument('--verbose', '-v', action='store_true', dest='verbose',
+                      help='Print all actions taken')
   args = parser.parse_args()
+  logconfig.init(verbose=args.verbose)
   if args.update and not args.uninstall_only:
     if await update_all():
       logging.info(f'Updated {util.format_path(SELF)}, restarting')

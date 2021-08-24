@@ -1,8 +1,8 @@
 import logging
 
 
-def init():
+def init(verbose: bool):
   logging.basicConfig(
       format='%(message)s',
-      level=logging.INFO,
+      level=logging.INFO if verbose else logging.WARNING,
   )
