@@ -6,7 +6,7 @@ import pathlib
 import shlex
 import subprocess
 import sys
-from typing import Iterable
+from typing import Iterable, List
 
 from . import configuration
 from . import database
@@ -103,12 +103,14 @@ class Installer:
     except FileNotFoundError:
       pass
 
+  def _paths(self) -> List[pathlib.Path]:
+    return [BASE] + sorted(APPS.iterdir()) + sorted(OVERLAYS.iterdir())
+
   def _load_manifests(self) -> Iterable[configuration.Manifest]:
     if self._manifests is not None:
       return self._manifests
     self._manifests = []
-    paths = [BASE] + sorted(APPS.iterdir()) + sorted(OVERLAYS.iterdir())
-    for path in paths:
+    for path in self._paths():
       if not path.is_dir():
         continue
       try:
