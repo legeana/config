@@ -1,7 +1,7 @@
 import logging
 
 
-class init():
+def init():
   logging.basicConfig(
       format='%(message)s',
       level=logging.INFO,
