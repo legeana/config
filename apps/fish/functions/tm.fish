@@ -29,8 +29,8 @@ end
 function _tm_forward_socket --no-scope-shadowing -a session -a env -a value
     mkdir -p -m 700 "$_TM_TMP"
     set path "$_TM_TMP/$USER.$session.$env"
-    set dst $$env
-    if ! test -e $$env
+    set dst $value
+    if ! count $dst >/dev/null
         set dst /dev/null
     end
     ln -snf -- $dst $path
@@ -43,8 +43,8 @@ function _tm_forward --no-scope-shadowing -a session
     # FWD_SSH_AUTH_SOCK if set points to the original agent socket.
     set --append env_overrides --unset=FWD_SSH_AUTH_SOCK
     if ! set -q FWD_SSH_AUTH_SOCK || ! test -S $FWD_SSH_AUTH_SOCK
-        _tm_forward_socket $session SSH_AUTH_SOCK $SSH_AUTH_SOCK
+        _tm_forward_socket $session SSH_AUTH_SOCK "$SSH_AUTH_SOCK"
     else
-        _tm_forward_socket $session SSH_AUTH_SOCK $FWD_SSH_AUTH_SOCK
+        _tm_forward_socket $session SSH_AUTH_SOCK "$FWD_SSH_AUTH_SOCK"
     end
 end
