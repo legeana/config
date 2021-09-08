@@ -15,4 +15,5 @@ bindsym --to-code {
 
     # Move focus to the parent container
     $mod+a focus parent
+    $mod+c focus child
 }
