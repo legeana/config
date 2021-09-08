@@ -3,7 +3,7 @@ import logging
 import os
 import pathlib
 import shutil
-from typing import Collection, List
+from typing import Collection, Iterable, List
 
 from . import entry
 from . import local_state
@@ -143,6 +143,19 @@ class OutputFileParser(SinglePathParser):
     return OutputFileEntry(self.prefix.current / path)
 
 
+def _glob(base: pathlib.Path, glob: str) -> Iterable[pathlib.Path]:
+  # This workaround is required because pathlib.Path.glob
+  # does not support absolute globs.
+  # NotImplementedError: Non-relative patterns are unsupported
+  glob_path = pathlib.Path(glob)
+  if glob_path.is_absolute():
+    anchor = pathlib.Path(glob_path.anchor)
+    relative_glob = str(glob_path.relative_to(anchor))
+    return anchor.glob(relative_glob)
+  else:
+    return base.glob(glob)
+
+
 @dataclasses.dataclass
 class CatGlobEntry(OutputFileEntry):
 
@@ -159,7 +172,7 @@ class CatGlobEntry(OutputFileEntry):
     inputs: List[pathlib.Path] = []
     with self.dst.open('w') as out:
       for glob in self.globs:
-        for src in sorted(self.prefix.glob(glob)):
+        for src in sorted(_glob(self.prefix, glob)):
           inputs.append(src)
           with open(src) as inp:
             shutil.copyfileobj(inp, out)
