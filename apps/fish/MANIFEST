@@ -4,6 +4,10 @@ aliases
 config.d
 config.fish
 functions
+login.bash
 plugins
+
+prefix ~
+symlink .bashrc
 
 install_system_package fish
