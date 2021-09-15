@@ -1,3 +1,6 @@
 bindsym --to-code {
-    $super+Shift+s exec --no-startup-id slurp | grim -g - - | wl-copy
+    $super+Shift+s exec --no-startup-id ~/.local/bin/sway-screenshot
 }
+
+for_window [title="imv.*sway_grim_screenshot"] floating enable
+for_window [title="imv.*sway_grim_screenshot"] fullscreen on

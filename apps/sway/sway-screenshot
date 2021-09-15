@@ -1,0 +1,33 @@
+#!/bin/sh
+
+# PNG is much faster to load than PPM, using PNG allows for more seamless
+# transition between the actual workspace and the captured image.
+src_format=png
+
+# The most common lossless format.
+dst_format=png
+
+# This must match config.d/screenshot window criteria.
+filename_prefix=sway_grim_screenshot
+
+# Singleton.
+if pidof -o %PPID -x "$0"; then
+    exit 0
+fi
+
+screenshot="$(mktemp --suffix "$filename_prefix.$src_format")"
+grim -t "$src_format" "$screenshot"
+imv-wayland "$screenshot" &
+imv_pid=$!
+
+while [ -z "$(swaymsg -t get_tree | grep imv)" ]; do
+    continue
+done
+
+get_crop() {
+    slurp -d | sed -r 's|([[:digit:]]+),([[:digit:]]+) (.+)|\3+\1+\2|'
+}
+
+convert -crop "$(get_crop)" "$screenshot" "$dst_format:-" | wl-copy -t "image/$dst_format"
+kill -s KILL "$imv_pid"
+rm "$screenshot"

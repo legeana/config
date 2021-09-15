@@ -5,3 +5,4 @@ symlink_tree config.d
 
 prefix ~/.local/bin
 symlink start-sway
+symlink sway-screenshot
