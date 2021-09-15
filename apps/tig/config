@@ -1,0 +1,4 @@
+bind generic j scroll-left
+bind generic k move-down
+bind generic l move-up
+bind generic ; scroll-right
