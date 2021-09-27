@@ -10,6 +10,12 @@ from . import post_install_hook
 from . import system_entry
 from . import util
 
+_MANIFEST_FILENAME: str = 'MANIFEST'
+
+
+def is_overlay(path: pathlib.Path) -> bool:
+  return (path / _MANIFEST_FILENAME).is_file()
+
 
 class CombinedParser(entry.Parser):
 
@@ -61,7 +67,7 @@ class Manifest(entry.Entry):
 
   def __init__(self, root: pathlib.Path, prefix: pathlib.Path):
     self._entries: List[entry.Entry] = []
-    self._path = root / 'MANIFEST'
+    self._path = root / _MANIFEST_FILENAME
     self._prefix = entry.Prefix(prefix)
     self._parsers = CombinedParser(
         ManifestParser(root=root, prefix=self._prefix),

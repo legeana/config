@@ -103,8 +103,18 @@ class Installer:
     except FileNotFoundError:
       pass
 
-  def _paths(self) -> List[pathlib.Path]:
-    return [BASE] + sorted(APPS.iterdir()) + sorted(OVERLAYS.iterdir())
+  def _paths(self) -> Iterable[pathlib.Path]:
+    yield BASE
+    yield from sorted(APPS.iterdir())
+    for overlay in sorted(OVERLAYS.iterdir()):
+      if not overlay.is_dir():
+        continue
+      if configuration.is_overlay(overlay):
+        yield overlay
+      else:
+        for sub in sorted(overlay.iterdir()):
+          if configuration.is_overlay(sub):
+            yield sub
 
   def _load_manifests(self) -> Iterable[configuration.Manifest]:
     if self._manifests is not None:
