@@ -6,3 +6,10 @@ symlink_tree config.d
 prefix ~/.local/bin
 symlink start-sway
 symlink sway-screenshot
+
+install_system_package sway swaybg swaylock swayidle xwayland
+install_system_package grim slurp imagemagick
+
+# Mako
+install_apt_package mako-notifier
+install_pacman_package mako
