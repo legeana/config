@@ -80,28 +80,42 @@ class Installer:
     self._db = database.SyncInstalledDatabase(INSTALL)
     self._manifests = None  # lazy loading
 
-  def uninstall(self) -> None:
-    for link in reversed(self._old_db):
-      if not link.is_symlink():
-        logging.error(f'Unable to remove {util.format_path(link)}')
-        continue
-      try:
-        link.unlink()
-        logging.info(f'Removed symlink {util.format_path(link)}')
-      except FileNotFoundError:
-        # TODO missing_ok=True, python-3.8+
-        pass
-      for parent in link.parents:
-        try:
-          parent.rmdir()
-          logging.info(f'Removed empty directory {util.format_path(parent)}')
-        except OSError:
-          break
+  @classmethod
+  def _rm_link(cls, path: pathlib.Path) -> None:
     try:
-      INSTALL.unlink()
-      # TODO missing_ok=True, python-3.8+
+      path.unlink()
+      logging.info(f'Removed symlink {util.format_path(path)}')
     except FileNotFoundError:
+      # TODO missing_ok=True, python-3.8+
       pass
+    cls._rm_dirs(path.parents)
+
+  @classmethod
+  def _rm_dir(cls, path: pathlib.Path) -> None:
+    try:
+      path.rmdir()
+      logging.info(f'Removed empty directory {util.format_path(path)}')
+    except OSError as e:
+      logging.error(f'Unable to remove directory {util.format_path(path)}: {e}')
+    cls._rm_dirs(path.parents)
+
+  @classmethod
+  def _rm_dirs(cls, paths: Iterable[pathlib.Path]) -> None:
+    for path in paths:
+      try:
+        path.rmdir()
+        logging.info(f'Removed empty directory {util.format_path(path)}')
+      except OSError:
+        break
+
+  def uninstall(self) -> None:
+    for path in reversed(self._old_db):
+      if path.is_symlink():
+        self._rm_link(path)
+      elif path.is_dir():
+        self._rm_dir(path)
+      else:
+        logging.error(f'Unable to remove {util.format_path(path)}')
 
   def _paths(self) -> Iterable[pathlib.Path]:
     yield BASE
