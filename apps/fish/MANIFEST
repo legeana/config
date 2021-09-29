@@ -1,11 +1,11 @@
 prefix ~/.config/fish
 
-aliases
-config.d
-config.fish
-functions
-login.bash
-plugins
+symlink aliases
+symlink config.d
+symlink config.fish
+symlink functions
+symlink login.bash
+mkdir plugins
 
 prefix ~
 symlink .bashrc

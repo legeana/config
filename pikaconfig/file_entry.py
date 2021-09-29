@@ -86,6 +86,27 @@ class SymlinkTreeParser(SinglePathParser):
     return SymlinkTreeEntry(self.root / path, self.prefix.current / path)
 
 
+class MkDirEntry(FileEntry):
+
+  def install(self, record: entry.PathRecorder) -> None:
+    if self.dst.exists() and not self.dst.is_dir():
+      logging.error(f'mkdir: unable to overwrite {util.format_path(self.dst)}')
+      return
+    self.dst.mkdir(parents=True, exist_ok=True)
+    record(self.dst)
+
+
+class MkDirParser(SinglePathParser):
+
+  @property
+  def supported_commands(self) -> Collection[str]:
+    return ['mkdir']
+
+  def parse_single_path(self, command: str, path: pathlib.Path) -> entry.Entry:
+    del command  # unused
+    return MkDirEntry(self.root / path, self.prefix.current / path)
+
+
 class CopyEntry(FileEntry):
 
   def install(self, record: entry.PathRecorder) -> None:
