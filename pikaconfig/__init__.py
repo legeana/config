@@ -116,6 +116,10 @@ class Installer:
         self._rm_dir(path)
       else:
         logging.error(f'Unable to remove {util.format_path(path)}')
+    try:
+      INSTALL.unlink()
+    except FileNotFoundError:
+      pass
 
   def _paths(self) -> Iterable[pathlib.Path]:
     yield BASE
