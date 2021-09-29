@@ -1,4 +1,5 @@
 symlink .vimrc
 symlink .vim/plugin
 
+subdir fish
 subdir xdg_config_home
