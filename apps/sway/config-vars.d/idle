@@ -1,3 +1,9 @@
+# 12 minutes to notify the user that the screen is going to get locked
+set $idle_warn_timeout 720
+
+# Warn for 3 minutes that the screen is going to get locked
+set $idle_warn_command 'notify-send -t 180000 "Going to lock the screen soon"'
+
 # 15 minutes to lock the screen
 set $idle_lock_timeout 900
 
