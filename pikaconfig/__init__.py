@@ -4,6 +4,7 @@ import logging
 import os
 import pathlib
 import shlex
+import stat
 import subprocess
 import sys
 from typing import Iterable, List
@@ -108,18 +109,26 @@ class Installer:
       except OSError:
         break
 
-  def uninstall(self) -> None:
-    for path in reversed(self._old_db):
-      if path.is_symlink():
-        self._rm_link(path)
-      elif path.is_dir():
-        self._rm_dir(path)
-      else:
-        logging.error(f'Unable to remove {util.format_path(path)}')
+  @classmethod
+  def _rm_install(cls) -> None:
     try:
       INSTALL.unlink()
     except FileNotFoundError:
       pass
+
+  def uninstall(self) -> None:
+    for path in reversed(self._old_db):
+      try:
+        pstat = path.lstat()
+      except FileNotFoundError:
+        logging.info(f'{util.format_path(path)} does not exist, nothing to remove')
+      if stat.S_ISLNK(pstat.st_mode):
+        self._rm_link(path)
+      elif stat.S_ISDIR(pstat.st_mode):
+        self._rm_dir(path)
+      else:
+        logging.error(f'Unable to remove {util.format_path(path)}')
+    self._rm_install()
 
   def _paths(self) -> Iterable[pathlib.Path]:
     yield BASE
