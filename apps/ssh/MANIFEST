@@ -4,3 +4,9 @@ symlink config.d/gpg-agent-fix
 
 prefix ~/.local/bin
 symlink gpg-agent-fix
+
+prefix ~/.config/systemd/user
+symlink ssh-agent.service
+
+prefix ~/.config/fish/plugins/ssh-agent/config.d
+symlink ssh-agent.fish
