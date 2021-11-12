@@ -2,7 +2,7 @@ function is_local_filesystem -a path
     if test -z $path
         set path $PWD
     end
-    set -l fstype (stat --file-system  --format='%T' $path)
+    set -l fstype (stat --file-system --format='%T' $path)
     if test (count $fstype) = 0
         # this is not a filesystem
         return 1
