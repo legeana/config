@@ -1,0 +1,51 @@
+#!/bin/sh -e
+
+load_env_via_shell() {
+    ENVIRONMENTD="$HOME/.config/environment.d"
+    set -a
+    if [ -d "$ENVIRONMENTD" ]; then
+        for conf in "$ENVIRONMENTD"/*.conf
+        do
+            . "$conf"
+        done
+    fi
+    set +a
+}
+
+load_env_via_systemctl() {
+    set -a
+    eval $(systemctl --user show-environment)
+    set +a
+}
+
+load_env() {
+    if command -v systemctl >/dev/null 2>&1; then
+        load_env_via_systemctl
+    else
+        load_env_via_shell
+    fi
+}
+
+add_to_path() {
+    local path="$1"
+    case "$PATH" in
+        # Don't add to $PATH if it is already there.
+        *":$path:"*) ;&
+        "$path:"*) ;&
+        *":$path") ;;
+        # Do add to $PATH if it's not.
+        *) export PATH="$path:$PATH" ;;
+    esac
+}
+
+load_opt_path() {
+    for path in ~/.local/opt/*; do
+        add_to_path "$path"
+    done
+}
+
+load_env
+add_to_path "$HOME/.local/bin"
+load_opt_path
+
+exec "$@"
