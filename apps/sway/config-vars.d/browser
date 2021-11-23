@@ -1,1 +1,1 @@
-set $browser firefox
+set $browser $launch firefox

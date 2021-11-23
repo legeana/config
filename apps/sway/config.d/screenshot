@@ -1,5 +1,5 @@
 bindsym --to-code {
-    $super+Shift+s exec --no-startup-id ~/.local/bin/sway-screenshot
+    $super+Shift+s exec --no-startup-id $launch sway-screenshot
     $super+$mod+Shift+s exec --no-startup-id slurp | grim -g - - | wl-copy
 }
 
