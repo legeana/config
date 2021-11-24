@@ -1,1 +1,1 @@
-bindsym $mod+g exec $browser
+bindsym $mod+g exec $launch $browser
