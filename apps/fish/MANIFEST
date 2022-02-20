@@ -10,4 +10,4 @@ mkdir plugins
 prefix ~
 symlink .bashrc
 
-install_system_package fish
+install_system_package fish moreutils
