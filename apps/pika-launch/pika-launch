@@ -18,11 +18,21 @@ load_env_via_systemctl() {
     set +a
 }
 
+load_wayland_env() {
+    export MOZ_ENABLE_WAYLAND=1
+    export SDL_VIDEODRIVER=wayland
+    export CLUTTER_BACKEND=wayland
+    export QT_QPA_PLATFORM=wayland
+}
+
 load_env() {
     if command -v systemctl >/dev/null 2>&1; then
         load_env_via_systemctl
     else
         load_env_via_shell
+    fi
+    if [ -n "$WAYLAND_DISPLAY" ]; then
+        load_wayland_env
     fi
 }
 
