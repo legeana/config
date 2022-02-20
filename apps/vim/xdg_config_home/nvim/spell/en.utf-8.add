@@ -45,7 +45,6 @@ cli
 clis
 cls
 cmake
-cmake
 cmakedefine
 cmp
 cond
@@ -57,11 +56,13 @@ configs
 const
 contextlib
 contrib
+corp
 cpp
 creds
 crl
 cronjob
 css
+ctypes
 curator
 cwd
 darwin
@@ -84,7 +85,6 @@ devtools
 dhcp
 dicts
 dir
-dirname
 dirname
 dirs
 dists
@@ -116,6 +116,7 @@ expanduser
 expr
 faq
 fatalf
+fbdev
 fdpass
 filegroup
 filesystem
@@ -131,11 +132,13 @@ fsck
 ftdetect
 ftplugin
 fullpath
+fullscreen
 func
 functools
 ge
 getattr
 getopt
+getpass
 getvalue
 gigasecond
 gitconfig
@@ -164,6 +167,7 @@ hostport
 hotspotting
 hpp
 href
+hsync
 htop
 ico
 idiv
@@ -201,6 +205,7 @@ len
 letsencrypt
 lgtm
 lib
+libinput
 libsonnet
 lifecycle
 lineno
@@ -229,6 +234,9 @@ mitm
 mixin
 mkdir
 mkmap
+modeline
+modeset
+moshtm
 mplayer
 mro
 mtproto
@@ -259,6 +267,7 @@ onclick
 oneline
 oneof
 oneshot
+openpty
 opensource
 openssh
 orgmode
@@ -271,10 +280,12 @@ paren
 parens
 parseable
 passwd
+password
 pathlib
 pathspec
 paxos
 pem
+pexpect
 pid
 pika
 pikaconfig
@@ -282,7 +293,9 @@ pikaplaylist
 pkgbuild
 pki
 pkill
+plugins
 png
+popen
 pprint
 pragma
 precompute
@@ -301,6 +314,7 @@ py3status
 pycache
 pyflags
 pylint
+randr
 ratelimit
 rdiv
 readonly
@@ -312,6 +326,7 @@ refactorings
 regen
 reloadall
 repr
+returncode
 rollout
 rollouts
 rpc
@@ -325,13 +340,14 @@ rustification
 safehtml
 sbin
 sdk
+sendline
 sendmsg
 serializer
 serializers
 server
+setattr
 setUp
 setUpModule
-setattr
 sha
 sha1
 sharded
@@ -367,6 +383,7 @@ subdir
 subpartition
 substr
 sudo
+symlink
 sys
 syscalls
 sysinfo
@@ -404,6 +421,7 @@ ttl
 tty
 turndown
 txt
+udev
 udp
 ui
 uname
@@ -429,11 +447,13 @@ varargs
 variadic
 vcc
 vendored
+vesa
 videogames
 vimdiff
 vimrc
 vimscript
 vlan
+vsync
 vulkan
 webtoon
 whitelist
@@ -449,6 +469,7 @@ www
 x11
 xargs
 xdg
+xorg
 xsrf
 xsrftoken
 yaml
