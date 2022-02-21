@@ -1,0 +1,10 @@
+#!/bin/sh -e
+
+CFG_D="$HOME/.config/chrome-flags.d"
+IFS=$'\n'
+
+if [ -d "$CFG_D" ]; then
+    exec google-chrome $(find -L "$CFG_D" -type f -exec cat '{}' '+') "$@"
+else
+    exec google-chrome "$@"
+fi

@@ -7,6 +7,10 @@ prefix ~/.local/bin
 symlink start-sway
 symlink sway-screenshot
 
+# chrome-launcher configuration
+prefix ~/.config/chrome-flags.d
+symlink chrome-ozone.conf
+
 install_system_package sway swaybg swaylock swayidle xwayland
 install_system_package grim slurp imagemagick
 
