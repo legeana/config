@@ -1,0 +1,6 @@
+# make IBus respect xkbmap
+exec_always --no-startup-id dconf write \
+    /desktop/ibus/general/use-system-keyboard-layout true
+exec_always --no-startup-id setxkbmap \
+    -layout us,ru \
+    -option grp:alt_space_toggle
