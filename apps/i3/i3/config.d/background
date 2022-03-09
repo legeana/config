@@ -1,0 +1,1 @@
+exec_always --no-startup-id xsetroot -solid "#333333"
