@@ -1,0 +1,2 @@
+prefix ~/.config/foot
+symlink foot.ini
