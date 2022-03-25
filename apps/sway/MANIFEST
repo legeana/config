@@ -14,6 +14,10 @@ symlink chrome-ozone.conf
 install_system_package sway swaybg swaylock swayidle xwayland
 install_system_package grim slurp imagemagick
 
+# pactl
+install_apt_package pulseaudio-utils
+install_pacman_package libpulse
+
 # Mako
 install_apt_package mako-notifier
 install_pacman_package mako
