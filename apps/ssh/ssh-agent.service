@@ -5,7 +5,7 @@ Description = "SSH agent"
 Type=simple
 Environment=SSH_AUTH_SOCK=%t/ssh-agent.socket
 # DISPLAY is required for ssh-askpass to work.
-Environment=DISPLAY=:0
+# DISPLAY must be set by $ systemctl --user import-environment DISPLAY
 ExecStart=/usr/bin/ssh-agent -D -a $SSH_AUTH_SOCK
 
 [Install]

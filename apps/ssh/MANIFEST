@@ -10,3 +10,9 @@ symlink ssh-agent.service
 
 prefix ~/.config/fish/plugins/ssh-agent/config.d
 symlink ssh-agent.fish
+
+prefix ~/.config/sway/config.d
+symlink sway-ssh-agent.conf
+
+prefix ~/.config/i3/config.d
+symlink i3-ssh-agent.conf
