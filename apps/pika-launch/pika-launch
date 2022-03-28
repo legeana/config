@@ -54,8 +54,24 @@ load_opt_path() {
     done
 }
 
+load_cargo_path() {
+    local cargo="$HOME/.cargo/bin"
+    if [ -d "$cargo" ]; then
+        add_to_path "$cargo"
+    fi
+}
+
+load_go_path() {
+    local gopath="$HOME/.go/bin"
+    if [ -d "$gopath" ]; then
+        add_to_path "$gopath"
+    fi
+}
+
 load_env
 add_to_path "$HOME/.local/bin"
 load_opt_path
+load_cargo_path
+load_go_path
 
 exec "$@"
