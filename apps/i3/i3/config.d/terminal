@@ -1,1 +1,1 @@
-bindsym $mod+Return exec $launch i3-sensible-terminal
+bindsym $mod+Return exec $launch pika-sensible-terminal

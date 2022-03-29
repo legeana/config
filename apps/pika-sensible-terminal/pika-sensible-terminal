@@ -1,0 +1,22 @@
+#!/bin/sh -e
+
+X11_TERMINALS='alacritty gnome-terminal konsole xterm'
+WAYLAND_TERMINALS='alacritty foot gnome-terminal konsole'
+
+try_terminal() {
+    if command -v "$1" >/dev/null 2>&1; then
+        exec "$@"
+    fi
+}
+
+if [ -n "$WAYLAND_DISPLAY" ]; then
+    for terminal in $WAYLAND_TERMINALS; do
+        try_terminal "$terminal" "$@"
+    done
+elif [ -n "$DISPLAY" ]; then
+    for terminal in $X11_TERMINALS; do
+        try_terminal "$terminal" "$@"
+    done
+else
+    echo Unable to find a terminal, aborting >&2
+fi
