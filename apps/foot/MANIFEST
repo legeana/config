@@ -1,2 +1,3 @@
 prefix ~/.config/foot
-symlink foot.ini
+import_from foot.ini
+symlink_tree foot.d
