@@ -9,6 +9,7 @@ from . import file_entry
 from . import post_install_hook
 from . import system_entry
 from . import util
+from . import xdg
 
 _MANIFEST_FILENAME: str = 'MANIFEST'
 
@@ -63,6 +64,54 @@ class SetPrefixParser(file_entry.SinglePathParser):
     return SetPrefixEntry(prefix=path)
 
 
+class SetXdgCachePrefixParser(file_entry.SinglePathParser):
+
+  @property
+  def supported_commands(self) -> Collection[str]:
+    return ['xdg_cache_prefix']
+
+  def parse_single_path(self, command: str, path: pathlib.Path) -> entry.Entry:
+    del command  # unused
+    self.prefix.current = xdg.CACHE_HOME / path
+    return SetPrefixEntry(prefix=path)
+
+
+class SetXdgConfigPrefixParser(file_entry.SinglePathParser):
+
+  @property
+  def supported_commands(self) -> Collection[str]:
+    return ['xdg_config_prefix']
+
+  def parse_single_path(self, command: str, path: pathlib.Path) -> entry.Entry:
+    del command  # unused
+    self.prefix.current = xdg.CONFIG_HOME / path
+    return SetPrefixEntry(prefix=path)
+
+
+class SetXdgDataPrefixParser(file_entry.SinglePathParser):
+
+  @property
+  def supported_commands(self) -> Collection[str]:
+    return ['xdg_data_prefix']
+
+  def parse_single_path(self, command: str, path: pathlib.Path) -> entry.Entry:
+    del command  # unused
+    self.prefix.current = xdg.DATA_HOME / path
+    return SetPrefixEntry(prefix=path)
+
+
+class SetXdgStatePrefixParser(file_entry.SinglePathParser):
+
+  @property
+  def supported_commands(self) -> Collection[str]:
+    return ['xdg_state_prefix']
+
+  def parse_single_path(self, command: str, path: pathlib.Path) -> entry.Entry:
+    del command  # unused
+    self.prefix.current = xdg.STATE_HOME / path
+    return SetPrefixEntry(prefix=path)
+
+
 class Manifest(entry.Entry):
 
   def __init__(self, root: pathlib.Path, prefix: pathlib.Path):
@@ -72,6 +121,10 @@ class Manifest(entry.Entry):
     self._parsers = CombinedParser(
         ManifestParser(root=root, prefix=self._prefix),
         SetPrefixParser(root=root, prefix=self._prefix),
+        SetXdgCachePrefixParser(root=root, prefix=self._prefix),
+        SetXdgConfigPrefixParser(root=root, prefix=self._prefix),
+        SetXdgDataPrefixParser(root=root, prefix=self._prefix),
+        SetXdgStatePrefixParser(root=root, prefix=self._prefix),
         system_entry.SystemCommandParser(),
         system_entry.AnyPackageParser(),
         system_entry.PacmanPackageParser(),
