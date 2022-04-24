@@ -24,7 +24,6 @@ def _make_symlink(src: pathlib.Path, dst: pathlib.Path,
   logging.info(f'{util.format_path(src)} -> {util.format_path(dst)}')
 
 
-
 @dataclasses.dataclass
 class SinglePathParser(entry.Parser):
 
@@ -71,9 +70,11 @@ class SymlinkTreeEntry(FileEntry):
 
   def install(self, record: entry.PathRecorder) -> None:
     for root, _, files in os.walk(self.src):
-      dstroot = self.dst / pathlib.Path(root).relative_to(self.src)
+      relroot = pathlib.Path(root).relative_to(self.src)
+      srcroot = self.src / relroot
+      dstroot = self.dst / relroot
       for f in files:
-        _make_symlink(src=self.src / f, dst=dstroot / f, record=record)
+        _make_symlink(src=srcroot / f, dst=dstroot / f, record=record)
 
 
 class SymlinkTreeParser(SinglePathParser):
