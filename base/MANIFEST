@@ -2,8 +2,6 @@
 .config/user-dirs.dirs
 .config/user-dirs.locale
 .gdbinit
-.gitconfig
-.gitconfig-user
 .ne
 .parallel
 .tmux.conf
