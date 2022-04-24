@@ -6,6 +6,7 @@ import shutil
 from typing import Collection, Iterable, List
 
 from . import entry
+from . import importer
 from . import local_state
 from . import util
 
@@ -219,3 +220,28 @@ class CatGlobParser(entry.Parser):
     return CatGlobEntry(dst=self.prefix.current / args[0],
                         prefix=self.prefix.current,
                         globs=args[1:])
+
+
+class ImporterEntry(FileEntry):
+
+  def install(self, record: entry.PathRecorder) -> None:
+    state = local_state.make_state(self.dst)
+    _make_symlink(src=state, dst=self.dst, record=record)
+
+  def post_install(self) -> None:
+    if not self.dst.is_symlink():
+      logging.error(f'{util.format_path(self.dst)} is not a symlink')
+      return
+    importer.render(src=self.src, dst=self.dst)
+    logging.info(f'{util.format_path(self.dst)} <- {util.format_path(self.src)}')
+
+
+class ImporterParser(SinglePathParser):
+
+  @property
+  def supported_commands(self) -> Collection[str]:
+    return ['import_from']
+
+  def parse_single_path(self, command: str, path: pathlib.Path) -> entry.Entry:
+    del command  # unused
+    return ImporterEntry(self.root / path, self.prefix.current / path)

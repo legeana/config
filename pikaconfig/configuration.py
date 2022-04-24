@@ -84,6 +84,7 @@ class Manifest(entry.Entry):
         file_entry.CopyParser(root=root, prefix=self._prefix),
         file_entry.OutputFileParser(root=root, prefix=self._prefix),
         file_entry.CatGlobParser(root=root, prefix=self._prefix),
+        file_entry.ImporterParser(root=root, prefix=self._prefix),
         post_install_hook.ExecPostHookParser(root=root, prefix=self._prefix),
     )
     with open(self._path) as f:
