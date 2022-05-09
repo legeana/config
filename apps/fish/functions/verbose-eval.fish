@@ -1,4 +1,4 @@
 function verbose-eval
-    echo '$' $argv
+    echo '$' (string escape -- $argv)
     $argv
 end
