@@ -1,0 +1,3 @@
+prefix ~/.config/kitty
+symlink kitty.conf
+symlink_tree kitty.d
