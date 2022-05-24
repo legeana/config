@@ -4,7 +4,6 @@
 .gdbinit
 .ne
 .parallel
-.tmux.conf
 .yaourtrc
 
 copy .config/htop/htoprc
