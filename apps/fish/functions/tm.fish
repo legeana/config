@@ -5,10 +5,9 @@ function tm -a session
     set env_overrides
     _tm_forward $session
     env $env_overrides tmux attach -t $session
+    or env $env_overrides tmuxinator start $session
     or env $env_overrides tmux new-session -s $session -c $HOME
 end
-
-complete --command=tm --no-files --arguments='(tmux list-sessions -F "#{session_name}")'
 
 # The functions below operate under the assumption that tmux will not be used
 # by more than one user simultaneously. The last connection wins.
