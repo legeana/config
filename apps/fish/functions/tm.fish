@@ -13,6 +13,7 @@ end
 # by more than one user simultaneously. The last connection wins.
 
 set -g _TM_TMP "$HOME/.local/state/tmux-ssh-agent"
+set -g _TM_PLACEHOLDER /dev/null
 
 function _tm_cleanup
     for f in "$_TM_TMP/"*
@@ -20,6 +21,9 @@ function _tm_cleanup
             continue
         end
         if ! test -e $f
+            rm -f $f
+        end
+        if test (readlink -- $f) = $_TM_PLACEHOLDER
             rm -f $f
         end
     end
@@ -30,7 +34,7 @@ function _tm_forward_socket --no-scope-shadowing -a session -a env -a value
     set path "$_TM_TMP/$USER.$session.$env"
     set dst "$value"
     if test -z "$dst"
-        set dst /dev/null
+        set dst $_TM_PLACEHOLDER
     end
     ln -snf -- $dst $path
     set --append env_overrides "$env=$path"
