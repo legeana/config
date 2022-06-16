@@ -1,1 +1,1 @@
-set nowrap
+set wrap
