@@ -2,7 +2,7 @@ import dataclasses
 import enum
 import pprint
 import subprocess
-from typing import List, Optional
+from typing import Optional
 
 
 @enum.unique
@@ -25,7 +25,7 @@ class Algorithm(enum.Enum):
 
 class _Tokens:
 
-  _tokens: List[str]
+  _tokens: list[str]
 
   def __init__(self, line: str):
     self._tokens = line.split(':')
@@ -105,8 +105,8 @@ class BaseKey:
 @dataclasses.dataclass
 class Key(BaseKey):
 
-  subkeys: List['SubKey'] = dataclasses.field(default_factory=list)
-  uids: List['Uid'] = dataclasses.field(default_factory=list)
+  subkeys: list['SubKey'] = dataclasses.field(default_factory=list)
+  uids: list['Uid'] = dataclasses.field(default_factory=list)
 
 
 class SubKey(BaseKey):
@@ -127,7 +127,7 @@ class Uid:
 
 class _Parser:
 
-  _keys: List[Key]
+  _keys: list[Key]
   _key: Optional[Key] = None
   _subkey: Optional[SubKey] = None
 
@@ -146,7 +146,7 @@ class _Parser:
     elif tokens.type() in {'fpr'}:
       self._parse_fpr(_KeyTokens(tokens))
 
-  def keys(self) -> List[Key]:
+  def keys(self) -> list[Key]:
     return self._keys
 
   def _fill_key(self, key, tokens: _KeyTokens) -> None:
@@ -193,7 +193,7 @@ class GPG:
     if gnupghome:
       self.gnupghome = gnupghome
 
-  def _argv(self, *args, **kwargs) -> List[str]:
+  def _argv(self, *args, **kwargs) -> list[str]:
     argv = [self.binary]
     argv.extend(['--batch', '--fixed-list-mode'])
     if self.gnupghome:
@@ -223,10 +223,10 @@ class GPG:
         return key
     return None
 
-  def list_keys(self) -> List[Key]:
+  def list_keys(self) -> list[Key]:
     return self._list_keys()
 
-  def _list_keys(self, *args) -> List[Key]:
+  def _list_keys(self, *args) -> list[Key]:
     out = self._check_utf8('--list-keys', '--with-colons', *args)
     p = _Parser()
     for line in out.split('\n'):

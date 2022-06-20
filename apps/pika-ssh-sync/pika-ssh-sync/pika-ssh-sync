@@ -3,7 +3,7 @@
 import argparse
 import subprocess
 import tempfile
-from typing import Callable, Iterable, List
+from typing import Callable, Iterable
 import urllib.parse
 import urllib.request
 
@@ -42,7 +42,7 @@ def export_keybase(
     gpg = gpgutil.GPG(gnupghome=tmpdir)
     pubkey = subprocess.check_output(['keybase', 'pgp', 'export'])
     gpg.import_keys(pubkey)
-    sshkeys: List[str] = []
+    sshkeys: list[str] = []
     for key in gpg.list_keys():
       sshkeys.extend(make_ssh_keys(key, token, gpg.export_ssh_key))
     authorized_keys.replace(keysutil.is_not_token(token), sshkeys)
@@ -53,7 +53,7 @@ def export_gpg(
     cfg: config.GPGKeyEntry) -> None:
   token = make_token(cfg.name)
   gpg = gpgutil.GPG()
-  sshkeys: List[str] = []
+  sshkeys: list[str] = []
   key = gpg.list_key(cfg.fingerprint)
   if key:
     sshkeys.extend(make_ssh_keys(key, token, gpg.export_ssh_key))
@@ -65,7 +65,7 @@ def export_ultimate(
     cfg: config.GPGUltimateEntry) -> None:
   token = make_token(cfg.name)
   gpg = gpgutil.GPG()
-  sshkeys: List[str] = []
+  sshkeys: list[str] = []
   for key in gpg.list_keys():
     if 'u' in key.owner_trust:
       sshkeys.extend(make_ssh_keys(key, token, gpg.export_ssh_key))

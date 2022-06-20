@@ -1,6 +1,6 @@
 import dataclasses
 import pathlib
-from typing import Callable, Collection, Dict, List, Optional, Type
+from typing import Callable, Collection, Optional, Type
 
 PathRecorder = Callable[[pathlib.Path], None]
 
@@ -58,5 +58,5 @@ class Parser:
     if command not in self.supported_commands:
       raise ParserError(f'{command} is not supported by {type(self)}')
 
-  def parse(self, command: str, args: List[str]) -> Entry:
+  def parse(self, command: str, args: list[str]) -> Entry:
     raise NotImplementedError

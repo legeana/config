@@ -3,7 +3,7 @@ import os
 import pathlib
 import sys
 import tempfile
-from typing import Callable, Iterable, IO, List, Optional
+from typing import Callable, Iterable, IO, Optional
 
 FilterFunction = Callable[[str], bool]
 
@@ -14,7 +14,7 @@ def _authorized_keys_path() -> pathlib.Path:
 
 class AuthorizedKeys:
 
-  _lines: List[str]
+  _lines: list[str]
 
   def __init__(self):
     self._lines = []

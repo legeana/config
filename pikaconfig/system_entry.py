@@ -1,5 +1,5 @@
 import dataclasses
-from typing import Collection, List, Type
+from typing import Collection, Type
 
 from . import entry
 from . import system
@@ -8,9 +8,9 @@ from . import util
 
 class SystemSetupEntry(entry.Entry):
 
-  DISTROS: List[str] = []
+  DISTROS: list[str] = []
 
-  def __init__(self, args: List[str]):
+  def __init__(self, args: list[str]):
     raise NotImplementedError
 
   def system_setup(self) -> None:
@@ -23,7 +23,7 @@ class SystemSetupEntry(entry.Entry):
 @dataclasses.dataclass
 class SystemCommandEntry(SystemSetupEntry):
 
-  args: List[str]
+  args: list[str]
 
   def system_setup(self) -> None:
     # TODO implement a confirmation
@@ -32,7 +32,7 @@ class SystemCommandEntry(SystemSetupEntry):
 
 class SystemCommandParser(entry.Parser):
 
-  def parse(self, command: str, args: List[str]) -> entry.Entry:
+  def parse(self, command: str, args: list[str]) -> entry.Entry:
     self.check_supported(command)
     return SystemCommandEntry(args=args)
 
@@ -54,14 +54,14 @@ class AnyPackageEntry(SystemSetupEntry):
 class AnyPackageParser(entry.Parser):
 
   @property
-  def _package_managers(self) -> List[Type[SystemSetupEntry]]:
+  def _package_managers(self) -> list[Type[SystemSetupEntry]]:
     return [
         PacmanPackageEntry,
         AptPackageEntry,
         BrewPackageEntry,
     ]
 
-  def parse(self, command: str, args: List[str]) -> entry.Entry:
+  def parse(self, command: str, args: list[str]) -> entry.Entry:
     self.check_supported(command)
     sysid = system.os_id()
     entries = [
@@ -79,7 +79,7 @@ class AnyPackageParser(entry.Parser):
 class PacmanPackageEntry(SystemSetupEntry):
 
   DISTROS = ['arch']
-  names: List[str]
+  names: list[str]
 
   def system_setup(self) -> None:
     if system.os_id() not in self.DISTROS:
@@ -89,7 +89,7 @@ class PacmanPackageEntry(SystemSetupEntry):
 
 class PacmanPackageParser(entry.Parser):
 
-  def parse(self, command: str, args: List[str]) -> entry.Entry:
+  def parse(self, command: str, args: list[str]) -> entry.Entry:
     self.check_supported(command)
     return PacmanPackageEntry(args)
 
@@ -102,7 +102,7 @@ class PacmanPackageParser(entry.Parser):
 class AptPackageEntry(SystemSetupEntry):
 
   DISTROS = ['debian', 'ubuntu']
-  names: List[str]
+  names: list[str]
 
   def system_setup(self) -> None:
     if system.os_id() not in self.DISTROS:
@@ -112,7 +112,7 @@ class AptPackageEntry(SystemSetupEntry):
 
 class AptPackageParser(entry.Parser):
 
-  def parse(self, command: str, args: List[str]) -> entry.Entry:
+  def parse(self, command: str, args: list[str]) -> entry.Entry:
     self.check_supported(command)
     return AptPackageEntry(args)
 
@@ -125,7 +125,7 @@ class AptPackageParser(entry.Parser):
 class BrewPackageEntry(SystemSetupEntry):
 
   DISTROS = ['darwin']
-  names: List[str]
+  names: list[str]
 
   def system_setup(self) -> None:
     if system.os_id() not in self.DISTROS:
@@ -135,7 +135,7 @@ class BrewPackageEntry(SystemSetupEntry):
 
 class BrewPackageParser(entry.Parser):
 
-  def parse(self, command: str, args: List[str]) -> entry.Entry:
+  def parse(self, command: str, args: list[str]) -> entry.Entry:
     self.check_supported(command)
     return BrewPackageEntry(args)
 
@@ -147,7 +147,7 @@ class BrewPackageParser(entry.Parser):
 @dataclasses.dataclass
 class PipPackageEntry(SystemSetupEntry):
 
-  names: List[str]
+  names: list[str]
 
   def system_setup(self) -> None:
     # system check is not necessary because pip is cross platform
@@ -156,7 +156,7 @@ class PipPackageEntry(SystemSetupEntry):
 
 class PipPackageParser(entry.Parser):
 
-  def parse(self, command: str, args: List[str]) -> entry.Entry:
+  def parse(self, command: str, args: list[str]) -> entry.Entry:
     self.check_supported(command)
     return PipPackageEntry(args)
 

@@ -2,7 +2,7 @@ import dataclasses
 import pathlib
 import shlex
 import sys
-from typing import Collection, Dict, List
+from typing import Collection
 
 from . import entry
 from . import file_entry
@@ -21,7 +21,7 @@ def is_overlay(path: pathlib.Path) -> bool:
 class CombinedParser(entry.Parser):
 
   def __init__(self, *parsers):
-    self._parsers: Dict[str, Parser] = dict()
+    self._parsers: dict[str, Parser] = dict()
     for parser in parsers:
       for command in parser.supported_commands:
         assert command not in self._parsers
@@ -31,7 +31,7 @@ class CombinedParser(entry.Parser):
   def supported_commands(self) -> Collection[str]:
     return self._parsers.keys()
 
-  def parse(self, command: str, args: List[str]) -> entry.Entry:
+  def parse(self, command: str, args: list[str]) -> entry.Entry:
     parser = self._parsers.get(command)
     if parser is None:
       raise entry.ParserError(f'{command} is not supported by {type(self)}')
@@ -115,7 +115,7 @@ class SetXdgStatePrefixParser(file_entry.SinglePathParser):
 class Manifest(entry.Entry):
 
   def __init__(self, root: pathlib.Path, prefix: pathlib.Path):
-    self._entries: List[entry.Entry] = []
+    self._entries: list[entry.Entry] = []
     self._path = root / _MANIFEST_FILENAME
     self._prefix = entry.Prefix(prefix)
     self._parsers = CombinedParser(
@@ -163,7 +163,7 @@ class Manifest(entry.Entry):
     else:
       self._add_command(parts[0], parts[1:])
 
-  def _add_command(self, command: str, args: List[str]) -> None:
+  def _add_command(self, command: str, args: list[str]) -> None:
     parser = self._parsers.parse(command, args)
     self._entries.append(parser)
 

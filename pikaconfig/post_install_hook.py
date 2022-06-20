@@ -1,6 +1,6 @@
 import dataclasses
 import pathlib
-from typing import Collection, List
+from typing import Collection
 
 from . import entry
 from . import util
@@ -19,7 +19,7 @@ class PostInstallHook(entry.Entry):
 class ExecPostHook(PostInstallHook):
 
   cwd: pathlib.Path
-  args: List[str]
+  args: list[str]
 
   def post_install(self) -> None:
     util.verbose_check_user_call(*self.args, cwd=self.cwd)
@@ -35,6 +35,6 @@ class ExecPostHookParser(entry.Parser):
   def supported_commands(self) -> Collection[str]:
     return ['post_install_exec']
 
-  def parse(self, command: str, args: List[str]) -> entry.Entry:
+  def parse(self, command: str, args: list[str]) -> entry.Entry:
     self.check_supported(command)
     return ExecPostHook(cwd=self.prefix.current, args=args)

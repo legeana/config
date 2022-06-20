@@ -7,7 +7,7 @@ import shlex
 import stat
 import subprocess
 import sys
-from typing import Iterable, List
+from typing import Iterable
 
 from . import configuration
 from . import database

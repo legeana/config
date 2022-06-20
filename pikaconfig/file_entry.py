@@ -3,7 +3,7 @@ import logging
 import os
 import pathlib
 import shutil
-from typing import Collection, Iterable, List
+from typing import Collection, Iterable
 
 from . import entry
 from . import importer
@@ -30,7 +30,7 @@ class SinglePathParser(entry.Parser):
   root: pathlib.Path
   prefix: entry.Prefix
 
-  def parse(self, command: str, args: List[str]) -> entry.Entry:
+  def parse(self, command: str, args: list[str]) -> entry.Entry:
     self.check_supported(command)
     if len(args) != 1:
       raise entry.ParserError(
@@ -183,7 +183,7 @@ def _glob(base: pathlib.Path, glob: str) -> Iterable[pathlib.Path]:
 class CatGlobEntry(OutputFileEntry):
 
   prefix: pathlib.Path
-  globs: List[str]
+  globs: list[str]
 
   def install(self, record: entry.PathRecorder) -> None:
     super().install(record)
@@ -192,7 +192,7 @@ class CatGlobEntry(OutputFileEntry):
     if not self.dst.is_symlink():
       logging.error(f'{util.format_path(self.dst)} is not a symlink')
       return
-    inputs: List[pathlib.Path] = []
+    inputs: list[pathlib.Path] = []
     with self.dst.open('w') as out:
       for glob in self.globs:
         for src in sorted(_glob(self.prefix, glob)):
@@ -213,7 +213,7 @@ class CatGlobParser(entry.Parser):
   def supported_commands(self) -> Collection[str]:
     return ['cat_glob_into']
 
-  def parse(self, command: str, args: List[str]) -> entry.Entry:
+  def parse(self, command: str, args: list[str]) -> entry.Entry:
     self.check_supported(command)
     if len(args) < 1:
       raise entry.ParserError(

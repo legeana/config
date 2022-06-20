@@ -1,7 +1,6 @@
 import configparser
 import dataclasses
 import pathlib
-from typing import List
 
 _LOCATION = pathlib.Path.home() / '.config' / 'pika-ssh-sync.ini'
 
@@ -34,13 +33,13 @@ class KeybaseEntry(Entry):
 @dataclasses.dataclass
 class Config:
 
-  entries: List[Entry]
+  entries: list[Entry]
 
   @classmethod
   def load(cls) -> 'Config':
     cfg = configparser.ConfigParser()
     cfg.read([_LOCATION])
-    entries: List[Entry] = []
+    entries: list[Entry] = []
     for section in cfg.sections():
       entry_type = cfg.get(section, 'type')
       if entry_type == 'web_keys_api':
