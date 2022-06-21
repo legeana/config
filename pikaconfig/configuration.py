@@ -163,7 +163,8 @@ class Manifest(entry.Entry):
     self._prefix = entry.Prefix(prefix)
     self._tag_matcher = tagutil.Matcher()
     self._parsers = CombinedParser(
-        ManifestParser(root=root, prefix=self._prefix),
+        SubdirParser(root=root, prefix=self._prefix),
+        SubdirsParser(root=root, prefix=self._prefix),
         SetPrefixParser(root=root, prefix=self._prefix),
         SetXdgCachePrefixParser(root=root, prefix=self._prefix),
         SetXdgConfigPrefixParser(root=root, prefix=self._prefix),
@@ -236,7 +237,32 @@ class Manifest(entry.Entry):
       entry.recursive_post_install(tags)
 
 
-class ManifestParser(file_entry.SinglePathParser):
+@dataclasses.dataclass
+class CombinedManifest(entry.Entry):
+
+  manifests: list[Manifest]
+
+  def recursive_system_setup(self, tags: tagutil.TagSet) -> None:
+    if not self.tags_match(tags):
+      return
+    for entry in self.manifests:
+      entry.recursive_system_setup(tags)
+
+  def recursive_install(self, tags: tagutil.TagSet,
+                        record: entry.PathRecorder) -> None:
+    if not self.tags_match(tags):
+      return
+    for entry in self.manifests:
+      entry.recursive_install(tags, record)
+
+  def recursive_post_install(self, tags: tagutil.TagSet) -> None:
+    if not self.tags_match(tags):
+      return
+    for entry in self.manifests:
+      entry.recursive_post_install(tags)
+
+
+class SubdirParser(file_entry.SinglePathParser):
 
   @property
   def supported_commands(self) -> Collection[str]:
@@ -245,3 +271,22 @@ class ManifestParser(file_entry.SinglePathParser):
   def parse_single_path(self, command: str, path: pathlib.Path) -> entry.Entry:
     del command  # unused
     return Manifest(self.root / path, self.prefix.current / path)
+
+
+@dataclasses.dataclass
+class SubdirsParser(entry.Parser):
+
+  root: pathlib.Path
+  prefix: entry.Prefix
+
+  @property
+  def supported_commands(self) -> Collection[str]:
+    return ['subdirs']
+
+  def parse(self, command: str, args: list[str]) -> entry.Entry:
+    del args  # unused
+    self.check_supported(command)
+    manifests: list[Manifest] = []
+    for subdir in sorted(self.root.iterdir()):
+      manifests.append(Manifest(self.root / subdir, self.prefix.current / subdir))
+    return CombinedManifest(manifests)

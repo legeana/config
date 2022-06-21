@@ -18,15 +18,15 @@ class Matcher:
   def match(self, profiles: TagSet) -> bool:
     return self._match_prerequisites(profiles) and self._match_conflicts(profiles)
 
-  def _match_prerequisites(self, profiles: list[str]) -> bool:
+  def _match_prerequisites(self, tags: TagSet) -> bool:
     for required in self.prerequisites:
-      if required not in profiles:
+      if required not in tags:
         return False
     return True
 
-  def _match_conflicts(self, profiles: list[str]) -> bool:
-    for profile in profiles:
-      if profile in self.conflicts:
+  def _match_conflicts(self, tags: TagSet) -> bool:
+    for tag in tags:
+      if tag in self.conflicts:
         return False
     return True
 
