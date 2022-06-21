@@ -1,10 +1,10 @@
-autoload
-ftdetect
-ftplugin
-init.vim
-plugin
-spell
-third_party
+symlink autoload
+symlink ftdetect
+symlink ftplugin
+symlink init.vim
+symlink plugin
+symlink spell
+symlink third_party
 
 install_system_package vim neovim
 post_install_exec vim -c PlugInstall -c PlugClean -c RegenSpellFiles -c qall

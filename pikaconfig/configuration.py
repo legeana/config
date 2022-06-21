@@ -203,12 +203,7 @@ class Manifest(entry.Entry):
     parts = shlex.split(line)
     if not parts:
       return
-    if len(parts) == 0:
-      return
-    elif len(parts) == 1:
-      self._add_command('symlink', parts)
-    else:
-      self._add_command(parts[0], parts[1:])
+    self._add_command(parts[0], parts[1:])
 
   def _add_command(self, command: str, args: list[str]) -> None:
     parser = self._parsers.parse(command, args)
@@ -288,5 +283,7 @@ class SubdirsParser(entry.Parser):
     self.check_supported(command)
     manifests: list[Manifest] = []
     for subdir in sorted(self.root.iterdir()):
+      if not subdir.is_dir():
+        continue
       manifests.append(Manifest(self.root / subdir, self.prefix.current / subdir))
     return CombinedManifest(manifests)

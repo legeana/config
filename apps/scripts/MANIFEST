@@ -1,7 +1,7 @@
 prefix ~/.local/bin
 
-discord-emojification
-git-new
-gpg-batch
-grub-update
-swap
+symlink discord-emojification
+symlink git-new
+symlink gpg-batch
+symlink grub-update
+symlink swap

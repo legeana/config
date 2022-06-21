@@ -1,3 +1,3 @@
 prefix ~
-.gitconfig
-.gitconfig-user
+symlink .gitconfig
+symlink .gitconfig-user

@@ -1,7 +1,7 @@
 prefix ~/.config/sublime-text-3
 
-Packages/User/C++.sublime-settings
-Packages/User/GoSublime-Go.sublime-settings
-Packages/User/GoSublime.sublime-settings
-Packages/User/Preferences.sublime-settings
-Packages/User/Protobuf.sublime-settings
+symlink Packages/User/C++.sublime-settings
+symlink Packages/User/GoSublime-Go.sublime-settings
+symlink Packages/User/GoSublime.sublime-settings
+symlink Packages/User/Preferences.sublime-settings
+symlink Packages/User/Protobuf.sublime-settings
