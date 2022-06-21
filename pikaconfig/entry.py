@@ -2,6 +2,8 @@ import dataclasses
 import pathlib
 from typing import Callable, Collection, Optional, Type
 
+from . import tagutil
+
 PathRecorder = Callable[[pathlib.Path], None]
 
 
@@ -32,6 +34,26 @@ class Prefix:
 
 
 class Entry:
+
+  def tags_match(self, tags: tagutil.TagSet) -> bool:
+    return True
+
+  def recursive_system_setup(self, tags: tagutil.TagSet) -> None:
+    if not self.tags_match(tags):
+      return
+    self.system_setup()
+
+  def recursive_install(self, tags: tagutil.TagSet,
+                        record: PathRecorder) -> None:
+    if not self.tags_match(tags):
+      return
+    self.install(record)
+
+  def recursive_post_install(self, tags: tagutil.TagSet) -> None:
+    """Post install hook."""
+    if not self.tags_match(tags):
+      return
+    self.post_install()
 
   def system_setup(self) -> None:
     pass

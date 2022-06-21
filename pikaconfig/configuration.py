@@ -8,6 +8,7 @@ from . import entry
 from . import file_entry
 from . import post_install_hook
 from . import system_entry
+from . import tagutil
 from . import util
 from . import xdg
 
@@ -112,12 +113,55 @@ class SetXdgStatePrefixParser(file_entry.SinglePathParser):
     return SetPrefixEntry(prefix=path)
 
 
+class TagsEntry(entry.Entry):
+
+  def install(self, record: entry.PathRecorder) -> None:
+    del record  # unused
+    # noop
+
+
+class TagsParser(entry.Parser):
+
+  def __init__(self, matcher: tagutil.Matcher):
+    self.matcher = matcher
+
+  def parse(self, command: str, args: list[str]) -> entry.Entry:
+    self.check_supported(command)
+    return self.parse_tags(tagutil.TagSet(args))
+
+  def parse_tags(self, tags: tagutil.TagSet) -> entry.Entry:
+    raise NotImplementedError
+
+
+class PrerequisiteTagsParser(TagsParser):
+
+  @property
+  def supported_commands(self) -> Collection[str]:
+    return ['requires']
+
+  def parse_tags(self, tags: tagutil.TagSet) -> entry.Entry:
+    self.matcher.prerequisites.update(tags)
+    return TagsEntry()
+
+
+class ConflictTagsParser(TagsParser):
+
+  @property
+  def supported_commands(self) -> Collection[str]:
+    return ['conflicts']
+
+  def parse_tags(self, tags: tagutil.TagSet) -> entry.Entry:
+    self.matcher.conflicts.update(tags)
+    return TagsEntry()
+
+
 class Manifest(entry.Entry):
 
   def __init__(self, root: pathlib.Path, prefix: pathlib.Path):
     self._entries: list[entry.Entry] = []
     self._path = root / _MANIFEST_FILENAME
     self._prefix = entry.Prefix(prefix)
+    self._tag_matcher = tagutil.Matcher()
     self._parsers = CombinedParser(
         ManifestParser(root=root, prefix=self._prefix),
         SetPrefixParser(root=root, prefix=self._prefix),
@@ -125,6 +169,8 @@ class Manifest(entry.Entry):
         SetXdgConfigPrefixParser(root=root, prefix=self._prefix),
         SetXdgDataPrefixParser(root=root, prefix=self._prefix),
         SetXdgStatePrefixParser(root=root, prefix=self._prefix),
+        PrerequisiteTagsParser(matcher=self._tag_matcher),
+        ConflictTagsParser(matcher=self._tag_matcher),
         system_entry.SystemCommandParser(),
         system_entry.AnyPackageParser(),
         system_entry.PacmanPackageParser(),
@@ -167,17 +213,27 @@ class Manifest(entry.Entry):
     parser = self._parsers.parse(command, args)
     self._entries.append(parser)
 
-  def system_setup(self) -> None:
-    for entry in self._entries:
-      entry.system_setup()
+  def tags_match(self, tags: tagutil.TagSet) -> bool:
+    return self._tag_matcher.match(tags)
 
-  def install(self, record: entry.PathRecorder) -> None:
+  def recursive_system_setup(self, tags: tagutil.TagSet) -> None:
+    if not self.tags_match(tags):
+      return
     for entry in self._entries:
-      entry.install(record)
+      entry.recursive_system_setup(tags)
 
-  def post_install(self) -> None:
+  def recursive_install(self, tags: tagutil.TagSet,
+                        record: entry.PathRecorder) -> None:
+    if not self.tags_match(tags):
+      return
     for entry in self._entries:
-      entry.post_install()
+      entry.recursive_install(tags, record)
+
+  def recursive_post_install(self, tags: tagutil.TagSet) -> None:
+    if not self.tags_match(tags):
+      return
+    for entry in self._entries:
+      entry.recursive_post_install(tags)
 
 
 class ManifestParser(file_entry.SinglePathParser):

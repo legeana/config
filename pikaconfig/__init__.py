@@ -7,11 +7,12 @@ import shlex
 import stat
 import subprocess
 import sys
-from typing import Iterable
+from typing import Iterable, Optional
 
 from . import configuration
 from . import database
 from . import logconfig
+from . import tagutil
 from . import util
 
 SELF = pathlib.Path(sys.argv[0]).absolute()
@@ -76,10 +77,12 @@ async def update_all() -> bool:
 
 class Installer:
 
-  def __init__(self):
+  def __init__(self, tags: tagutil.TagSet):
     self._old_db = database.InstalledDatabase.load_from(INSTALL)
     self._db = database.SyncInstalledDatabase(INSTALL)
-    self._manifests = None  # lazy loading
+    # lazy loading
+    self._manifests: Optional[list[configuration.Manifest]] = None
+    self._tags = tags
 
   @classmethod
   def _rm_link(cls, path: pathlib.Path) -> None:
@@ -160,17 +163,17 @@ class Installer:
   def system_setup(self) -> None:
     for manifest in self._load_manifests():
       logging.info(f'\nInstalling packages from {manifest}')
-      manifest.system_setup()
+      manifest.recursive_system_setup(self._tags)
 
   def install(self) -> None:
     for manifest in self._load_manifests():
       logging.info(f'\nInstalling from {manifest}')
-      manifest.install(self._db.add)
+      manifest.recursive_install(self._tags, self._db.add)
 
   def post_install(self) -> None:
     for manifest in self._load_manifests():
       logging.info(f'\nRunning post install from {manifest}')
-      manifest.post_install()
+      manifest.recursive_post_install(self._tags)
 
 
 async def asyncio_main():
@@ -179,6 +182,8 @@ async def asyncio_main():
   parser.add_argument('--uninstall', '-u', action='store_true', dest='uninstall_only')
   parser.add_argument('--system', '-s', action='store_true', dest='system_setup',
                       help='Execute system level commands such as package installation')
+  parser.add_argument('--tags', '-t', nargs='+', default=tagutil.system_tags(),
+                      help='List of tags to set for the current machine')
   parser.add_argument('--verbose', '-v', action='store_true', dest='verbose',
                       help='Print all actions taken')
   args = parser.parse_args()
@@ -187,7 +192,7 @@ async def asyncio_main():
     if await update_all():
       logging.info(f'Updated {util.format_path(SELF)}, restarting')
       os.execv(SELF, sys.argv + ['--no-update'])
-  installer = Installer()
+  installer = Installer(tagutil.TagSet(args.tags))
   if args.system_setup:
     installer.system_setup()
     sys.exit()
