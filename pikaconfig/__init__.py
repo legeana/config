@@ -146,6 +146,10 @@ class Installer:
           if configuration.is_overlay(sub):
             yield sub
 
+  def force_load(self) -> None:
+    """Force MANIFEST loading to catch errors."""
+    self._load_manifests()
+
   def _load_manifests(self) -> Iterable[configuration.Manifest]:
     if self._manifests is not None:
       return self._manifests
@@ -182,6 +186,7 @@ async def install(args: argparse.Namespace) -> None:
       logging.info(f'Updated {util.format_path(SELF)}, restarting')
       os.execv(SELF, sys.argv + ['--no-update'])
   installer = Installer(tagutil.TagSet(args.tags))
+  installer.force_load()  # catch errors early
   if args.system_setup:
     installer.system_setup()
     sys.exit()
