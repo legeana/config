@@ -180,23 +180,31 @@ class Installer:
       manifest.recursive_post_install(self._tags)
 
 
-async def install(args: argparse.Namespace) -> None:
+async def handle_update(args: argparse.Namespace) -> None:
   if args.update:
     if await update_all():
       logging.info(f'Updated {util.format_path(SELF)}, restarting')
       os.execv(SELF, sys.argv + ['--no-update'])
+
+
+async def handle_install(args: argparse.Namespace) -> None:
+  await handle_update(args)
   installer = Installer(tagutil.TagSet(args.tags))
   installer.force_load()  # catch errors early
-  if args.system_setup:
-    installer.system_setup()
-    sys.exit()
   installer.uninstall()
   installer.install()
   installer.post_install()
 
 
-async def uninstall(args: argparse.Namespace) -> None:
-  installer = Installer(tagutil.TagSet())
+async def handle_system_setup(args: argparse.Namespace) -> None:
+  await handle_update(args)
+  installer = Installer(tagutil.TagSet(args.tags))
+  installer.system_setup()
+
+
+async def handle_uninstall(args: argparse.Namespace) -> None:
+  # no update is necessary, just purge everything
+  installer = Installer(args.tags)
   installer.uninstall()
 
 
@@ -207,21 +215,23 @@ async def asyncio_main():
       '--verbose', '-v', action='store_true', dest='verbose',
       help='Print all actions taken')
   parser.add_argument('--no-update', '-d', action='store_false', dest='update')
+  parser.add_argument(
+      '--tags', '-t', nargs='+', default=tagutil.system_tags(),
+      help='List of tags to set for the current machine')
   subparsers = parser.add_subparsers()
 
   uninstall_parser = subparsers.add_parser(
       'uninstall', help='Uninstall configuration')
-  uninstall_parser.set_defaults(func=uninstall)
+  uninstall_parser.set_defaults(func=handle_uninstall)
 
   install_parser = subparsers.add_parser(
       'install', help='Install configuration')
-  install_parser.set_defaults(func=install)
-  install_parser.add_argument(
-      '--system', '-s', action='store_true', dest='system_setup',
+  install_parser.set_defaults(func=handle_install)
+
+  system_parser = subparsers.add_parser(
+      'system',
       help='Execute system level commands such as package installation')
-  install_parser.add_argument(
-      '--tags', '-t', nargs='+', default=tagutil.system_tags(),
-      help='List of tags to set for the current machine')
+  system_parser.set_defaults(func=handle_system_setup)
 
   args = parser.parse_args()
 
