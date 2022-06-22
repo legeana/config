@@ -15,7 +15,8 @@ def _make_symlink(src: pathlib.Path, dst: pathlib.Path,
                   record: entry.PathRecorder) -> None:
   if dst.exists():
     if not dst.is_symlink():
-      logging.error(f'Symlink: unable to overwrite {util.format_path(dst)}')
+      logging.error(f'Symlink: unable to overwrite {util.format_path(dst)} '
+                    f'by {util.format_path(src)}: destination is not a symlink')
       return
     dst.unlink()
   dst.parent.mkdir(parents=True, exist_ok=True)
