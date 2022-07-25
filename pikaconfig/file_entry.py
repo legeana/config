@@ -19,8 +19,13 @@ def _make_symlink(src: pathlib.Path, dst: pathlib.Path,
                     f'by {util.format_path(src)}: destination is not a symlink')
       return
     dst.unlink()
-  dst.parent.mkdir(parents=True, exist_ok=True)
-  dst.symlink_to(src)
+  try:
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    dst.symlink_to(src)
+  except Exception as e:
+    logging.exception(f'Unable to create a symlink to {util.format_path(dst)} '
+                      f'from {util.format_path(src)}')
+    return
   record(dst)
   logging.info(f'{util.format_path(src)} -> {util.format_path(dst)}')
 
