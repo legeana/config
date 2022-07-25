@@ -184,7 +184,7 @@ async def handle_update(args: argparse.Namespace) -> None:
   if args.update:
     if await update_all():
       logging.info(f'Updated {util.format_path(SELF)}, restarting')
-      os.execv(SELF, sys.argv[0] + ['--no-update'] + sys.argv[1:])
+      os.execv(SELF, [sys.argv[0], '--no-update'] + sys.argv[1:])
 
 
 async def handle_install(args: argparse.Namespace) -> None:
