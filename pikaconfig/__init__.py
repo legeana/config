@@ -180,6 +180,12 @@ class Installer:
       logging.info(f'\nRunning post install from {manifest}')
       manifest.recursive_post_install(self._tags)
 
+  def supported_tags(self) -> tagutil.TagSet:
+    tags = tagutil.TagSet()
+    for manifest in self._load_manifests():
+      tags.update(manifest.supported_tags())
+    return tags
+
 
 async def handle_update(args: argparse.Namespace) -> None:
   if args.update:
@@ -198,8 +204,11 @@ async def handle_install(args: argparse.Namespace) -> None:
 
 
 async def handle_tag(args: argparse.Namespace) -> None:
+  await handle_update(args)
   print('System tags:', tagutil.system_tags())
   print('Local tags:', tagutil.local_tags(TAGS))
+  installer = Installer()
+  print('Supported tags:', installer.supported_tags())
 
 
 async def handle_tag_add(args: argparse.Namespace) -> None:

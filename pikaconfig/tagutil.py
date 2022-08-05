@@ -14,8 +14,8 @@ TagSet = set[str]
 @dataclasses.dataclass
 class Matcher:
 
-  prerequisites: set[str] = dataclasses.field(default_factory=set)
-  conflicts: set[str] = dataclasses.field(default_factory=set)
+  prerequisites: TagSet = dataclasses.field(default_factory=TagSet)
+  conflicts: TagSet = dataclasses.field(default_factory=TagSet)
 
   def match(self, profiles: TagSet) -> bool:
     return self._match_prerequisites(profiles) and self._match_conflicts(profiles)
@@ -31,6 +31,9 @@ class Matcher:
       if tag in self.conflicts:
         return False
     return True
+
+  def supported_tags(self) -> TagSet:
+    return self.prerequisites.union(self.conflicts)
 
 
 def _system_profiles() -> Iterable[str]:

@@ -231,6 +231,9 @@ class Manifest(entry.Entry):
     for entry in self._entries:
       entry.recursive_post_install(tags)
 
+  def supported_tags(self) -> tagutil.TagSet:
+    return self._tag_matcher.supported_tags()
+
 
 @dataclasses.dataclass
 class CombinedManifest(entry.Entry):
