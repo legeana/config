@@ -1,7 +1,9 @@
+requires i3
+
 prefix ~/.config/plasma-workspace/env
 symlink kde-i3.sh
 
 prefix ~/.config
 subdir i3
 
-# TODO: install rofi
+install_system_package i3-wm rofi i3status i3lock
