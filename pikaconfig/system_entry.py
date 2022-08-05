@@ -84,7 +84,7 @@ class PacmanPackageEntry(SystemSetupEntry):
   def system_setup(self) -> None:
     if system.os_id() not in self.DISTROS:
       return
-    util.verbose_check_call('sudo', 'pacman', '-S', '--', *self.names)
+    util.verbose_check_call('sudo', 'pacman', '-S', '--needed', '--', *self.names)
 
 
 class PacmanPackageParser(entry.Parser):
