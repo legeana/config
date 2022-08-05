@@ -19,6 +19,7 @@ SELF = pathlib.Path(sys.argv[0]).absolute()
 ROOT = SELF.parent
 OVERLAYS = ROOT / 'overlay.d'
 INSTALL = ROOT / '.install'
+TAGS = ROOT / '.tags'
 BASE = ROOT / 'base'
 APPS = ROOT / 'apps'
 
@@ -77,12 +78,12 @@ async def update_all() -> bool:
 
 class Installer:
 
-  def __init__(self, tags: tagutil.TagSet):
+  def __init__(self):
     self._old_db = database.InstalledDatabase.load_from(INSTALL)
     self._db = database.SyncInstalledDatabase(INSTALL)
     # lazy loading
     self._manifests: Optional[list[configuration.Manifest]] = None
-    self._tags = tags
+    self._tags = tagutil.system_tags().union(tagutil.local_tags(TAGS))
 
   @classmethod
   def _rm_link(cls, path: pathlib.Path) -> None:
@@ -189,16 +190,33 @@ async def handle_update(args: argparse.Namespace) -> None:
 
 async def handle_install(args: argparse.Namespace) -> None:
   await handle_update(args)
-  installer = Installer(tagutil.TagSet(args.tags))
+  installer = Installer()
   installer.force_load()  # catch errors early
   installer.uninstall()
   installer.install()
   installer.post_install()
 
 
+async def handle_tag(args: argparse.Namespace) -> None:
+  print('System tags:', tagutil.system_tags())
+  print('Local tags:', tagutil.local_tags(TAGS))
+
+
+async def handle_tag_add(args: argparse.Namespace) -> None:
+  tags = tagutil.local_tags(TAGS)
+  tags.update(args.tags)
+  tagutil.save_local_tags(TAGS, tags)
+
+
+async def handle_tag_rm(args: argparse.Namespace) -> None:
+  tags = tagutil.local_tags(TAGS)
+  tags.difference_update(args.tags)
+  tagutil.save_local_tags(TAGS, tags)
+
+
 async def handle_system_setup(args: argparse.Namespace) -> None:
   await handle_update(args)
-  installer = Installer(tagutil.TagSet(args.tags))
+  installer = Installer()
   installer.system_setup()
 
 
@@ -227,6 +245,18 @@ async def asyncio_main():
   install_parser = subparsers.add_parser(
       'install', help='Install configuration')
   install_parser.set_defaults(func=handle_install)
+
+  tag_parser = subparsers.add_parser('tag', help='Configure local tags')
+  tag_parser.set_defaults(func=handle_tag)
+  tag_subparsers = tag_parser.add_subparsers()
+
+  tag_parser_add = tag_subparsers.add_parser('add', help='Add tags')
+  tag_parser_add.set_defaults(func=handle_tag_add)
+  tag_parser_add.add_argument('tags', nargs='+', default=[])
+
+  tag_parser_rm = tag_subparsers.add_parser('rm', help='Remove tags')
+  tag_parser_rm.set_defaults(func=handle_tag_rm)
+  tag_parser_rm.add_argument('tags', nargs='+', default=[])
 
   system_parser = subparsers.add_parser(
       'system',
