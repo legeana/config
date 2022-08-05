@@ -1,0 +1,30 @@
+#!/bin/bash -e
+
+AGENTS=(
+    # Desktop Environments
+    /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+    /usr/lib/polkit-kde-authentication-agent-1
+    /usr/lib/xfce-polkit/xfce-polkit
+    /usr/lib/mate-polkit/polkit-mate-authentication-agent-1
+    # Lightweight
+    /usr/bin/lxqt-policykit-agent
+    /usr/bin/lxpolkit
+    /usr/bin/polkit-efl-authentication-agent-1
+    /usr/lib/ts-polkitagent
+    /usr/bin/polkit-dumb-agent
+)
+
+for agent in "${AGENTS[@]}"; do
+    if pgrep --full "$agent" >/dev/null 2>&1; then
+        echo "$agent is already running" >&2
+        exit
+    fi
+done
+for agent in "${AGENTS[@]}"; do
+    if [[ -x "$agent" ]]; then
+        echo "Found $agent, starting..." >&2
+        exec "$agent" "$@"
+    fi
+done
+
+echo "Polkit agent not found, quitting." >&2

@@ -1,0 +1,2 @@
+prefix ~/.local/bin
+symlink pika-sensible-polkit-agent
