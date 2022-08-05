@@ -1,3 +1,5 @@
+requires sway
+
 prefix ~/.config/sway
 symlink config
 symlink_tree config-vars.d
@@ -11,8 +13,11 @@ symlink sway-screenshot
 prefix ~/.config/chrome-flags.d
 symlink chrome-ozone.conf
 
-install_system_package sway swaybg swaylock swayidle xwayland
+install_system_package sway swaybg swaylock swayidle
 install_system_package grim slurp imagemagick
+
+install_apt_package xwayland
+install_pacman_package xorg-xwayland
 
 # pactl
 install_apt_package pulseaudio-utils
