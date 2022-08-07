@@ -4,6 +4,7 @@ Plug 'editorconfig/editorconfig-vim'
 Plug 'machakann/vim-highlightedyank'
 Plug 'kamykn/spelunker.vim'
 Plug 'dag/vim-fish'
+Plug 'itchyny/lightline.vim'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 call autoplug#end()
 
