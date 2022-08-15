@@ -1,1 +1,1 @@
-bindsym $mod+d exec --no-startup-id $launch rofi -combi-modi window#drun#ssh -terminal pika-sensible-terminal -show combi -show-icons
+bindsym $mod+d exec --no-startup-id $launch rofi -combi-modi window#drun#run#ssh -terminal pika-sensible-terminal -show combi -show-icons
