@@ -1,8 +1,8 @@
 mod layout;
 mod repository;
 
-use anyhow::Result;
 use anyhow::anyhow;
+use anyhow::Result;
 
 use std::env;
 use std::path::PathBuf;
