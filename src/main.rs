@@ -23,6 +23,9 @@ fn config_root() -> Result<PathBuf> {
 fn main() -> Result<()> {
     let root = config_root()?;
     println!("Found user configuration: {}", root.display());
-    let _repos = layout::repositories(&root)?;
+    let repos = layout::repositories(&root)?;
+    for repo in repos {
+        println!("{}: {:?}", repo.name(), repo.list());
+    }
     Ok(())
 }
