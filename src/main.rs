@@ -1,4 +1,5 @@
 mod layout;
+mod package;
 mod repository;
 
 use anyhow::anyhow;
