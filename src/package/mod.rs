@@ -1,5 +1,5 @@
-mod system;
 mod configuration;
+mod system;
 
 use std::path::PathBuf;
 

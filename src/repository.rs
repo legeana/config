@@ -38,9 +38,6 @@ impl Repository {
         &self.name
     }
     pub fn list(&self) -> Vec<String> {
-        self.packages
-            .iter()
-            .map(|p| p.name().to_string())
-            .collect()
+        self.packages.iter().map(|p| p.name().to_string()).collect()
     }
 }
