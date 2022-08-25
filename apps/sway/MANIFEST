@@ -26,3 +26,5 @@ install_pacman_package libpulse
 # Mako
 install_apt_package mako-notifier
 install_pacman_package mako
+
+# Depends on wofi

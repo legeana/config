@@ -1,0 +1,6 @@
+requires sway
+
+xdg_config_prefix wofi
+symlink config
+
+install_system_package wofi
