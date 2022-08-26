@@ -52,7 +52,11 @@ fn main() -> Result<()> {
     match args.command {
         Commands::Install {} => {
             if !args.no_update {
-                layout::update(&root)?;
+                let need_restart = layout::update(&root)?;
+                if need_restart {
+                    // TODO use env variable to set no_update
+                    println!("need restart");
+                }
             }
             debug(&root)?;
         }
