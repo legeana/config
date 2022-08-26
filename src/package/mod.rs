@@ -3,8 +3,8 @@ mod system;
 
 use std::path::PathBuf;
 
-use crate::package::configuration::Configuration;
-use crate::package::system::SystemPackage;
+use configuration::Configuration;
+use system::SystemPackage;
 
 use anyhow::{anyhow, Result};
 
