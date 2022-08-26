@@ -80,3 +80,12 @@ pub fn parse(configuration: &mut Configuration, args: &[&str]) -> anyhow::Result
         )),
     }
 }
+
+pub fn help() -> String {
+    let mut help = String::new();
+    for parser in parsers() {
+        help.push_str(parser.help());
+        help.push('\n');
+    }
+    return help;
+}

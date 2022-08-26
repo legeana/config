@@ -2,11 +2,11 @@ mod layout;
 mod package;
 mod repository;
 
-use anyhow::anyhow;
-use anyhow::Result;
+use anyhow::{anyhow, Result};
+use clap::{Args, Parser, Subcommand};
 
 use std::env;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 fn config_root() -> Result<PathBuf> {
     let exe_path = env::current_exe()?;
@@ -21,12 +21,44 @@ fn config_root() -> Result<PathBuf> {
     Err(anyhow!("unable to find Cargo.toml, use setup helper"))
 }
 
-fn main() -> Result<()> {
-    let root = config_root()?;
-    println!("Found user configuration: {}", root.display());
-    let repos = layout::repositories(&root)?;
+#[derive(Debug, Parser)]
+struct Cli {
+    #[clap(short, long)]
+    verbose: bool,
+    #[clap(short = 'd', long)]
+    no_update: bool,
+    #[clap(subcommand)]
+    command: Commands,
+}
+
+#[derive(Debug, Subcommand)]
+enum Commands {
+    Install {},
+    Uninstall {},
+}
+
+fn debug(root: &Path) -> Result<()> {
+    let repos = layout::repositories(root)?;
     for repo in repos {
         println!("{}: {:?}", repo.name(), repo.list());
     }
-    Ok(())
+    return Ok(());
+}
+
+fn main() -> Result<()> {
+    let root = config_root()?;
+    println!("Found user configuration: {}", root.display());
+    let args = Cli::parse();
+    match args.command {
+        Commands::Install {} => {
+            if !args.no_update {
+                layout::update(&root)?;
+            }
+            debug(&root)?;
+        }
+        Commands::Uninstall {} => {
+            println!("uninstalling");
+        }
+    }
+    return Ok(());
 }
