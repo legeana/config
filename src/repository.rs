@@ -28,6 +28,11 @@ impl Repository {
             .with_context(|| format!("failed to read {}", repository.root.display()))?;
         for entry in dirs {
             let dir = entry?;
+            let md = std::fs::metadata(dir.path())
+                .with_context(|| format!("failed to read metadata for {}", dir.path().display()))?;
+            if !md.is_dir() {
+                continue;
+            }
             let package = Package::new(dir.path())
                 .with_context(|| format!("failed to load {}", dir.path().display()))?;
             repository.packages.push(package);
