@@ -1,3 +1,4 @@
+mod parser;
 mod subdir;
 mod util;
 
@@ -28,11 +29,6 @@ pub struct Configuration {
     files: Vec<Box<dyn FileInstaller>>,
 }
 
-pub trait Parser {
-    fn help() -> &'static str;
-    fn parse(configuration: &mut Configuration, args: &[&str]) -> Result<()>;
-}
-
 impl Configuration {
     pub fn new(root: PathBuf) -> Result<Self> {
         let mut conf = Configuration {
@@ -47,13 +43,13 @@ impl Configuration {
             .with_context(|| format!("failed to load {}", manifest.display()))?;
         return Ok(conf);
     }
-    fn parse_line(&mut self, line_num: usize, line: &str) -> Result<()> {
+    fn parse_line(&mut self, line: &str) -> Result<()> {
         if line.is_empty() || line.starts_with("#") {
             return Ok(());
         }
         let args = shlex::split(&line).ok_or(anyhow!("failed to split line {:?}", line))?;
-        println!("{}/{}:{} {:?}", self.root.display(), MANIFEST, line_num, args);
-        Ok(())
+        let arg_refs: Vec<&str> = args.iter().map(String::as_str).collect();
+        return parser::parse(self, &arg_refs);
     }
     fn parse(&mut self, manifest_path: &PathBuf) -> Result<()> {
         let manifest = File::open(manifest_path)
@@ -68,7 +64,7 @@ impl Configuration {
                     manifest_path.display()
                 )
             })?;
-            self.parse_line(line_num, &line).with_context(|| {
+            self.parse_line(&line).with_context(|| {
                 format!(
                     "failed to parse line {} {:?} from {}",
                     line_num,
@@ -77,7 +73,7 @@ impl Configuration {
                 )
             })?;
         }
-        Ok(())
+        return Ok(());
     }
 }
 
