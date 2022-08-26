@@ -1,3 +1,6 @@
+fn parse() {
+}
+
 // TODO: subdir
 // TODO: subdirs
 // TODO: prefix

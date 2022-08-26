@@ -1,3 +1,7 @@
+mod subdir;
+mod util;
+
+use core::fmt;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::PathBuf;
@@ -25,7 +29,8 @@ pub struct Configuration {
 }
 
 pub trait Parser {
-    fn parse(configuration: &mut Configuration, args: &Vec<String>) -> Result<()>;
+    fn help() -> &'static str;
+    fn parse(configuration: &mut Configuration, args: &[&str]) -> Result<()>;
 }
 
 impl Configuration {
@@ -73,5 +78,11 @@ impl Configuration {
             })?;
         }
         Ok(())
+    }
+}
+
+impl fmt::Display for Configuration {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.root.display())
     }
 }
