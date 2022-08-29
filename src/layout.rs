@@ -1,8 +1,9 @@
 use std::path::{Path, PathBuf};
+use std::process::Command;
 
 use crate::repository::Repository;
 
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Context, Result};
 
 const APPS: &str = "apps";
 const OVERLAY: &str = "overlay.d";
@@ -42,13 +43,48 @@ pub fn repositories(root: &Path) -> Result<Vec<Repository>> {
     return Ok(result);
 }
 
-fn update_repository(root: &Path) -> Result<bool> {
-    if !root.join(GIT_DIR).is_dir() {
-        // Skip non-git overlay.
-        return Ok(false);
+fn get_head(root: &Path) -> Result<String> {
+    let rev_parse = Command::new("git")
+        .args(["rev-parse", "HEAD"])
+        .output()
+        .with_context(|| format!("{} $ git rev-parse HEAD", root.display()))?;
+    if !rev_parse.status.success() {
+        let err = String::from_utf8_lossy(&rev_parse.stdout);
+        return Err(anyhow!("failed git rev-parse HEAD: {}", err));
     }
-    println!("{} $ git pull", root.display());
-    return Ok(true);
+    let out = String::from_utf8(rev_parse.stdout).with_context(|| {
+        format!(
+            "failed to parse '{} $ git rev-parse HEAD' output",
+            root.display()
+        )
+    })?;
+    return Ok(out.trim().to_string());
+}
+
+/// Returns whether pull changed HEAD.
+fn git_pull(root: &Path) -> Result<bool> {
+    let old_head = get_head(root)?;
+    let status = Command::new("git")
+        .arg("-C")
+        .arg(root)
+        .arg("pull")
+        .arg("--ff-only")
+        .status()
+        .with_context(|| format!("git -C {} pull --ff-only", root.display()))?;
+    if !status.success() {
+        return Err(anyhow!("git -C {} pull --ff-only", root.display()));
+    }
+    let new_head = get_head(root)?;
+    return Ok(old_head != new_head);
+}
+
+/// Returns true if restart is required.
+fn update_repository(root: &Path) -> Result<bool> {
+    if root.join(GIT_DIR).is_dir() {
+        return git_pull(root);
+    }
+    // Unsupported version control system, if any. Skip.
+    return Ok(false);
 }
 
 /// Returns true if restart is required.

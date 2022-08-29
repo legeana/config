@@ -42,7 +42,11 @@ enum Commands {
 
 fn reload() -> Result<()> {
     let setup = config_root()?.join("setup");
-    println!("Restarting: $ {} {:?}", setup.display(), env::args_os().skip(1).collect::<Vec<OsString>>());
+    println!(
+        "Restarting: $ {} {:?}",
+        setup.display(),
+        env::args_os().skip(1).collect::<Vec<OsString>>()
+    );
     let exit_status = std::process::Command::new(&setup)
         .args(env::args_os().skip(1))
         .env(NO_UPDATE_ENV, "yes")
@@ -67,10 +71,11 @@ fn main() -> Result<()> {
     let args = Cli::parse();
     match args.command {
         Commands::Install {} => {
-            let no_update = args.no_update || match env::var(NO_UPDATE_ENV) {
-                Ok(_) => true,
-                Err(_) => false,
-            };
+            let no_update = args.no_update
+                || match env::var(NO_UPDATE_ENV) {
+                    Ok(_) => true,
+                    Err(_) => false,
+                };
             if !no_update {
                 let need_restart = layout::update(&root)?;
                 if need_restart {
