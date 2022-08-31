@@ -27,11 +27,7 @@ impl parser::Parser for SubdirParser {
         let subconf = Configuration::new_sub(state, subroot)?;
         // TODO: use try_insert when available
         if configuration.subdirs.contains_key(subdir) {
-            return Err(parser::Error::Other(anyhow!(
-                "{} already includes {}",
-                configuration,
-                subdir
-            )));
+            return Err(anyhow!("{} already includes {}", configuration, subdir).into());
         }
         configuration.subdirs.insert(subdir.to_string(), subconf);
         return Ok(());
