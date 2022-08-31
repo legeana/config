@@ -4,7 +4,7 @@ mod registry;
 mod repository;
 
 use anyhow::{anyhow, Result};
-use clap::{Args, Parser, Subcommand};
+use clap::{Parser, Subcommand};
 
 use std::env;
 use std::ffi::OsString;
