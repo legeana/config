@@ -1,6 +1,9 @@
+use std::path::PathBuf;
+
 use crate::package::configuration::Configuration;
 
 use anyhow::anyhow;
+use dirs;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -13,11 +16,30 @@ pub enum Error {
 
 pub type Result<T> = std::result::Result<T, Error>;
 
-pub struct State {}
+struct Prefix {
+    base: PathBuf,
+    current: PathBuf,
+}
+
+impl Prefix {
+    fn new() -> Self {
+        let home = dirs::home_dir().expect("failed to determine home dir");
+        return Self {
+            base: home.clone(),
+            current: home,
+        };
+    }
+}
+
+pub struct State {
+    prefix: Prefix,
+}
 
 impl State {
     pub fn new() -> Self {
-        Self {}
+        Self {
+            prefix: Prefix::new(),
+        }
     }
 }
 
