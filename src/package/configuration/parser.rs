@@ -81,7 +81,7 @@ fn parsers() -> Vec<Box<dyn Parser>> {
         // TODO: install_brew_package
         // TODO: install_pip_user_package
         Box::new(super::symlink::SymlinkParser {}),
-        // TODO: symlink_tree
+        Box::new(super::symlink_tree::SymlinkTreeParser {}),
         // TODO: copy
         // TODO: output_file
         // TODO: cat_glob

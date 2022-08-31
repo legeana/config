@@ -3,6 +3,7 @@ mod parser;
 mod prefix;
 mod subdir;
 mod symlink;
+mod symlink_tree;
 mod util;
 
 use crate::registry::Registry;
