@@ -24,7 +24,10 @@ impl parser::Parser for SubdirParser {
     ) -> parser::Result<()> {
         let subdir = single_arg(COMMAND, args)?;
         let subroot = configuration.root.clone().join(subdir);
-        let subconf = Configuration::new_sub(state, subroot)?;
+        let mut substate = parser::State {
+            prefix: state.prefix.join(subdir),
+        };
+        let subconf = Configuration::new_sub(&mut substate, subroot)?;
         // TODO: use try_insert when available
         if configuration.subdirs.contains_key(subdir) {
             return Err(anyhow!("{} already includes {}", configuration, subdir).into());

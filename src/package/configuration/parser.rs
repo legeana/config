@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use crate::package::configuration::Configuration;
 
@@ -16,9 +16,9 @@ pub enum Error {
 
 pub type Result<T> = std::result::Result<T, Error>;
 
-struct Prefix {
-    base: PathBuf,
-    current: PathBuf,
+pub struct Prefix {
+    pub base: PathBuf,
+    pub current: PathBuf,
 }
 
 impl Prefix {
@@ -29,10 +29,20 @@ impl Prefix {
             current: home,
         };
     }
+    pub fn set(&mut self, current: PathBuf) {
+        self.current = current;
+    }
+    pub fn join<P: AsRef<Path>>(&self, subdir: P) -> Self {
+        let sub = self.current.join(subdir);
+        return Self {
+            base: sub.clone(),
+            current: sub,
+        };
+    }
 }
 
 pub struct State {
-    prefix: Prefix,
+    pub prefix: Prefix,
 }
 
 impl State {
