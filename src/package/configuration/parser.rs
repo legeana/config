@@ -68,7 +68,7 @@ fn parsers() -> Vec<Box<dyn Parser>> {
     vec![
         Box::new(super::subdir::SubdirParser {}),
         // TODO: subdirs
-        // TODO: prefix
+        Box::new(super::prefix::PrefixParser {}),
         // TODO: xdg_cache_prefix
         // TODO: xdg_config_prefix
         // TODO: xdg_data_prefix

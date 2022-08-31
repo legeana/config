@@ -9,5 +9,6 @@ edition = "2021"
 anyhow = "1.0"
 clap = { version = "3.2", features = ["derive"] }
 dirs = "4.0"
+shellexpand = "2.1"
 shlex = "1.1.0"
 thiserror = "1.0"
