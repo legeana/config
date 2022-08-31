@@ -31,6 +31,10 @@ pub struct Configuration {
 
 impl Configuration {
     pub fn new(root: PathBuf) -> Result<Self> {
+        let mut state = parser::State::new();
+        Configuration::new_sub(&mut state, root)
+    }
+    pub fn new_sub(state: &mut parser::State, root: PathBuf) -> Result<Self> {
         let manifest = root.join(MANIFEST);
         let mut conf = Configuration {
             root,
@@ -39,19 +43,19 @@ impl Configuration {
             post_hooks: Vec::new(),
             files: Vec::new(),
         };
-        conf.parse(&manifest)
+        conf.parse(state, &manifest)
             .with_context(|| format!("failed to load {}", manifest.display()))?;
         return Ok(conf);
     }
-    fn parse_line(&mut self, line: &str) -> Result<()> {
+    fn parse_line(&mut self, state: &mut parser::State, line: &str) -> Result<()> {
         if line.is_empty() || line.starts_with("#") {
             return Ok(());
         }
         let args = shlex::split(&line).ok_or(anyhow!("failed to split line {:?}", line))?;
         let arg_refs: Vec<&str> = args.iter().map(String::as_str).collect();
-        return parser::parse(self, &arg_refs);
+        return parser::parse(state, self, &arg_refs);
     }
-    fn parse(&mut self, manifest_path: &PathBuf) -> Result<()> {
+    fn parse(&mut self, state: &mut parser::State, manifest_path: &PathBuf) -> Result<()> {
         let manifest = File::open(manifest_path)
             .with_context(|| format!("failed to open {}", manifest_path.display()))?;
         let reader = BufReader::new(manifest);
@@ -64,7 +68,7 @@ impl Configuration {
                     manifest_path.display()
                 )
             })?;
-            self.parse_line(&line).with_context(|| {
+            self.parse_line(state, &line).with_context(|| {
                 format!(
                     "failed to parse line {} {:?} from {}",
                     line_num,

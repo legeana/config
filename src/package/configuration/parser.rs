@@ -13,10 +13,23 @@ pub enum Error {
 
 pub type Result<T> = std::result::Result<T, Error>;
 
+pub struct State {}
+
+impl State {
+    pub fn new() -> Self {
+        Self {}
+    }
+}
+
 pub trait Parser {
     fn name(&self) -> &'static str;
     fn help(&self) -> &'static str;
-    fn parse(&self, configuration: &mut Configuration, args: &[&str]) -> Result<()>;
+    fn parse(
+        &self,
+        state: &mut State,
+        configuration: &mut Configuration,
+        args: &[&str],
+    ) -> Result<()>;
 }
 
 fn parsers() -> Vec<Box<dyn Parser>> {
@@ -45,10 +58,14 @@ fn parsers() -> Vec<Box<dyn Parser>> {
     ]
 }
 
-pub fn parse(configuration: &mut Configuration, args: &[&str]) -> anyhow::Result<()> {
+pub fn parse(
+    state: &mut State,
+    configuration: &mut Configuration,
+    args: &[&str],
+) -> anyhow::Result<()> {
     let mut matched = Vec::<String>::new();
     for parser in parsers() {
-        match parser.parse(configuration, args) {
+        match parser.parse(state, configuration, args) {
             Ok(()) => {
                 // Success.
                 matched.push(parser.name().to_string());
