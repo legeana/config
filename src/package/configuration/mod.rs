@@ -31,14 +31,14 @@ pub struct Configuration {
 
 impl Configuration {
     pub fn new(root: PathBuf) -> Result<Self> {
+        let manifest = root.join(MANIFEST);
         let mut conf = Configuration {
-            root: root.clone(),
+            root,
             subdirs: HashMap::new(),
             pre_hooks: Vec::new(),
             post_hooks: Vec::new(),
             files: Vec::new(),
         };
-        let manifest = root.join(MANIFEST);
         conf.parse(&manifest)
             .with_context(|| format!("failed to load {}", manifest.display()))?;
         return Ok(conf);
