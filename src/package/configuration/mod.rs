@@ -1,7 +1,11 @@
+mod file_util;
 mod parser;
 mod prefix;
 mod subdir;
+mod symlink;
 mod util;
+
+use crate::registry::Registry;
 
 use core::fmt;
 use std::fs::File;
@@ -19,7 +23,7 @@ pub trait Hook {
 }
 
 pub trait FileInstaller {
-    // TODO
+    fn install(&self, registry: &mut dyn Registry) -> anyhow::Result<()>;
 }
 
 pub struct Configuration {

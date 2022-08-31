@@ -1,5 +1,6 @@
 mod layout;
 mod package;
+mod registry;
 mod repository;
 
 use anyhow::{anyhow, Result};
