@@ -20,7 +20,6 @@ ROOT = SELF.parent
 OVERLAYS = ROOT / 'overlay.d'
 INSTALL = ROOT / '.install'
 TAGS = ROOT / '.tags'
-BASE = ROOT / 'base'
 APPS = ROOT / 'apps'
 
 
@@ -135,7 +134,6 @@ class Installer:
     self._rm_install()
 
   def _paths(self) -> Iterable[pathlib.Path]:
-    yield BASE
     yield from sorted(APPS.iterdir())
     for overlay in sorted(OVERLAYS.iterdir()):
       if not overlay.is_dir():
