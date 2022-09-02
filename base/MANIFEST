@@ -4,7 +4,6 @@ symlink .config/user-dirs.locale
 symlink .gdbinit
 symlink .ne
 symlink .parallel
-symlink .yaourtrc
 
 copy .config/htop/htoprc
 install_system_package htop

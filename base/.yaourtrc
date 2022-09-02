@@ -1,3 +1,0 @@
-EXPORT=1
-EXPORTDIR="$HOME/.yaourt-export-pkg"
-TMPDIR="$HOME/.yaourt-tmp"
