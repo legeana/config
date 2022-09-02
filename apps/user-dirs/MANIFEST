@@ -1,0 +1,3 @@
+prefix ~/.config
+symlink user-dirs.dirs
+symlink user-dirs.locale
