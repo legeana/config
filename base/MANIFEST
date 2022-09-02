@@ -1,3 +1,2 @@
-symlink .clang-format
 symlink .config/user-dirs.dirs
 symlink .config/user-dirs.locale
