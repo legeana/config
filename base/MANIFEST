@@ -1,7 +1,6 @@
 symlink .clang-format
 symlink .config/user-dirs.dirs
 symlink .config/user-dirs.locale
-symlink .gdbinit
 symlink .ne
 symlink .parallel
 
