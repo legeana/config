@@ -1,0 +1,4 @@
+prefix ~/.config/htop
+copy htoprc
+
+install_system_package htop
