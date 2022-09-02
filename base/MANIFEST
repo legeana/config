@@ -2,7 +2,6 @@ symlink .clang-format
 symlink .config/user-dirs.dirs
 symlink .config/user-dirs.locale
 symlink .ne
-symlink .parallel
 
 copy .config/htop/htoprc
 install_system_package htop
