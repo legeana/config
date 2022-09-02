@@ -1,25 +1,27 @@
 if command --search pacman >/dev/null
-    if [ (id -u) = 0 ]
+    if [ "$(id -u)" = 0 ]
         alias pacorig='pacman'
         alias pack='pacman-key'
+        alias pac='pacman'
+        alias pacuser='pacman'
     else
         alias pacorig='sudo pacman'
         alias pack='sudo pacman-key'
+        alias pac='sudo pacman'
+        alias pacuser='pacman'
     end
-    if command --search yay >/dev/null && set -q SUDO_USER
+
+    if command --search yay >/dev/null
         if [ "$(id -u)" = 0 ]
-            alias pac="sudo -u $SUDO_USER yay --sudoloop"
+            # can use yay as root
+            if set -q SUDO_USER
+                alias pac="sudo -u $SUDO_USER yay --sudoloop"
+                alias pacuser='yay --sudoloop'
+            end
         else
             alias pac='yay --sudoloop'
+            alias pacuser='yay --sudoloop'
         end
-        alias pacuser='yay --sudoloop'
-    else
-        if [ "$(id -u)" = 0 ]
-            alias pac='pacman'
-        else
-            alias pac='sudo pacman'
-        end
-        alias pacuser='pacman'
     end
 
     alias pacu='pac -U'
