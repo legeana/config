@@ -7,8 +7,10 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0"
+base64 = "0.13.0"
 clap = { version = "3.2", features = ["derive"] }
 dirs = "4.0"
+sha2 = "0.10.5"
 shellexpand = "2.1"
 shlex = "1.1.0"
 thiserror = "1.0"
