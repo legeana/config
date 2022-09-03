@@ -1,6 +1,7 @@
 mod file_util;
 mod local_state;
 mod mkdir;
+mod output_file;
 mod parser;
 mod prefix;
 mod subdir;
