@@ -1,4 +1,5 @@
 mod file_util;
+mod mkdir;
 mod parser;
 mod prefix;
 mod subdir;
