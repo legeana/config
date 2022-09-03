@@ -1,0 +1,16 @@
+#!/bin/bash -e
+
+MICE=(
+    'SteelSeries SteelSeries Rival 500 Gaming Mouse'
+)
+
+function setup_mouse {
+    # disable acceleration
+    xinput --set-prop "$1" 'libinput Accel Profile Enabled' 0, 1
+    # set speed
+    xinput --set-prop "$1" 'libinput Accel Speed' 0
+}
+
+for mouse in "${MICE[@]}"; do
+    setup_mouse "$mouse"
+done
