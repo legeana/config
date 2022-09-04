@@ -39,6 +39,7 @@ struct Cli {
 enum Commands {
     Install {},
     Uninstall {},
+    ManifestHelp {},
 }
 
 fn reload() -> Result<()> {
@@ -89,6 +90,9 @@ fn main() -> Result<()> {
         }
         Commands::Uninstall {} => {
             println!("uninstalling");
+        }
+        Commands::ManifestHelp {} => {
+            print!("{}", package::manifest_help());
         }
     }
     return Ok(());

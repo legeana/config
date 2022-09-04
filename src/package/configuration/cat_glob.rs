@@ -56,7 +56,7 @@ impl parser::Parser for CatGlobIntoParser {
         COMMAND
     }
     fn help(&self) -> &'static str {
-        "cat_glob_into filename glob1 [glob2 ...]
+        "cat_glob_into <filename> <glob1> [<glob2> ...]
            create filename in local storage by concatenating globs"
     }
     fn parse(

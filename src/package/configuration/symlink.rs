@@ -30,7 +30,7 @@ impl parser::Parser for SymlinkParser {
         COMMAND
     }
     fn help(&self) -> &'static str {
-        "symlink filename
+        "symlink <filename>
            create a symlink for filename in prefix"
     }
     fn parse(

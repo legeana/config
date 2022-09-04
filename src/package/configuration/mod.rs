@@ -24,6 +24,8 @@ use shlex;
 
 const MANIFEST: &str = "MANIFEST";
 
+pub use parser::help;
+
 pub trait Hook {
     // TODO
 }

@@ -8,6 +8,8 @@ use system::SystemPackage;
 
 use anyhow::{anyhow, Result};
 
+pub use configuration::help as manifest_help;
+
 pub struct Package {
     name: String,
     configuration: Configuration,

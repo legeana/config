@@ -29,7 +29,7 @@ impl parser::Parser for OutputFileParser {
         COMMAND
     }
     fn help(&self) -> &'static str {
-        "output_file filename
+        "output_file <filename>
            create a symlink for filename in prefix to a local persistent state"
     }
     fn parse(

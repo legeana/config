@@ -27,7 +27,7 @@ impl parser::Parser for MkDirParser {
         COMMAND
     }
     fn help(&self) -> &'static str {
-        "mkdir directory
+        "mkdir <directory>
            create a directory in prefix"
     }
     fn parse(

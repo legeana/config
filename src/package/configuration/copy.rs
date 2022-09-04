@@ -37,7 +37,7 @@ impl parser::Parser for CopyParser {
         COMMAND
     }
     fn help(&self) -> &'static str {
-        "copy filename
+        "copy <filename>
            create a copy of a filename in local storage and install a symlink to it"
     }
     fn parse(

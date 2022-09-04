@@ -43,7 +43,7 @@ impl parser::Parser for SymlinkTreeParser {
         COMMAND
     }
     fn help(&self) -> &'static str {
-        "symlink_tree directory
+        "symlink_tree <directory>
            create a symlink for every file in a directory recursively"
     }
     fn parse(
