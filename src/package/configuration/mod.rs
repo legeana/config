@@ -1,3 +1,4 @@
+mod cat_glob;
 mod copy;
 mod file_util;
 mod local_state;

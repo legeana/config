@@ -85,7 +85,7 @@ fn parsers() -> Vec<Box<dyn Parser>> {
         Box::new(super::mkdir::MkDirParser {}),
         Box::new(super::copy::CopyParser {}),
         Box::new(super::output_file::OutputFileParser {}),
-        // TODO: cat_glob
+        Box::new(super::cat_glob::CatGlobIntoParser {}),
         // TODO: import_from
         // TODO: post_install_exec
     ]
