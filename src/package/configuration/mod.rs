@@ -1,3 +1,4 @@
+mod copy;
 mod file_util;
 mod local_state;
 mod mkdir;

@@ -1,6 +1,6 @@
 use std::fs;
 use std::os::unix;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Context, Result};
 
@@ -29,8 +29,9 @@ pub fn make_symlink(src: &Path, dst: &Path) -> Result<()> {
     Ok(())
 }
 
-pub fn make_local_state(dst: &Path) -> Result<()> {
+pub fn make_local_state(dst: &Path) -> Result<PathBuf> {
     let state = super::local_state::make_state(dst)
         .with_context(|| format!("unable to make local state for {}", dst.display()))?;
-    return make_symlink(&state, dst);
+    make_symlink(&state, dst)?;
+    return Ok(state);
 }
