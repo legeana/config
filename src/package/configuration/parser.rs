@@ -69,10 +69,10 @@ fn parsers() -> Vec<Box<dyn Parser>> {
         Box::new(super::subdir::SubdirParser {}),
         // TODO: subdirs
         Box::new(super::prefix::PrefixParser {}),
-        // TODO: xdg_cache_prefix
-        // TODO: xdg_config_prefix
-        // TODO: xdg_data_prefix
-        // TODO: xdg_state_prefix
+        Box::new(super::xdg_prefix::XdgCachePrefixParser {}),
+        Box::new(super::xdg_prefix::XdgConfigPrefixParser {}),
+        Box::new(super::xdg_prefix::XdgDataPrefixParser {}),
+        Box::new(super::xdg_prefix::XdgStatePrefixParser {}),
         // TODO: requires
         // TODO: conflicts
         // TODO: install_system_package

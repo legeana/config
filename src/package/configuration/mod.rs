@@ -10,6 +10,7 @@ mod subdir;
 mod symlink;
 mod symlink_tree;
 mod util;
+mod xdg_prefix;
 
 use crate::registry::Registry;
 
