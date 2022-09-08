@@ -1,6 +1,7 @@
 mod cat_glob;
 mod copy;
 mod file_util;
+mod importer;
 mod local_state;
 mod mkdir;
 mod output_file;
