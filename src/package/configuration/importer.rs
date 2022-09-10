@@ -50,6 +50,10 @@ fn parse_import_tree<W: Write>(prefix: &Path, line: &str, out: &mut W) -> Result
     let subdir = prefix.join(arg);
     for e in WalkDir::new(&subdir).sort_by_file_name() {
         let entry = e.with_context(|| format!("failed to read {}", subdir.display()))?;
+        if !entry.file_type().is_file() {
+            // Only files are supported.
+            continue;
+        }
         let include_file = entry.path();
         let subprefix = include_file.parent().ok_or(anyhow!(
             "failed to get parent of {}",
