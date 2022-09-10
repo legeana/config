@@ -15,7 +15,8 @@ fn path_hash(path: &Path) -> Result<PathBuf> {
     hasher.update(path_str.as_bytes());
     let result = hasher.finalize();
 
-    return Ok(base64::encode_config(result, base64::URL_SAFE_NO_PAD).into());
+    // URL_SAFE is used for compatibility with Python version of pikaconfig.
+    return Ok(base64::encode_config(result, base64::URL_SAFE).into());
 }
 
 pub fn make_state(path: &Path) -> Result<PathBuf> {
