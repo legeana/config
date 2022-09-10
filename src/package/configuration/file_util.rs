@@ -3,6 +3,7 @@ use std::os::unix;
 use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Context, Result};
+use log;
 
 pub fn make_symlink(src: &Path, dst: &Path) -> Result<()> {
     if dst.exists() {
@@ -26,6 +27,7 @@ pub fn make_symlink(src: &Path, dst: &Path) -> Result<()> {
             dst.display(),
         )
     })?;
+    log::info!("Symlink {} -> {}", src.display(), dst.display());
     Ok(())
 }
 

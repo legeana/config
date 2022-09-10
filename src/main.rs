@@ -6,6 +6,8 @@ mod repository;
 
 use anyhow::{anyhow, Context, Result};
 use clap::{Parser, Subcommand};
+use log;
+use stderrlog;
 
 use std::env;
 use std::ffi::OsString;
@@ -85,6 +87,10 @@ fn install(root: &Path) -> Result<()> {
 }
 
 fn main() -> Result<()> {
+    stderrlog::new()
+        .timestamp(stderrlog::Timestamp::Off)
+        .init()
+        .with_context(|| format!("failed to initialize stderrlog"))?;
     let root = config_root()?;
     println!("Found user configuration: {}", root.display());
     let args = Cli::parse();
