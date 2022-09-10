@@ -4,6 +4,7 @@ use crate::package::configuration::Configuration;
 
 use anyhow::anyhow;
 use dirs;
+use log;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -118,7 +119,7 @@ pub fn parse(
     }
     match matched.len() {
         0 => {
-            println!("unsupported command {:?}", args);
+            log::error!("unsupported command {:?}", args);
             Ok(())
             // TODO: Err(anyhow!("unsupported command {:?}", args));
         }

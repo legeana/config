@@ -100,7 +100,8 @@ impl Configuration {
                 .with_context(|| format!("failed to execute pre-install hook"))?;
         }
         for (name, subdir) in self.subdirs.iter() {
-            subdir.pre_install()
+            subdir
+                .pre_install()
                 .with_context(|| format!("failed to pre-install {name}"))?;
         }
         return Ok(());
@@ -111,7 +112,8 @@ impl Configuration {
                 .with_context(|| format!("failed to install file installer"))?;
         }
         for (name, subdir) in self.subdirs.iter() {
-            subdir.install(registry)
+            subdir
+                .install(registry)
                 .with_context(|| format!("failed to install {name}"))?;
         }
         return Ok(());
@@ -122,7 +124,8 @@ impl Configuration {
                 .with_context(|| format!("failed to execute post-install hook"))?;
         }
         for (name, subdir) in self.subdirs.iter() {
-            subdir.post_install()
+            subdir
+                .post_install()
                 .with_context(|| format!("failed to post-install {name}"))?;
         }
         return Ok(());

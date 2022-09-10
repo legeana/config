@@ -48,7 +48,7 @@ enum Commands {
 
 fn reload() -> Result<()> {
     let setup = config_root()?.join("setup");
-    println!(
+    log::info!(
         "Restarting: $ {} {:?}",
         setup.display(),
         env::args_os().skip(1).collect::<Vec<OsString>>()
@@ -95,8 +95,6 @@ fn install(root: &Path) -> Result<()> {
 }
 
 fn main() -> Result<()> {
-    let root = config_root()?;
-    println!("Found user configuration: {}", root.display());
     let args = Cli::parse();
     let verbosity = if args.verbose {
         log::Level::Debug
@@ -108,6 +106,9 @@ fn main() -> Result<()> {
         .verbosity(verbosity)
         .init()
         .with_context(|| format!("failed to initialize stderrlog"))?;
+    // Main code.
+    let root = config_root()?;
+    log::info!("Found user configuration: {}", root.display());
     match args.command {
         Commands::Install {} => {
             let no_update = args.no_update || env::var(NO_UPDATE_ENV).is_ok();
