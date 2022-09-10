@@ -22,6 +22,10 @@ impl super::FileInstaller for SymlinkTreeInstaller {
     fn install(&self, registry: &mut dyn Registry) -> anyhow::Result<()> {
         for e in WalkDir::new(&self.src).sort_by_file_name() {
             let entry = e.with_context(|| format!("failed to read {}", self.src.display()))?;
+            if entry.file_type().is_dir() {
+                // Skip directories. They will be automatically created by make_symlink().
+                continue;
+            }
             let src = entry.path();
             let suffix = src.strip_prefix(&self.src).with_context(|| {
                 format!(
