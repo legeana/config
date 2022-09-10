@@ -99,6 +99,10 @@ impl Configuration {
             hook.execute()
                 .with_context(|| format!("failed to execute pre-install hook"))?;
         }
+        for (name, subdir) in self.subdirs.iter() {
+            subdir.pre_install()
+                .with_context(|| format!("failed to pre-install {name}"))?;
+        }
         return Ok(());
     }
     pub fn install(&self, registry: &mut dyn Registry) -> Result<()> {
@@ -106,12 +110,20 @@ impl Configuration {
             file.install(registry)
                 .with_context(|| format!("failed to install file installer"))?;
         }
+        for (name, subdir) in self.subdirs.iter() {
+            subdir.install(registry)
+                .with_context(|| format!("failed to install {name}"))?;
+        }
         return Ok(());
     }
     pub fn post_install(&self) -> Result<()> {
         for hook in self.post_hooks.iter() {
             hook.execute()
                 .with_context(|| format!("failed to execute post-install hook"))?;
+        }
+        for (name, subdir) in self.subdirs.iter() {
+            subdir.post_install()
+                .with_context(|| format!("failed to post-install {name}"))?;
         }
         return Ok(());
     }
