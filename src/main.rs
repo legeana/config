@@ -79,9 +79,17 @@ fn install(root: &Path) -> Result<()> {
     installer::uninstall(&registry)
         .with_context(|| format!("failed to uninstall before installing"))?;
     let repos = layout::repositories(root)?;
-    for repo in repos {
+    for repo in repos.iter() {
+        repo.pre_install_all()
+            .with_context(|| format!("failed to pre-install {}", repo.name()))?;
+    }
+    for repo in repos.iter() {
         repo.install_all(&mut registry)
             .with_context(|| format!("failed to install {}", repo.name()))?;
+    }
+    for repo in repos.iter() {
+        repo.post_install_all()
+            .with_context(|| format!("failed to post-install {}", repo.name()))?;
     }
     return Ok(());
 }

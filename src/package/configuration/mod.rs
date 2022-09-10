@@ -28,12 +28,12 @@ const MANIFEST: &str = "MANIFEST";
 
 pub use parser::help;
 
-pub trait Hook {
-    // TODO
+pub trait FileInstaller {
+    fn install(&self, registry: &mut dyn Registry) -> Result<()>;
 }
 
-pub trait FileInstaller {
-    fn install(&self, registry: &mut dyn Registry) -> anyhow::Result<()>;
+pub trait Hook {
+    fn execute(&self) -> Result<()>;
 }
 
 pub struct Configuration {
@@ -94,10 +94,24 @@ impl Configuration {
         }
         return Ok(());
     }
+    pub fn pre_install(&self) -> Result<()> {
+        for hook in self.pre_hooks.iter() {
+            hook.execute()
+                .with_context(|| format!("failed to execute pre-install hook"))?;
+        }
+        return Ok(());
+    }
     pub fn install(&self, registry: &mut dyn Registry) -> Result<()> {
         for file in self.files.iter() {
             file.install(registry)
-                .with_context(|| format!("failed to install FileInstaller"))?;
+                .with_context(|| format!("failed to install file installer"))?;
+        }
+        return Ok(());
+    }
+    pub fn post_install(&self) -> Result<()> {
+        for hook in self.post_hooks.iter() {
+            hook.execute()
+                .with_context(|| format!("failed to execute post-install hook"))?;
         }
         return Ok(());
     }

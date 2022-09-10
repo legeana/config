@@ -34,7 +34,13 @@ impl Package {
     pub fn name(&self) -> &str {
         &self.name
     }
+    pub fn pre_install(&self) -> Result<()> {
+        self.configuration.pre_install()
+    }
     pub fn install(&self, registry: &mut dyn Registry) -> Result<()> {
         self.configuration.install(registry)
+    }
+    pub fn post_install(&self) -> Result<()> {
+        self.configuration.post_install()
     }
 }

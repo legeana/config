@@ -16,6 +16,10 @@ pub struct ImporterParser {}
 const COMMAND: &str = "import_from";
 
 struct ImporterInstaller {
+    dst: PathBuf,
+}
+
+struct ImporterHook {
     src: PathBuf,
     dst: PathBuf,
 }
@@ -91,8 +95,13 @@ fn render(src: &Path, dst: &Path) -> Result<()> {
 impl super::FileInstaller for ImporterInstaller {
     fn install(&self, registry: &mut dyn Registry) -> Result<()> {
         make_local_state(registry, &self.dst)?;
-        render(&self.src, &self.dst)?;
-        return Ok(());
+        Ok(())
+    }
+}
+
+impl super::Hook for ImporterHook {
+    fn execute(&self) -> Result<()> {
+        render(&self.src, &self.dst)
     }
 }
 
@@ -111,10 +120,14 @@ impl parser::Parser for ImporterParser {
         args: &[&str],
     ) -> parser::Result<()> {
         let filename = single_arg(COMMAND, args)?;
-        configuration.files.push(Box::new(ImporterInstaller {
-            src: configuration.root.join(filename),
-            dst: state.prefix.current.join(filename),
-        }));
+        let src = configuration.root.join(filename);
+        let dst = state.prefix.current.join(filename);
+        configuration
+            .files
+            .push(Box::new(ImporterInstaller { dst: dst.clone() }));
+        configuration
+            .post_hooks
+            .push(Box::new(ImporterHook { src, dst }));
         return Ok(());
     }
 }
