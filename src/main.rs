@@ -6,6 +6,7 @@ mod repository;
 
 use anyhow::{anyhow, Context, Result};
 use clap::{Parser, Subcommand};
+use log;
 use stderrlog;
 
 use std::env;
@@ -94,13 +95,19 @@ fn install(root: &Path) -> Result<()> {
 }
 
 fn main() -> Result<()> {
-    stderrlog::new()
-        .timestamp(stderrlog::Timestamp::Off)
-        .init()
-        .with_context(|| format!("failed to initialize stderrlog"))?;
     let root = config_root()?;
     println!("Found user configuration: {}", root.display());
     let args = Cli::parse();
+    let verbosity = if args.verbose {
+        log::Level::Debug
+    } else {
+        log::Level::Info
+    };
+    stderrlog::new()
+        .timestamp(stderrlog::Timestamp::Off)
+        .verbosity(verbosity)
+        .init()
+        .with_context(|| format!("failed to initialize stderrlog"))?;
     match args.command {
         Commands::Install {} => {
             let no_update = args.no_update || env::var(NO_UPDATE_ENV).is_ok();
