@@ -24,8 +24,7 @@ struct CatGlobIntoInstaller {
 
 impl super::FileInstaller for CatGlobIntoInstaller {
     fn install(&self, registry: &mut dyn Registry) -> anyhow::Result<()> {
-        let state = make_local_state(&self.dst)?;
-        registry.register_symlink(&self.dst)?;
+        let state = make_local_state(registry, &self.dst)?;
         let out_file = std::fs::File::create(&state)
             .with_context(|| format!("unable to create {}", state.display()))?;
         let mut out = std::io::BufWriter::new(out_file);

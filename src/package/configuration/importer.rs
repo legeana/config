@@ -90,8 +90,7 @@ fn render(src: &Path, dst: &Path) -> Result<()> {
 
 impl super::FileInstaller for ImporterInstaller {
     fn install(&self, registry: &mut dyn Registry) -> Result<()> {
-        make_local_state(&self.dst)?;
-        registry.register_symlink(&self.dst)?;
+        make_local_state(registry, &self.dst)?;
         render(&self.src, &self.dst)?;
         return Ok(());
     }

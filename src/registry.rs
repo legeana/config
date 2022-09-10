@@ -6,8 +6,8 @@ use std::{
 use anyhow::{anyhow, Context, Result};
 
 pub trait Registry {
-    fn register_symlink(&mut self, path: &Path) -> Result<()>;
-    fn symlinks(&self) -> Result<Vec<PathBuf>>;
+    fn register(&mut self, path: &Path) -> Result<()>;
+    fn paths(&self) -> Result<Vec<PathBuf>>;
     fn clear(&mut self) -> Result<()>;
 }
 
@@ -22,13 +22,13 @@ impl FileRegistry {
 }
 
 impl Registry for FileRegistry {
-    fn register_symlink(&mut self, path: &Path) -> Result<()> {
-        let mut symlinks = self.symlinks()?;
-        symlinks.push(path.to_owned());
-        let file = std::fs::File::create(&self.path)
+    fn register(&mut self, path: &Path) -> Result<()> {
+        let mut paths = self.paths()?;
+        paths.push(path.to_owned());
+        let db = std::fs::File::create(&self.path)
             .with_context(|| format!("unable to open {}", self.path.display()))?;
-        let mut writer = std::io::BufWriter::new(file);
-        for path in symlinks {
+        let mut writer = std::io::BufWriter::new(db);
+        for path in paths {
             let s = path
                 .to_str()
                 .ok_or(anyhow!("{} is not a valid unicode", path.display()))?;
@@ -39,7 +39,7 @@ impl Registry for FileRegistry {
             .flush()
             .with_context(|| format!("unable to write to {}", self.path.display()));
     }
-    fn symlinks(&self) -> Result<Vec<PathBuf>> {
+    fn paths(&self) -> Result<Vec<PathBuf>> {
         if !self.path.exists() {
             return Ok(Vec::new());
         }

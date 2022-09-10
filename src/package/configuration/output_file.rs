@@ -18,9 +18,7 @@ struct OutputFileInstaller {
 
 impl super::FileInstaller for OutputFileInstaller {
     fn install(&self, registry: &mut dyn Registry) -> anyhow::Result<()> {
-        make_local_state(&self.dst)?;
-        registry.register_symlink(&self.dst)?;
-        return Ok(());
+        make_local_state(registry, &self.dst).map(|_| ())
     }
 }
 

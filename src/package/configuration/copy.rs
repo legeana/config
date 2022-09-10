@@ -19,8 +19,7 @@ struct CopyInstaller {
 
 impl super::FileInstaller for CopyInstaller {
     fn install(&self, registry: &mut dyn Registry) -> anyhow::Result<()> {
-        let state = make_local_state(&self.dst)?;
-        registry.register_symlink(&self.dst)?;
+        let state = make_local_state(registry, &self.dst)?;
         std::fs::copy(&self.src, &state).with_context(|| {
             format!(
                 "unable to copy {} to {}",

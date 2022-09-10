@@ -5,7 +5,9 @@ use std::path::{Path, PathBuf};
 use anyhow::{anyhow, Context, Result};
 use log;
 
-pub fn make_symlink(src: &Path, dst: &Path) -> Result<()> {
+use crate::registry::Registry;
+
+pub fn make_symlink(registry: &mut dyn Registry, src: &Path, dst: &Path) -> Result<()> {
     if dst.exists() {
         if !dst.is_symlink() {
             return Err(anyhow!(
@@ -27,13 +29,15 @@ pub fn make_symlink(src: &Path, dst: &Path) -> Result<()> {
             dst.display(),
         )
     })?;
+    registry.register(dst)
+        .with_context(|| format!("failed to register symlink {}", dst.display()))?;
     log::info!("Symlink {} -> {}", src.display(), dst.display());
     Ok(())
 }
 
-pub fn make_local_state(dst: &Path) -> Result<PathBuf> {
+pub fn make_local_state(registry: &mut dyn Registry, dst: &Path) -> Result<PathBuf> {
     let state = super::local_state::make_state(dst)
         .with_context(|| format!("unable to make local state for {}", dst.display()))?;
-    make_symlink(&state, dst)?;
+    make_symlink(registry, &state, dst)?;
     return Ok(state);
 }

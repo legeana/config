@@ -19,9 +19,7 @@ struct SymlinkInstaller {
 
 impl super::FileInstaller for SymlinkInstaller {
     fn install(&self, registry: &mut dyn Registry) -> anyhow::Result<()> {
-        make_symlink(&self.src, &self.dst)?;
-        registry.register_symlink(&self.dst)?;
-        return Ok(());
+        make_symlink(registry, &self.src, &self.dst)
     }
 }
 

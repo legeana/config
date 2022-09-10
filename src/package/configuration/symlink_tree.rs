@@ -31,8 +31,7 @@ impl super::FileInstaller for SymlinkTreeInstaller {
                 )
             })?;
             let dst = self.dst.join(suffix);
-            make_symlink(&src, &dst)?;
-            registry.register_symlink(&dst)?;
+            make_symlink(registry, &src, &dst)?;
         }
         return Ok(());
     }
