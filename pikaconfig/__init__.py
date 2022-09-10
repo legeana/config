@@ -125,6 +125,7 @@ class Installer:
         pstat = path.lstat()
       except FileNotFoundError:
         logging.info(f'{util.format_path(path)} does not exist, nothing to remove')
+        continue
       if stat.S_ISLNK(pstat.st_mode):
         self._rm_link(path)
       elif stat.S_ISDIR(pstat.st_mode):
