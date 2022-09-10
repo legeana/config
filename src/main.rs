@@ -90,11 +90,7 @@ fn main() -> Result<()> {
     let args = Cli::parse();
     match args.command {
         Commands::Install {} => {
-            let no_update = args.no_update
-                || match env::var(NO_UPDATE_ENV) {
-                    Ok(_) => true,
-                    Err(_) => false,
-                };
+            let no_update = args.no_update || env::var(NO_UPDATE_ENV).is_ok();
             if !no_update {
                 let need_restart = layout::update(&root)?;
                 if need_restart {
