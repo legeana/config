@@ -19,7 +19,8 @@ impl super::FileInstaller for MkDirInstaller {
     fn install(&self, registry: &mut dyn Registry) -> anyhow::Result<()> {
         std::fs::create_dir_all(&self.dst)
             .with_context(|| format!("unable to create {}", self.dst.display()))?;
-        registry.register(&self.dst)
+        registry
+            .register(&self.dst)
             .with_context(|| format!("failed to register directory {}", self.dst.display()))?;
         return Ok(());
     }

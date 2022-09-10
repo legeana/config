@@ -29,7 +29,8 @@ pub fn make_symlink(registry: &mut dyn Registry, src: &Path, dst: &Path) -> Resu
             dst.display(),
         )
     })?;
-    registry.register(dst)
+    registry
+        .register(dst)
         .with_context(|| format!("failed to register symlink {}", dst.display()))?;
     log::info!("Symlink {} -> {}", src.display(), dst.display());
     Ok(())
