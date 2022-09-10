@@ -6,7 +6,6 @@ mod repository;
 
 use anyhow::{anyhow, Context, Result};
 use clap::{Parser, Subcommand};
-use log;
 use stderrlog;
 
 use std::env;
