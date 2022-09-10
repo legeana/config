@@ -68,15 +68,15 @@ fn registry(root: &Path) -> registry::FileRegistry {
 }
 
 fn uninstall(root: &Path) -> Result<()> {
-    let registry = registry(root);
-    installer::uninstall(&registry)
+    let mut registry = registry(root);
+    installer::uninstall(&mut registry)
         .with_context(|| format!("failed to uninstall before installing"))?;
     return Ok(());
 }
 
 fn install(root: &Path) -> Result<()> {
     let mut registry = registry(root);
-    installer::uninstall(&registry)
+    installer::uninstall(&mut registry)
         .with_context(|| format!("failed to uninstall before installing"))?;
     let repos = layout::repositories(root)?;
     for repo in repos.iter() {

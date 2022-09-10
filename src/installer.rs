@@ -50,7 +50,7 @@ fn remove(path: &Path) -> Result<()> {
     }
 }
 
-pub fn uninstall(registry: &dyn Registry) -> Result<()> {
+pub fn uninstall(registry: &mut dyn Registry) -> Result<()> {
     let paths = registry
         .paths()
         .with_context(|| format!("failed to get installed files"))?;
@@ -59,5 +59,5 @@ pub fn uninstall(registry: &dyn Registry) -> Result<()> {
             log::error!("Failed to remove {}: {err}", path.display());
         }
     }
-    return Ok(());
+    return registry.clear();
 }
