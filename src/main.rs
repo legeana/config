@@ -1,9 +1,10 @@
+mod installer;
 mod layout;
 mod package;
 mod registry;
 mod repository;
 
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, Context, Result};
 use clap::{Parser, Subcommand};
 
 use std::env;
@@ -11,6 +12,7 @@ use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
 const NO_UPDATE_ENV: &str = "PIKACONFIG_NO_UPDATE";
+const INSTALL_REGISTRY: &str = ".install";
 
 fn config_root() -> Result<PathBuf> {
     let exe_path = env::current_exe()?;
@@ -59,10 +61,25 @@ fn reload() -> Result<()> {
     return Ok(());
 }
 
-fn debug(root: &Path) -> Result<()> {
+fn registry(root: &Path) -> registry::FileRegistry {
+    registry::FileRegistry::new(root.join(INSTALL_REGISTRY))
+}
+
+fn uninstall(root: &Path) -> Result<()> {
+    let registry = registry(root);
+    installer::uninstall(&registry)
+        .with_context(|| format!("failed to uninstall before installing"))?;
+    return Ok(());
+}
+
+fn install(root: &Path) -> Result<()> {
+    let mut registry = registry(root);
+    installer::uninstall(&registry)
+        .with_context(|| format!("failed to uninstall before installing"))?;
     let repos = layout::repositories(root)?;
     for repo in repos {
-        println!("{}: {:?}", repo.name(), repo.list());
+        repo.install_all(&mut registry)
+            .with_context(|| format!("failed to install {}", repo.name()))?;
     }
     return Ok(());
 }
@@ -86,10 +103,10 @@ fn main() -> Result<()> {
                     return reload();
                 }
             }
-            debug(&root)?;
+            install(&root).with_context(|| format!("failed to install"))?;
         }
         Commands::Uninstall {} => {
-            println!("uninstalling");
+            uninstall(&root).with_context(|| format!("failed to uninstall"))?;
         }
         Commands::ManifestHelp {} => {
             print!("{}", package::manifest_help());

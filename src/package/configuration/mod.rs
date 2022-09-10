@@ -94,6 +94,13 @@ impl Configuration {
         }
         return Ok(());
     }
+    pub fn install(&self, registry: &mut dyn Registry) -> Result<()> {
+        for file in self.files.iter() {
+            file.install(registry)
+                .with_context(|| format!("failed to install FileInstaller"))?;
+        }
+        return Ok(());
+    }
 }
 
 impl fmt::Display for Configuration {

@@ -3,8 +3,8 @@ mod system;
 
 use std::path::PathBuf;
 
+use crate::registry::Registry;
 use configuration::Configuration;
-use system::SystemPackage;
 
 use anyhow::{anyhow, Result};
 
@@ -14,7 +14,7 @@ pub struct Package {
     name: String,
     configuration: Configuration,
     dependencies: Vec<String>,
-    system_dependencies: Vec<SystemPackage>,
+    system_dependencies: Vec<system::SystemPackage>,
 }
 
 impl Package {
@@ -33,5 +33,8 @@ impl Package {
     }
     pub fn name(&self) -> &str {
         &self.name
+    }
+    pub fn install(&self, registry: &mut dyn Registry) -> Result<()> {
+        self.configuration.install(registry)
     }
 }

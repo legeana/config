@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 
 use crate::package::Package;
+use crate::registry::Registry;
 
 use anyhow::{anyhow, Context, Result};
 
@@ -44,5 +45,13 @@ impl Repository {
     }
     pub fn list(&self) -> Vec<String> {
         self.packages.iter().map(|p| p.name().to_string()).collect()
+    }
+    pub fn install_all(&self, registry: &mut dyn Registry) -> Result<()> {
+        for package in self.packages.iter() {
+            package
+                .install(registry)
+                .with_context(|| format!("failed to install {}", package.name()))?;
+        }
+        return Ok(());
     }
 }
