@@ -46,6 +46,7 @@ pub fn repositories(root: &Path) -> Result<Vec<Repository>> {
 fn get_head(root: &Path) -> Result<String> {
     let rev_parse = Command::new("git")
         .args(["rev-parse", "HEAD"])
+        .current_dir(root)
         .output()
         .with_context(|| format!("{} $ git rev-parse HEAD", root.display()))?;
     if !rev_parse.status.success() {
@@ -65,14 +66,12 @@ fn get_head(root: &Path) -> Result<String> {
 fn git_pull(root: &Path) -> Result<bool> {
     let old_head = get_head(root)?;
     let status = Command::new("git")
-        .arg("-C")
-        .arg(root)
-        .arg("pull")
-        .arg("--ff-only")
+        .args(["pull", "--ff-only"])
+        .current_dir(root)
         .status()
-        .with_context(|| format!("git -C {} pull --ff-only", root.display()))?;
+        .with_context(|| format!("{} $ git pull --ff-only", root.display()))?;
     if !status.success() {
-        return Err(anyhow!("git -C {} pull --ff-only", root.display()));
+        return Err(anyhow!("{} $ git pull --ff-only", root.display()));
     }
     let new_head = get_head(root)?;
     return Ok(old_head != new_head);
