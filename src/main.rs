@@ -44,6 +44,7 @@ enum Commands {
     Install {},
     Uninstall {},
     ManifestHelp {},
+    List {},
 }
 
 fn reload() -> Result<()> {
@@ -122,6 +123,13 @@ fn main() -> Result<()> {
         }
         Commands::ManifestHelp {} => {
             print!("{}", package::manifest_help());
+        }
+        Commands::List {} => {
+            for repos in layout::repositories(&root).iter() {
+                for repo in repos.iter() {
+                    println!("{}: {}", repo.name(), repo.list().join(", "));
+                }
+            }
         }
     }
     return Ok(());
