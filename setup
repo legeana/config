@@ -1,7 +1,64 @@
-#!/usr/bin/env python3
+#!/bin/sh -e
 
-import pikaconfig
+log() {
+    echo "$@" >&2
+}
 
+fatal() {
+    log "$@"
+    exit 1
+}
 
-if __name__ == '__main__':
-  pikaconfig.main()
+get_rust_arch() {
+    sudo pacman -S rust
+}
+
+get_rust_debian() {
+    sudo apt install rust-all
+}
+
+get_rust_fedora() {
+    sudo dnf install rust cargo
+}
+
+get_rust_gentoo() {
+    sudo emerge dev-lang/rust-bin
+}
+
+get_rust_ubuntu() {
+    get_rust_debian
+}
+
+get_rust_linux() {
+    if [ ! -f /etc/os-release ]; then
+        fatal "/etc/os-release is not present"
+    fi
+    id="$(cat /etc/os-release | awk -F = '$1 == "ID" { print $2 }')"
+    case "$id" in
+        arch) get_rust_arch ;;
+        debian) get_rust_debian ;;
+        fedora) get_rust_fedora ;;
+        gentoo) get_rust_gentoo ;;
+        ubuntu) get_rust_ubuntu ;;
+        *) fail "Unsupported distribution, please install rust and cargo" ;;
+    esac
+}
+
+get_rust_darwin() {
+    fatal "Not implemented yet"
+}
+
+get_rust() {
+    if cargo --version >/dev/null 2>&1; then
+        log "Using existing cargo"
+        return
+    fi
+    case `uname -s` in
+        Linux) return get_rust_linux ;;
+        Darwin) return get_rust_darwin ;;
+        *) fatal "Unknown platform `uname -s`" ;;
+    esac
+}
+
+get_rust
+cargo run --release -- "$@"

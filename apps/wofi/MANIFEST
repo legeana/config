@@ -1,5 +1,3 @@
-requires sway
-
 xdg_config_prefix wofi
 symlink config
 

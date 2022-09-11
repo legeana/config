@@ -1,5 +1,3 @@
-requires sway
-
 prefix ~/.config/sway
 symlink config
 symlink_tree config-vars.d

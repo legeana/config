@@ -1,0 +1,22 @@
+[package]
+name = "pikaconfig"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0"
+base64 = "0.13.0"
+clap = { version = "3.2", features = ["derive"] }
+dirs = "4.0"
+glob = "0.3.0"
+log = "0.4"
+sha2 = "0.10.5"
+shellexpand = "2.1"
+shlex = "1.1.0"
+stderrlog = "0.5.3"
+sysinfo = { version = "0.26.2", default-features = false }
+thiserror = "1.0"
+walkdir = "2"
+xdg = "^2.1"
