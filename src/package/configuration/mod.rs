@@ -10,6 +10,7 @@ mod prefix;
 mod subdir;
 mod symlink;
 mod symlink_tree;
+mod tags;
 mod util;
 mod xdg_prefix;
 
@@ -37,6 +38,7 @@ pub trait Hook {
 }
 
 pub struct Configuration {
+    enabled: bool,
     root: PathBuf,
     subdirs: HashMap<String, Configuration>,
     pre_hooks: Vec<Box<dyn Hook>>,
@@ -52,6 +54,7 @@ impl Configuration {
     pub fn new_sub(state: &mut parser::State, root: PathBuf) -> Result<Self> {
         let manifest = root.join(MANIFEST);
         let mut conf = Configuration {
+            enabled: true,
             root,
             subdirs: HashMap::new(),
             pre_hooks: Vec::new(),
@@ -95,6 +98,9 @@ impl Configuration {
         return Ok(());
     }
     pub fn pre_install(&self) -> Result<()> {
+        if !self.enabled {
+            return Ok(());
+        }
         for hook in self.pre_hooks.iter() {
             hook.execute()
                 .with_context(|| format!("failed to execute pre-install hook"))?;
@@ -107,6 +113,9 @@ impl Configuration {
         return Ok(());
     }
     pub fn install(&self, registry: &mut dyn Registry) -> Result<()> {
+        if !self.enabled {
+            return Ok(());
+        }
         for file in self.files.iter() {
             file.install(registry)
                 .with_context(|| format!("failed to install file installer"))?;
@@ -119,6 +128,9 @@ impl Configuration {
         return Ok(());
     }
     pub fn post_install(&self) -> Result<()> {
+        if !self.enabled {
+            return Ok(());
+        }
         for hook in self.post_hooks.iter() {
             hook.execute()
                 .with_context(|| format!("failed to execute post-install hook"))?;

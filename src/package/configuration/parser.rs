@@ -74,8 +74,8 @@ fn parsers() -> Vec<Box<dyn Parser>> {
         Box::new(super::xdg_prefix::XdgConfigPrefixParser {}),
         Box::new(super::xdg_prefix::XdgDataPrefixParser {}),
         Box::new(super::xdg_prefix::XdgStatePrefixParser {}),
-        // TODO: requires
-        // TODO: conflicts
+        Box::new(super::tags::RequiresParser {}),
+        Box::new(super::tags::ConflictsParser {}),
         // TODO: install_system_package
         // TODO: install_pacman_package
         // TODO: install_apt_package
