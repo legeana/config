@@ -5,6 +5,27 @@ use log;
 
 use crate::registry::Registry;
 
+pub trait Uninstaller {
+    fn uninstall(&mut self) -> Result<()>;
+}
+
+impl<T> Uninstaller for T
+where
+    T: Registry,
+{
+    fn uninstall(&mut self) -> Result<()> {
+        let paths = self
+            .paths()
+            .with_context(|| format!("failed to get installed files"))?;
+        for path in paths.iter().rev() {
+            if let Err(err) = remove(&path) {
+                log::error!("Failed to remove {}: {err}", path.display());
+            }
+        }
+        return self.clear();
+    }
+}
+
 fn remove_symlink(path: &Path) -> Result<()> {
     if let Err(err) = std::fs::remove_file(path) {
         if err.kind() == std::io::ErrorKind::NotFound {
@@ -55,16 +76,4 @@ fn remove(path: &Path) -> Result<()> {
     } else {
         Err(anyhow!("unexpected file type {:?}", metadata.file_type()))
     }
-}
-
-pub fn uninstall(registry: &mut dyn Registry) -> Result<()> {
-    let paths = registry
-        .paths()
-        .with_context(|| format!("failed to get installed files"))?;
-    for path in paths.iter().rev() {
-        if let Err(err) = remove(&path) {
-            log::error!("Failed to remove {}: {err}", path.display());
-        }
-    }
-    return registry.clear();
 }

@@ -1,11 +1,13 @@
 mod file_registry;
 mod hostname;
-mod installer;
 mod layout;
 mod package;
 mod registry;
 mod repository;
 mod tag_util;
+mod uninstaller;
+
+use uninstaller::Uninstaller;
 
 use anyhow::{anyhow, Context, Result};
 use clap::{Parser, Subcommand};
@@ -73,7 +75,8 @@ fn registry(root: &Path) -> file_registry::FileRegistry {
 
 fn uninstall(root: &Path) -> Result<()> {
     let mut registry = registry(root);
-    installer::uninstall(&mut registry)
+    registry
+        .uninstall()
         .with_context(|| format!("failed to uninstall before installing"))?;
     return Ok(());
 }
@@ -83,7 +86,8 @@ fn install(root: &Path) -> Result<()> {
     // It's better to keep the old configuration than no configuration.
     let repos = layout::repositories(root)?;
     let mut registry = registry(root);
-    installer::uninstall(&mut registry)
+    registry
+        .uninstall()
         .with_context(|| format!("failed to uninstall before installing"))?;
     for repo in repos.iter() {
         repo.pre_install_all()
