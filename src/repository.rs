@@ -38,6 +38,7 @@ impl Repository {
                 .with_context(|| format!("failed to load {}", dir.path().display()))?;
             repository.packages.push(package);
         }
+        repository.packages.sort_by(|a, b| a.name().cmp(b.name()));
         return Ok(repository);
     }
     pub fn name(&self) -> &str {
