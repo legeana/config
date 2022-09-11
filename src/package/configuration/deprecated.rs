@@ -16,7 +16,8 @@ impl parser::Parser for DeprecatedParser {
            - install_pacman_package
            - install_apt_package
            - install_brew_package
-           - install_pip_user_package"
+           - install_pip_user_package
+           - sudo"
     }
     fn parse(
         &self,
@@ -37,6 +38,9 @@ impl parser::Parser for DeprecatedParser {
             return Ok(());
         }
         if check_command("install_pip_user_package", args).is_ok() {
+            return Ok(());
+        }
+        if check_command("sudo", args).is_ok() {
             return Ok(());
         }
         return check_command(COMMAND, args).map(|_| ());
