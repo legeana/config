@@ -1,4 +1,5 @@
 mod file_registry;
+mod hostname;
 mod installer;
 mod layout;
 mod package;

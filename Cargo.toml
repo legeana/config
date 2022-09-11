@@ -16,6 +16,7 @@ sha2 = "0.10.5"
 shellexpand = "2.1"
 shlex = "1.1.0"
 stderrlog = "0.5.3"
+sysinfo = { version = "0.26.2", default-features = false }
 thiserror = "1.0"
 walkdir = "2"
 xdg = "^2.1"
