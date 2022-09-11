@@ -17,6 +17,6 @@ fn has_tag_kv(key: &str, value: &str) -> Result<bool> {
 }
 
 fn match_hostname(want_hostname: &str) -> Result<bool> {
-    let got_hostname = hostname::hostname().with_context(|| format!("unable to get hostname"))?;
-    return Ok(want_hostname == got_hostname);
+    let got_hostname = hostname::hostname().with_context(|| "unable to get hostname")?;
+    Ok(want_hostname == got_hostname)
 }

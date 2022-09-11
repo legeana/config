@@ -2,8 +2,6 @@ use crate::package::configuration::parser;
 use crate::package::configuration::util::single_arg;
 use crate::package::configuration::Configuration;
 
-use shellexpand;
-
 pub struct PrefixParser {}
 
 const COMMAND: &str = "prefix";
@@ -24,6 +22,6 @@ impl parser::Parser for PrefixParser {
     ) -> parser::Result<()> {
         let prefix = single_arg(COMMAND, args)?;
         state.prefix.set(shellexpand::tilde(prefix).as_ref().into());
-        return Ok(());
+        Ok(())
     }
 }

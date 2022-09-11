@@ -6,8 +6,6 @@ use crate::package::configuration::util::single_arg;
 use crate::package::configuration::Configuration;
 use crate::registry::Registry;
 
-use anyhow;
-
 pub struct SymlinkParser {}
 
 const COMMAND: &str = "symlink";
@@ -42,6 +40,6 @@ impl parser::Parser for SymlinkParser {
             src: configuration.root.join(filename),
             dst: state.prefix.current.join(filename),
         }));
-        return Ok(());
+        Ok(())
     }
 }

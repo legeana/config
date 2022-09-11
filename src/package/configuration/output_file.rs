@@ -6,8 +6,6 @@ use crate::package::configuration::util::single_arg;
 use crate::package::configuration::Configuration;
 use crate::registry::Registry;
 
-use anyhow;
-
 pub struct OutputFileParser {}
 
 const COMMAND: &str = "output_file";
@@ -40,6 +38,6 @@ impl parser::Parser for OutputFileParser {
         configuration.files.push(Box::new(OutputFileInstaller {
             dst: state.prefix.current.join(filename),
         }));
-        return Ok(());
+        Ok(())
     }
 }

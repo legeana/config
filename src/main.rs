@@ -11,8 +11,6 @@ use uninstaller::Uninstaller;
 
 use anyhow::{anyhow, Context, Result};
 use clap::{Parser, Subcommand};
-use log;
-use stderrlog;
 
 use std::env;
 use std::ffi::OsString;
@@ -66,7 +64,7 @@ fn reload() -> Result<()> {
     if !exit_status.success() {
         return Err(anyhow!("failed to run {}", setup.display()));
     }
-    return Ok(());
+    Ok(())
 }
 
 fn registry(root: &Path) -> file_registry::FileRegistry {
@@ -77,8 +75,8 @@ fn uninstall(root: &Path) -> Result<()> {
     let mut registry = registry(root);
     registry
         .uninstall()
-        .with_context(|| format!("failed to uninstall before installing"))?;
-    return Ok(());
+        .with_context(|| "failed to uninstall before installing")?;
+    Ok(())
 }
 
 fn install(root: &Path) -> Result<()> {
@@ -88,7 +86,7 @@ fn install(root: &Path) -> Result<()> {
     let mut registry = registry(root);
     registry
         .uninstall()
-        .with_context(|| format!("failed to uninstall before installing"))?;
+        .with_context(|| "failed to uninstall before installing")?;
     for repo in repos.iter() {
         repo.pre_install_all()
             .with_context(|| format!("failed to pre-install {}", repo.name()))?;
@@ -101,7 +99,7 @@ fn install(root: &Path) -> Result<()> {
         repo.post_install_all()
             .with_context(|| format!("failed to post-install {}", repo.name()))?;
     }
-    return Ok(());
+    Ok(())
 }
 
 fn main() -> Result<()> {
@@ -110,7 +108,7 @@ fn main() -> Result<()> {
         .timestamp(stderrlog::Timestamp::Off)
         .verbosity(usize::from(args.verbose))
         .init()
-        .with_context(|| format!("failed to initialize stderrlog"))?;
+        .with_context(|| "failed to initialize stderrlog")?;
     // Main code.
     let root = config_root()?;
     log::info!("Found user configuration: {}", root.display());
@@ -125,21 +123,21 @@ fn main() -> Result<()> {
                     return reload();
                 }
             }
-            install(&root).with_context(|| format!("failed to install"))?;
+            install(&root).with_context(|| "failed to install")?;
         }
         Commands::Uninstall {} => {
-            uninstall(&root).with_context(|| format!("failed to uninstall"))?;
+            uninstall(&root).with_context(|| "failed to uninstall")?;
         }
         Commands::ManifestHelp {} => {
             print!("{}", package::manifest_help());
         }
         Commands::List {} => {
-            for repos in layout::repositories(&root).iter() {
-                for repo in repos.iter() {
-                    println!("{}: {}", repo.name(), repo.list().join(", "));
-                }
+            let repos = layout::repositories(&root)
+                .with_context(|| format!("failed to get repositories from {}", root.display()))?;
+            for repo in repos.iter() {
+                println!("{}: {}", repo.name(), repo.list().join(", "));
             }
         }
     }
-    return Ok(());
+    Ok(())
 }

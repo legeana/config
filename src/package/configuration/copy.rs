@@ -27,7 +27,7 @@ impl super::FileInstaller for CopyInstaller {
                 state.display()
             )
         })?;
-        return Ok(());
+        Ok(())
     }
 }
 
@@ -50,6 +50,6 @@ impl parser::Parser for CopyParser {
             src: configuration.root.join(filename),
             dst: state.prefix.current.join(filename),
         }));
-        return Ok(());
+        Ok(())
     }
 }

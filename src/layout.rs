@@ -24,7 +24,7 @@ fn overlay_dirs(root: &Path) -> Result<Vec<PathBuf>> {
         }
         result.push(dir.path());
     }
-    return Ok(result);
+    Ok(result)
 }
 
 fn repositories_dirs(root: &Path) -> Result<Vec<PathBuf>> {
@@ -32,7 +32,7 @@ fn repositories_dirs(root: &Path) -> Result<Vec<PathBuf>> {
     let mut result = Vec::<PathBuf>::new();
     result.push(apps);
     result.extend(overlay_dirs(root)?);
-    return Ok(result);
+    Ok(result)
 }
 
 pub fn repositories(root: &Path) -> Result<Vec<Repository>> {
@@ -40,7 +40,7 @@ pub fn repositories(root: &Path) -> Result<Vec<Repository>> {
     for dir in repositories_dirs(root)? {
         result.push(Repository::new(dir)?);
     }
-    return Ok(result);
+    Ok(result)
 }
 
 fn get_head(root: &Path) -> Result<String> {
@@ -59,7 +59,7 @@ fn get_head(root: &Path) -> Result<String> {
             root.display()
         )
     })?;
-    return Ok(out.trim().to_string());
+    Ok(out.trim().to_string())
 }
 
 /// Returns whether pull changed HEAD.
@@ -74,7 +74,7 @@ fn git_pull(root: &Path) -> Result<bool> {
         return Err(anyhow!("{} $ git pull --ff-only", root.display()));
     }
     let new_head = get_head(root)?;
-    return Ok(old_head != new_head);
+    Ok(old_head != new_head)
 }
 
 /// Returns true if restart is required.
@@ -83,7 +83,7 @@ fn update_repository(root: &Path) -> Result<bool> {
         return git_pull(root);
     }
     // Unsupported version control system, if any. Skip.
-    return Ok(false);
+    Ok(false)
 }
 
 /// Returns true if restart is required.
@@ -93,5 +93,5 @@ pub fn update(root: &Path) -> Result<bool> {
     for overlay in overlay_dirs(root)? {
         update_repository(&overlay)?;
     }
-    return Ok(updated);
+    Ok(updated)
 }

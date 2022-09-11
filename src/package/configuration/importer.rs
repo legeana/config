@@ -32,12 +32,11 @@ fn parse_import<W: Write>(prefix: &Path, line: &str, out: &mut W) -> Result<bool
     }
     let arg = line[COMMAND.len()..].trim();
     let include_file = prefix.join(arg);
-    let subprefix = include_file.parent().ok_or(anyhow!(
-        "failed to get parent of {}",
-        include_file.display()
-    ))?;
+    let subprefix = include_file
+        .parent()
+        .ok_or_else(|| anyhow!("failed to get parent of {}", include_file.display()))?;
     render_w(subprefix, &include_file, out).with_context(|| format!("failed to import {}", arg))?;
-    return Ok(true);
+    Ok(true)
 }
 
 /// Returns true if parser matched.
@@ -55,14 +54,13 @@ fn parse_import_tree<W: Write>(prefix: &Path, line: &str, out: &mut W) -> Result
             continue;
         }
         let include_file = entry.path();
-        let subprefix = include_file.parent().ok_or(anyhow!(
-            "failed to get parent of {}",
-            include_file.display()
-        ))?;
-        render_w(subprefix, &include_file, out)
+        let subprefix = include_file
+            .parent()
+            .ok_or_else(|| anyhow!("failed to get parent of {}", include_file.display()))?;
+        render_w(subprefix, include_file, out)
             .with_context(|| format!("failed to import tree {}", arg))?;
     }
-    return Ok(true);
+    Ok(true)
 }
 
 fn parse_line<W: Write>(prefix: &Path, line: &str, out: &mut W) -> Result<()> {
@@ -72,8 +70,8 @@ fn parse_line<W: Write>(prefix: &Path, line: &str, out: &mut W) -> Result<()> {
     if parse_import_tree(prefix, line, out)? {
         return Ok(());
     }
-    writeln!(out, "{}", line).with_context(|| format!("failed to write line"))?;
-    return Ok(());
+    writeln!(out, "{}", line).with_context(|| "failed to write line")?;
+    Ok(())
 }
 
 fn render_w<W: Write>(prefix: &Path, src: &Path, out: &mut W) -> Result<()> {
@@ -83,7 +81,7 @@ fn render_w<W: Write>(prefix: &Path, src: &Path, out: &mut W) -> Result<()> {
         let line = line.with_context(|| format!("failed to read line from {}", src.display()))?;
         parse_line(prefix, &line, out).with_context(|| format!("failed to parse {}", line))?;
     }
-    return Ok(());
+    Ok(())
 }
 
 fn render(src: &Path, dst: &Path) -> Result<()> {
@@ -91,9 +89,8 @@ fn render(src: &Path, dst: &Path) -> Result<()> {
     let mut out = BufWriter::new(f);
     let prefix = dst
         .parent()
-        .ok_or(anyhow!("failed to get parent of {}", dst.display()))?;
-    return render_w(prefix, src, &mut out)
-        .with_context(|| format!("failed to render {}", dst.display()));
+        .ok_or_else(|| anyhow!("failed to get parent of {}", dst.display()))?;
+    render_w(prefix, src, &mut out).with_context(|| format!("failed to render {}", dst.display()))
 }
 
 impl super::FileInstaller for ImporterInstaller {
@@ -132,6 +129,6 @@ impl parser::Parser for ImporterParser {
         configuration
             .post_hooks
             .push(Box::new(ImporterHook { src, dst }));
-        return Ok(());
+        Ok(())
     }
 }

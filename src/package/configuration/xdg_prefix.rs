@@ -5,7 +5,6 @@ use crate::package::configuration::util::single_arg;
 use crate::package::configuration::Configuration;
 
 use anyhow::{Context, Result};
-use xdg;
 
 trait XdgPrefixParser {
     fn name(&self) -> &'static str;
@@ -23,9 +22,8 @@ impl XdgPrefixParser for XdgCachePrefixParser {
            set current installation prefix to $XDG_CACHE_HOME/<directory>"
     }
     fn xdg_prefix(&self, path: &str) -> Result<PathBuf> {
-        let base = xdg::BaseDirectories::new()
-            .with_context(|| format!("failed to parse XDG_CACHE_HOME"))?;
-        return Ok(base.get_cache_home().join(path));
+        let base = xdg::BaseDirectories::new().with_context(|| "failed to parse XDG_CACHE_HOME")?;
+        Ok(base.get_cache_home().join(path))
     }
 }
 
@@ -39,9 +37,9 @@ impl XdgPrefixParser for XdgConfigPrefixParser {
            set current installation prefix to $XDG_CONFIG_HOME/<directory>"
     }
     fn xdg_prefix(&self, path: &str) -> Result<PathBuf> {
-        let base = xdg::BaseDirectories::new()
-            .with_context(|| format!("failed to parse XDG_CONFIG_HOME"))?;
-        return Ok(base.get_config_home().join(path));
+        let base =
+            xdg::BaseDirectories::new().with_context(|| "failed to parse XDG_CONFIG_HOME")?;
+        Ok(base.get_config_home().join(path))
     }
 }
 
@@ -55,9 +53,8 @@ impl XdgPrefixParser for XdgDataPrefixParser {
            set current installation prefix to $XDG_DATA_HOME/<directory>"
     }
     fn xdg_prefix(&self, path: &str) -> Result<PathBuf> {
-        let base = xdg::BaseDirectories::new()
-            .with_context(|| format!("failed to parse XDG_DATA_HOME"))?;
-        return Ok(base.get_data_home().join(path));
+        let base = xdg::BaseDirectories::new().with_context(|| "failed to parse XDG_DATA_HOME")?;
+        Ok(base.get_data_home().join(path))
     }
 }
 
@@ -71,9 +68,8 @@ impl XdgPrefixParser for XdgStatePrefixParser {
            set current installation prefix to $XDG_STATE_HOME/<directory>"
     }
     fn xdg_prefix(&self, path: &str) -> Result<PathBuf> {
-        let base = xdg::BaseDirectories::new()
-            .with_context(|| format!("failed to parse XDG_STATE_HOME"))?;
-        return Ok(base.get_state_home().join(path));
+        let base = xdg::BaseDirectories::new().with_context(|| "failed to parse XDG_STATE_HOME")?;
+        Ok(base.get_state_home().join(path))
     }
 }
 
@@ -95,6 +91,6 @@ where
     ) -> parser::Result<()> {
         let path = single_arg(self.name(), args)?;
         state.prefix.set(self.xdg_prefix(path)?);
-        return Ok(());
+        Ok(())
     }
 }

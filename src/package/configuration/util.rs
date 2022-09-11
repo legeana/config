@@ -15,12 +15,12 @@ pub fn check_command<'a, 'b>(command: &str, args: &'a [&'b str]) -> Result<&'a [
             command: cmd.to_owned(),
         });
     }
-    return Ok(cmd_args);
+    Ok(cmd_args)
 }
 
 pub fn no_args(command: &str, args: &[&str]) -> Result<()> {
     let cmd_args = check_command(command, args)?;
-    if cmd_args.len() != 0 {
+    if !cmd_args.is_empty() {
         return Err(anyhow!(
             "{} parser: want no arguments, got {}: {:?}",
             command,
@@ -29,7 +29,7 @@ pub fn no_args(command: &str, args: &[&str]) -> Result<()> {
         )
         .into());
     }
-    return Ok(());
+    Ok(())
 }
 
 pub fn single_arg<'a>(command: &str, args: &[&'a str]) -> Result<&'a str> {
@@ -43,7 +43,7 @@ pub fn single_arg<'a>(command: &str, args: &[&'a str]) -> Result<&'a str> {
         )
         .into());
     }
-    return Ok(args[1]);
+    Ok(args[1])
 }
 
 /// Returns (required_args, remainder_args).
@@ -65,5 +65,5 @@ pub fn multiple_args<'a, 'b>(
     }
     let required_args = &cmd_args[0..required];
     let remainder_args = &cmd_args[required..];
-    return Ok((required_args, remainder_args));
+    Ok((required_args, remainder_args))
 }

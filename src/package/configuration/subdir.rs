@@ -33,6 +33,6 @@ impl parser::Parser for SubdirParser {
             return Err(anyhow!("{} already includes {}", configuration, subdir).into());
         }
         configuration.subdirs.insert(subdir.to_string(), subconf);
-        return Ok(());
+        Ok(())
     }
 }

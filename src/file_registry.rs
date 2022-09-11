@@ -27,13 +27,13 @@ impl registry::Registry for FileRegistry {
         for path in paths {
             let s = path
                 .to_str()
-                .ok_or(anyhow!("{} is not a valid unicode", path.display()))?;
-            write!(&mut writer, "{}\n", s)
+                .ok_or_else(|| anyhow!("{} is not a valid unicode", path.display()))?;
+            writeln!(&mut writer, "{}", s)
                 .with_context(|| format!("failed to write to {}", self.path.display()))?;
         }
-        return writer
+        writer
             .flush()
-            .with_context(|| format!("unable to write to {}", self.path.display()));
+            .with_context(|| format!("unable to write to {}", self.path.display()))
     }
     fn paths(&self) -> Result<Vec<PathBuf>> {
         if !self.path.exists() {
@@ -44,11 +44,11 @@ impl registry::Registry for FileRegistry {
         }
         let data = std::fs::read_to_string(&self.path)
             .with_context(|| format!("failed to read {}", self.path.display()))?;
-        return Ok(data
+        Ok(data
             .split('\n')
             .filter(|s| !s.is_empty())
-            .map(|s| PathBuf::from(s))
-            .collect());
+            .map(PathBuf::from)
+            .collect())
     }
     fn clear(&mut self) -> Result<()> {
         std::fs::remove_file(&self.path)

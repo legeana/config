@@ -3,7 +3,6 @@ use std::os::unix;
 use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Context, Result};
-use log;
 
 use crate::registry::Registry;
 
@@ -20,7 +19,7 @@ pub fn make_symlink(registry: &mut dyn Registry, src: &Path, dst: &Path) -> Resu
     }
     let parent = dst
         .parent()
-        .ok_or(anyhow!("unable to get parent of {}", dst.display()))?;
+        .ok_or_else(|| anyhow!("unable to get parent of {}", dst.display()))?;
     fs::create_dir_all(parent).with_context(|| format!("failed to create {}", parent.display()))?;
     unix::fs::symlink(src, dst).with_context(|| {
         format!(
@@ -40,5 +39,5 @@ pub fn make_local_state(registry: &mut dyn Registry, dst: &Path) -> Result<PathB
     let state = super::local_state::make_state(dst)
         .with_context(|| format!("unable to make local state for {}", dst.display()))?;
     make_symlink(registry, &state, dst)?;
-    return Ok(state);
+    Ok(state)
 }

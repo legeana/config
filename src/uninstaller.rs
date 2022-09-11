@@ -1,7 +1,6 @@
 use std::path::Path;
 
 use anyhow::{anyhow, Context, Result};
-use log;
 
 use crate::registry::Registry;
 
@@ -16,13 +15,13 @@ where
     fn uninstall(&mut self) -> Result<()> {
         let paths = self
             .paths()
-            .with_context(|| format!("failed to get installed files"))?;
+            .with_context(|| "failed to get installed files")?;
         for path in paths.iter().rev() {
-            if let Err(err) = remove(&path) {
+            if let Err(err) = remove(path) {
                 log::error!("Failed to remove {}: {err}", path.display());
             }
         }
-        return self.clear();
+        self.clear()
     }
 }
 
@@ -55,7 +54,7 @@ fn remove_dir(path: &Path) -> Result<()> {
             }
         }
     }
-    return Ok(());
+    Ok(())
 }
 
 fn remove(path: &Path) -> Result<()> {

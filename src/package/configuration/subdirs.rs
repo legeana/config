@@ -39,7 +39,7 @@ impl parser::Parser for SubdirsParser {
             let fname = entry.file_name();
             let subdir = fname
                 .to_str()
-                .ok_or(anyhow!("failed to parse {:?}", fname))?;
+                .ok_or_else(|| anyhow!("failed to parse {:?}", fname))?;
             let subroot = entry.path();
             let mut substate = parser::State {
                 prefix: state.prefix.join(subdir),
@@ -50,6 +50,6 @@ impl parser::Parser for SubdirsParser {
             }
             configuration.subdirs.insert(subdir.to_owned(), subconf);
         }
-        return Ok(());
+        Ok(())
     }
 }

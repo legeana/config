@@ -35,9 +35,9 @@ impl super::FileInstaller for SymlinkTreeInstaller {
                 )
             })?;
             let dst = self.dst.join(suffix);
-            make_symlink(registry, &src, &dst)?;
+            make_symlink(registry, src, &dst)?;
         }
-        return Ok(());
+        Ok(())
     }
 }
 
@@ -60,6 +60,6 @@ impl parser::Parser for SymlinkTreeParser {
             src: configuration.root.join(filename),
             dst: state.prefix.current.join(filename),
         }));
-        return Ok(());
+        Ok(())
     }
 }

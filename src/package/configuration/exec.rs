@@ -32,7 +32,7 @@ impl super::Hook for PostInstallExecHook {
                 self.args,
             ));
         }
-        return Ok(());
+        Ok(())
     }
 }
 
@@ -55,8 +55,8 @@ impl parser::Parser for PostInstallExecParser {
         configuration.post_hooks.push(Box::new(PostInstallExecHook {
             current_dir: state.prefix.current.clone(),
             cmd: command[0].to_owned(),
-            args: args.into_iter().cloned().map(String::from).collect(),
+            args: args.iter().cloned().map(String::from).collect(),
         }));
-        return Ok(());
+        Ok(())
     }
 }

@@ -21,7 +21,7 @@ impl Package {
     pub fn new(root: PathBuf) -> Result<Self> {
         let name: String = root
             .file_name()
-            .ok_or(anyhow!("failed to get {} basename", root.display()))?
+            .ok_or_else(|| anyhow!("failed to get {} basename", root.display()))?
             .to_string_lossy()
             .into();
         Ok(Package {

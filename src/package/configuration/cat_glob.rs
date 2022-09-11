@@ -29,7 +29,7 @@ impl super::FileInstaller for CatGlobIntoInstaller {
             .with_context(|| format!("unable to create {}", state.display()))?;
         let mut out = std::io::BufWriter::new(out_file);
         for glob in self.globs.iter() {
-            for entry in glob_iter(&glob).with_context(|| format!("failed to glob {}", &glob))? {
+            for entry in glob_iter(glob).with_context(|| format!("failed to glob {}", glob))? {
                 let path =
                     entry.with_context(|| format!("failed to iterate over glob {}", glob))?;
                 let inp_file = std::fs::File::open(&path)
@@ -46,7 +46,7 @@ impl super::FileInstaller for CatGlobIntoInstaller {
         }
         out.flush()
             .with_context(|| format!("failed to flush {}", state.display()))?;
-        return Ok(());
+        Ok(())
     }
 }
 
@@ -67,10 +67,12 @@ impl parser::Parser for CatGlobIntoParser {
         let (fname, globs) = multiple_args(COMMAND, args, 1)?;
         assert!(fname.len() == 1);
         let filename = fname[0];
-        let current_prefix = state.prefix.current.to_str().ok_or(anyhow!(
-            "failed to represent current prefix {:?} as a string",
-            &state.prefix.current
-        ))?;
+        let current_prefix = state.prefix.current.to_str().ok_or_else(|| {
+            anyhow!(
+                "failed to represent current prefix {:?} as a string",
+                &state.prefix.current
+            )
+        })?;
         let glob_prefix = current_prefix.to_owned() + PATH_SEP;
         let concatenated_globs: Vec<String> =
             globs.iter().map(|g| glob_prefix.clone() + g).collect();
@@ -78,6 +80,6 @@ impl parser::Parser for CatGlobIntoParser {
             globs: concatenated_globs,
             dst: state.prefix.current.join(filename),
         }));
-        return Ok(());
+        Ok(())
     }
 }

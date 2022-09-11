@@ -3,8 +3,6 @@ use std::path::{Path, PathBuf};
 use crate::package::configuration::Configuration;
 
 use anyhow::anyhow;
-use dirs;
-use log;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -25,20 +23,20 @@ pub struct Prefix {
 impl Prefix {
     fn new() -> Self {
         let home = dirs::home_dir().expect("failed to determine home dir");
-        return Self {
+        Self {
             base: home.clone(),
             current: home,
-        };
+        }
     }
     pub fn set(&mut self, current: PathBuf) {
         self.current = current;
     }
     pub fn join<P: AsRef<Path>>(&self, subdir: P) -> Self {
         let sub = self.current.join(subdir);
-        return Self {
+        Self {
             base: sub.clone(),
             current: sub,
-        };
+        }
     }
 }
 
@@ -134,5 +132,5 @@ pub fn help() -> String {
         help.push_str(parser.help());
         help.push('\n');
     }
-    return help;
+    help
 }

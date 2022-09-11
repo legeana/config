@@ -33,7 +33,7 @@ impl parser::Parser for RequiresParser {
                 configuration.enabled = false;
             }
         }
-        return Ok(());
+        Ok(())
     }
 }
 
@@ -59,6 +59,6 @@ impl parser::Parser for ConflictsParser {
                 configuration.enabled = false;
             }
         }
-        return Ok(());
+        Ok(())
     }
 }

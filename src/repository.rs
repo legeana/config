@@ -15,7 +15,7 @@ impl Repository {
     pub fn new(root: PathBuf) -> Result<Self> {
         let name: String = root
             .file_name()
-            .ok_or(anyhow!("failed to get {} basename", root.display()))?
+            .ok_or_else(|| anyhow!("failed to get {} basename", root.display()))?
             .to_string_lossy()
             .into();
         let mut repository = Repository {
@@ -39,7 +39,7 @@ impl Repository {
             repository.packages.push(package);
         }
         repository.packages.sort_by(|a, b| a.name().cmp(b.name()));
-        return Ok(repository);
+        Ok(repository)
     }
     pub fn name(&self) -> &str {
         &self.name
@@ -53,7 +53,7 @@ impl Repository {
                 .pre_install()
                 .with_context(|| format!("failed to pre-install {}", package.name()))?;
         }
-        return Ok(());
+        Ok(())
     }
     pub fn install_all(&self, registry: &mut dyn Registry) -> Result<()> {
         for package in self.packages.iter() {
@@ -61,7 +61,7 @@ impl Repository {
                 .install(registry)
                 .with_context(|| format!("failed to install {}", package.name()))?;
         }
-        return Ok(());
+        Ok(())
     }
     pub fn post_install_all(&self) -> Result<()> {
         for package in self.packages.iter() {
@@ -69,6 +69,6 @@ impl Repository {
                 .post_install()
                 .with_context(|| format!("failed to post-install {}", package.name()))?;
         }
-        return Ok(());
+        Ok(())
     }
 }

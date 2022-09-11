@@ -22,7 +22,7 @@ impl super::FileInstaller for MkDirInstaller {
         registry
             .register(&self.dst)
             .with_context(|| format!("failed to register directory {}", self.dst.display()))?;
-        return Ok(());
+        Ok(())
     }
 }
 
@@ -44,6 +44,6 @@ impl parser::Parser for MkDirParser {
         configuration.files.push(Box::new(MkDirInstaller {
             dst: state.prefix.current.join(filename),
         }));
-        return Ok(());
+        Ok(())
     }
 }

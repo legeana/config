@@ -4,5 +4,6 @@ use anyhow::{anyhow, Result};
 
 pub fn hostname() -> Result<String> {
     let sys = System::new();
-    return sys.host_name().ok_or(anyhow!("failed to obtain hostname"));
+    sys.host_name()
+        .ok_or_else(|| anyhow!("failed to obtain hostname"))
 }
