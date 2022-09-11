@@ -68,7 +68,7 @@ pub trait Parser {
 fn parsers() -> Vec<Box<dyn Parser>> {
     vec![
         Box::new(super::subdir::SubdirParser {}),
-        // TODO: subdirs
+        Box::new(super::subdirs::SubdirsParser {}),
         Box::new(super::prefix::PrefixParser {}),
         Box::new(super::xdg_prefix::XdgCachePrefixParser {}),
         Box::new(super::xdg_prefix::XdgConfigPrefixParser {}),

@@ -18,6 +18,20 @@ pub fn check_command<'a, 'b>(command: &str, args: &'a [&'b str]) -> Result<&'a [
     return Ok(cmd_args);
 }
 
+pub fn no_args(command: &str, args: &[&str]) -> Result<()> {
+    let cmd_args = check_command(command, args)?;
+    if cmd_args.len() != 0 {
+        return Err(anyhow!(
+            "{} parser: want no arguments, got {}: {:?}",
+            command,
+            cmd_args.len(),
+            cmd_args,
+        )
+        .into());
+    }
+    return Ok(());
+}
+
 pub fn single_arg<'a>(command: &str, args: &[&'a str]) -> Result<&'a str> {
     let cmd_args = check_command(command, args)?;
     if cmd_args.len() != 1 {
