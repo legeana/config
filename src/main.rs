@@ -79,10 +79,12 @@ fn uninstall(root: &Path) -> Result<()> {
 }
 
 fn install(root: &Path) -> Result<()> {
+    // Load repositories before uninstalling to abort early.
+    // It's better to keep the old configuration than no configuration.
+    let repos = layout::repositories(root)?;
     let mut registry = registry(root);
     installer::uninstall(&mut registry)
         .with_context(|| format!("failed to uninstall before installing"))?;
-    let repos = layout::repositories(root)?;
     for repo in repos.iter() {
         repo.pre_install_all()
             .with_context(|| format!("failed to pre-install {}", repo.name()))?;
