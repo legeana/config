@@ -1,3 +1,4 @@
+mod file_registry;
 mod installer;
 mod layout;
 mod package;
@@ -64,8 +65,8 @@ fn reload() -> Result<()> {
     return Ok(());
 }
 
-fn registry(root: &Path) -> registry::FileRegistry {
-    registry::FileRegistry::new(root.join(INSTALL_REGISTRY))
+fn registry(root: &Path) -> file_registry::FileRegistry {
+    file_registry::FileRegistry::new(root.join(INSTALL_REGISTRY))
 }
 
 fn uninstall(root: &Path) -> Result<()> {
