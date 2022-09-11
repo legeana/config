@@ -31,8 +31,8 @@ fn config_root() -> Result<PathBuf> {
 
 #[derive(Debug, Parser)]
 struct Cli {
-    #[clap(short, long)]
-    verbose: bool,
+    #[clap(short, long, action = clap::ArgAction::Count)]
+    verbose: u8,
     #[clap(short = 'd', long)]
     no_update: bool,
     #[clap(subcommand)]
@@ -96,14 +96,9 @@ fn install(root: &Path) -> Result<()> {
 
 fn main() -> Result<()> {
     let args = Cli::parse();
-    let verbosity = if args.verbose {
-        log::Level::Debug
-    } else {
-        log::Level::Info
-    };
     stderrlog::new()
         .timestamp(stderrlog::Timestamp::Off)
-        .verbosity(verbosity)
+        .verbosity(usize::from(args.verbose))
         .init()
         .with_context(|| format!("failed to initialize stderrlog"))?;
     // Main code.
