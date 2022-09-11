@@ -5,6 +5,7 @@ mod layout;
 mod package;
 mod registry;
 mod repository;
+mod tag_util;
 
 use anyhow::{anyhow, Context, Result};
 use clap::{Parser, Subcommand};
