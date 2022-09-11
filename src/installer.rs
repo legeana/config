@@ -38,9 +38,16 @@ fn remove_dir(path: &Path) -> Result<()> {
 }
 
 fn remove(path: &Path) -> Result<()> {
-    let metadata = path
-        .symlink_metadata()
-        .with_context(|| format!("failed to get {} metadata", path.display()))?;
+    let metadata = match path.symlink_metadata() {
+        Err(err) => {
+            if err.kind() == std::io::ErrorKind::NotFound {
+                log::debug!("{} is already removed, skipping", path.display());
+                return Ok(());
+            }
+            return Err(err).with_context(|| format!("failed to get {} metadata", path.display()));
+        }
+        Ok(metadata) => metadata,
+    };
     if metadata.is_symlink() {
         remove_symlink(path)
     } else if metadata.is_dir() {
