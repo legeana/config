@@ -61,4 +61,4 @@ get_rust() {
 }
 
 get_rust
-cargo run --release -- "$@"
+cargo run --manifest-path="$(dirname "$0")/Cargo.toml" --release -- "$@"
