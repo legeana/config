@@ -76,11 +76,6 @@ fn parsers() -> Vec<Box<dyn Parser>> {
         Box::new(super::xdg_prefix::XdgStatePrefixParser {}),
         Box::new(super::tags::RequiresParser {}),
         Box::new(super::tags::ConflictsParser {}),
-        // TODO: install_system_package
-        // TODO: install_pacman_package
-        // TODO: install_apt_package
-        // TODO: install_brew_package
-        // TODO: install_pip_user_package
         Box::new(super::symlink::SymlinkParser {}),
         Box::new(super::symlink_tree::SymlinkTreeParser {}),
         Box::new(super::mkdir::MkDirParser {}),
@@ -89,6 +84,7 @@ fn parsers() -> Vec<Box<dyn Parser>> {
         Box::new(super::cat_glob::CatGlobIntoParser {}),
         Box::new(super::importer::ImporterParser {}),
         // TODO: post_install_exec
+        Box::new(super::deprecated::DeprecatedParser {}),
     ]
 }
 

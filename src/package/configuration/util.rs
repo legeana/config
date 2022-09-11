@@ -3,7 +3,7 @@ use crate::package::configuration::parser::{Error, Result};
 use anyhow::anyhow;
 
 /// Checks that the first argument is command and returns a slice of command arguments.
-fn check_command<'a, 'b>(command: &str, args: &'a [&'b str]) -> Result<&'a [&'b str]> {
+pub fn check_command<'a, 'b>(command: &str, args: &'a [&'b str]) -> Result<&'a [&'b str]> {
     if args.is_empty() {
         return Err(anyhow!("{} parser: got empty list", command).into());
     }

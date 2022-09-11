@@ -1,5 +1,6 @@
 mod cat_glob;
 mod copy;
+mod deprecated;
 mod file_util;
 mod importer;
 mod local_state;
