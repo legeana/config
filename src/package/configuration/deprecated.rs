@@ -22,25 +22,46 @@ impl parser::Parser for DeprecatedParser {
     fn parse(
         &self,
         _state: &mut parser::State,
-        _configuration: &mut Configuration,
+        configuration: &mut Configuration,
         args: &[&str],
     ) -> parser::Result<()> {
         if check_command("install_system_package", args).is_ok() {
+            log::warn!(
+                "{}: install_system_package is unsupported",
+                configuration.root.display()
+            );
             return Ok(());
         }
         if check_command("install_pacman_package", args).is_ok() {
+            log::warn!(
+                "{}: install_pacman_package is unsupported",
+                configuration.root.display()
+            );
             return Ok(());
         }
         if check_command("install_apt_package", args).is_ok() {
+            log::warn!(
+                "{}: install_apt_package is unsupported",
+                configuration.root.display()
+            );
             return Ok(());
         }
         if check_command("install_brew_package", args).is_ok() {
+            log::warn!(
+                "{}: install_brew_package is unsupported",
+                configuration.root.display()
+            );
             return Ok(());
         }
         if check_command("install_pip_user_package", args).is_ok() {
+            log::warn!(
+                "{}: install_pip_user_package is unsupported",
+                configuration.root.display()
+            );
             return Ok(());
         }
         if check_command("sudo", args).is_ok() {
+            log::warn!("{}: sudo is unsupported", configuration.root.display());
             return Ok(());
         }
         return check_command(COMMAND, args).map(|_| ());
