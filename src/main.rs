@@ -4,6 +4,7 @@ mod layout;
 mod package;
 mod registry;
 mod repository;
+mod sql_registry;
 mod tag_util;
 mod uninstaller;
 
