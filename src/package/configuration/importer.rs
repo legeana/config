@@ -3,6 +3,7 @@ use std::path::{Path, PathBuf};
 use std::{fs::File, io::Write};
 
 use crate::package::configuration::file_util::make_local_state;
+use crate::package::configuration::local_state;
 use crate::package::configuration::parser;
 use crate::package::configuration::util::single_arg;
 use crate::package::configuration::Configuration;
@@ -20,8 +21,10 @@ struct ImporterInstaller {
 }
 
 struct ImporterHook {
+    prefix: PathBuf,
     src: PathBuf,
     dst: PathBuf,
+    output: PathBuf,
 }
 
 /// Returns true if parser matched.
@@ -35,7 +38,7 @@ fn parse_import<W: Write>(prefix: &Path, line: &str, out: &mut W) -> Result<bool
     let subprefix = include_file
         .parent()
         .ok_or_else(|| anyhow!("failed to get parent of {}", include_file.display()))?;
-    render_w(subprefix, &include_file, out).with_context(|| format!("failed to import {}", arg))?;
+    render(subprefix, &include_file, out).with_context(|| format!("failed to import {}", arg))?;
     Ok(true)
 }
 
@@ -47,6 +50,7 @@ fn parse_import_tree<W: Write>(prefix: &Path, line: &str, out: &mut W) -> Result
     }
     let arg = line[COMMAND.len()..].trim();
     let subdir = prefix.join(arg);
+    log::trace!("#import_tree {subdir:?}");
     for e in WalkDir::new(&subdir).sort_by_file_name() {
         let entry = e.with_context(|| format!("failed to read {}", subdir.display()))?;
         if !entry.file_type().is_file() {
@@ -57,7 +61,7 @@ fn parse_import_tree<W: Write>(prefix: &Path, line: &str, out: &mut W) -> Result
         let subprefix = include_file
             .parent()
             .ok_or_else(|| anyhow!("failed to get parent of {}", include_file.display()))?;
-        render_w(subprefix, include_file, out)
+        render(subprefix, include_file, out)
             .with_context(|| format!("failed to import tree {}", arg))?;
     }
     Ok(true)
@@ -74,7 +78,7 @@ fn parse_line<W: Write>(prefix: &Path, line: &str, out: &mut W) -> Result<()> {
     Ok(())
 }
 
-fn render_w<W: Write>(prefix: &Path, src: &Path, out: &mut W) -> Result<()> {
+fn render<W: Write>(prefix: &Path, src: &Path, out: &mut W) -> Result<()> {
     let f = File::open(src).with_context(|| format!("failed to open {}", src.display()))?;
     let inp = BufReader::new(f);
     for line in inp.lines() {
@@ -82,15 +86,6 @@ fn render_w<W: Write>(prefix: &Path, src: &Path, out: &mut W) -> Result<()> {
         parse_line(prefix, &line, out).with_context(|| format!("failed to parse {}", line))?;
     }
     Ok(())
-}
-
-fn render(src: &Path, dst: &Path) -> Result<()> {
-    let f = File::create(dst).with_context(|| format!("failed to open {}", dst.display()))?;
-    let mut out = BufWriter::new(f);
-    let prefix = dst
-        .parent()
-        .ok_or_else(|| anyhow!("failed to get parent of {}", dst.display()))?;
-    render_w(prefix, src, &mut out).with_context(|| format!("failed to render {}", dst.display()))
 }
 
 impl super::FileInstaller for ImporterInstaller {
@@ -102,7 +97,16 @@ impl super::FileInstaller for ImporterInstaller {
 
 impl super::Hook for ImporterHook {
     fn execute(&self) -> Result<()> {
-        render(&self.src, &self.dst)
+        let f = File::create(&self.output)
+            .with_context(|| format!("failed to open {}", self.output.display()))?;
+        let mut out = BufWriter::new(f);
+        render(&self.prefix, &self.src, &mut out).with_context(|| {
+            format!(
+                "failed to render {} ({})",
+                self.output.display(),
+                self.dst.display()
+            )
+        })
     }
 }
 
@@ -123,12 +127,20 @@ impl parser::Parser for ImporterParser {
         let filename = single_arg(COMMAND, args)?;
         let src = configuration.root.join(filename);
         let dst = state.prefix.current.join(filename);
+        let prefix = dst
+            .parent()
+            .ok_or_else(|| anyhow!("failed to get parent of {}", dst.display()))?;
+        let output = local_state::state_path(&dst)
+            .with_context(|| format!("failed to get state_path for {}", dst.display()))?;
         configuration
             .files
             .push(Box::new(ImporterInstaller { dst: dst.clone() }));
-        configuration
-            .post_hooks
-            .push(Box::new(ImporterHook { src, dst }));
+        configuration.post_hooks.push(Box::new(ImporterHook {
+            prefix: prefix.to_owned(),
+            src,
+            dst,
+            output,
+        }));
         Ok(())
     }
 }

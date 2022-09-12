@@ -1,9 +1,9 @@
 use std::{io::Write, path::PathBuf};
 
-use crate::package::configuration::file_util::make_local_state;
 use crate::package::configuration::parser;
 use crate::package::configuration::util::multiple_args;
 use crate::package::configuration::Configuration;
+use crate::package::configuration::{file_util::make_local_state, local_state};
 use crate::registry::Registry;
 
 use anyhow::{anyhow, Context};
@@ -23,7 +23,7 @@ struct CatGlobIntoInstaller {
 
 struct CatGlobIntoHook {
     globs: Vec<String>,
-    dst: PathBuf,
+    output: PathBuf,
 }
 
 impl super::FileInstaller for CatGlobIntoInstaller {
@@ -35,8 +35,8 @@ impl super::FileInstaller for CatGlobIntoInstaller {
 
 impl super::Hook for CatGlobIntoHook {
     fn execute(&self) -> anyhow::Result<()> {
-        let out_file = std::fs::File::create(&self.dst)
-            .with_context(|| format!("unable to create {}", self.dst.display()))?;
+        let out_file = std::fs::File::create(&self.output)
+            .with_context(|| format!("unable to create {}", self.output.display()))?;
         let mut out = std::io::BufWriter::new(out_file);
         for glob in self.globs.iter() {
             for entry in glob_iter(glob).with_context(|| format!("failed to glob {}", glob))? {
@@ -49,13 +49,13 @@ impl super::Hook for CatGlobIntoHook {
                     format!(
                         "failed to copy from {} to {}",
                         path.display(),
-                        self.dst.display()
+                        self.output.display()
                     )
                 })?;
             }
         }
         out.flush()
-            .with_context(|| format!("failed to flush {}", self.dst.display()))?;
+            .with_context(|| format!("failed to flush {}", self.output.display()))?;
         Ok(())
     }
 }
@@ -86,12 +86,15 @@ impl parser::Parser for CatGlobIntoParser {
         let glob_prefix = current_prefix.to_owned() + PATH_SEP;
         let concatenated_globs: Vec<String> =
             globs.iter().map(|g| glob_prefix.clone() + g).collect();
-        configuration.files.push(Box::new(CatGlobIntoInstaller {
-            dst: state.prefix.current.join(filename),
-        }));
+        let dst = state.prefix.current.join(filename);
+        let output = local_state::state_path(&dst)
+            .with_context(|| format!("failed to get state_path for {}", dst.display()))?;
+        configuration
+            .files
+            .push(Box::new(CatGlobIntoInstaller { dst }));
         configuration.post_hooks.push(Box::new(CatGlobIntoHook {
             globs: concatenated_globs,
-            dst: state.prefix.current.join(filename),
+            output,
         }));
         Ok(())
     }
