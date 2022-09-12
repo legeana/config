@@ -51,7 +51,7 @@ impl parser::Parser for ConflictsParser {
         configuration: &mut Configuration,
         args: &[&str],
     ) -> parser::Result<()> {
-        let (_, tags) = multiple_args(REQUIRES_COMMAND, args, 0)?;
+        let (_, tags) = multiple_args(CONFLICTS_COMMAND, args, 0)?;
         for tag in tags.iter() {
             let has_tag =
                 tag_util::has_tag(tag).with_context(|| format!("failed to check tag {tag}"))?;
