@@ -1,3 +1,4 @@
+use std::ffi::OsStr;
 use std::path::PathBuf;
 
 use crate::package::Package;
@@ -29,6 +30,9 @@ impl Repository {
             .with_context(|| format!("failed to read {}", repository.root.display()))?;
         for entry in dirs {
             let dir = entry?;
+            if dir.path().file_name() == Some(OsStr::new(".git")) {
+                continue;
+            }
             let md = std::fs::metadata(dir.path())
                 .with_context(|| format!("failed to read metadata for {}", dir.path().display()))?;
             if !md.is_dir() {
