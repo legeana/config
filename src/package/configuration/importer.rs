@@ -53,8 +53,10 @@ fn parse_import_tree<W: Write>(prefix: &Path, line: &str, out: &mut W) -> Result
     log::trace!("#import_tree {subdir:?}");
     for e in WalkDir::new(&subdir).sort_by_file_name() {
         let entry = e.with_context(|| format!("failed to read {}", subdir.display()))?;
-        if !entry.file_type().is_file() {
-            // Only files are supported.
+        let md = std::fs::metadata(entry.path())
+            .with_context(|| format!("failed to get {} metadata", entry.path().display()))?;
+        if !md.file_type().is_file() {
+            // Only files (or symlinks to files) are supported.
             continue;
         }
         let include_file = entry.path();
