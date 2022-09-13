@@ -52,10 +52,15 @@ impl parser::Parser for PostInstallExecParser {
     ) -> parser::Result<()> {
         let (command, args) = multiple_args(COMMAND, args, 1)?;
         assert!(command.len() == 1);
+        let args: Vec<String> = args
+            .iter()
+            .map(shellexpand::tilde)
+            .map(String::from)
+            .collect();
         configuration.post_hooks.push(Box::new(PostInstallExecHook {
             current_dir: state.prefix.current.clone(),
             cmd: command[0].to_owned(),
-            args: args.iter().cloned().map(String::from).collect(),
+            args,
         }));
         Ok(())
     }
