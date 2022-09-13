@@ -18,7 +18,7 @@ where
             .with_context(|| "failed to get installed files")?;
         for path in paths.iter().rev() {
             if let Err(err) = remove(path) {
-                log::error!("Failed to remove {}: {err}", path.display());
+                log::error!("Failed to remove {path:?}: {err}");
             }
         }
         self.clear()
@@ -28,12 +28,12 @@ where
 fn remove_symlink(path: &Path) -> Result<()> {
     if let Err(err) = std::fs::remove_file(path) {
         if err.kind() == std::io::ErrorKind::NotFound {
-            log::debug!("Nothing to remove: {}", path.display());
+            log::debug!("Nothing to remove: {path:?}");
             return Ok(());
         }
-        return Err(err).with_context(|| format!("failed to remove {}", path.display()));
+        return Err(err).with_context(|| format!("failed to remove {path:?}"));
     }
-    log::info!("Removed symlink {}", path.display());
+    log::info!("Removed symlink {path:?}");
     match path.parent() {
         Some(parent) => remove_dir(parent),
         None => Ok(()),
@@ -44,7 +44,7 @@ fn remove_dir(path: &Path) -> Result<()> {
     for dir in path.ancestors() {
         match std::fs::remove_dir(dir) {
             Ok(()) => {
-                log::info!("Removed directory {}", dir.display());
+                log::info!("Removed directory {dir:?}");
             }
             Err(_) => {
                 // TODO: check if DirectoryNotEmpty when available,
@@ -61,10 +61,10 @@ fn remove(path: &Path) -> Result<()> {
     let metadata = match path.symlink_metadata() {
         Err(err) => {
             if err.kind() == std::io::ErrorKind::NotFound {
-                log::debug!("{} is already removed, skipping", path.display());
+                log::debug!("{path:?} is already removed, skipping");
                 return Ok(());
             }
-            return Err(err).with_context(|| format!("failed to get {} metadata", path.display()));
+            return Err(err).with_context(|| format!("failed to get {path:?} metadata"));
         }
         Ok(metadata) => metadata,
     };

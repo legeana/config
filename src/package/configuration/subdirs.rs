@@ -26,13 +26,12 @@ impl parser::Parser for SubdirsParser {
         for entry in configuration
             .root
             .read_dir()
-            .with_context(|| format!("failed to read {}", configuration.root.display()))?
+            .with_context(|| format!("failed to read {:?}", configuration.root))?
         {
-            let entry = entry
-                .with_context(|| format!("failed to read {}", configuration.root.display()))?;
-            let md = std::fs::metadata(entry.path()).with_context(|| {
-                format!("failed to read metadata for {}", entry.path().display())
-            })?;
+            let entry =
+                entry.with_context(|| format!("failed to read {:?}", configuration.root))?;
+            let md = std::fs::metadata(entry.path())
+                .with_context(|| format!("failed to read metadata for {:?}", entry.path()))?;
             if !md.is_dir() {
                 continue;
             }
@@ -46,7 +45,7 @@ impl parser::Parser for SubdirsParser {
             };
             let subconf = Configuration::new_sub(&mut substate, subroot)?;
             if configuration.subdirs.contains_key(subdir) {
-                return Err(anyhow!("{} already includes {}", configuration, subdir).into());
+                return Err(anyhow!("{configuration} already includes {subdir}").into());
             }
             configuration.subdirs.insert(subdir.to_owned(), subconf);
         }

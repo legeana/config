@@ -26,8 +26,8 @@ impl super::Hook for PostInstallExecHook {
             .with_context(|| format!("failed to start {}", self.cmd))?;
         if !status.success() {
             return Err(anyhow!(
-                "failed to execute {} $ {} {:?}",
-                self.current_dir.display(),
+                "failed to execute {:?} $ {} {:?}",
+                self.current_dir,
                 self.cmd,
                 self.args,
             ));

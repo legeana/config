@@ -6,7 +6,7 @@ use sha2::{Digest, Sha256};
 fn path_hash(path: &Path) -> Result<PathBuf> {
     let path_str = path
         .to_str()
-        .ok_or_else(|| anyhow!("unable to convert {} path to string", path.display()))?;
+        .ok_or_else(|| anyhow!("unable to convert {path:?} path to string"))?;
 
     let mut hasher = Sha256::new();
     hasher.update(path_str.as_bytes());
@@ -17,8 +17,7 @@ fn path_hash(path: &Path) -> Result<PathBuf> {
 }
 
 pub fn state_path(path: &Path) -> Result<PathBuf> {
-    let hash =
-        path_hash(path).with_context(|| format!("unable to make hash of {}", path.display()))?;
+    let hash = path_hash(path).with_context(|| format!("unable to make hash of {path:?}"))?;
     // TODO: Windows/MacOS
     let output_state = dirs::state_dir()
         .ok_or_else(|| anyhow!("failed to get state dir"))?
@@ -28,12 +27,12 @@ pub fn state_path(path: &Path) -> Result<PathBuf> {
 }
 
 pub fn make_state(path: &Path) -> Result<PathBuf> {
-    let state_path = state_path(path)
-        .with_context(|| format!("failed to generate state_path for {}", path.display()))?;
+    let state_path =
+        state_path(path).with_context(|| format!("failed to generate state_path for {path:?}"))?;
     let state_dir = state_path
         .parent()
-        .ok_or_else(|| anyhow!("failed to get {} parent", state_path.display()))?;
+        .ok_or_else(|| anyhow!("failed to get {state_path:?} parent"))?;
     std::fs::create_dir_all(state_dir)
-        .with_context(|| format!("failed to create {}", state_dir.display()))?;
+        .with_context(|| format!("failed to create {state_dir:?}"))?;
     Ok(state_path)
 }

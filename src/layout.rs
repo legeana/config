@@ -14,11 +14,11 @@ fn overlay_dirs(root: &Path) -> Result<Vec<PathBuf>> {
     let mut result = Vec::<PathBuf>::new();
     let dirs = overlays
         .read_dir()
-        .with_context(|| format!("failed to read {}", overlays.display()))?;
+        .with_context(|| format!("failed to read {overlays:?}"))?;
     for entry in dirs {
         let dir = entry?;
         let md = std::fs::metadata(dir.path())
-            .with_context(|| format!("failed to read metadata for {}", dir.path().display()))?;
+            .with_context(|| format!("failed to read metadata for {:?}", dir.path()))?;
         if !md.is_dir() {
             continue;
         }
@@ -48,15 +48,15 @@ fn get_head(root: &Path) -> Result<String> {
         .args(["rev-parse", "HEAD"])
         .current_dir(root)
         .output()
-        .with_context(|| format!("{} $ git rev-parse HEAD", root.display()))?;
+        .with_context(|| format!("{root:?} $ git rev-parse HEAD"))?;
     if !rev_parse.status.success() {
         let err = String::from_utf8_lossy(&rev_parse.stdout);
         return Err(anyhow!("failed git rev-parse HEAD: {}", err));
     }
-    let out = String::from_utf8(rev_parse.stdout).with_context(|| {
+    let out = String::from_utf8(rev_parse.stdout.clone()).with_context(|| {
         format!(
-            "failed to parse '{} $ git rev-parse HEAD' output",
-            root.display()
+            "failed to parse {root:?} $ git rev-parse HEAD output {:?}",
+            String::from_utf8_lossy(&rev_parse.stdout),
         )
     })?;
     Ok(out.trim().to_string())
@@ -69,9 +69,9 @@ fn git_pull(root: &Path) -> Result<bool> {
         .args(["pull", "--ff-only"])
         .current_dir(root)
         .status()
-        .with_context(|| format!("{} $ git pull --ff-only", root.display()))?;
+        .with_context(|| format!("{root:?} $ git pull --ff-only"))?;
     if !status.success() {
-        return Err(anyhow!("{} $ git pull --ff-only", root.display()));
+        return Err(anyhow!("{root:?} $ git pull --ff-only"));
     }
     let new_head = get_head(root)?;
     Ok(old_head != new_head)

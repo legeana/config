@@ -52,17 +52,14 @@ enum Commands {
 
 fn reload() -> Result<()> {
     let setup = config_root()?.join("setup");
-    log::info!(
-        "Restarting: $ {} {:?}",
-        setup.display(),
-        env::args_os().skip(1).collect::<Vec<OsString>>()
-    );
+    let args: Vec<OsString> = env::args_os().skip(1).collect();
+    log::info!("Restarting: $ {setup:?} {args:?}");
     let exit_status = std::process::Command::new(&setup)
-        .args(env::args_os().skip(1))
+        .args(args)
         .env(NO_UPDATE_ENV, "yes")
         .status()?;
     if !exit_status.success() {
-        return Err(anyhow!("failed to run {}", setup.display()));
+        return Err(anyhow!("failed to run {setup:?}"));
     }
     Ok(())
 }
@@ -111,7 +108,7 @@ fn main() -> Result<()> {
         .with_context(|| "failed to initialize stderrlog")?;
     // Main code.
     let root = config_root()?;
-    log::info!("Found user configuration: {}", root.display());
+    log::info!("Found user configuration: {root:?}");
     match args.command {
         Commands::Install {} => {
             let no_update = args.no_update || env::var(NO_UPDATE_ENV).is_ok();
@@ -133,7 +130,7 @@ fn main() -> Result<()> {
         }
         Commands::List {} => {
             let repos = layout::repositories(&root)
-                .with_context(|| format!("failed to get repositories from {}", root.display()))?;
+                .with_context(|| format!("failed to get repositories from {root:?}"))?;
             for repo in repos.iter() {
                 println!("{}: {}", repo.name(), repo.list().join(", "));
             }

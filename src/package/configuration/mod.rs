@@ -64,7 +64,7 @@ impl Configuration {
             files: Vec::new(),
         };
         conf.parse(state, &manifest)
-            .with_context(|| format!("failed to load {}", manifest.display()))?;
+            .with_context(|| format!("failed to load {manifest:?}"))?;
         Ok(conf)
     }
     fn parse_line(&mut self, state: &mut parser::State, line: &str) -> Result<()> {
@@ -77,24 +77,15 @@ impl Configuration {
     }
     fn parse(&mut self, state: &mut parser::State, manifest_path: &PathBuf) -> Result<()> {
         let manifest = File::open(manifest_path)
-            .with_context(|| format!("failed to open {}", manifest_path.display()))?;
+            .with_context(|| format!("failed to open {manifest_path:?}"))?;
         let reader = BufReader::new(manifest);
         for (line_idx, line_or) in reader.lines().enumerate() {
             let line_num = line_idx + 1;
             let line = line_or.with_context(|| {
-                format!(
-                    "failed to read line {} from {}",
-                    line_num,
-                    manifest_path.display()
-                )
+                format!("failed to read line {line_num} from {manifest_path:?}")
             })?;
             self.parse_line(state, &line).with_context(|| {
-                format!(
-                    "failed to parse line {} {:?} from {}",
-                    line_num,
-                    line,
-                    manifest_path.display()
-                )
+                format!("failed to parse line {line_num} {line:?} from {manifest_path:?}")
             })?;
         }
         Ok(())

@@ -37,8 +37,8 @@ fn parse_import<W: Write>(prefix: &Path, line: &str, out: &mut W) -> Result<bool
     let include_file = prefix.join(arg);
     let subprefix = include_file
         .parent()
-        .ok_or_else(|| anyhow!("failed to get parent of {}", include_file.display()))?;
-    render(subprefix, &include_file, out).with_context(|| format!("failed to import {}", arg))?;
+        .ok_or_else(|| anyhow!("failed to get parent of {include_file:?}"))?;
+    render(subprefix, &include_file, out).with_context(|| format!("failed to import {arg}"))?;
     Ok(true)
 }
 
@@ -52,9 +52,9 @@ fn parse_import_tree<W: Write>(prefix: &Path, line: &str, out: &mut W) -> Result
     let subdir = prefix.join(arg);
     log::trace!("#import_tree {subdir:?}");
     for e in WalkDir::new(&subdir).sort_by_file_name() {
-        let entry = e.with_context(|| format!("failed to read {}", subdir.display()))?;
+        let entry = e.with_context(|| format!("failed to read {subdir:?}"))?;
         let md = std::fs::metadata(entry.path())
-            .with_context(|| format!("failed to get {} metadata", entry.path().display()))?;
+            .with_context(|| format!("failed to get {:?} metadata", entry.path()))?;
         if !md.file_type().is_file() {
             // Only files (or symlinks to files) are supported.
             continue;
@@ -62,7 +62,7 @@ fn parse_import_tree<W: Write>(prefix: &Path, line: &str, out: &mut W) -> Result
         let include_file = entry.path();
         let subprefix = include_file
             .parent()
-            .ok_or_else(|| anyhow!("failed to get parent of {}", include_file.display()))?;
+            .ok_or_else(|| anyhow!("failed to get parent of {include_file:?}"))?;
         render(subprefix, include_file, out)
             .with_context(|| format!("failed to import tree {}", arg))?;
     }
@@ -81,11 +81,11 @@ fn parse_line<W: Write>(prefix: &Path, line: &str, out: &mut W) -> Result<()> {
 }
 
 fn render<W: Write>(prefix: &Path, src: &Path, out: &mut W) -> Result<()> {
-    let f = File::open(src).with_context(|| format!("failed to open {}", src.display()))?;
+    let f = File::open(src).with_context(|| format!("failed to open {src:?}"))?;
     let inp = BufReader::new(f);
     for line in inp.lines() {
-        let line = line.with_context(|| format!("failed to read line from {}", src.display()))?;
-        parse_line(prefix, &line, out).with_context(|| format!("failed to parse {}", line))?;
+        let line = line.with_context(|| format!("failed to read line from {src:?}"))?;
+        parse_line(prefix, &line, out).with_context(|| format!("failed to parse {line}"))?;
     }
     Ok(())
 }
@@ -100,13 +100,12 @@ impl super::FileInstaller for ImporterInstaller {
 impl super::Hook for ImporterHook {
     fn execute(&self) -> Result<()> {
         let f = File::create(&self.output)
-            .with_context(|| format!("failed to open {}", self.output.display()))?;
+            .with_context(|| format!("failed to open {:?}", self.output))?;
         let mut out = BufWriter::new(f);
         render(&self.prefix, &self.src, &mut out).with_context(|| {
             format!(
-                "failed to render {} ({})",
-                self.output.display(),
-                self.dst.display()
+                "failed to render state {:?} for {:?}",
+                self.output, self.dst,
             )
         })
     }
@@ -131,9 +130,9 @@ impl parser::Parser for ImporterParser {
         let dst = state.prefix.current.join(filename);
         let prefix = dst
             .parent()
-            .ok_or_else(|| anyhow!("failed to get parent of {}", dst.display()))?;
+            .ok_or_else(|| anyhow!("failed to get parent of {dst:?}"))?;
         let output = local_state::state_path(&dst)
-            .with_context(|| format!("failed to get state_path for {}", dst.display()))?;
+            .with_context(|| format!("failed to get state_path for {dst:?}"))?;
         configuration
             .files
             .push(Box::new(ImporterInstaller { dst: dst.clone() }));

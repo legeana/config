@@ -16,7 +16,7 @@ impl Repository {
     pub fn new(root: PathBuf) -> Result<Self> {
         let name: String = root
             .file_name()
-            .ok_or_else(|| anyhow!("failed to get {} basename", root.display()))?
+            .ok_or_else(|| anyhow!("failed to get {root:?} basename"))?
             .to_string_lossy()
             .into();
         let mut repository = Repository {
@@ -27,19 +27,19 @@ impl Repository {
         let dirs = repository
             .root
             .read_dir()
-            .with_context(|| format!("failed to read {}", repository.root.display()))?;
+            .with_context(|| format!("failed to read {:?}", repository.root))?;
         for entry in dirs {
             let dir = entry?;
             if dir.path().file_name() == Some(OsStr::new(".git")) {
                 continue;
             }
             let md = std::fs::metadata(dir.path())
-                .with_context(|| format!("failed to read metadata for {}", dir.path().display()))?;
+                .with_context(|| format!("failed to read metadata for {:?}", dir.path()))?;
             if !md.is_dir() {
                 continue;
             }
             let package = Package::new(dir.path())
-                .with_context(|| format!("failed to load {}", dir.path().display()))?;
+                .with_context(|| format!("failed to load {:?}", dir.path()))?;
             repository.packages.push(package);
         }
         repository.packages.sort_by(|a, b| a.name().cmp(b.name()));

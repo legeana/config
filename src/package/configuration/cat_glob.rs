@@ -36,26 +36,22 @@ impl super::FileInstaller for CatGlobIntoInstaller {
 impl super::Hook for CatGlobIntoHook {
     fn execute(&self) -> anyhow::Result<()> {
         let out_file = std::fs::File::create(&self.output)
-            .with_context(|| format!("unable to create {}", self.output.display()))?;
+            .with_context(|| format!("unable to create {:?}", self.output))?;
         let mut out = std::io::BufWriter::new(out_file);
         for glob in self.globs.iter() {
             for entry in glob_iter(glob).with_context(|| format!("failed to glob {}", glob))? {
                 let path =
                     entry.with_context(|| format!("failed to iterate over glob {}", glob))?;
                 let inp_file = std::fs::File::open(&path)
-                    .with_context(|| format!("failed to open {}", path.display()))?;
+                    .with_context(|| format!("failed to open {path:?}"))?;
                 let mut inp = std::io::BufReader::new(inp_file);
                 std::io::copy(&mut inp, &mut out).with_context(|| {
-                    format!(
-                        "failed to copy from {} to {}",
-                        path.display(),
-                        self.output.display()
-                    )
+                    format!("failed to copy from {path:?} to {:?}", self.output)
                 })?;
             }
         }
         out.flush()
-            .with_context(|| format!("failed to flush {}", self.output.display()))?;
+            .with_context(|| format!("failed to flush {:?}", self.output))?;
         Ok(())
     }
 }
@@ -88,7 +84,7 @@ impl parser::Parser for CatGlobIntoParser {
             globs.iter().map(|g| glob_prefix.clone() + g).collect();
         let dst = state.prefix.current.join(filename);
         let output = local_state::state_path(&dst)
-            .with_context(|| format!("failed to get state_path for {}", dst.display()))?;
+            .with_context(|| format!("failed to get state_path for {dst:?}"))?;
         configuration
             .files
             .push(Box::new(CatGlobIntoInstaller { dst }));
