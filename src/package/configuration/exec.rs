@@ -19,6 +19,11 @@ struct PostInstallExecHook {
 
 impl super::Hook for PostInstallExecHook {
     fn execute(&self) -> Result<()> {
+        log::info!(
+            "$ {} {}",
+            shlex::quote(&self.cmd),
+            shlex::join(self.args.iter().map(|s| s.as_str())),
+        );
         let status = process::Command::new(&self.cmd)
             .args(&self.args)
             .current_dir(&self.current_dir)
