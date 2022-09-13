@@ -19,23 +19,20 @@ struct PostInstallExecHook {
 
 impl super::Hook for PostInstallExecHook {
     fn execute(&self) -> Result<()> {
-        log::info!(
-            "$ {} {}",
+        let cmdline = format!(
+            "{:?} $ {} {}",
+            self.current_dir,
             shlex::quote(&self.cmd),
-            shlex::join(self.args.iter().map(|s| s.as_str())),
-        );
+            shlex::join(self.args.iter().map(String::as_str)));
+        log::info!("Executing {cmdline}");
         let status = process::Command::new(&self.cmd)
             .args(&self.args)
             .current_dir(&self.current_dir)
             .status()
-            .with_context(|| format!("failed to start {}", self.cmd))?;
+            .with_context(|| cmdline.clone())?;
         if !status.success() {
-            return Err(anyhow!(
-                "failed to execute {:?} $ {} {:?}",
-                self.current_dir,
-                self.cmd,
-                self.args,
-            ));
+            log::error!("failed to run {cmdline}");
+            return Err(anyhow!("failed to execute {cmdline}"));
         }
         Ok(())
     }
