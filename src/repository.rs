@@ -75,4 +75,12 @@ impl Repository {
         }
         Ok(())
     }
+    pub fn system_install_all(&self) -> Result<()> {
+        for package in self.packages.iter() {
+            package
+                .system_install()
+                .with_context(|| format!("failed to system install {}", package.name()))?;
+        }
+        Ok(())
+    }
 }

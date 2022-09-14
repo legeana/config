@@ -9,6 +9,28 @@ pub fn has_tag(tag: &str) -> Result<bool> {
     }
 }
 
+pub fn has_all_tags<T: AsRef<str>>(tags: &[T]) -> Result<bool> {
+    for tag in tags {
+        let tag = tag.as_ref();
+        let has = !has_tag(tag).with_context(|| format!("failed to check tag {tag:?}"))?;
+        if !has {
+            return Ok(false);
+        }
+    }
+    Ok(true)
+}
+
+pub fn has_any_tags<T: AsRef<str>>(tags: &[T]) -> Result<bool> {
+    for tag in tags {
+        let tag = tag.as_ref();
+        let has = !has_tag(tag).with_context(|| format!("failed to check tag {tag:?}"))?;
+        if has {
+            return Ok(true);
+        }
+    }
+    Ok(false)
+}
+
 fn has_tag_kv(key: &str, value: &str) -> Result<bool> {
     match key {
         "hostname" => match_hostname(value),

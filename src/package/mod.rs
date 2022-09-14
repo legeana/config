@@ -1,30 +1,65 @@
+mod config;
 mod contents;
 mod system;
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use crate::registry::Registry;
 
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, Context, Result};
 
 pub use contents::help as manifest_help;
 
 pub struct Package {
     name: String,
     configuration: contents::Configuration,
+    #[allow(dead_code)]
     dependencies: Vec<String>,
     system_dependencies: Vec<system::SystemPackage>,
 }
 
+fn name_from_path(path: &Path) -> Result<String> {
+    Ok(path
+        .file_name()
+        .ok_or_else(|| anyhow!("failed to get {path:?} basename"))?
+        .to_string_lossy()
+        .into())
+}
+
 impl Package {
     pub fn new(root: PathBuf) -> Result<Self> {
-        let name: String = root
-            .file_name()
-            .ok_or_else(|| anyhow!("failed to get {root:?} basename"))?
-            .to_string_lossy()
-            .into();
+        let pkgconfig = config::load_package(&root)
+            .with_context(|| format!("failed to load package config for {:?}", root));
+        match pkgconfig {
+            // TODO distinguish between no file and parsing failure
+            Err(_) => Self::new_no_pkg(root),
+            Ok(pkgconfig) => Self::new_with_pkg(root, pkgconfig),
+        }
+    }
+    fn new_with_pkg(root: PathBuf, pkgconfig: config::Package) -> Result<Self> {
+        let backup_name = name_from_path(&root)?;
+        let dependencies: Vec<String> = pkgconfig
+            .dependencies
+            .unwrap_or_default()
+            .iter()
+            .map(|dep| dep.name.clone())
+            .collect();
+        let system_dependencies = pkgconfig
+            .system_dependencies
+            .unwrap_or_default()
+            .iter()
+            .map(system::SystemPackage::new)
+            .collect::<Result<Vec<system::SystemPackage>, _>>()?;
         Ok(Package {
-            name,
+            name: pkgconfig.name.unwrap_or(backup_name),
+            configuration: contents::Configuration::new(root)?,
+            dependencies,
+            system_dependencies,
+        })
+    }
+    fn new_no_pkg(root: PathBuf) -> Result<Self> {
+        Ok(Package {
+            name: name_from_path(&root)?,
             configuration: contents::Configuration::new(root)?,
             dependencies: Vec::new(),
             system_dependencies: Vec::new(),
@@ -41,5 +76,11 @@ impl Package {
     }
     pub fn post_install(&self) -> Result<()> {
         self.configuration.post_install()
+    }
+    pub fn system_install(&self) -> Result<()> {
+        for sysdep in self.system_dependencies.iter() {
+            sysdep.install()?
+        }
+        Ok(())
     }
 }

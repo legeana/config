@@ -45,6 +45,7 @@ struct Cli {
 #[derive(Debug, Subcommand)]
 enum Commands {
     Install {},
+    SystemInstall {},
     Uninstall {},
     ManifestHelp {},
     List {},
@@ -99,6 +100,15 @@ fn install(root: &Path) -> Result<()> {
     Ok(())
 }
 
+fn system_install(root: &Path) -> Result<()> {
+    let repos = layout::repositories(root)?;
+    for repo in repos.iter() {
+        repo.system_install_all()
+            .with_context(|| format!("failed to system_install {}", repo.name()))?;
+    }
+    Ok(())
+}
+
 fn main() -> Result<()> {
     let args = Cli::parse();
     stderrlog::new()
@@ -109,18 +119,26 @@ fn main() -> Result<()> {
     // Main code.
     let root = config_root()?;
     log::info!("Found user configuration: {root:?}");
+    let check_update = || -> Result<()> {
+        let no_update = args.no_update || env::var(NO_UPDATE_ENV).is_ok();
+        if !no_update {
+            let need_restart = layout::update(&root)?;
+            if need_restart {
+                // This process is considered replaced.
+                // Don't do anything here.
+                return reload();
+            }
+        }
+        Ok(())
+    };
     match args.command {
         Commands::Install {} => {
-            let no_update = args.no_update || env::var(NO_UPDATE_ENV).is_ok();
-            if !no_update {
-                let need_restart = layout::update(&root)?;
-                if need_restart {
-                    // This process is considered replaced.
-                    // Don't do anything here.
-                    return reload();
-                }
-            }
+            check_update()?;
             install(&root).with_context(|| "failed to install")?;
+        }
+        Commands::SystemInstall {} => {
+            check_update()?;
+            system_install(&root).with_context(|| "failed to system_install")?;
         }
         Commands::Uninstall {} => {
             uninstall(&root).with_context(|| "failed to uninstall")?;
