@@ -113,9 +113,7 @@ pub fn parse(
     }
     match matched.len() {
         0 => {
-            log::error!("unsupported command {:?}", args);
-            Ok(())
-            // TODO: Err(anyhow!("unsupported command {:?}", args));
+            Err(anyhow!("unsupported command {:?}", args))
         }
         1 => Ok(()),
         _ => Err(anyhow!(
