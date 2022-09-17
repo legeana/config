@@ -112,9 +112,7 @@ pub fn parse(
         }
     }
     match matched.len() {
-        0 => {
-            Err(anyhow!("unsupported command {:?}", args))
-        }
+        0 => Err(anyhow!("unsupported command {:?}", args)),
         1 => Ok(()),
         _ => Err(anyhow!(
             "{:?} matched multiple parsers: {:?}",

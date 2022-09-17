@@ -23,7 +23,8 @@ impl super::Hook for PostInstallExecHook {
             "{:?} $ {} {}",
             self.current_dir,
             shlex::quote(&self.cmd),
-            shlex::join(self.args.iter().map(String::as_str)));
+            shlex::join(self.args.iter().map(String::as_str))
+        );
         log::info!("Executing {cmdline}");
         let status = process::Command::new(&self.cmd)
             .args(&self.args)
