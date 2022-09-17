@@ -1,4 +1,4 @@
-use crate::package::configuration::parser::{Error, Result};
+use crate::package::contents::parser::{Error, Result};
 
 use anyhow::anyhow;
 

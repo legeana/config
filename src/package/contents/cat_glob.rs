@@ -1,9 +1,9 @@
 use std::{io::Write, path::PathBuf};
 
-use crate::package::configuration::parser;
-use crate::package::configuration::util::multiple_args;
-use crate::package::configuration::Configuration;
-use crate::package::configuration::{file_util::make_local_state, local_state};
+use crate::package::contents::parser;
+use crate::package::contents::util::multiple_args;
+use crate::package::contents::Configuration;
+use crate::package::contents::{file_util::make_local_state, local_state};
 use crate::registry::Registry;
 
 use anyhow::{anyhow, Context};

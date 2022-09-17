@@ -1,6 +1,6 @@
-use crate::package::configuration::parser;
-use crate::package::configuration::util::no_args;
-use crate::package::configuration::Configuration;
+use crate::package::contents::parser;
+use crate::package::contents::util::no_args;
+use crate::package::contents::Configuration;
 
 use anyhow::{anyhow, Context};
 

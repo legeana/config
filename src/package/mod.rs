@@ -1,14 +1,14 @@
-mod configuration;
+mod contents;
 mod system;
 
 use std::path::PathBuf;
 
 use crate::registry::Registry;
-use configuration::Configuration;
+use contents::Configuration;
 
 use anyhow::{anyhow, Result};
 
-pub use configuration::help as manifest_help;
+pub use contents::help as manifest_help;
 
 pub struct Package {
     name: String,

@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use crate::package::configuration::Configuration;
+use crate::package::contents::Configuration;
 
 use anyhow::anyhow;
 use thiserror::Error;

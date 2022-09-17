@@ -1,8 +1,8 @@
 use anyhow::Context;
 
-use crate::package::configuration::parser;
-use crate::package::configuration::util::multiple_args;
-use crate::package::configuration::Configuration;
+use crate::package::contents::parser;
+use crate::package::contents::util::multiple_args;
+use crate::package::contents::Configuration;
 use crate::tag_util;
 
 pub struct RequiresParser;

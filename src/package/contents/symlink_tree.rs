@@ -1,9 +1,9 @@
 use std::path::PathBuf;
 
-use crate::package::configuration::file_util::make_symlink;
-use crate::package::configuration::parser;
-use crate::package::configuration::util::single_arg;
-use crate::package::configuration::Configuration;
+use crate::package::contents::file_util::make_symlink;
+use crate::package::contents::parser;
+use crate::package::contents::util::single_arg;
+use crate::package::contents::Configuration;
 use crate::registry::Registry;
 
 use anyhow::{self, Context};

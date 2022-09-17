@@ -1,6 +1,6 @@
-use crate::package::configuration::parser;
-use crate::package::configuration::util::check_command;
-use crate::package::configuration::Configuration;
+use crate::package::contents::parser;
+use crate::package::contents::util::check_command;
+use crate::package::contents::Configuration;
 
 pub struct DeprecatedParser;
 

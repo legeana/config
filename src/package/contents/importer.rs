@@ -2,11 +2,11 @@ use std::io::{BufRead, BufReader, BufWriter};
 use std::path::{Path, PathBuf};
 use std::{fs::File, io::Write};
 
-use crate::package::configuration::file_util::make_local_state;
-use crate::package::configuration::local_state;
-use crate::package::configuration::parser;
-use crate::package::configuration::util::single_arg;
-use crate::package::configuration::Configuration;
+use crate::package::contents::file_util::make_local_state;
+use crate::package::contents::local_state;
+use crate::package::contents::parser;
+use crate::package::contents::util::single_arg;
+use crate::package::contents::Configuration;
 use crate::registry::Registry;
 
 use anyhow::{anyhow, Context, Result};
