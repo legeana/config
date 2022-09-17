@@ -1,9 +1,8 @@
 use std::path::PathBuf;
 use std::process;
 
-use crate::package::contents::parser;
-use crate::package::contents::util::multiple_args;
-use crate::package::contents::Configuration;
+use super::parser;
+use super::util;
 
 use anyhow::{anyhow, Context, Result};
 
@@ -50,10 +49,10 @@ impl parser::Parser for PostInstallExecParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        configuration: &mut Configuration,
+        configuration: &mut super::Configuration,
         args: &[&str],
     ) -> parser::Result<()> {
-        let (command, args) = multiple_args(COMMAND, args, 1)?;
+        let (command, args) = util::multiple_args(COMMAND, args, 1)?;
         assert!(command.len() == 1);
         let args: Vec<String> = args
             .iter()

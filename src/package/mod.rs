@@ -4,7 +4,6 @@ mod system;
 use std::path::PathBuf;
 
 use crate::registry::Registry;
-use contents::Configuration;
 
 use anyhow::{anyhow, Result};
 
@@ -12,7 +11,7 @@ pub use contents::help as manifest_help;
 
 pub struct Package {
     name: String,
-    configuration: Configuration,
+    configuration: contents::Configuration,
     dependencies: Vec<String>,
     system_dependencies: Vec<system::SystemPackage>,
 }
@@ -26,7 +25,7 @@ impl Package {
             .into();
         Ok(Package {
             name,
-            configuration: Configuration::new(root)?,
+            configuration: contents::Configuration::new(root)?,
             dependencies: Vec::new(),
             system_dependencies: Vec::new(),
         })

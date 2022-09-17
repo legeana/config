@@ -2,11 +2,10 @@ use std::io::{BufRead, BufReader, BufWriter};
 use std::path::{Path, PathBuf};
 use std::{fs::File, io::Write};
 
-use crate::package::contents::file_util::make_local_state;
-use crate::package::contents::local_state;
-use crate::package::contents::parser;
-use crate::package::contents::util::single_arg;
-use crate::package::contents::Configuration;
+use super::file_util;
+use super::local_state;
+use super::parser;
+use super::util;
 use crate::registry::Registry;
 
 use anyhow::{anyhow, Context, Result};
@@ -92,7 +91,7 @@ fn render<W: Write>(prefix: &Path, src: &Path, out: &mut W) -> Result<()> {
 
 impl super::FileInstaller for ImporterInstaller {
     fn install(&self, registry: &mut dyn Registry) -> Result<()> {
-        make_local_state(registry, &self.dst)?;
+        file_util::make_local_state(registry, &self.dst)?;
         Ok(())
     }
 }
@@ -122,10 +121,10 @@ impl parser::Parser for ImporterParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        configuration: &mut Configuration,
+        configuration: &mut super::Configuration,
         args: &[&str],
     ) -> parser::Result<()> {
-        let filename = single_arg(COMMAND, args)?;
+        let filename = util::single_arg(COMMAND, args)?;
         let src = configuration.root.join(filename);
         let dst = state.prefix.current.join(filename);
         let prefix = dst

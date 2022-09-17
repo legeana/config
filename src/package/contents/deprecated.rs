@@ -1,6 +1,5 @@
-use crate::package::contents::parser;
-use crate::package::contents::util::check_command;
-use crate::package::contents::Configuration;
+use super::parser;
+use super::util::check_command;
 
 pub struct DeprecatedParser;
 
@@ -22,7 +21,7 @@ impl parser::Parser for DeprecatedParser {
     fn parse(
         &self,
         _state: &mut parser::State,
-        configuration: &mut Configuration,
+        configuration: &mut super::Configuration,
         args: &[&str],
     ) -> parser::Result<()> {
         if check_command("install_system_package", args).is_ok() {

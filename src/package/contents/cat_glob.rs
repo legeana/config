@@ -1,9 +1,9 @@
 use std::{io::Write, path::PathBuf};
 
-use crate::package::contents::parser;
-use crate::package::contents::util::multiple_args;
-use crate::package::contents::Configuration;
-use crate::package::contents::{file_util::make_local_state, local_state};
+use super::file_util;
+use super::local_state;
+use super::parser;
+use super::util;
 use crate::registry::Registry;
 
 use anyhow::{anyhow, Context};
@@ -28,7 +28,7 @@ struct CatGlobIntoHook {
 
 impl super::FileInstaller for CatGlobIntoInstaller {
     fn install(&self, registry: &mut dyn Registry) -> anyhow::Result<()> {
-        make_local_state(registry, &self.dst)?;
+        file_util::make_local_state(registry, &self.dst)?;
         Ok(())
     }
 }
@@ -67,10 +67,10 @@ impl parser::Parser for CatGlobIntoParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        configuration: &mut Configuration,
+        configuration: &mut super::Configuration,
         args: &[&str],
     ) -> parser::Result<()> {
-        let (fname, globs) = multiple_args(COMMAND, args, 1)?;
+        let (fname, globs) = util::multiple_args(COMMAND, args, 1)?;
         assert!(fname.len() == 1);
         let filename = fname[0];
         let current_prefix = state.prefix.current.to_str().ok_or_else(|| {

@@ -1,7 +1,5 @@
 use std::path::{Path, PathBuf};
 
-use crate::package::contents::Configuration;
-
 use anyhow::anyhow;
 use thiserror::Error;
 
@@ -58,7 +56,7 @@ pub trait Parser {
     fn parse(
         &self,
         state: &mut State,
-        configuration: &mut Configuration,
+        configuration: &mut super::Configuration,
         args: &[&str],
     ) -> Result<()>;
 }
@@ -88,7 +86,7 @@ fn parsers() -> Vec<Box<dyn Parser>> {
 
 pub fn parse(
     state: &mut State,
-    configuration: &mut Configuration,
+    configuration: &mut super::Configuration,
     args: &[&str],
 ) -> anyhow::Result<()> {
     let mut matched = Vec::<String>::new();

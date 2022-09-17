@@ -1,9 +1,8 @@
 use std::path::PathBuf;
 
-use crate::package::contents::file_util::make_local_state;
+use crate::package::contents::file_util;
 use crate::package::contents::parser;
-use crate::package::contents::util::single_arg;
-use crate::package::contents::Configuration;
+use crate::package::contents::util;
 use crate::registry::Registry;
 
 pub struct OutputFileParser {}
@@ -16,7 +15,7 @@ struct OutputFileInstaller {
 
 impl super::FileInstaller for OutputFileInstaller {
     fn install(&self, registry: &mut dyn Registry) -> anyhow::Result<()> {
-        make_local_state(registry, &self.dst).map(|_| ())
+        file_util::make_local_state(registry, &self.dst).map(|_| ())
     }
 }
 
@@ -31,10 +30,10 @@ impl parser::Parser for OutputFileParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        configuration: &mut Configuration,
+        configuration: &mut super::Configuration,
         args: &[&str],
     ) -> parser::Result<()> {
-        let filename = single_arg(COMMAND, args)?;
+        let filename = util::single_arg(COMMAND, args)?;
         configuration.files.push(Box::new(OutputFileInstaller {
             dst: state.prefix.current.join(filename),
         }));

@@ -1,8 +1,7 @@
 use std::path::PathBuf;
 
-use crate::package::contents::parser;
-use crate::package::contents::util::single_arg;
-use crate::package::contents::Configuration;
+use super::parser;
+use super::util;
 
 use anyhow::{Context, Result};
 
@@ -86,10 +85,10 @@ where
     fn parse(
         &self,
         state: &mut parser::State,
-        _configuration: &mut Configuration,
+        _configuration: &mut super::Configuration,
         args: &[&str],
     ) -> parser::Result<()> {
-        let path = single_arg(self.name(), args)?;
+        let path = util::single_arg(self.name(), args)?;
         state.prefix.set(self.xdg_prefix(path)?);
         Ok(())
     }

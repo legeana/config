@@ -1,9 +1,8 @@
 use std::path::PathBuf;
 
-use crate::package::contents::file_util::make_symlink;
-use crate::package::contents::parser;
-use crate::package::contents::util::single_arg;
-use crate::package::contents::Configuration;
+use super::file_util;
+use super::parser;
+use super::util;
 use crate::registry::Registry;
 
 pub struct SymlinkParser {}
@@ -17,7 +16,7 @@ struct SymlinkInstaller {
 
 impl super::FileInstaller for SymlinkInstaller {
     fn install(&self, registry: &mut dyn Registry) -> anyhow::Result<()> {
-        make_symlink(registry, &self.src, &self.dst)
+        file_util::make_symlink(registry, &self.src, &self.dst)
     }
 }
 
@@ -32,10 +31,10 @@ impl parser::Parser for SymlinkParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        configuration: &mut Configuration,
+        configuration: &mut super::Configuration,
         args: &[&str],
     ) -> parser::Result<()> {
-        let filename = single_arg(COMMAND, args)?;
+        let filename = util::single_arg(COMMAND, args)?;
         configuration.files.push(Box::new(SymlinkInstaller {
             src: configuration.root.join(filename),
             dst: state.prefix.current.join(filename),

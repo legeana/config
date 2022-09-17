@@ -1,8 +1,7 @@
 use anyhow::Context;
 
-use crate::package::contents::parser;
-use crate::package::contents::util::multiple_args;
-use crate::package::contents::Configuration;
+use super::parser;
+use super::util;
 use crate::tag_util;
 
 pub struct RequiresParser;
@@ -22,10 +21,10 @@ impl parser::Parser for RequiresParser {
     fn parse(
         &self,
         _state: &mut parser::State,
-        configuration: &mut Configuration,
+        configuration: &mut super::Configuration,
         args: &[&str],
     ) -> parser::Result<()> {
-        let (_, tags) = multiple_args(REQUIRES_COMMAND, args, 0)?;
+        let (_, tags) = util::multiple_args(REQUIRES_COMMAND, args, 0)?;
         for tag in tags.iter() {
             let has_tag =
                 tag_util::has_tag(tag).with_context(|| format!("failed to check tag {tag}"))?;
@@ -48,10 +47,10 @@ impl parser::Parser for ConflictsParser {
     fn parse(
         &self,
         _state: &mut parser::State,
-        configuration: &mut Configuration,
+        configuration: &mut super::Configuration,
         args: &[&str],
     ) -> parser::Result<()> {
-        let (_, tags) = multiple_args(CONFLICTS_COMMAND, args, 0)?;
+        let (_, tags) = util::multiple_args(CONFLICTS_COMMAND, args, 0)?;
         for tag in tags.iter() {
             let has_tag =
                 tag_util::has_tag(tag).with_context(|| format!("failed to check tag {tag}"))?;

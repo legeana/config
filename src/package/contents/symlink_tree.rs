@@ -1,9 +1,8 @@
 use std::path::PathBuf;
 
-use crate::package::contents::file_util::make_symlink;
-use crate::package::contents::parser;
-use crate::package::contents::util::single_arg;
-use crate::package::contents::Configuration;
+use super::file_util;
+use super::parser;
+use super::util;
 use crate::registry::Registry;
 
 use anyhow::{self, Context};
@@ -31,7 +30,7 @@ impl super::FileInstaller for SymlinkTreeInstaller {
                 .strip_prefix(&self.src)
                 .with_context(|| format!("unable to remove prefix {:?} from {src:?}", self.src))?;
             let dst = self.dst.join(suffix);
-            make_symlink(registry, src, &dst)?;
+            file_util::make_symlink(registry, src, &dst)?;
         }
         Ok(())
     }
@@ -48,10 +47,10 @@ impl parser::Parser for SymlinkTreeParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        configuration: &mut Configuration,
+        configuration: &mut super::Configuration,
         args: &[&str],
     ) -> parser::Result<()> {
-        let filename = single_arg(COMMAND, args)?;
+        let filename = util::single_arg(COMMAND, args)?;
         configuration.files.push(Box::new(SymlinkTreeInstaller {
             src: configuration.root.join(filename),
             dst: state.prefix.current.join(filename),

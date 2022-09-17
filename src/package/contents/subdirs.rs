@@ -1,6 +1,5 @@
-use crate::package::contents::parser;
-use crate::package::contents::util::no_args;
-use crate::package::contents::Configuration;
+use super::parser;
+use super::util;
 
 use anyhow::{anyhow, Context};
 
@@ -19,10 +18,10 @@ impl parser::Parser for SubdirsParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        configuration: &mut Configuration,
+        configuration: &mut super::Configuration,
         args: &[&str],
     ) -> parser::Result<()> {
-        no_args(COMMAND, args)?;
+        util::no_args(COMMAND, args)?;
         for entry in configuration
             .root
             .read_dir()
@@ -43,7 +42,7 @@ impl parser::Parser for SubdirsParser {
             let mut substate = parser::State {
                 prefix: state.prefix.join(subdir),
             };
-            let subconf = Configuration::new_sub(&mut substate, subroot)?;
+            let subconf = super::Configuration::new_sub(&mut substate, subroot)?;
             if configuration.subdirs.contains_key(subdir) {
                 return Err(anyhow!("{configuration} already includes {subdir}").into());
             }

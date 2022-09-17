@@ -1,6 +1,5 @@
-use crate::package::contents::parser;
-use crate::package::contents::util::single_arg;
-use crate::package::contents::Configuration;
+use super::parser;
+use super::util;
 
 pub struct PrefixParser {}
 
@@ -17,10 +16,10 @@ impl parser::Parser for PrefixParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        _configuration: &mut Configuration,
+        _configuration: &mut super::Configuration,
         args: &[&str],
     ) -> parser::Result<()> {
-        let prefix = single_arg(COMMAND, args)?;
+        let prefix = util::single_arg(COMMAND, args)?;
         state.prefix.set(shellexpand::tilde(prefix).as_ref().into());
         Ok(())
     }

@@ -1,8 +1,7 @@
 use std::path::PathBuf;
 
-use crate::package::contents::parser;
-use crate::package::contents::util::single_arg;
-use crate::package::contents::Configuration;
+use super::parser;
+use super::util;
 use crate::registry::Registry;
 
 use anyhow::{self, Context};
@@ -37,10 +36,10 @@ impl parser::Parser for MkDirParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        configuration: &mut Configuration,
+        configuration: &mut super::Configuration,
         args: &[&str],
     ) -> parser::Result<()> {
-        let filename = single_arg(COMMAND, args)?;
+        let filename = util::single_arg(COMMAND, args)?;
         configuration.files.push(Box::new(MkDirInstaller {
             dst: state.prefix.current.join(filename),
         }));

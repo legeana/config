@@ -1,9 +1,8 @@
 use std::path::PathBuf;
 
-use crate::package::contents::file_util::make_local_state;
-use crate::package::contents::parser;
-use crate::package::contents::util::single_arg;
-use crate::package::contents::Configuration;
+use super::file_util;
+use super::parser;
+use super::util;
 use crate::registry::Registry;
 
 use anyhow::{self, Context};
@@ -19,7 +18,7 @@ struct CopyInstaller {
 
 impl super::FileInstaller for CopyInstaller {
     fn install(&self, registry: &mut dyn Registry) -> anyhow::Result<()> {
-        let state = make_local_state(registry, &self.dst)?;
+        let state = file_util::make_local_state(registry, &self.dst)?;
         std::fs::copy(&self.src, &state)
             .with_context(|| format!("unable to copy {:?} to {state:?}", self.src))?;
         Ok(())
@@ -37,10 +36,10 @@ impl parser::Parser for CopyParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        configuration: &mut Configuration,
+        configuration: &mut super::Configuration,
         args: &[&str],
     ) -> parser::Result<()> {
-        let filename = single_arg(COMMAND, args)?;
+        let filename = util::single_arg(COMMAND, args)?;
         configuration.files.push(Box::new(CopyInstaller {
             src: configuration.root.join(filename),
             dst: state.prefix.current.join(filename),
