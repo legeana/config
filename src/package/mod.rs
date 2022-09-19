@@ -6,7 +6,7 @@ use std::path::{Path, PathBuf};
 
 use crate::registry::Registry;
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{anyhow, Result};
 
 pub use contents::help as manifest_help;
 
@@ -28,11 +28,14 @@ fn name_from_path(path: &Path) -> Result<String> {
 
 impl Package {
     pub fn new(root: PathBuf) -> Result<Self> {
-        let pkgconfig = config::load_package(&root)
-            .with_context(|| format!("failed to load package config for {:?}", root));
-        match pkgconfig {
-            // TODO distinguish between no file and parsing failure
-            Err(_) => Self::new_no_pkg(root),
+        let pkgconfig_result = config::load_package(&root);
+        match pkgconfig_result {
+            Err(err) => match err {
+                config::Error::FileNotFound(_) => Self::new_no_pkg(root),
+                config::Error::Other(err) => {
+                    Err(err.context(format!("failed to load package config for {root:?}")))
+                }
+            },
             Ok(pkgconfig) => Self::new_with_pkg(root, pkgconfig),
         }
     }
