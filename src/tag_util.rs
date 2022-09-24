@@ -42,12 +42,16 @@ fn has_tag_kv(key: &str, value: &str) -> Result<bool> {
 
 /// Returns system tags.
 pub fn tags() -> Result<Vec<String>> {
-    Ok(vec![
-        format!("distro={}", distro()?),
-        format!("hostname={}", hostname()?),
-        format!("family={}", family()),
-        format!("os={}", os()),
-    ])
+    let mut tags = Vec::new();
+    if let Ok(v) = distro() {
+        tags.push(format!("distro={v}"))
+    }
+    if let Ok(v) = hostname() {
+        tags.push(format!("hostname={v}"));
+    }
+    tags.push(format!("family={}", family()));
+    tags.push(format!("os={}", os()));
+    Ok(tags)
 }
 
 /// Returns 'windows' or 'unix'.
@@ -85,6 +89,10 @@ fn distro() -> Result<String> {
         .ok_or_else(|| anyhow!("failed to obtain distro"))
 }
 
-fn match_distro(want_distro: &str) -> Result<bool> {
-    Ok(want_distro == distro()?)
+fn match_distro(want_distro: &str) -> bool {
+    if let Ok(got_distro) = distro() {
+        want_distro == got_distro
+    } else {
+        false
+    }
 }
