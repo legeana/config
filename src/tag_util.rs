@@ -1,6 +1,7 @@
 use crate::hostname;
 
 use anyhow::{anyhow, Context, Result};
+use sysinfo::{System, SystemExt};
 
 pub fn has_tag(tag: &str) -> Result<bool> {
     match tag.find('=') {
@@ -33,6 +34,7 @@ pub fn has_any_tags<T: AsRef<str>>(tags: &[T]) -> Result<bool> {
 
 fn has_tag_kv(key: &str, value: &str) -> Result<bool> {
     match key {
+        "distro" => match_distro(value),
         "family" => match_family(value),
         "hostname" => match_hostname(value),
         "os" => match_os(value),
@@ -43,6 +45,7 @@ fn has_tag_kv(key: &str, value: &str) -> Result<bool> {
 /// Returns system tags.
 pub fn tags() -> Result<Vec<String>> {
     Ok(vec![
+        format!("distro={}", distro()?),
         format!("hostname={}", hostname()?),
         format!("family={}", family()),
         format!("os={}", os()),
@@ -74,4 +77,14 @@ fn os() -> &'static str {
 
 fn match_os(want_os: &str) -> Result<bool> {
     Ok(want_os == os())
+}
+
+fn distro() -> Result<String> {
+    let sys = System::new();
+    sys.name()
+        .ok_or_else(|| anyhow!("failed to obtain distro"))
+}
+
+fn match_distro(want_distro: &str) -> Result<bool> {
+    Ok(want_distro == distro()?)
 }
