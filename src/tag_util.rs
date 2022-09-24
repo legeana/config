@@ -33,7 +33,9 @@ pub fn has_any_tags<T: AsRef<str>>(tags: &[T]) -> Result<bool> {
 
 fn has_tag_kv(key: &str, value: &str) -> Result<bool> {
     match key {
+        "family" => match_family(value),
         "hostname" => match_hostname(value),
+        "os" => match_os(value),
         _ => Ok(false),
     }
 }
@@ -42,7 +44,18 @@ fn has_tag_kv(key: &str, value: &str) -> Result<bool> {
 pub fn tags() -> Result<Vec<String>> {
     Ok(vec![
         format!("hostname={}", hostname()?),
+        format!("family={}", family()),
+        format!("os={}", os()),
     ])
+}
+
+/// Returns 'windows' or 'unix'.
+fn family() -> &'static str {
+    std::env::consts::FAMILY
+}
+
+fn match_family(want_family: &str) -> Result<bool> {
+    Ok(want_family == family())
 }
 
 fn hostname() -> Result<String> {
@@ -51,4 +64,14 @@ fn hostname() -> Result<String> {
 
 fn match_hostname(want_hostname: &str) -> Result<bool> {
     Ok(want_hostname == hostname()?)
+}
+
+/// Returns 'linux', 'macos', 'windows' etc.
+/// See https://doc.rust-lang.org/std/env/consts/constant.OS.html
+fn os() -> &'static str {
+    std::env::consts::OS
+}
+
+fn match_os(want_os: &str) -> Result<bool> {
+    Ok(want_os == os())
 }
