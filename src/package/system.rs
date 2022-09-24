@@ -30,7 +30,9 @@ impl SystemPackage {
                 return Ok(Self::default());
             }
         }
-        // TODO apt
+        if let Some(apt) = &cfg.apt {
+            installers.push(Box::new(Apt::new(apt)));
+        }
         // TODO brew
         // TODO npm
         if let Some(pacman) = &cfg.pacman {
@@ -47,6 +49,38 @@ impl SystemPackage {
     pub fn install(&self) -> Result<()> {
         for installer in self.installers.iter() {
             installer.install()?
+        }
+        Ok(())
+    }
+}
+
+struct Apt {
+    packages: Vec<String>,
+}
+
+impl Apt {
+    fn new(packages: &[String]) -> Self {
+        Self {
+            packages: packages.to_owned(),
+        }
+    }
+}
+
+impl Installer for Apt {
+    fn install(&self) -> Result<()> {
+        let cmdline = format!(
+            "sudo apt install -- {}",
+            shlex::join(self.packages.iter().map(|s| s.as_ref()))
+        );
+        let status = std::process::Command::new("sudo")
+            .arg("apt")
+            .arg("install")
+            .arg("--")
+            .args(&self.packages)
+            .status()
+            .with_context(|| format!("failed to execute {cmdline:?}"))?;
+        if !status.success() {
+            return Err(anyhow!("failed to execute {cmdline:?}"));
         }
         Ok(())
     }
