@@ -48,6 +48,7 @@ enum Commands {
     SystemInstall {},
     Uninstall {},
     ManifestHelp {},
+    Tags {},
     List {},
 }
 
@@ -145,6 +146,11 @@ fn main() -> Result<()> {
         }
         Commands::ManifestHelp {} => {
             print!("{}", package::manifest_help());
+        }
+        Commands::Tags {} => {
+            for tag in tag_util::tags().context("failed to get tags")? {
+                println!("{}", tag);
+            }
         }
         Commands::List {} => {
             let repos = layout::repositories(&root)

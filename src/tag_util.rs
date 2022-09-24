@@ -38,7 +38,17 @@ fn has_tag_kv(key: &str, value: &str) -> Result<bool> {
     }
 }
 
+/// Returns system tags.
+pub fn tags() -> Result<Vec<String>> {
+    Ok(vec![
+        format!("hostname={}", hostname()?),
+    ])
+}
+
+fn hostname() -> Result<String> {
+    hostname::hostname().context("unable to get hostname")
+}
+
 fn match_hostname(want_hostname: &str) -> Result<bool> {
-    let got_hostname = hostname::hostname().with_context(|| "unable to get hostname")?;
-    Ok(want_hostname == got_hostname)
+    Ok(want_hostname == hostname()?)
 }
