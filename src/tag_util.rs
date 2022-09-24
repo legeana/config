@@ -1,9 +1,12 @@
 use anyhow::{anyhow, Context, Result};
+use once_cell::sync::Lazy;
 use sysinfo::{System, SystemExt};
+
+static SYSINFO: Lazy<SystemInfo> = Lazy::new(SystemInfo::new);
 
 pub fn has_tag(tag: &str) -> Result<bool> {
     match tag.find('=') {
-        Some(pos) => has_tag_kv(&tag[..pos], &tag[pos + 1..]),
+        Some(pos) => Ok(has_tag_kv(&tag[..pos], &tag[pos + 1..])),
         None => Err(anyhow!("invalid tag: must contain '=', got {tag}")),
     }
 }
@@ -30,61 +33,61 @@ pub fn has_any_tags<T: AsRef<str>>(tags: &[T]) -> Result<bool> {
     Ok(false)
 }
 
-fn has_tag_kv(key: &str, value: &str) -> Result<bool> {
+fn has_tag_kv(key: &str, value: &str) -> bool {
     match key {
-        "distro" => match_distro(value),
-        "family" => match_family(value),
-        "hostname" => match_hostname(value),
-        "os" => match_os(value),
-        _ => Ok(false),
+        "distro" => SYSINFO.match_distro(value),
+        "family" => SYSINFO.match_family(value),
+        "hostname" => SYSINFO.match_hostname(value),
+        "os" => SYSINFO.match_os(value),
+        _ => false,
+    }
+}
+
+struct SystemInfo {
+    system: System,
+}
+
+impl SystemInfo {
+    fn new() -> Self {
+        Self {
+            system: System::new(),
+        }
+    }
+    /// Returns 'windows' or 'unix'.
+    fn family(&self) -> &'static str {
+        std::env::consts::FAMILY
+    }
+    fn match_family(&self, want_family: &str) -> bool {
+        want_family == self.family()
+    }
+    fn hostname(&self) -> Option<String> {
+        self.system.host_name()
+    }
+    fn match_hostname(&self, want_hostname: &str) -> bool {
+        Some(want_hostname.into()) == self.hostname()
+    }
+    /// Returns 'linux', 'macos', 'windows' etc.
+    /// See https://doc.rust-lang.org/std/env/consts/constant.OS.html
+    fn os(&self) -> &'static str {
+        std::env::consts::OS
+    }
+    fn match_os(&self, want_os: &str) -> bool {
+        want_os == self.os()
+    }
+    fn distro(&self) -> Option<String> {
+        self.system.name()
+    }
+    fn match_distro(&self, want_distro: &str) -> bool {
+        Some(want_distro.into()) == self.distro()
     }
 }
 
 /// Returns system tags.
 pub fn tags() -> Result<Vec<String>> {
     Ok(vec![
-        format!("distro={}", distro()?),
-        format!("hostname={}", hostname()?),
-        format!("family={}", family()),
-        format!("os={}", os()),
+        format!("distro={}", SYSINFO.distro().unwrap_or("N/A".into())),
+        format!("hostname={}", SYSINFO.hostname().unwrap_or("N/A".into())),
+        format!("family={}", SYSINFO.family()),
+        format!("os={}", SYSINFO.os()),
     ])
-}
-
-/// Returns 'windows' or 'unix'.
-fn family() -> &'static str {
-    std::env::consts::FAMILY
-}
-
-fn match_family(want_family: &str) -> Result<bool> {
-    Ok(want_family == family())
-}
-
-fn hostname() -> Result<String> {
-    let sys = System::new();
-    sys.host_name()
-        .ok_or_else(|| anyhow!("failed to obtain hostname"))
-}
-
-fn match_hostname(want_hostname: &str) -> Result<bool> {
-    Ok(want_hostname == hostname()?)
-}
-
-/// Returns 'linux', 'macos', 'windows' etc.
-/// See https://doc.rust-lang.org/std/env/consts/constant.OS.html
-fn os() -> &'static str {
-    std::env::consts::OS
-}
-
-fn match_os(want_os: &str) -> Result<bool> {
-    Ok(want_os == os())
-}
-
-fn distro() -> Result<String> {
-    let sys = System::new();
-    sys.name()
-        .ok_or_else(|| anyhow!("failed to obtain distro"))
-}
-
-fn match_distro(want_distro: &str) -> Result<bool> {
-    Ok(want_distro == distro()?)
 }
