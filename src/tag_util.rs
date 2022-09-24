@@ -1,5 +1,3 @@
-use crate::hostname;
-
 use anyhow::{anyhow, Context, Result};
 use sysinfo::{System, SystemExt};
 
@@ -62,7 +60,9 @@ fn match_family(want_family: &str) -> Result<bool> {
 }
 
 fn hostname() -> Result<String> {
-    hostname::hostname().context("unable to get hostname")
+    let sys = System::new();
+    sys.host_name()
+        .ok_or_else(|| anyhow!("failed to obtain hostname"))
 }
 
 fn match_hostname(want_hostname: &str) -> Result<bool> {
