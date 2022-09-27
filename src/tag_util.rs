@@ -75,7 +75,14 @@ impl SystemInfo {
         want_os == self.os()
     }
     fn distro(&self) -> Option<String> {
-        self.system.name()
+        // TODO: use distribution_id() once available.
+        match self.system.name() {
+            Some(name) => name
+                .split_whitespace()
+                .next()
+                .map(|word| word.to_lowercase()),
+            None => None,
+        }
     }
     fn match_distro(&self, want_distro: &str) -> bool {
         Some(want_distro.into()) == self.distro()
@@ -97,7 +104,6 @@ pub fn tags() -> Result<Vec<String>> {
         format!("os={}", SYSINFO.os()),
     ])
 }
-
 
 #[cfg(test)]
 mod tests {
