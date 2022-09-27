@@ -85,9 +85,27 @@ impl SystemInfo {
 /// Returns system tags.
 pub fn tags() -> Result<Vec<String>> {
     Ok(vec![
-        format!("distro={}", SYSINFO.distro().unwrap_or("N/A".into())),
-        format!("hostname={}", SYSINFO.hostname().unwrap_or("N/A".into())),
+        format!(
+            "distro={}",
+            SYSINFO.distro().unwrap_or_else(|| "N/A".into())
+        ),
+        format!(
+            "hostname={}",
+            SYSINFO.hostname().unwrap_or_else(|| "N/A".into())
+        ),
         format!("family={}", SYSINFO.family()),
         format!("os={}", SYSINFO.os()),
     ])
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_tags() {
+        let tags = tags().expect("tags()");
+        assert!(!tags.is_empty());
+    }
 }
