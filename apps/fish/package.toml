@@ -1,0 +1,6 @@
+name = "fish"
+
+[[system_dependencies]]
+if_available = true
+apt = ["fish", "moreutils"]
+pacman = ["fish", "moreutils"]
