@@ -3,8 +3,3 @@ symlink kde-i3.sh
 
 prefix ~/.config
 subdir i3
-
-install_system_package i3-wm rofi i3status i3lock
-
-install_apt_package x11-xserver-utils
-install_pacman_package xorg-xsetroot
