@@ -1,3 +1,5 @@
+use std::ffi::OsStr;
+
 use anyhow::{anyhow, Context, Result};
 
 use crate::tag_util;
@@ -168,6 +170,15 @@ impl Installer for Exec {
     }
 }
 
-fn is_available(_cmd: &str) -> Result<bool> {
-    unimplemented!("")
+fn is_available<T: AsRef<OsStr> + std::fmt::Debug>(cmd: T) -> Result<bool> {
+    match which::which(&cmd) {
+        Ok(_) => Ok(true),
+        Err(err) => {
+            match err {
+                which::Error::CannotFindBinaryPath => Ok(false),
+                _ => Err(anyhow::Error::new(err)
+                    .context(format!("failed to check if {cmd:?} is installed"))),
+            }
+        }
+    }
 }

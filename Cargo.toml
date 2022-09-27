@@ -22,4 +22,5 @@ sysinfo = { version = "0.26.2", default-features = false }
 thiserror = "1.0"
 toml = "0.5.9"
 walkdir = "2"
+which = "4.3.0"
 xdg = "^2.1"
