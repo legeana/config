@@ -34,6 +34,8 @@ pub struct SystemDependency {
     pub requires: Option<Vec<String>>,
     /// Conflicting tags.
     pub conflicts: Option<Vec<String>>,
+    // Do not fail if package manager is not available.
+    pub if_available: Option<bool>,
     // Package managers.
     pub apt: Option<Vec<String>>,
     pub brew: Option<Vec<String>>,
@@ -57,7 +59,7 @@ fn read(path: &Path) -> Result<Vec<u8>> {
         Ok(data) => Ok(data),
         Err(err) => match err.kind() {
             std::io::ErrorKind::NotFound => Err(Error::FileNotFound(path.to_owned())),
-            _ => Err(Error::Other(anyhow!("failed to read {path:?}").into())),
+            _ => Err(Error::Other(anyhow!("failed to read {path:?}"))),
         },
     }
 }
@@ -84,5 +86,66 @@ mod tests {
         assert_eq!(pkg.name, None);
         assert_eq!(pkg.dependencies, None);
         assert_eq!(pkg.system_dependencies, None);
+    }
+
+    #[test]
+    fn test_load_example() {
+        let pkg = load_string(
+            "
+            name = 'test'
+
+            [[dependencies]]
+            name = 'pkg1'
+
+            [[dependencies]]
+            name = 'pkg2'
+
+            [[system_dependencies]]
+            pip_user = ['pkg1-pip', 'pkg2-pip']
+
+            [[system_dependencies]]
+            if_available = true
+            apt = ['pkg1-part-deb', 'pkg2-part-deb']
+
+            [[system_dependencies]]
+            if_available = true
+            pacman = ['pkg1-part-arch', 'pkg2-part-arch']
+        ",
+        )
+        .expect("load_string");
+        assert_eq!(pkg.name, Some("test".to_owned()));
+        assert_eq!(
+            pkg.dependencies,
+            Some(vec![
+                Dependency {
+                    name: "pkg1".to_owned(),
+                },
+                Dependency {
+                    name: "pkg2".to_owned(),
+                }
+            ])
+        );
+        assert_eq!(
+            pkg.system_dependencies,
+            Some(vec![
+                SystemDependency {
+                    pip_user: Some(vec!["pkg1-pip".to_owned(), "pkg2-pip".to_owned()]),
+                    ..SystemDependency::default()
+                },
+                SystemDependency {
+                    if_available: Some(true),
+                    apt: Some(vec!["pkg1-part-deb".to_owned(), "pkg2-part-deb".to_owned(),]),
+                    ..SystemDependency::default()
+                },
+                SystemDependency {
+                    if_available: Some(true),
+                    pacman: Some(vec![
+                        "pkg1-part-arch".to_owned(),
+                        "pkg2-part-arch".to_owned()
+                    ]),
+                    ..SystemDependency::default()
+                },
+            ])
+        );
     }
 }

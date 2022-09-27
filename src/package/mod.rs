@@ -6,7 +6,7 @@ use std::path::{Path, PathBuf};
 
 use crate::registry::Registry;
 
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, Context, Result};
 
 pub use contents::help as manifest_help;
 
@@ -15,7 +15,7 @@ pub struct Package {
     configuration: contents::Configuration,
     #[allow(dead_code)]
     dependencies: Vec<String>,
-    system_dependencies: Vec<system::SystemPackage>,
+    system_dependency: system::SystemDependency,
 }
 
 fn name_from_path(path: &Path) -> Result<String> {
@@ -47,17 +47,16 @@ impl Package {
             .iter()
             .map(|dep| dep.name.clone())
             .collect();
-        let system_dependencies = pkgconfig
-            .system_dependencies
-            .unwrap_or_default()
-            .iter()
-            .map(system::SystemPackage::new)
-            .collect::<Result<Vec<system::SystemPackage>, _>>()?;
+        let system_dependency = match pkgconfig.system_dependencies {
+            Some(variants) => system::SystemDependency::new(&variants)
+                .context("failed to parse system_dependencies")?,
+            None => system::SystemDependency::default(),
+        };
         Ok(Package {
             name: pkgconfig.name.unwrap_or(backup_name),
             configuration: contents::Configuration::new(root)?,
             dependencies,
-            system_dependencies,
+            system_dependency,
         })
     }
     fn new_no_pkg(root: PathBuf) -> Result<Self> {
@@ -65,7 +64,7 @@ impl Package {
             name: name_from_path(&root)?,
             configuration: contents::Configuration::new(root)?,
             dependencies: Vec::new(),
-            system_dependencies: Vec::new(),
+            system_dependency: system::SystemDependency::default(),
         })
     }
     pub fn name(&self) -> &str {
@@ -81,9 +80,6 @@ impl Package {
         self.configuration.post_install()
     }
     pub fn system_install(&self) -> Result<()> {
-        for sysdep in self.system_dependencies.iter() {
-            sysdep.install()?
-        }
-        Ok(())
+        self.system_dependency.install()
     }
 }

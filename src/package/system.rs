@@ -9,12 +9,34 @@ trait Installer {
 }
 
 #[derive(Default)]
-pub struct SystemPackage {
+pub struct SystemDependency {
+    variants: Vec<SystemDependencyVariant>,
+}
+
+impl SystemDependency {
+    pub fn new(cfg: &[config::SystemDependency]) -> Result<Self> {
+        let mut variants: Vec<SystemDependencyVariant> = Vec::with_capacity(cfg.len());
+        for variant in cfg.iter() {
+            variants.push(SystemDependencyVariant::new(variant)?);
+        }
+        Ok(SystemDependency { variants })
+    }
+    pub fn install(&self) -> Result<()> {
+        for variant in self.variants.iter() {
+            variant.install()?;
+        }
+        Ok(())
+    }
+}
+
+#[derive(Default)]
+pub struct SystemDependencyVariant {
     installers: Vec<Box<dyn Installer>>,
 }
 
-impl SystemPackage {
+impl SystemDependencyVariant {
     pub fn new(cfg: &config::SystemDependency) -> Result<Self> {
+        let if_available = cfg.if_available.unwrap_or_default();
         let mut installers: Vec<Box<dyn Installer>> = Vec::new();
         if let Some(requires) = &cfg.requires {
             if !tag_util::has_all_tags(requires)
@@ -31,12 +53,12 @@ impl SystemPackage {
             }
         }
         if let Some(apt) = &cfg.apt {
-            installers.push(Box::new(Apt::new(apt)));
+            installers.push(Box::new(Apt::new(apt.clone(), if_available)));
         }
         // TODO brew
         // TODO npm
         if let Some(pacman) = &cfg.pacman {
-            installers.push(Box::new(Pacman::new(pacman)));
+            installers.push(Box::new(Pacman::new(pacman.clone(), if_available)));
         }
         // TODO pip_user
         if let Some(exec) = &cfg.exec {
@@ -56,18 +78,23 @@ impl SystemPackage {
 
 struct Apt {
     packages: Vec<String>,
+    if_available: bool,
 }
 
 impl Apt {
-    fn new(packages: &[String]) -> Self {
+    fn new(packages: Vec<String>, if_available: bool) -> Self {
         Self {
-            packages: packages.to_owned(),
+            packages,
+            if_available,
         }
     }
 }
 
 impl Installer for Apt {
     fn install(&self) -> Result<()> {
+        if self.if_available && !is_available("apt")? {
+            return Ok(());
+        }
         let cmdline = format!(
             "sudo apt install -- {}",
             shlex::join(self.packages.iter().map(|s| s.as_ref()))
@@ -88,18 +115,23 @@ impl Installer for Apt {
 
 struct Pacman {
     packages: Vec<String>,
+    if_available: bool,
 }
 
 impl Pacman {
-    fn new(packages: &[String]) -> Self {
+    fn new(packages: Vec<String>, if_available: bool) -> Self {
         Self {
-            packages: packages.to_owned(),
+            packages,
+            if_available,
         }
     }
 }
 
 impl Installer for Pacman {
     fn install(&self) -> Result<()> {
+        if self.if_available && !is_available("pacman")? {
+            return Ok(());
+        }
         let cmdline = format!(
             "sudo pacman -S --needed -- {}",
             shlex::join(self.packages.iter().map(|s| s.as_ref()))
@@ -134,4 +166,8 @@ impl Installer for Exec {
     fn install(&self) -> Result<()> {
         unimplemented!()
     }
+}
+
+fn is_available(_cmd: &str) -> Result<bool> {
+    unimplemented!("")
 }
