@@ -101,6 +101,8 @@ impl Installer for Apt {
             "sudo apt install -- {}",
             shlex::join(self.packages.iter().map(|s| s.as_ref()))
         );
+        println!("$ {cmdline}");
+        log::info!("Running $ {cmdline}");
         let status = std::process::Command::new("sudo")
             .arg("apt")
             .arg("install")
@@ -138,6 +140,8 @@ impl Installer for Pacman {
             "sudo pacman -S --needed -- {}",
             shlex::join(self.packages.iter().map(|s| s.as_ref()))
         );
+        println!("$ {cmdline}");
+        log::info!("Running $ {cmdline}");
         let status = std::process::Command::new("sudo")
             .arg("pacman")
             .arg("-S")
