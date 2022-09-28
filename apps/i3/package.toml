@@ -1,11 +1,9 @@
 name = "i3wm"
 
 [[system_dependencies]]
-if_available = true
 apt = ["i3-wm", "rofi", "i3status", "i3lock"]
 pacman = ["i3-wm", "rofi", "i3status", "i3lock"]
 
 [[system_dependencies]]
-if_available = true
 apt = ["x11-xserver-utils"]
 pacman = ["xorg-xsetroot"]

@@ -21,6 +21,7 @@ pub struct Package {
     pub name: Option<String>,
     pub dependencies: Option<Vec<Dependency>>,
     pub system_dependencies: Option<Vec<SystemDependency>>,
+    pub user_dependencies: Option<Vec<UserDependency>>,
 }
 
 #[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
@@ -28,23 +29,31 @@ pub struct Dependency {
     pub name: String,
 }
 
+/// SystemDependency doesn't consider missing package manager a failure.
 #[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
 pub struct SystemDependency {
     /// Required tags.
     pub requires: Option<Vec<String>>,
     /// Conflicting tags.
     pub conflicts: Option<Vec<String>>,
-    // Do not fail if package manager is not available.
-    pub if_available: Option<bool>,
     // Package managers.
     pub apt: Option<Vec<String>>,
-    pub brew: Option<Vec<String>>,
-    pub npm: Option<Vec<String>>,
     pub pacman: Option<Vec<String>>,
-    pub pip_user: Option<Vec<String>>,
     /// Custom multi-line shell script.
     /// Use requires/conflicts for platform selection.
     pub exec: Option<String>,
+}
+
+#[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
+pub struct UserDependency {
+    /// Required tags.
+    pub requires: Option<Vec<String>>,
+    /// Conflicting tags.
+    pub conflicts: Option<Vec<String>>,
+    // User-level package managers.
+    pub brew: Option<Vec<String>>,
+    pub npm: Option<Vec<String>>,
+    pub pip_user: Option<Vec<String>>,
 }
 
 pub fn load_string(data: &str) -> Result<Package> {
@@ -101,15 +110,13 @@ mod tests {
             name = 'pkg2'
 
             [[system_dependencies]]
-            pip_user = ['pkg1-pip', 'pkg2-pip']
-
-            [[system_dependencies]]
-            if_available = true
             apt = ['pkg1-part-deb', 'pkg2-part-deb']
 
             [[system_dependencies]]
-            if_available = true
             pacman = ['pkg1-part-arch', 'pkg2-part-arch']
+
+            [[user_dependencies]]
+            pip_user = ['pkg1-pip', 'pkg2-pip']
         ",
         )
         .expect("load_string");
@@ -129,16 +136,10 @@ mod tests {
             pkg.system_dependencies,
             Some(vec![
                 SystemDependency {
-                    pip_user: Some(vec!["pkg1-pip".to_owned(), "pkg2-pip".to_owned()]),
-                    ..SystemDependency::default()
-                },
-                SystemDependency {
-                    if_available: Some(true),
                     apt: Some(vec!["pkg1-part-deb".to_owned(), "pkg2-part-deb".to_owned(),]),
                     ..SystemDependency::default()
                 },
                 SystemDependency {
-                    if_available: Some(true),
                     pacman: Some(vec![
                         "pkg1-part-arch".to_owned(),
                         "pkg2-part-arch".to_owned()
@@ -146,6 +147,13 @@ mod tests {
                     ..SystemDependency::default()
                 },
             ])
+        );
+        assert_eq!(
+            pkg.user_dependencies,
+            Some(vec![UserDependency {
+                pip_user: Some(vec!["pkg1-pip".to_owned(), "pkg2-pip".to_owned()]),
+                ..UserDependency::default()
+            },])
         );
     }
 }

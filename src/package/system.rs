@@ -38,7 +38,6 @@ pub struct SystemDependencyVariant {
 
 impl SystemDependencyVariant {
     pub fn new(cfg: &config::SystemDependency) -> Result<Self> {
-        let if_available = cfg.if_available.unwrap_or_default();
         let mut installers: Vec<Box<dyn Installer>> = Vec::new();
         if let Some(requires) = &cfg.requires {
             if !tag_util::has_all_tags(requires)
@@ -55,12 +54,12 @@ impl SystemDependencyVariant {
             }
         }
         if let Some(apt) = &cfg.apt {
-            installers.push(Box::new(Apt::new(apt.clone(), if_available)));
+            installers.push(Box::new(Apt::new(apt.clone())));
         }
         // TODO brew
         // TODO npm
         if let Some(pacman) = &cfg.pacman {
-            installers.push(Box::new(Pacman::new(pacman.clone(), if_available)));
+            installers.push(Box::new(Pacman::new(pacman.clone())));
         }
         // TODO pip_user
         if let Some(exec) = &cfg.exec {
@@ -80,21 +79,17 @@ impl SystemDependencyVariant {
 
 struct Apt {
     packages: Vec<String>,
-    if_available: bool,
 }
 
 impl Apt {
-    fn new(packages: Vec<String>, if_available: bool) -> Self {
-        Self {
-            packages,
-            if_available,
-        }
+    fn new(packages: Vec<String>) -> Self {
+        Self { packages }
     }
 }
 
 impl Installer for Apt {
     fn install(&self) -> Result<()> {
-        if self.if_available && !is_available("apt")? {
+        if !is_available("apt")? {
             return Ok(());
         }
         let cmdline = format!(
@@ -119,21 +114,17 @@ impl Installer for Apt {
 
 struct Pacman {
     packages: Vec<String>,
-    if_available: bool,
 }
 
 impl Pacman {
-    fn new(packages: Vec<String>, if_available: bool) -> Self {
-        Self {
-            packages,
-            if_available,
-        }
+    fn new(packages: Vec<String>) -> Self {
+        Self { packages }
     }
 }
 
 impl Installer for Pacman {
     fn install(&self) -> Result<()> {
-        if self.if_available && !is_available("pacman")? {
+        if !is_available("pacman")? {
             return Ok(());
         }
         let cmdline = format!(
