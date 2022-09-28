@@ -11,32 +11,32 @@ trait Installer {
 }
 
 #[derive(Default)]
-pub struct SystemDependency {
-    variants: Vec<SystemDependencyVariant>,
+pub struct SystemDependencyGroup {
+    dependencies: Vec<SystemDependency>,
 }
 
-impl SystemDependency {
+impl SystemDependencyGroup {
     pub fn new(cfg: &[config::SystemDependency]) -> Result<Self> {
-        let mut variants: Vec<SystemDependencyVariant> = Vec::with_capacity(cfg.len());
-        for variant in cfg.iter() {
-            variants.push(SystemDependencyVariant::new(variant)?);
+        let mut dependencies: Vec<SystemDependency> = Vec::with_capacity(cfg.len());
+        for dependency in cfg.iter() {
+            dependencies.push(SystemDependency::new(dependency)?);
         }
-        Ok(SystemDependency { variants })
+        Ok(Self { dependencies })
     }
     pub fn install(&self) -> Result<()> {
-        for variant in self.variants.iter() {
-            variant.install()?;
+        for dependency in self.dependencies.iter() {
+            dependency.install()?;
         }
         Ok(())
     }
 }
 
 #[derive(Default)]
-pub struct SystemDependencyVariant {
+pub struct SystemDependency {
     installers: Vec<Box<dyn Installer>>,
 }
 
-impl SystemDependencyVariant {
+impl SystemDependency {
     pub fn new(cfg: &config::SystemDependency) -> Result<Self> {
         let mut installers: Vec<Box<dyn Installer>> = Vec::new();
         if let Some(requires) = &cfg.requires {

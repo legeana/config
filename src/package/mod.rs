@@ -15,7 +15,7 @@ pub struct Package {
     configuration: contents::Configuration,
     #[allow(dead_code)]
     dependencies: Vec<String>,
-    system_dependency: system::SystemDependency,
+    system_dependency: system::SystemDependencyGroup,
 }
 
 fn name_from_path(path: &Path) -> Result<String> {
@@ -48,9 +48,9 @@ impl Package {
             .map(|dep| dep.name.clone())
             .collect();
         let system_dependency = match pkgconfig.system_dependencies {
-            Some(variants) => system::SystemDependency::new(&variants)
+            Some(deps) => system::SystemDependencyGroup::new(&deps)
                 .context("failed to parse system_dependencies")?,
-            None => system::SystemDependency::default(),
+            None => system::SystemDependencyGroup::default(),
         };
         Ok(Package {
             name: pkgconfig.name.unwrap_or(backup_name),
@@ -64,7 +64,7 @@ impl Package {
             name: name_from_path(&root)?,
             configuration: contents::Configuration::new(root)?,
             dependencies: Vec::new(),
-            system_dependency: system::SystemDependency::default(),
+            system_dependency: system::SystemDependencyGroup::default(),
         })
     }
     pub fn name(&self) -> &str {
