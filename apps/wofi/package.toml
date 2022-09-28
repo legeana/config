@@ -1,0 +1,4 @@
+name = "wofi"
+
+[[system_dependencies]]
+any = ["wofi"]
