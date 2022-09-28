@@ -1,0 +1,6 @@
+configuration {
+    combi-modes: "window,drun,run,ssh";
+    modes: "combi";
+    show-icons: true;
+    terminal: "pika-sensible-terminal";
+}

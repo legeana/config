@@ -1,7 +1,10 @@
 name = "i3wm"
 
+[[dependencies]]
+name = "rofi"
+
 [[system_dependencies]]
-any = ["i3-wm", "rofi", "i3status", "i3lock"]
+any = ["i3-wm", "i3status", "i3lock"]
 
 [[system_dependencies]]
 apt = ["x11-xserver-utils"]
