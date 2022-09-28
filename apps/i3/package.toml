@@ -3,6 +3,9 @@ name = "i3wm"
 [[dependencies]]
 name = "rofi"
 
+[[dependencies]]
+name = "pika-xinput"
+
 [[system_dependencies]]
 any = ["i3-wm", "i3status", "i3lock"]
 
