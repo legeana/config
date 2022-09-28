@@ -1,0 +1,3 @@
+[[system_dependencies]]
+apt = ["openssh-client"]
+pacman = ["openssh"]
