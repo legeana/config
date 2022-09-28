@@ -1,0 +1,4 @@
+name = "tmux"
+
+[[system_dependencies]]
+any = ["tmux"]
