@@ -1,0 +1,7 @@
+name = "vim"
+
+[[dependencies]]
+name = "nvim"
+
+[[system_dependencies]]
+any = ["vim"]
