@@ -4,6 +4,9 @@ name = "i3wm"
 name = "rofi"
 
 [[dependencies]]
+name = "pika-sensible-polkit-agent"
+
+[[dependencies]]
 name = "pika-xinput"
 
 [[system_dependencies]]
