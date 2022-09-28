@@ -1,5 +1,4 @@
 name = "fish"
 
 [[system_dependencies]]
-apt = ["fish", "moreutils"]
-pacman = ["fish", "moreutils"]
+any = ["fish", "moreutils"]
