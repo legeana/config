@@ -10,19 +10,3 @@ symlink sway-screenshot
 # chrome-launcher configuration
 prefix ~/.config/chrome-flags.d
 symlink chrome-ozone.conf
-
-install_system_package sway swaybg swaylock swayidle
-install_system_package grim slurp imagemagick
-
-install_apt_package xwayland
-install_pacman_package xorg-xwayland
-
-# pactl
-install_apt_package pulseaudio-utils
-install_pacman_package libpulse
-
-# Mako
-install_apt_package mako-notifier
-install_pacman_package mako
-
-# Depends on wofi

@@ -1,0 +1,24 @@
+name = "sway"
+
+[[dependencies]]
+name = "wofi"
+
+[[system_dependencies]]
+any = ["sway", "swaybg", "swaylock", "swayidle"]
+
+[[system_dependencies]]
+any = ["grim", "slurp", "imagemagick"]
+
+[[system_dependencies]]
+apt = ["xwayland"]
+pacman = ["xorg-xwayland"]
+
+[[system_dependencies]]
+# pactl
+apt = ["pulseaudio-utils"]
+pacman = ["libpulse"]
+
+[[system_dependencies]]
+# Mako
+apt = ["mako-notifier"]
+pacman = ["mako"]
