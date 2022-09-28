@@ -53,6 +53,11 @@ impl SystemDependencyVariant {
                 return Ok(Self::default());
             }
         }
+        if let Some(any) = &cfg.any {
+            // All available installers.
+            installers.push(Box::new(Apt::new(any.clone())));
+            installers.push(Box::new(Pacman::new(any.clone())));
+        }
         if let Some(apt) = &cfg.apt {
             installers.push(Box::new(Apt::new(apt.clone())));
         }

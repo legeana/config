@@ -37,6 +37,7 @@ pub struct SystemDependency {
     /// Conflicting tags.
     pub conflicts: Option<Vec<String>>,
     // Package managers.
+    pub any: Option<Vec<String>>,
     pub apt: Option<Vec<String>>,
     pub pacman: Option<Vec<String>>,
     /// Custom multi-line shell script.
@@ -110,6 +111,9 @@ mod tests {
             name = 'pkg2'
 
             [[system_dependencies]]
+            any = ['pkg1', 'pkg2']
+
+            [[system_dependencies]]
             apt = ['pkg1-part-deb', 'pkg2-part-deb']
 
             [[system_dependencies]]
@@ -135,6 +139,10 @@ mod tests {
         assert_eq!(
             pkg.system_dependencies,
             Some(vec![
+                SystemDependency {
+                    any: Some(vec!["pkg1".to_owned(), "pkg2".to_owned(),]),
+                    ..SystemDependency::default()
+                },
                 SystemDependency {
                     apt: Some(vec!["pkg1-part-deb".to_owned(), "pkg2-part-deb".to_owned(),]),
                     ..SystemDependency::default()
