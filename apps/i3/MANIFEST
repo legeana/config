@@ -3,3 +3,4 @@ symlink kde-i3.sh
 
 prefix ~/.config
 subdir i3
+symlink_tree lxqt

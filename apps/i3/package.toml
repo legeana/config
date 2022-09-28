@@ -6,3 +6,7 @@ any = ["i3-wm", "rofi", "i3status", "i3lock"]
 [[system_dependencies]]
 apt = ["x11-xserver-utils"]
 pacman = ["xorg-xsetroot"]
+
+[[system_dependencies]]
+# TODO: apt
+pacman = ["lxqt"]
