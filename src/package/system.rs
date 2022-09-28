@@ -79,10 +79,10 @@ impl SystemDependency {
                 return Ok(Self::default());
             }
         }
-        if let Some(apt) = cfg.apt.clone().or(cfg.any.clone()) {
+        if let Some(apt) = cfg.apt.clone().or_else(|| cfg.any.clone()) {
             installers.push(Box::new(Apt::new(apt)));
         }
-        if let Some(pacman) = cfg.pacman.clone().or(cfg.any.clone()) {
+        if let Some(pacman) = cfg.pacman.clone().or_else(|| cfg.any.clone()) {
             installers.push(Box::new(Pacman::new(pacman)));
         }
         if let Some(exec) = &cfg.exec {
