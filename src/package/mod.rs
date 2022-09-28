@@ -16,6 +16,7 @@ pub struct Package {
     #[allow(dead_code)]
     dependencies: Vec<String>,
     system_dependency: system::SystemDependencyGroup,
+    user_dependency: system::UserDependencyGroup,
 }
 
 fn name_from_path(path: &Path) -> Result<String> {
@@ -52,11 +53,17 @@ impl Package {
                 .context("failed to parse system_dependencies")?,
             None => system::SystemDependencyGroup::default(),
         };
+        let user_dependency = match pkgconfig.user_dependencies {
+            Some(deps) => system::UserDependencyGroup::new(&deps)
+                .context("failed to parse user_dependencies")?,
+            None => system::UserDependencyGroup::default(),
+        };
         Ok(Package {
             name: pkgconfig.name.unwrap_or(backup_name),
             configuration: contents::Configuration::new(root)?,
             dependencies,
             system_dependency,
+            user_dependency,
         })
     }
     fn new_no_pkg(root: PathBuf) -> Result<Self> {
@@ -65,6 +72,7 @@ impl Package {
             configuration: contents::Configuration::new(root)?,
             dependencies: Vec::new(),
             system_dependency: system::SystemDependencyGroup::default(),
+            user_dependency: system::UserDependencyGroup::default(),
         })
     }
     pub fn name(&self) -> &str {
@@ -80,6 +88,11 @@ impl Package {
         self.configuration.post_install()
     }
     pub fn system_install(&self) -> Result<()> {
-        self.system_dependency.install()
+        self.system_dependency
+            .install()
+            .context("failed to install system dependencies")?;
+        self.user_dependency
+            .install()
+            .context("failed to install user dependencies")
     }
 }
