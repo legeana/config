@@ -53,18 +53,13 @@ impl SystemDependencyVariant {
                 return Ok(Self::default());
             }
         }
-        if let Some(any) = &cfg.any {
-            // All available installers.
-            installers.push(Box::new(Apt::new(any.clone())));
-            installers.push(Box::new(Pacman::new(any.clone())));
-        }
-        if let Some(apt) = &cfg.apt {
-            installers.push(Box::new(Apt::new(apt.clone())));
+        if let Some(apt) = cfg.apt.clone().or(cfg.any.clone()) {
+            installers.push(Box::new(Apt::new(apt)));
         }
         // TODO brew
         // TODO npm
-        if let Some(pacman) = &cfg.pacman {
-            installers.push(Box::new(Pacman::new(pacman.clone())));
+        if let Some(pacman) = cfg.pacman.clone().or(cfg.any.clone()) {
+            installers.push(Box::new(Pacman::new(pacman)));
         }
         // TODO pip_user
         if let Some(exec) = &cfg.exec {
