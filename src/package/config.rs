@@ -26,6 +26,10 @@ pub struct Package {
 
 #[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
 pub struct Dependency {
+    /// Required tags.
+    pub requires: Option<Vec<String>>,
+    /// Conflicting tags.
+    pub conflicts: Option<Vec<String>>,
     pub names: Vec<String>,
 }
 

@@ -5,6 +5,7 @@ mod system;
 use std::path::{Path, PathBuf};
 
 use crate::registry::Registry;
+use crate::tag_util;
 
 use anyhow::{anyhow, Context, Result};
 
@@ -30,6 +31,16 @@ fn name_from_path(path: &Path) -> Result<String> {
 fn filter_dependencies(dependencies: &[config::Dependency]) -> Result<Vec<String>> {
     let mut deps: Vec<String> = Vec::new();
     for dep in dependencies.iter() {
+        if let Some(tags) = &dep.requires {
+            if !tag_util::has_all_tags(tags).context("failed has_all_tags")? {
+                continue;
+            }
+        }
+        if let Some(tags) = &dep.conflicts {
+            if tag_util::has_any_tags(tags).context("failed has_any_tags")? {
+                continue;
+            }
+        }
         deps.extend(dep.names.iter().cloned());
     }
     Ok(deps)
