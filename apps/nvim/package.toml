@@ -1,4 +1,2 @@
-name = "nvim"
-
 [[system_dependencies]]
 any = ["neovim"]
