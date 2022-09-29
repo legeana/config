@@ -15,3 +15,10 @@ any = ["i3-wm", "i3status", "i3lock"]
 [[system_dependencies]]
 apt = ["x11-xserver-utils"]
 pacman = ["xorg-xsetroot"]
+
+[[system_dependencies]]
+# TODO: apt
+pacman = [
+    "xfce4-clipman-plugin",
+    "xfce4-screenshooter",
+]

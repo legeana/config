@@ -1,0 +1,1 @@
+set $screenshooter xfce4-screenshooter --clipboard --region

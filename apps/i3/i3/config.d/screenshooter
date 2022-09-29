@@ -1,0 +1,1 @@
+bindsym $super+shift+s exec --no-startup-id $launch $screenshooter
