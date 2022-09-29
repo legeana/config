@@ -1,2 +1,5 @@
-prefix ~/.config
-subdir i3
+xdg_config_prefix i3
+symlink .header
+symlink_tree config-vars.d
+symlink_tree config.d
+cat_glob_into config .header config-vars.d/* config.d/*
