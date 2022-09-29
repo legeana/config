@@ -1,5 +1,5 @@
 [[dependencies]]
-name = "wofi"
+names = ["wofi"]
 
 [[system_dependencies]]
 any = ["sway", "swaybg", "swaylock", "swayidle"]

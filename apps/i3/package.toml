@@ -1,11 +1,11 @@
 [[dependencies]]
-name = "rofi"
+names = ["rofi"]
 
 [[dependencies]]
-name = "pika-sensible-polkit-agent"
-
-[[dependencies]]
-name = "pika-xinput"
+names = [
+    "pika-sensible-polkit-agent",
+    "pika-xinput",
+]
 
 [[system_dependencies]]
 any = ["i3-wm", "i3status", "i3lock"]

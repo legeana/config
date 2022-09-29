@@ -26,7 +26,7 @@ pub struct Package {
 
 #[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
 pub struct Dependency {
-    pub name: String,
+    pub names: Vec<String>,
 }
 
 /// SystemDependency doesn't consider missing package manager a failure.
@@ -105,10 +105,10 @@ mod tests {
             name = 'test'
 
             [[dependencies]]
-            name = 'pkg1'
+            names = ['pkg1', 'pkg2']
 
             [[dependencies]]
-            name = 'pkg2'
+            names = ['pkg3']
 
             [[system_dependencies]]
             any = ['pkg1', 'pkg2']
@@ -129,10 +129,10 @@ mod tests {
             pkg.dependencies,
             Some(vec![
                 Dependency {
-                    name: "pkg1".to_owned(),
+                    names: vec!["pkg1".to_owned(), "pkg2".to_owned()],
                 },
                 Dependency {
-                    name: "pkg2".to_owned(),
+                    names: vec!["pkg3".to_owned()],
                 }
             ])
         );

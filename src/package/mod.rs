@@ -27,6 +27,14 @@ fn name_from_path(path: &Path) -> Result<String> {
         .into())
 }
 
+fn filter_dependencies(dependencies: &[config::Dependency]) -> Result<Vec<String>> {
+    let mut deps: Vec<String> = Vec::new();
+    for dep in dependencies.iter() {
+        deps.extend(dep.names.iter().cloned());
+    }
+    Ok(deps)
+}
+
 impl Package {
     pub fn new(root: PathBuf) -> Result<Self> {
         let pkgconfig_result = config::load_package(&root);
@@ -42,12 +50,11 @@ impl Package {
     }
     fn new_with_pkg(root: PathBuf, pkgconfig: config::Package) -> Result<Self> {
         let backup_name = name_from_path(&root)?;
-        let dependencies: Vec<String> = pkgconfig
-            .dependencies
-            .unwrap_or_default()
-            .iter()
-            .map(|dep| dep.name.clone())
-            .collect();
+        let dependencies: Vec<String> = match pkgconfig.dependencies {
+            Some(deps) => filter_dependencies(&deps)
+                .with_context(|| format!("failed to get dependencies of {root:?}"))?,
+            None => Vec::new(),
+        };
         let system_dependency = match pkgconfig.system_dependencies {
             Some(deps) => system::SystemDependencyGroup::new(&deps)
                 .context("failed to parse system_dependencies")?,
