@@ -119,25 +119,30 @@ fn main() -> Result<()> {
     // Main code.
     let root = config_root()?;
     log::info!("Found user configuration: {root:?}");
-    let check_update = || -> Result<()> {
+    let check_update = || -> Result<bool> {
         let no_update = args.no_update || env::var(NO_UPDATE_ENV).is_ok();
         if !no_update {
             let need_restart = layout::update(&root)?;
             if need_restart {
                 // This process is considered replaced.
                 // Don't do anything here.
-                return reload();
+                reload()?;
+                return Ok(true);
             }
         }
-        Ok(())
+        Ok(false)
     };
     match args.command {
         Commands::Install {} => {
-            check_update()?;
+            if check_update()? {
+                return Ok(());
+            }
             install(&root).with_context(|| "failed to install")?;
         }
         Commands::SystemInstall {} => {
-            check_update()?;
+            if check_update()? {
+                return Ok(());
+            }
             system_install(&root).with_context(|| "failed to system_install")?;
         }
         Commands::Uninstall {} => {
