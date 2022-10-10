@@ -44,7 +44,10 @@ struct Cli {
 #[derive(Debug, Subcommand)]
 enum Commands {
     Install {},
-    SystemInstall {},
+    SystemInstall {
+        #[clap(long, default_value_t = true, action = clap::ArgAction::Set)]
+        strict: bool,
+    },
     Uninstall {},
     ManifestHelp {},
     Tags {},
@@ -100,10 +103,10 @@ fn install(root: &Path) -> Result<()> {
     Ok(())
 }
 
-fn system_install(root: &Path) -> Result<()> {
+fn system_install(root: &Path, strict: bool) -> Result<()> {
     let repos = layout::repositories(root)?;
     for repo in repos.iter() {
-        repo.system_install_all()
+        repo.system_install_all(strict)
             .with_context(|| format!("failed to system_install {}", repo.name()))?;
     }
     Ok(())
@@ -139,11 +142,11 @@ fn main() -> Result<()> {
             }
             install(&root).with_context(|| "failed to install")?;
         }
-        Commands::SystemInstall {} => {
+        Commands::SystemInstall { strict } => {
             if check_update()? {
                 return Ok(());
             }
-            system_install(&root).with_context(|| "failed to system_install")?;
+            system_install(&root, strict).with_context(|| "failed to system_install")?;
         }
         Commands::Uninstall {} => {
             uninstall(&root).with_context(|| "failed to uninstall")?;

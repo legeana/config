@@ -75,11 +75,21 @@ impl Repository {
         }
         Ok(())
     }
-    pub fn system_install_all(&self) -> Result<()> {
+    pub fn system_install_all(&self, strict: bool) -> Result<()> {
         for package in self.packages.iter() {
-            package
+            let result = package
                 .system_install()
-                .with_context(|| format!("failed to system install {}", package.name()))?;
+                .with_context(|| format!("failed to system install {}", package.name()));
+            match result {
+                Ok(_) => (),
+                Err(err) => {
+                    if strict {
+                        return Err(err);
+                    } else {
+                        log::error!("failed to install {}: {err}", package.name());
+                    }
+                }
+            };
         }
         Ok(())
     }
