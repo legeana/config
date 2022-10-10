@@ -146,7 +146,7 @@ impl Installer for Apt {
             return Ok(());
         }
         let cmdline = format!(
-            "sudo apt install -- {}",
+            "sudo apt install --yes -- {}",
             shlex::join(self.packages.iter().map(|s| s.as_ref()))
         );
         println!("$ {cmdline}");
@@ -154,6 +154,7 @@ impl Installer for Apt {
         let status = std::process::Command::new("sudo")
             .arg("apt")
             .arg("install")
+            .arg("--yes")
             .arg("--")
             .args(&self.packages)
             .status()
