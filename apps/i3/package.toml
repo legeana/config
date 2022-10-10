@@ -15,7 +15,10 @@ apt = ["x11-xserver-utils"]
 pacman = ["xorg-xsetroot"]
 
 [[system_dependencies]]
-# TODO: apt
+apt = [
+    "xfce4-clipman",
+    "xfce4-screenshooter",
+]
 pacman = [
     "xfce4-clipman-plugin",
     "xfce4-screenshooter",
