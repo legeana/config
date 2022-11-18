@@ -1,1 +1,2 @@
 bindsym $mod+Return exec $launch pika-sensible-terminal
+bindsym $mod+Ctrl+Return exec $launch pika-sensible-terminal -e env FORCE_BASH=1 bash
