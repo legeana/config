@@ -1,5 +1,8 @@
 WHICH_FISH="$(which fish)"
-if [[ "$-" =~ i && -x "${WHICH_FISH}" && "${SHELL}" != "${WHICH_FISH}" ]]; then
+if [[ "$-" =~ i &&
+      -x "${WHICH_FISH}" &&
+      "${SHELL}" != "${WHICH_FISH}" &&
+      -z "${FORCE_BASH}" ]]; then
   # Safeguard to only activate fish for interactive shells and only if fish
   # shell is present and executable. Verify that this is a new session by
   # checking if $SHELL is set to the path to fish. If it is not, we set
