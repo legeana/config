@@ -50,18 +50,8 @@ fn filter_dependencies(dependencies: &[config::Dependency]) -> Result<Vec<String
 
 impl Package {
     pub fn new(root: PathBuf) -> Result<Self> {
-        let pkgconfig_result = config::load_package(&root);
-        match pkgconfig_result {
-            Err(err) => match err {
-                config::Error::FileNotFound(_) => Self::new_no_pkg(root),
-                config::Error::Other(err) => {
-                    Err(err.context(format!("failed to load package config for {root:?}")))
-                }
-            },
-            Ok(pkgconfig) => Self::new_with_pkg(root, pkgconfig),
-        }
-    }
-    fn new_with_pkg(root: PathBuf, pkgconfig: config::Package) -> Result<Self> {
+        let pkgconfig = config::load_package(&root)
+            .with_context(|| format!("failed to load {root:?} package"))?;
         let backup_name = name_from_path(&root)?;
         let dependencies: Vec<String> = match pkgconfig.dependencies {
             Some(deps) => filter_dependencies(&deps)
@@ -86,17 +76,6 @@ impl Package {
             dependencies,
             system_dependency,
             user_dependency,
-        })
-    }
-    fn new_no_pkg(root: PathBuf) -> Result<Self> {
-        Ok(Package {
-            name: name_from_path(&root)?,
-            requires: Vec::new(),
-            conflicts: Vec::new(),
-            configuration: contents::Configuration::new(root)?,
-            dependencies: Vec::new(),
-            system_dependency: system::SystemDependencyGroup::default(),
-            user_dependency: system::UserDependencyGroup::default(),
         })
     }
     pub fn name(&self) -> &str {
