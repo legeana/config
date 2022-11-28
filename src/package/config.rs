@@ -134,9 +134,11 @@ mod tests {
             Some(vec![
                 Dependency {
                     names: vec!["pkg1".to_owned(), "pkg2".to_owned()],
+                    ..Dependency::default()
                 },
                 Dependency {
                     names: vec!["pkg3".to_owned()],
+                    ..Dependency::default()
                 }
             ])
         );
