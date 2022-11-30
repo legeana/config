@@ -13,6 +13,7 @@ pub use contents::help as manifest_help;
 
 pub struct Package {
     name: String,
+    raw_name: String,
     configuration: contents::Configuration,
     #[allow(dead_code)]
     dependencies: Vec<String>,
@@ -47,7 +48,7 @@ fn filter_dependencies(dependencies: &[config::Dependency]) -> Result<Vec<String
 }
 
 impl Package {
-    pub fn new(root: PathBuf) -> Result<Self> {
+    pub fn new(root: PathBuf, raw_name: String) -> Result<Self> {
         let pkgconfig = config::load_package(&root)
             .with_context(|| format!("failed to load {root:?} package"))?;
         let backup_name = name_from_path(&root)?;
@@ -68,11 +69,15 @@ impl Package {
         };
         Ok(Package {
             name: pkgconfig.name.unwrap_or(backup_name),
+            raw_name,
             configuration: contents::Configuration::new(root)?,
             dependencies,
             system_dependency,
             user_dependency,
         })
+    }
+    pub fn is_package(root: &Path) -> Result<bool> {
+        config::is_package(root)
     }
     pub fn name(&self) -> &str {
         &self.name

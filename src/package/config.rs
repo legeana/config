@@ -67,8 +67,12 @@ pub fn load_file(config_path: &Path) -> Result<Package> {
     Ok(pkg)
 }
 
-pub fn load_package(config_path: &Path) -> Result<Package> {
-    load_file(&config_path.join(PACKAGE_CONFIG_NAME))
+pub fn load_package(root: &Path) -> Result<Package> {
+    load_file(&root.join(PACKAGE_CONFIG_NAME))
+}
+
+pub fn is_package(root: &Path) -> Result<bool> {
+    Ok(root.join(PACKAGE_CONFIG_NAME).try_exists()?)
 }
 
 #[cfg(test)]
