@@ -1,3 +1,5 @@
+mod config;
+
 use std::ffi::OsStr;
 use std::path::PathBuf;
 
