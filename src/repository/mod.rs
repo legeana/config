@@ -3,10 +3,12 @@ mod config;
 use std::ffi::OsStr;
 use std::path::PathBuf;
 
-use crate::{package::Package, tag_util};
 use crate::registry::Registry;
+use crate::{package::Package, tag_util};
 
 use anyhow::{anyhow, Context, Result};
+
+pub use config::is_repository_dir;
 
 pub struct Repository {
     root: PathBuf,
@@ -60,14 +62,16 @@ impl Repository {
     pub fn enabled(&self) -> Result<bool> {
         if let Some(requires) = &self.config.requires {
             if !tag_util::has_all_tags(requires)
-                .with_context(|| format!("failed to check tags {requires:?}"))? {
-                    return Ok(false);
+                .with_context(|| format!("failed to check tags {requires:?}"))?
+            {
+                return Ok(false);
             }
         }
         if let Some(conflicts) = &self.config.conflicts {
             if tag_util::has_any_tags(conflicts)
-                .with_context(|| format!("failed to check tags {conflicts:?}"))? {
-                    return Ok(false);
+                .with_context(|| format!("failed to check tags {conflicts:?}"))?
+            {
+                return Ok(false);
             }
         }
         Ok(true)

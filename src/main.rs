@@ -163,7 +163,11 @@ fn main() -> Result<()> {
             let repos = layout::repositories(&root)
                 .with_context(|| format!("failed to get repositories from {root:?}"))?;
             for repo in repos.iter() {
-                let status = if repo.enabled()? { "[enabled]" } else { "[disabled]" };
+                let status = if repo.enabled()? {
+                    "[enabled]"
+                } else {
+                    "[disabled]"
+                };
                 println!("{} {status}: {}", repo.name(), repo.list().join(", "));
             }
         }
