@@ -1,7 +1,7 @@
 use crate::registry;
 
 use std::{
-    io::Write,
+    io::{ErrorKind, Write},
     path::{Path, PathBuf},
 };
 
@@ -51,7 +51,9 @@ impl registry::Registry for FileRegistry {
             .collect())
     }
     fn clear(&mut self) -> Result<()> {
-        std::fs::remove_file(&self.path)
-            .with_context(|| format!("failed to remove {:?}", self.path))
+        match std::fs::remove_file(&self.path) {
+            Err(err) if err.kind() == ErrorKind::NotFound => Ok(()),
+            r => r.with_context(|| format!("failed to remove {:?}", self.path)),
+        }
     }
 }
