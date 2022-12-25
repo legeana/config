@@ -50,22 +50,23 @@ fn walk_repositories<F>(root: &Path, mut visit: F) -> Result<()>
 where
     F: FnMut(walkdir::DirEntry) -> Result<()>,
 {
-    let mut it = walkdir::WalkDir::new(root)
-        .sort_by_file_name()
-        .into_iter();
+    let mut it = walkdir::WalkDir::new(root).sort_by_file_name().into_iter();
     while let Some(entry) = it.next() {
         let entry = entry.with_context(|| format!("failed to iterate over {root:?}"))?;
         match entry.metadata() {
             Err(err) => {
-                log::warn!("skipping unknown filesystem entry {:?}: {err}", entry.path());
+                log::warn!(
+                    "skipping unknown filesystem entry {:?}: {err}",
+                    entry.path()
+                );
                 continue;
-            },
+            }
             Ok(md) => {
                 if !md.is_dir() {
                     log::debug!("skipping non-directory filesystem entry {:?}", entry.path());
                     continue;
                 }
-            },
+            }
         }
         if entry.path().file_name() == Some(OsStr::new(".git")) {
             it.skip_current_dir();
