@@ -74,28 +74,18 @@ impl SystemInfo {
     fn match_os(&self, want_os: &str) -> bool {
         want_os == self.os()
     }
-    fn distro(&self) -> Option<String> {
-        // TODO: use distribution_id() once available.
-        match self.system.name() {
-            Some(name) => name
-                .split_whitespace()
-                .next()
-                .map(|word| word.to_lowercase()),
-            None => None,
-        }
+    fn distro(&self) -> String {
+        self.system.distribution_id()
     }
     fn match_distro(&self, want_distro: &str) -> bool {
-        Some(want_distro.into()) == self.distro()
+        want_distro == self.distro()
     }
 }
 
 /// Returns system tags.
 pub fn tags() -> Result<Vec<String>> {
     Ok(vec![
-        format!(
-            "distro={}",
-            SYSINFO.distro().unwrap_or_else(|| "N/A".into())
-        ),
+        format!("distro={}", SYSINFO.distro()),
         format!(
             "hostname={}",
             SYSINFO.hostname().unwrap_or_else(|| "N/A".into())
