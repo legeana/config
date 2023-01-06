@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use anyhow::{anyhow, Context, Result};
 use once_cell::sync::Lazy;
 use sysinfo::{System, SystemExt};
@@ -74,7 +76,21 @@ impl SystemInfo {
     fn match_os(&self, want_os: &str) -> bool {
         want_os == self.os()
     }
+    fn is_unraid(&self) -> bool {
+        if self.os() != "linux" {
+            // Unraid is linux.
+            return false;
+        }
+        // Unraid's /etc/os-release#ID is "slackware".
+        // It's not particularly useful because Unraid is not a general-purpose
+        // distro. Instead we check if /etc/unraid-version exists.
+        let unraid_version = Path::new("/etc/unraid-version");
+        unraid_version.exists()
+    }
     fn distro(&self) -> String {
+        if self.is_unraid() {
+            return "unraid".to_owned();
+        }
         self.system.distribution_id()
     }
     fn match_distro(&self, want_distro: &str) -> bool {
