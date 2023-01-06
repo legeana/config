@@ -13,6 +13,8 @@ pub use contents::help as manifest_help;
 
 pub struct Package {
     name: String,
+    requires: Vec<String>,
+    conflicts: Vec<String>,
     configuration: contents::Configuration,
     #[allow(dead_code)]
     dependencies: Vec<String>,
@@ -78,6 +80,8 @@ impl Package {
         };
         Ok(Package {
             name: pkgconfig.name.unwrap_or(backup_name),
+            requires: pkgconfig.requires.unwrap_or_default(),
+            conflicts: pkgconfig.conflicts.unwrap_or_default(),
             configuration: contents::Configuration::new(root)?,
             dependencies,
             system_dependency,
@@ -87,6 +91,8 @@ impl Package {
     fn new_no_pkg(root: PathBuf) -> Result<Self> {
         Ok(Package {
             name: name_from_path(&root)?,
+            requires: Vec::new(),
+            conflicts: Vec::new(),
             configuration: contents::Configuration::new(root)?,
             dependencies: Vec::new(),
             system_dependency: system::SystemDependencyGroup::default(),
@@ -96,16 +102,41 @@ impl Package {
     pub fn name(&self) -> &str {
         &self.name
     }
+    fn enabled(&self) -> Result<bool> {
+        if !tag_util::has_all_tags(&self.requires).context("failed has_all_tags")? {
+            return Ok(false);
+        }
+        if tag_util::has_any_tags(&self.conflicts).context("failed has_any_tags")? {
+            return Ok(false);
+        }
+        Ok(true)
+    }
     pub fn pre_install(&self) -> Result<()> {
+        if !self.enabled().with_context(|| format!("failed to check if {} is enabled", self.name()))? {
+            log::info!("Skipping disabled {}", self.name());
+            return Ok(());
+        }
         self.configuration.pre_install()
     }
     pub fn install(&self, registry: &mut dyn Registry) -> Result<()> {
+        if !self.enabled().with_context(|| format!("failed to check if {} is enabled", self.name()))? {
+            log::info!("Skipping disabled {}", self.name());
+            return Ok(());
+        }
         self.configuration.install(registry)
     }
     pub fn post_install(&self) -> Result<()> {
+        if !self.enabled().with_context(|| format!("failed to check if {} is enabled", self.name()))? {
+            log::info!("Skipping disabled {}", self.name());
+            return Ok(());
+        }
         self.configuration.post_install()
     }
     pub fn system_install(&self) -> Result<()> {
+        if !self.enabled().with_context(|| format!("failed to check if {} is enabled", self.name()))? {
+            log::info!("Skipping disabled {}", self.name());
+            return Ok(());
+        }
         self.system_dependency
             .install()
             .context("failed to install system dependencies")?;

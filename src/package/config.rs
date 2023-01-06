@@ -19,6 +19,8 @@ type Result<T> = std::result::Result<T, Error>;
 #[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
 pub struct Package {
     pub name: Option<String>,
+    pub requires: Option<Vec<String>>,
+    pub conflicts: Option<Vec<String>>,
     pub dependencies: Option<Vec<Dependency>>,
     pub system_dependencies: Option<Vec<SystemDependency>>,
     pub user_dependencies: Option<Vec<UserDependency>>,
@@ -98,6 +100,8 @@ mod tests {
     fn test_load_empty_string() {
         let pkg = load_string("").expect("load_string");
         assert_eq!(pkg.name, None);
+        assert_eq!(pkg.requires, None);
+        assert_eq!(pkg.conflicts, None);
         assert_eq!(pkg.dependencies, None);
         assert_eq!(pkg.system_dependencies, None);
     }
@@ -107,6 +111,8 @@ mod tests {
         let pkg = load_string(
             "
             name = 'test'
+            requires = ['r1', 'r2']
+            conflicts = ['c1', 'c2']
 
             [[dependencies]]
             names = ['pkg1', 'pkg2']
@@ -129,6 +135,8 @@ mod tests {
         )
         .expect("load_string");
         assert_eq!(pkg.name, Some("test".to_owned()));
+        assert_eq!(pkg.requires, Some(vec!["r1".to_owned(), "r2".to_owned()]));
+        assert_eq!(pkg.conflicts, Some(vec!["c1".to_owned(), "c2".to_owned()]));
         assert_eq!(
             pkg.dependencies,
             Some(vec![
