@@ -1,7 +1,28 @@
 #!/bin/sh -e
 
+# Supports methods such as native or docker.
+# See <setup>_setup helpers.
+USE_SETUP="${PIKACONFIG_SETUP:-native}"
+
+dispatch_setup_helper() {
+    log Using "${USE_SETUP?}" setup
+    "${USE_SETUP?}_setup" "$@"
+}
+
+src_root() {
+    cd "$(dirname "$0")"
+    pwd
+}
+
+SRC="$(src_root)"
+
 log() {
     echo "$@" >&2
+}
+
+log_eval() {
+    log '$' "$@"
+    "$@"
 }
 
 fatal() {
@@ -19,5 +40,28 @@ get_rust() {
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 }
 
-get_rust
-cargo run --manifest-path="$(dirname "$0")/Cargo.toml" --release -- "$@"
+native_setup() {
+    get_rust
+    cargo run --manifest-path="${SRC?}/Cargo.toml" --release -- "$@"
+}
+
+base_docker_setup() {
+    mkdir -p "${SRC?}/target/release"
+    log_eval $OPTIONAL_SUDO docker run \
+        --volume="${SRC?}/cargo-registry:/usr/local/cargo/registry" \
+        --volume="${SRC?}:/app" \
+        --rm --workdir=/app -it rust:latest \
+        cargo build --release
+    "${SRC?}/target/release/pikaconfig" "$@"
+}
+
+docker_setup() {
+    base_docker_setup "$@"
+}
+
+sudo_docker_setup() {
+    OPTIONAL_SUDO=sudo
+    base_docker_setup "$@"
+}
+
+dispatch_setup_helper "$@"
