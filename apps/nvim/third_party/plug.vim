@@ -6,7 +6,11 @@ Plug 'kamykn/spelunker.vim'
 Plug 'dag/vim-fish'
 Plug 'itchyny/lightline.vim'
 Plug 'dracula/vim', { 'as': 'dracula' }
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
+if executable("node")
+    Plug 'neoclide/coc.nvim', {'branch': 'release'}
+endif
+
 call autoplug#end()
 
 " Force tpope/vim-sensible to load now.
