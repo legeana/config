@@ -50,7 +50,9 @@ base_docker_setup() {
     log_eval $OPTIONAL_SUDO docker run \
         --volume="${SRC?}/cargo-registry:/usr/local/cargo/registry" \
         --volume="${SRC?}:/app" \
-        --rm --workdir=/app -it rust:latest \
+        --rm \
+        --workdir=/app \
+        rust:latest \
         cargo build --release
     "${SRC?}/target/release/pikaconfig" "$@"
 }
