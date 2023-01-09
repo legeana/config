@@ -3,6 +3,7 @@ symlink autoload
 symlink ftdetect
 symlink ftplugin
 symlink init.vim
+symlink opt_plugin
 symlink plugin
 symlink spell
 symlink third_party

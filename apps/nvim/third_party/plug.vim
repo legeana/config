@@ -9,6 +9,7 @@ Plug 'dracula/vim', { 'as': 'dracula' }
 
 if executable("node")
     Plug 'neoclide/coc.nvim', {'branch': 'release'}
+    runtime! opt_plugin/coc.vim
 endif
 
 call autoplug#end()
