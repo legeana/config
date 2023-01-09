@@ -48,7 +48,10 @@ pub struct SystemDependency {
     pub pacman: Option<Vec<String>>,
     /// Custom multi-line shell script.
     /// Use requires/conflicts for platform selection.
-    pub exec: Option<String>,
+    /// This is intentionally non-portable because arbitrary shell commands
+    /// are never portable. It gives a lot of flexibility to write custom
+    /// installers.
+    pub bash: Option<String>,
 }
 
 #[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]

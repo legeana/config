@@ -85,10 +85,8 @@ impl SystemDependency {
         if let Some(pacman) = cfg.pacman.clone().or_else(|| cfg.any.clone()) {
             installers.push(Box::new(Pacman::new(pacman)));
         }
-        if let Some(exec) = &cfg.exec {
-            installers.push(Box::new(Exec::new(exec).with_context(|| {
-                format!("failed to parse system_dependencies.exec {exec:?}")
-            })?));
+        if let Some(bash) = &cfg.bash {
+            installers.push(Box::new(Bash::new(bash.clone())));
         }
         Ok(Self { installers })
     }
@@ -202,20 +200,35 @@ impl Installer for Pacman {
     }
 }
 
-struct Exec {
-    #[allow(dead_code)]
-    commands: Vec<Vec<String>>,
+struct Bash {
+    script: String,
 }
 
-impl Exec {
-    fn new(_cmd: &str) -> Result<Self> {
-        unimplemented!()
+impl Bash {
+    fn new(script: String) -> Self {
+        Self {
+            script,
+        }
     }
 }
 
-impl Installer for Exec {
+impl Installer for Bash {
     fn install(&self) -> Result<()> {
-        unimplemented!()
+        let cmdline = format!(
+            "bash -c {}",
+            shlex::quote(&self.script)
+        );
+        println!("$ {cmdline}");
+        log::info!("Running $ {cmdline}");
+        let status = std::process::Command::new("bash")
+            .arg("-c")
+            .arg(&self.script)
+            .status()
+            .context("failed to execute bash")?;
+        if !status.success() {
+            return Err(anyhow!("failed to execute {cmdline:?}"));
+        }
+        Ok(())
     }
 }
 
