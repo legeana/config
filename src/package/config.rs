@@ -11,6 +11,7 @@ fn default_has_contents() -> bool {
 
 /// package.toml file definition
 #[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct Package {
     pub name: Option<String>,
     pub requires: Option<Vec<String>>,
@@ -23,6 +24,7 @@ pub struct Package {
 }
 
 #[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct Dependency {
     /// Required tags.
     pub requires: Option<Vec<String>>,
@@ -33,6 +35,7 @@ pub struct Dependency {
 
 /// SystemDependency doesn't consider missing package manager a failure.
 #[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct SystemDependency {
     /// Required tags.
     pub requires: Option<Vec<String>>,
@@ -51,6 +54,7 @@ pub struct SystemDependency {
 }
 
 #[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct UserDependency {
     /// Required tags.
     pub requires: Option<Vec<String>>,

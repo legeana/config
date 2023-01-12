@@ -7,6 +7,7 @@ const REPOSITORY_CONFIG_NAME: &str = "repository.toml";
 
 /// repository.toml file definition
 #[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct Repository {
     /// Required tags.
     pub requires: Option<Vec<String>>,
