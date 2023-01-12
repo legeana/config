@@ -64,8 +64,8 @@ pub fn load_string(data: &str) -> Result<Package> {
 }
 
 pub fn load_file(config_path: &Path) -> Result<Package> {
-    let raw_input = std::fs::read(config_path)
-        .with_context(|| format!("failed to read {config_path:?}"))?;
+    let raw_input =
+        std::fs::read(config_path).with_context(|| format!("failed to read {config_path:?}"))?;
     let input = String::from_utf8(raw_input)
         .with_context(|| format!("failed to convert {config_path:?} to utf8"))?;
     let pkg = load_string(&input).with_context(|| format!("failed to load {config_path:?}"))?;

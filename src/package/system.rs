@@ -206,18 +206,13 @@ struct Bash {
 
 impl Bash {
     fn new(script: String) -> Self {
-        Self {
-            script,
-        }
+        Self { script }
     }
 }
 
 impl Installer for Bash {
     fn install(&self) -> Result<()> {
-        let cmdline = format!(
-            "bash -c {}",
-            shlex::quote(&self.script)
-        );
+        let cmdline = format!("bash -c {}", shlex::quote(&self.script));
         println!("$ {cmdline}");
         log::info!("Running $ {cmdline}");
         let status = std::process::Command::new("bash")

@@ -91,28 +91,40 @@ impl Package {
         Ok(true)
     }
     pub fn pre_install(&self) -> Result<()> {
-        if !self.enabled().with_context(|| format!("failed to check if {} is enabled", self.name()))? {
+        if !self
+            .enabled()
+            .with_context(|| format!("failed to check if {} is enabled", self.name()))?
+        {
             log::info!("Skipping disabled {}", self.name());
             return Ok(());
         }
         self.configuration.pre_install()
     }
     pub fn install(&self, registry: &mut dyn Registry) -> Result<()> {
-        if !self.enabled().with_context(|| format!("failed to check if {} is enabled", self.name()))? {
+        if !self
+            .enabled()
+            .with_context(|| format!("failed to check if {} is enabled", self.name()))?
+        {
             log::info!("Skipping disabled {}", self.name());
             return Ok(());
         }
         self.configuration.install(registry)
     }
     pub fn post_install(&self) -> Result<()> {
-        if !self.enabled().with_context(|| format!("failed to check if {} is enabled", self.name()))? {
+        if !self
+            .enabled()
+            .with_context(|| format!("failed to check if {} is enabled", self.name()))?
+        {
             log::info!("Skipping disabled {}", self.name());
             return Ok(());
         }
         self.configuration.post_install()
     }
     pub fn system_install(&self) -> Result<()> {
-        if !self.enabled().with_context(|| format!("failed to check if {} is enabled", self.name()))? {
+        if !self
+            .enabled()
+            .with_context(|| format!("failed to check if {} is enabled", self.name()))?
+        {
             log::info!("Skipping disabled {}", self.name());
             return Ok(());
         }
