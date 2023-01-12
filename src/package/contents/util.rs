@@ -1,11 +1,11 @@
 use super::parser;
 
-use anyhow::anyhow;
+use anyhow::{anyhow, Result};
 
 /// Checks that the first argument is command and returns a slice of command arguments.
-pub fn check_command<'a, 'b>(command: &str, args: &'a [&'b str]) -> parser::Result<&'a [&'b str]> {
+pub fn check_command<'a, 'b>(command: &str, args: &'a [&'b str]) -> Result<&'a [&'b str]> {
     if args.is_empty() {
-        return Err(anyhow!("{} parser: got empty list", command).into());
+        return Err(anyhow!("{} parser: got empty list", command));
     }
     let cmd = args[0];
     let cmd_args = &args[1..];
@@ -13,12 +13,13 @@ pub fn check_command<'a, 'b>(command: &str, args: &'a [&'b str]) -> parser::Resu
         return Err(parser::Error::UnsupportedCommand {
             parser: command.to_owned(),
             command: cmd.to_owned(),
-        });
+        }
+        .into());
     }
     Ok(cmd_args)
 }
 
-pub fn no_args(command: &str, args: &[&str]) -> parser::Result<()> {
+pub fn no_args(command: &str, args: &[&str]) -> Result<()> {
     let cmd_args = check_command(command, args)?;
     if !cmd_args.is_empty() {
         return Err(anyhow!(
@@ -26,13 +27,12 @@ pub fn no_args(command: &str, args: &[&str]) -> parser::Result<()> {
             command,
             cmd_args.len(),
             cmd_args,
-        )
-        .into());
+        ));
     }
     Ok(())
 }
 
-pub fn single_arg<'a>(command: &str, args: &[&'a str]) -> parser::Result<&'a str> {
+pub fn single_arg<'a>(command: &str, args: &[&'a str]) -> Result<&'a str> {
     let cmd_args = check_command(command, args)?;
     if cmd_args.len() != 1 {
         return Err(anyhow!(
@@ -40,8 +40,7 @@ pub fn single_arg<'a>(command: &str, args: &[&'a str]) -> parser::Result<&'a str
             command,
             cmd_args.len(),
             cmd_args,
-        )
-        .into());
+        ));
     }
     Ok(args[1])
 }
@@ -51,7 +50,7 @@ pub fn multiple_args<'a, 'b>(
     command: &str,
     args: &'a [&'b str],
     required: usize,
-) -> parser::Result<(&'a [&'b str], &'a [&'b str])> {
+) -> Result<(&'a [&'b str], &'a [&'b str])> {
     let cmd_args = check_command(command, args)?;
     if cmd_args.len() < required {
         return Err(anyhow!(
@@ -60,8 +59,7 @@ pub fn multiple_args<'a, 'b>(
             required,
             cmd_args.len(),
             cmd_args,
-        )
-        .into());
+        ));
     }
     let required_args = &cmd_args[0..required];
     let remainder_args = &cmd_args[required..];

@@ -1,17 +1,13 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::anyhow;
+use anyhow::{anyhow, Result};
 use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum Error {
     #[error("parser {parser}: unsupported command {command}")]
     UnsupportedCommand { parser: String, command: String },
-    #[error(transparent)]
-    Other(#[from] anyhow::Error),
 }
-
-pub type Result<T> = std::result::Result<T, Error>;
 
 pub struct Prefix {
     pub base: PathBuf,
@@ -88,26 +84,24 @@ pub fn parse(
     state: &mut State,
     configuration: &mut super::Configuration,
     args: &[&str],
-) -> anyhow::Result<()> {
+) -> Result<()> {
     let mut matched = Vec::<String>::new();
     for parser in parsers() {
-        match parser.parse(state, configuration, args) {
-            Ok(()) => {
-                // Success.
-                matched.push(parser.name().to_string());
-                continue;
-            }
-            Err(Error::UnsupportedCommand {
-                parser: _,
-                command: _,
-            }) => {
-                // Try another parser.
-                continue;
-            }
-            Err(Error::Other(error)) => {
-                return Err(error);
+        if let Err(err) = parser.parse(state, configuration, args) {
+            match err.downcast_ref::<Error>() {
+                Some(Error::UnsupportedCommand {
+                    parser: _,
+                    command: _,
+                }) => {
+                    // Try another parser.
+                    continue;
+                }
+                _ => {
+                    return Err(err);
+                }
             }
         }
+        matched.push(parser.name().to_string());
     }
     match matched.len() {
         0 => Err(anyhow!("unsupported command {:?}", args)),

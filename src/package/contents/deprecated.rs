@@ -1,3 +1,5 @@
+use anyhow::Result;
+
 use super::parser;
 use super::util::check_command;
 
@@ -23,7 +25,7 @@ impl parser::Parser for DeprecatedParser {
         _state: &mut parser::State,
         configuration: &mut super::Configuration,
         args: &[&str],
-    ) -> parser::Result<()> {
+    ) -> Result<()> {
         if check_command("install_system_package", args).is_ok() {
             log::warn!(
                 "{:?}: install_system_package is unsupported",

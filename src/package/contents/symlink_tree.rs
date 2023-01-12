@@ -5,7 +5,7 @@ use super::parser;
 use super::util;
 use crate::registry::Registry;
 
-use anyhow::{self, Context};
+use anyhow::{self, Context, Result};
 use walkdir::WalkDir;
 
 pub struct SymlinkTreeParser {}
@@ -18,7 +18,7 @@ struct SymlinkTreeInstaller {
 }
 
 impl super::FileInstaller for SymlinkTreeInstaller {
-    fn install(&self, registry: &mut dyn Registry) -> anyhow::Result<()> {
+    fn install(&self, registry: &mut dyn Registry) -> Result<()> {
         for e in WalkDir::new(&self.src).sort_by_file_name() {
             let entry = e.with_context(|| format!("failed to read {:?}", self.src))?;
             if entry.file_type().is_dir() {
@@ -49,7 +49,7 @@ impl parser::Parser for SymlinkTreeParser {
         state: &mut parser::State,
         configuration: &mut super::Configuration,
         args: &[&str],
-    ) -> parser::Result<()> {
+    ) -> Result<()> {
         let filename = util::single_arg(COMMAND, args)?;
         configuration.files.push(Box::new(SymlinkTreeInstaller {
             src: configuration.root.join(filename),

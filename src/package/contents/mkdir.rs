@@ -4,7 +4,7 @@ use super::parser;
 use super::util;
 use crate::registry::Registry;
 
-use anyhow::{self, Context};
+use anyhow::{self, Context, Result};
 
 pub struct MkDirParser {}
 
@@ -15,7 +15,7 @@ struct MkDirInstaller {
 }
 
 impl super::FileInstaller for MkDirInstaller {
-    fn install(&self, registry: &mut dyn Registry) -> anyhow::Result<()> {
+    fn install(&self, registry: &mut dyn Registry) -> Result<()> {
         std::fs::create_dir_all(&self.dst)
             .with_context(|| format!("unable to create {:?}", self.dst))?;
         registry
@@ -38,7 +38,7 @@ impl parser::Parser for MkDirParser {
         state: &mut parser::State,
         configuration: &mut super::Configuration,
         args: &[&str],
-    ) -> parser::Result<()> {
+    ) -> Result<()> {
         let filename = util::single_arg(COMMAND, args)?;
         configuration.files.push(Box::new(MkDirInstaller {
             dst: state.prefix.current.join(filename),

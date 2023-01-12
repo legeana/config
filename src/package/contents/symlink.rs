@@ -1,5 +1,7 @@
 use std::path::PathBuf;
 
+use anyhow::Result;
+
 use super::file_util;
 use super::parser;
 use super::util;
@@ -15,7 +17,7 @@ struct SymlinkInstaller {
 }
 
 impl super::FileInstaller for SymlinkInstaller {
-    fn install(&self, registry: &mut dyn Registry) -> anyhow::Result<()> {
+    fn install(&self, registry: &mut dyn Registry) -> Result<()> {
         file_util::make_symlink(registry, &self.src, &self.dst)
     }
 }
@@ -33,7 +35,7 @@ impl parser::Parser for SymlinkParser {
         state: &mut parser::State,
         configuration: &mut super::Configuration,
         args: &[&str],
-    ) -> parser::Result<()> {
+    ) -> Result<()> {
         let filename = util::single_arg(COMMAND, args)?;
         configuration.files.push(Box::new(SymlinkInstaller {
             src: configuration.root.join(filename),

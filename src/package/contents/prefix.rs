@@ -1,3 +1,5 @@
+use anyhow::Result;
+
 use super::parser;
 use super::util;
 
@@ -18,7 +20,7 @@ impl parser::Parser for PrefixParser {
         state: &mut parser::State,
         _configuration: &mut super::Configuration,
         args: &[&str],
-    ) -> parser::Result<()> {
+    ) -> Result<()> {
         let prefix = util::single_arg(COMMAND, args)?;
         state.prefix.set(shellexpand::tilde(prefix).as_ref().into());
         Ok(())

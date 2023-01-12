@@ -123,7 +123,7 @@ impl parser::Parser for ImporterParser {
         state: &mut parser::State,
         configuration: &mut super::Configuration,
         args: &[&str],
-    ) -> parser::Result<()> {
+    ) -> Result<()> {
         let filename = util::single_arg(COMMAND, args)?;
         let src = configuration.root.join(filename);
         let dst = state.prefix.current.join(filename);

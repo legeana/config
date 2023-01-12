@@ -87,7 +87,7 @@ where
         state: &mut parser::State,
         _configuration: &mut super::Configuration,
         args: &[&str],
-    ) -> parser::Result<()> {
+    ) -> Result<()> {
         let path = util::single_arg(self.name(), args)?;
         state.prefix.set(self.xdg_prefix(path)?);
         Ok(())

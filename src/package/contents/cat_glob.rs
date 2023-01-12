@@ -6,7 +6,7 @@ use super::parser;
 use super::util;
 use crate::registry::Registry;
 
-use anyhow::{anyhow, Context};
+use anyhow::{anyhow, Context, Result};
 use glob::glob as glob_iter;
 
 pub struct CatGlobIntoParser;
@@ -27,14 +27,14 @@ struct CatGlobIntoHook {
 }
 
 impl super::FileInstaller for CatGlobIntoInstaller {
-    fn install(&self, registry: &mut dyn Registry) -> anyhow::Result<()> {
+    fn install(&self, registry: &mut dyn Registry) -> Result<()> {
         file_util::make_local_state(registry, &self.dst)?;
         Ok(())
     }
 }
 
 impl super::Hook for CatGlobIntoHook {
-    fn execute(&self) -> anyhow::Result<()> {
+    fn execute(&self) -> Result<()> {
         let out_file = std::fs::File::create(&self.output)
             .with_context(|| format!("unable to create {:?}", self.output))?;
         let mut out = std::io::BufWriter::new(out_file);
@@ -69,7 +69,7 @@ impl parser::Parser for CatGlobIntoParser {
         state: &mut parser::State,
         configuration: &mut super::Configuration,
         args: &[&str],
-    ) -> parser::Result<()> {
+    ) -> Result<()> {
         let (fname, globs) = util::multiple_args(COMMAND, args, 1)?;
         assert!(fname.len() == 1);
         let filename = fname[0];

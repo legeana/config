@@ -51,7 +51,7 @@ impl parser::Parser for PostInstallExecParser {
         state: &mut parser::State,
         configuration: &mut super::Configuration,
         args: &[&str],
-    ) -> parser::Result<()> {
+    ) -> Result<()> {
         let (command, args) = util::multiple_args(COMMAND, args, 1)?;
         assert!(command.len() == 1);
         let args: Vec<String> = args

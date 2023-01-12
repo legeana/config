@@ -1,4 +1,4 @@
-use anyhow::Context;
+use anyhow::{Context, Result};
 
 use super::parser;
 use super::util;
@@ -23,7 +23,7 @@ impl parser::Parser for RequiresParser {
         _state: &mut parser::State,
         configuration: &mut super::Configuration,
         args: &[&str],
-    ) -> parser::Result<()> {
+    ) -> Result<()> {
         let (_, tags) = util::multiple_args(REQUIRES_COMMAND, args, 0)?;
         for tag in tags.iter() {
             let has_tag =
@@ -49,7 +49,7 @@ impl parser::Parser for ConflictsParser {
         _state: &mut parser::State,
         configuration: &mut super::Configuration,
         args: &[&str],
-    ) -> parser::Result<()> {
+    ) -> Result<()> {
         let (_, tags) = util::multiple_args(CONFLICTS_COMMAND, args, 0)?;
         for tag in tags.iter() {
             let has_tag =
