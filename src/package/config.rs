@@ -5,13 +5,18 @@ use serde::Deserialize;
 
 const PACKAGE_CONFIG_NAME: &str = "package.toml";
 
+fn default_has_contents() -> bool {
+    true
+}
+
 /// package.toml file definition
 #[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
 pub struct Package {
     pub name: Option<String>,
     pub requires: Option<Vec<String>>,
     pub conflicts: Option<Vec<String>>,
-    pub has_contents: Option<bool>,  // Has MANIFEST. True by default.
+    #[serde(default = "default_has_contents")]
+    pub has_contents: bool,
     pub dependencies: Option<Vec<Dependency>>,
     pub system_dependencies: Option<Vec<SystemDependency>>,
     pub user_dependencies: Option<Vec<UserDependency>>,
@@ -87,6 +92,7 @@ mod tests {
         assert_eq!(pkg.name, None);
         assert_eq!(pkg.requires, None);
         assert_eq!(pkg.conflicts, None);
+        assert_eq!(pkg.has_contents, true);
         assert_eq!(pkg.dependencies, None);
         assert_eq!(pkg.system_dependencies, None);
     }
@@ -123,7 +129,7 @@ mod tests {
         assert_eq!(pkg.name, Some("test".to_owned()));
         assert_eq!(pkg.requires, Some(vec!["r1".to_owned(), "r2".to_owned()]));
         assert_eq!(pkg.conflicts, Some(vec!["c1".to_owned(), "c2".to_owned()]));
-        assert_eq!(pkg.has_contents, Some(false));
+        assert_eq!(pkg.has_contents, false);
         assert_eq!(
             pkg.dependencies,
             Some(vec![

@@ -68,7 +68,7 @@ impl Package {
                 .context("failed to parse user_dependencies")?,
             None => system::UserDependencyGroup::default(),
         };
-        let configuration = if pkgconfig.has_contents.unwrap_or(true) {
+        let configuration = if pkgconfig.has_contents {
             contents::Configuration::new(root)?
         } else {
             contents::Configuration::new_empty(root)
