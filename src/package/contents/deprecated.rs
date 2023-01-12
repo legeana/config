@@ -12,59 +12,21 @@ impl parser::Parser for DeprecatedParser {
         COMMAND
     }
     fn help(&self) -> &'static str {
-        "DEPRECATED:
-           - install_system_package
-           - install_pacman_package
-           - install_apt_package
-           - install_brew_package
-           - install_pip_user_package
-           - sudo"
+        "DEPRECATED: N/A"
     }
     fn parse(
         &self,
         _state: &mut parser::State,
-        configuration: &mut super::Configuration,
+        _configuration: &mut super::Configuration,
         args: &[&str],
     ) -> Result<()> {
-        if check_command("install_system_package", args).is_ok() {
+        /*if check_command("<deprecated>", args).is_ok() {
             log::warn!(
-                "{:?}: install_system_package is unsupported",
+                "{:?}: <deprecated> is unsupported",
                 configuration.root
             );
             return Ok(());
-        }
-        if check_command("install_pacman_package", args).is_ok() {
-            log::warn!(
-                "{:?}: install_pacman_package is unsupported",
-                configuration.root
-            );
-            return Ok(());
-        }
-        if check_command("install_apt_package", args).is_ok() {
-            log::warn!(
-                "{:?}: install_apt_package is unsupported",
-                configuration.root
-            );
-            return Ok(());
-        }
-        if check_command("install_brew_package", args).is_ok() {
-            log::warn!(
-                "{:?}: install_brew_package is unsupported",
-                configuration.root
-            );
-            return Ok(());
-        }
-        if check_command("install_pip_user_package", args).is_ok() {
-            log::warn!(
-                "{:?}: install_pip_user_package is unsupported",
-                configuration.root
-            );
-            return Ok(());
-        }
-        if check_command("sudo", args).is_ok() {
-            log::warn!("{:?}: sudo is unsupported", configuration.root);
-            return Ok(());
-        }
+        }*/
         return check_command(COMMAND, args).map(|_| ());
     }
 }
