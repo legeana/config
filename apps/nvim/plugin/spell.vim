@@ -21,3 +21,6 @@ function! s:regen()
 endfunction
 
 command! RegenSpellFiles call s:regen()
+
+" https://github.com/kamykn/spelunker.vim/issues/71#issuecomment-1023835797
+autocmd BufRead * if getfsize(@%) > 100000 | let g:spelunker_check_type = 2 | endif

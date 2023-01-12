@@ -1,3 +1,2 @@
 prefix ~/.config/fish/plugins/huge-vim/functions
 symlink bare-vim.fish
-symlink huge-vim.fish
