@@ -11,6 +11,7 @@ pub struct Package {
     pub name: Option<String>,
     pub requires: Option<Vec<String>>,
     pub conflicts: Option<Vec<String>>,
+    pub has_contents: Option<bool>,  // Has MANIFEST. True by default.
     pub dependencies: Option<Vec<Dependency>>,
     pub system_dependencies: Option<Vec<SystemDependency>>,
     pub user_dependencies: Option<Vec<UserDependency>>,
@@ -97,6 +98,7 @@ mod tests {
             name = 'test'
             requires = ['r1', 'r2']
             conflicts = ['c1', 'c2']
+            has_contents = false
 
             [[dependencies]]
             names = ['pkg1', 'pkg2']
@@ -121,6 +123,7 @@ mod tests {
         assert_eq!(pkg.name, Some("test".to_owned()));
         assert_eq!(pkg.requires, Some(vec!["r1".to_owned(), "r2".to_owned()]));
         assert_eq!(pkg.conflicts, Some(vec!["c1".to_owned(), "c2".to_owned()]));
+        assert_eq!(pkg.has_contents, Some(false));
         assert_eq!(
             pkg.dependencies,
             Some(vec![

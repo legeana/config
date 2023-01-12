@@ -68,11 +68,16 @@ impl Package {
                 .context("failed to parse user_dependencies")?,
             None => system::UserDependencyGroup::default(),
         };
+        let configuration = if pkgconfig.has_contents.unwrap_or(true) {
+            contents::Configuration::new(root)?
+        } else {
+            contents::Configuration::new_empty(root)
+        };
         Ok(Package {
             name: pkgconfig.name.unwrap_or(backup_name),
             requires: pkgconfig.requires.unwrap_or_default(),
             conflicts: pkgconfig.conflicts.unwrap_or_default(),
-            configuration: contents::Configuration::new(root)?,
+            configuration,
             dependencies,
             system_dependency,
             user_dependency,

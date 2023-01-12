@@ -39,6 +39,7 @@ pub trait Hook {
     fn execute(&self) -> Result<()>;
 }
 
+#[derive(Default)]
 pub struct Configuration {
     enabled: bool,
     root: PathBuf,
@@ -49,19 +50,23 @@ pub struct Configuration {
 }
 
 impl Configuration {
+    pub fn new_empty(root: PathBuf) -> Self {
+        Self {
+            enabled: false,
+            root,
+            ..Self::default()
+        }
+    }
     pub fn new(root: PathBuf) -> Result<Self> {
         let mut state = parser::State::new();
-        Configuration::new_sub(&mut state, root)
+        Self::new_sub(&mut state, root)
     }
     pub fn new_sub(state: &mut parser::State, root: PathBuf) -> Result<Self> {
         let manifest = root.join(MANIFEST);
-        let mut conf = Configuration {
+        let mut conf = Self {
             enabled: true,
             root,
-            subdirs: HashMap::new(),
-            pre_hooks: Vec::new(),
-            post_hooks: Vec::new(),
-            files: Vec::new(),
+            ..Self::default()
         };
         conf.parse(state, &manifest)
             .with_context(|| format!("failed to load {manifest:?}"))?;
