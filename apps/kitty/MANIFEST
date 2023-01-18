@@ -1,3 +1,5 @@
 prefix ~/.config/kitty
-symlink kitty.conf
+# globinclude is not supported in old versions.
+# symlink kitty.conf
+cat_glob_into kitty.conf kitty.d/*.conf
 symlink_tree kitty.d
