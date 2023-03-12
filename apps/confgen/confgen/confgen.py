@@ -42,6 +42,7 @@ def main():
   if not templates.is_dir():
     sys.exit(f'Create {str(templates)!r} directory in order to use ConfGen')
   env = jinja2.Environment(loader=ConfGenLoader(templates))
+  env.globals.update(exists=os.path.exists)
   for root, dirs, files in os.walk(templates):
     root = pathlib.Path(root)
     relroot = root.relative_to(templates)
