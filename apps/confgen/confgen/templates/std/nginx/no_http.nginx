@@ -1,0 +1,3 @@
+{# Disable server. #}
+listen 127.0.0.1:41285;
+server_name {{server_name}} {{server_aliases}};
