@@ -13,7 +13,7 @@ STD_TEMPLATES = pathlib.Path(__file__).parent.absolute() / 'templates'
 
 class ConfGenLoader(jinja2.BaseLoader):
 
-  def __init__(self, path):
+  def __init__(self, path: pathlib.Path):
     self._path = path
     if STD_TEMPLATES.is_dir():
       self._std = STD_TEMPLATES
@@ -36,13 +36,19 @@ class ConfGenLoader(jinja2.BaseLoader):
     return source, path, lambda: mtime == pathlib.Path(path).stat().st_mtime
 
 
+def helpers():
+  return dict(
+      exists=os.path.exists,
+  )
+
+
 def main():
   cwd = pathlib.Path.cwd()
   templates = cwd / '.confgen'
   if not templates.is_dir():
     sys.exit(f'Create {str(templates)!r} directory in order to use ConfGen')
   env = jinja2.Environment(loader=ConfGenLoader(templates))
-  env.globals.update(exists=os.path.exists)
+  env.globals.update(**helpers())
   for root, dirs, files in os.walk(templates):
     root = pathlib.Path(root)
     relroot = root.relative_to(templates)
