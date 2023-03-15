@@ -1,0 +1,16 @@
+{% macro _base(port, modifiers) %}
+listen      {{port}} {{modifiers}};
+listen [::]:{{port}} {{modifiers}};
+{% endmacro %}
+
+{% macro http(port=80) %}
+{{_base(port, "")}}
+{% endmacro %}
+
+{% macro https(port=443) %}
+{{_base(port, "ssl http2")}}
+{% endmacro %}
+
+{% macro disable() %}
+listen 127.0.0.1:41285;
+{% endmacro %}

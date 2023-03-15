@@ -1,6 +1,8 @@
+{% macro default(server_name) %}
 {% if server_name.startswith('www.') %}
     {# merge www.X and X #}
     {% set server_name = server_name[4:] %}
 {% endif %}
 access_log  /var/log/nginx/{{server_name}}-access.log;
 error_log   /var/log/nginx/{{server_name}}-error.log error;
+{% endmacro %}

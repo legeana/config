@@ -1,3 +1,4 @@
+{% macro server(matrix_server) %}
 location /.well-known/matrix/client {
     return 200 '{"m.server": {"base_url": "{{matrix_server}}"}}';
     default_type application/json;
@@ -8,3 +9,4 @@ location /.well-known/matrix/server {
     add_header Access-Control-Allow-Origin *;
     return 200 '{"m.server":"{{matrix_server}}"}';
 }
+{% endmacro %}

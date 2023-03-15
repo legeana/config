@@ -1,19 +1,14 @@
-{% with %}
-    {% if server_cert_name is not defined %}
-        {% set server_cert_name = server_name %}
-    {% endif %}
-    {% if ssl_certificate is not defined %}
-        {% set ssl_certificate = '/etc/letsencrypt/live/' + server_cert_name + '/fullchain.pem' %}
-    {% endif %}
-    {% if ssl_certificate_key is not defined %}
-        {% set ssl_certificate_key = '/etc/letsencrypt/live/' + server_cert_name + '/privkey.pem' %}
-    {% endif %}
-    {% if exists(ssl_certificate) and exists(ssl_certificate_key) %}
-        {% include "std/nginx/https.nginx" %}
-        ssl_certificate {{ssl_certificate}};
-        ssl_certificate_key {{ssl_certificate_key}};
-    {% else %}
-        {% include "std/nginx/no_http.nginx" %}
-    {% endif %}
-    include /etc/letsencrypt/options-ssl-nginx.conf;
-{% endwith %}
+{% import "std/nginx/listen.nginx" as _listen %}
+
+{% macro listen(server_cert_name, port=443) %}
+{% set ssl_certificate = '/etc/letsencrypt/live/' + server_cert_name + '/fullchain.pem' %}
+{% set ssl_certificate_key = '/etc/letsencrypt/live/' + server_cert_name + '/privkey.pem' %}
+{% if exists(ssl_certificate) and exists(ssl_certificate_key) %}
+    {{_listen.https(port)}}
+    ssl_certificate {{ssl_certificate}};
+    ssl_certificate_key {{ssl_certificate_key}};
+{% else %}
+    {{_listen.disable()}}
+{% endif %}
+include /etc/letsencrypt/options-ssl-nginx.conf;
+{% endmacro %}
