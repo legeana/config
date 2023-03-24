@@ -9,8 +9,6 @@ function fish_prompt --description 'Write out the prompt'
     end
 
     __fish_prompt_profile begin
-    # Just calculate this once, to save a few cycles when displaying the prompt
-    set -g __fish_prompt_hostname (echo $hostname | cut -d . -f 1)
 
     __fish_prompt_signal
     __fish_prompt_profile signal
@@ -108,7 +106,7 @@ function __fish_prompt_hostinfo
         echo -n @
     end
     set_color cyan
-    echo -n $__fish_prompt_hostname
+    echo -n $(string replace -r '\..*$' '' $hostname)
     set_color normal
 end
 
