@@ -10,9 +10,7 @@ function fish_prompt --description 'Write out the prompt'
 
     __fish_prompt_profile begin
     # Just calculate this once, to save a few cycles when displaying the prompt
-    if not set -q __fish_prompt_hostname
-        set -g __fish_prompt_hostname (hostname | cut -d . -f 1)
-    end
+    set -g __fish_prompt_hostname (echo $hostname | cut -d . -f 1)
 
     __fish_prompt_signal
     __fish_prompt_profile signal
