@@ -20,7 +20,7 @@ shlex = "1.1.0"
 stderrlog = "0.5.4"
 sysinfo = { version = "0.28.4", default-features = false }
 thiserror = "1.0"
-toml = "0.5.9"
+toml = "0.7.3"
 walkdir = "2"
 which = "4.4.0"
 xdg = "^2.1"

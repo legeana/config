@@ -16,9 +16,9 @@ pub struct Repository {
 }
 
 pub fn load_string(data: &str) -> Result<Repository> {
-    let mut deserializer = toml::Deserializer::new(data);
+    let deserializer = toml::Deserializer::new(data);
     let pkg =
-        Repository::deserialize(&mut deserializer).context("failed to deserialize Repository")?;
+        Repository::deserialize(deserializer).context("failed to deserialize Repository")?;
     Ok(pkg)
 }
 
