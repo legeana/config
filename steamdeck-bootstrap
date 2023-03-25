@@ -1,0 +1,9 @@
+#!/bin/bash -e
+
+# https://brew.sh/
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+export PATH="$HOME/.cargo/bin:$PATH"
+brew install rustup-init
+rustup-init --no-modify-path --profile=default
+rustup default stable
