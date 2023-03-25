@@ -16,3 +16,6 @@ symlink sway-ssh-agent.conf
 
 prefix ~/.config/i3/config.d
 symlink i3-ssh-agent.conf
+
+prefix ~/.config/plasma-workspace/env
+symlink plasma-env.sh
