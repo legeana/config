@@ -1,6 +1,8 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Context, Result};
+use base64::engine::general_purpose::URL_SAFE;
+use base64::Engine;
 use sha2::{Digest, Sha256};
 
 fn path_hash(path: &Path) -> Result<PathBuf> {
@@ -13,7 +15,7 @@ fn path_hash(path: &Path) -> Result<PathBuf> {
     let result = hasher.finalize();
 
     // URL_SAFE is used for compatibility with Python version of pikaconfig.
-    Ok(base64::encode_config(result, base64::URL_SAFE).into())
+    Ok(URL_SAFE.encode(result).into())
 }
 
 pub fn state_path(path: &Path) -> Result<PathBuf> {
