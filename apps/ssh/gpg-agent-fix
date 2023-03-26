@@ -1,5 +1,0 @@
-#!/bin/bash -e
-
-if [[ $GPG_TTY ]]; then
-    gpg-connect-agent updatestartuptty /bye
-fi
