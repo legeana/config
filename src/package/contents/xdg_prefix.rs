@@ -21,7 +21,7 @@ impl XdgPrefixParser for XdgCachePrefixParser {
            set current installation prefix to $XDG_CACHE_HOME/<directory>"
     }
     fn xdg_prefix(&self, path: &str) -> Result<PathBuf> {
-        let base = xdg::BaseDirectories::new().with_context(|| "failed to parse XDG_CACHE_HOME")?;
+        let base = xdg::BaseDirectories::new().context("failed to parse XDG_CACHE_HOME")?;
         Ok(base.get_cache_home().join(path))
     }
 }
@@ -36,8 +36,7 @@ impl XdgPrefixParser for XdgConfigPrefixParser {
            set current installation prefix to $XDG_CONFIG_HOME/<directory>"
     }
     fn xdg_prefix(&self, path: &str) -> Result<PathBuf> {
-        let base =
-            xdg::BaseDirectories::new().with_context(|| "failed to parse XDG_CONFIG_HOME")?;
+        let base = xdg::BaseDirectories::new().context("failed to parse XDG_CONFIG_HOME")?;
         Ok(base.get_config_home().join(path))
     }
 }
@@ -52,7 +51,7 @@ impl XdgPrefixParser for XdgDataPrefixParser {
            set current installation prefix to $XDG_DATA_HOME/<directory>"
     }
     fn xdg_prefix(&self, path: &str) -> Result<PathBuf> {
-        let base = xdg::BaseDirectories::new().with_context(|| "failed to parse XDG_DATA_HOME")?;
+        let base = xdg::BaseDirectories::new().context("failed to parse XDG_DATA_HOME")?;
         Ok(base.get_data_home().join(path))
     }
 }
@@ -67,7 +66,7 @@ impl XdgPrefixParser for XdgStatePrefixParser {
            set current installation prefix to $XDG_STATE_HOME/<directory>"
     }
     fn xdg_prefix(&self, path: &str) -> Result<PathBuf> {
-        let base = xdg::BaseDirectories::new().with_context(|| "failed to parse XDG_STATE_HOME")?;
+        let base = xdg::BaseDirectories::new().context("failed to parse XDG_STATE_HOME")?;
         Ok(base.get_state_home().join(path))
     }
 }

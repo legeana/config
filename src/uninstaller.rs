@@ -13,9 +13,7 @@ where
     T: Registry,
 {
     fn uninstall(&mut self) -> Result<()> {
-        let paths = self
-            .paths()
-            .with_context(|| "failed to get installed files")?;
+        let paths = self.paths().context("failed to get installed files")?;
         for path in paths.iter().rev() {
             if let Err(err) = remove(path) {
                 log::error!("Failed to remove {path:?}: {err}");

@@ -116,7 +116,7 @@ impl Configuration {
         }
         for file in self.files.iter() {
             file.install(registry)
-                .with_context(|| "failed to install file installer")?;
+                .context("failed to install file installer")?;
         }
         for (name, subdir) in self.subdirs.iter() {
             subdir
@@ -131,7 +131,7 @@ impl Configuration {
         }
         for hook in self.post_hooks.iter() {
             hook.execute()
-                .with_context(|| "failed to execute post-install hook")?;
+                .context("failed to execute post-install hook")?;
         }
         for (name, subdir) in self.subdirs.iter() {
             subdir

@@ -76,7 +76,7 @@ fn uninstall(root: &Path) -> Result<()> {
     let mut registry = registry(root);
     registry
         .uninstall()
-        .with_context(|| "failed to uninstall before installing")?;
+        .context("failed to uninstall before installing")?;
     Ok(())
 }
 
@@ -87,7 +87,7 @@ fn install(root: &Path) -> Result<()> {
     let mut registry = registry(root);
     registry
         .uninstall()
-        .with_context(|| "failed to uninstall before installing")?;
+        .context("failed to uninstall before installing")?;
     for repo in repos.iter() {
         repo.pre_install_all()
             .with_context(|| format!("failed to pre-install {}", repo.name()))?;
@@ -118,7 +118,7 @@ fn main() -> Result<()> {
         .timestamp(stderrlog::Timestamp::Off)
         .verbosity(usize::from(args.verbose))
         .init()
-        .with_context(|| "failed to initialize stderrlog")?;
+        .context("failed to initialize stderrlog")?;
     // Main code.
     let root = config_root()?;
     log::info!("Found user configuration: {root:?}");
@@ -140,16 +140,16 @@ fn main() -> Result<()> {
             if check_update()? {
                 return Ok(());
             }
-            install(&root).with_context(|| "failed to install")?;
+            install(&root).context("failed to install")?;
         }
         Commands::SystemInstall { strict } => {
             if check_update()? {
                 return Ok(());
             }
-            system_install(&root, strict).with_context(|| "failed to system_install")?;
+            system_install(&root, strict).context("failed to system_install")?;
         }
         Commands::Uninstall {} => {
-            uninstall(&root).with_context(|| "failed to uninstall")?;
+            uninstall(&root).context("failed to uninstall")?;
         }
         Commands::ManifestHelp {} => {
             print!("{}", package::manifest_help());

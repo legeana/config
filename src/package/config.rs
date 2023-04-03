@@ -68,8 +68,7 @@ pub struct UserDependency {
 
 pub fn load_string(data: &str) -> Result<Package> {
     let deserializer = toml::Deserializer::new(data);
-    let pkg =
-        Package::deserialize(deserializer).with_context(|| "failed to deserialize Package")?;
+    let pkg = Package::deserialize(deserializer).context("failed to deserialize Package")?;
     Ok(pkg)
 }
 
