@@ -106,7 +106,7 @@ function __fish_prompt_hostinfo
         echo -n @
     end
     set_color cyan
-    echo -n $(string replace -r '\..*$' '' $hostname)
+    echo -n (string replace -r '\..*$' '' $hostname)
     set_color normal
 end
 
