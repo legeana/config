@@ -1,0 +1,2 @@
+prefix ~/.local/opt/pika-autostart
+symlink pika-autostart

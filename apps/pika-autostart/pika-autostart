@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+
+import argparse
+import os
+import pathlib
+import shlex
+import subprocess
+import sys
+
+
+def make_service(name: str, type: str, command: list[str]) -> None:
+  user_root = pathlib.Path.home() / '.config/systemd/user'
+  path = user_root / f'{name}.service'
+  with open(path, 'w') as service:
+    service.write(f"""
+[Unit]
+Description=autostart: {shlex.join(command)}
+
+[Service]
+Type={type}
+WorkingDirectory={os.getcwd()}
+ExecStart={shlex.join(command)}
+
+[Install]
+WantedBy=default.target
+""")
+
+
+def main() -> None:
+  parser = argparse.ArgumentParser()
+  parser.add_argument('--name', required=True)
+  parser.add_argument('--type', default='simple')
+  parser.add_argument('command', nargs='+')
+  args = parser.parse_args()
+  if not args.command:
+    sys.exit('Must specify a command to autostart')
+  make_service(name=args.name, type=args.type, command=args.command)
+  subprocess.check_call(['systemctl', '--user', 'enable', '--now', args.name])
+
+
+if __name__ == '__main__':
+  main()
