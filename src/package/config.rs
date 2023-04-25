@@ -18,6 +18,7 @@ pub struct Package {
     pub conflicts: Option<Vec<String>>,
     #[serde(default = "default_has_contents")]
     pub has_contents: bool,
+    pub ansible_playbooks: Option<Vec<AnsiblePlaybook>>,
     pub dependencies: Option<Vec<Dependency>>,
     pub system_dependencies: Option<Vec<SystemDependency>>,
     pub user_dependencies: Option<Vec<UserDependency>>,
@@ -66,6 +67,13 @@ pub struct UserDependency {
     pub pip_user: Option<Vec<String>>,
 }
 
+#[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct AnsiblePlaybook {
+    pub playbook: String,
+    pub ask_become_pass: Option<bool>,
+}
+
 pub fn load_string(data: &str) -> Result<Package> {
     let deserializer = toml::Deserializer::new(data);
     let pkg = Package::deserialize(deserializer).context("failed to deserialize Package")?;
@@ -109,6 +117,13 @@ mod tests {
             conflicts = ['c1', 'c2']
             has_contents = false
 
+            [[ansible_playbooks]]
+            playbook = 'playbook1.yml'
+
+            [[ansible_playbooks]]
+            playbook = 'playbook2.yml'
+            ask_become_pass = true
+
             [[dependencies]]
             names = ['pkg1', 'pkg2']
 
@@ -133,6 +148,19 @@ mod tests {
         assert_eq!(pkg.requires, Some(vec!["r1".to_owned(), "r2".to_owned()]));
         assert_eq!(pkg.conflicts, Some(vec!["c1".to_owned(), "c2".to_owned()]));
         assert_eq!(pkg.has_contents, false);
+        assert_eq!(
+            pkg.ansible_playbooks,
+            Some(vec![
+                 AnsiblePlaybook {
+                     playbook: "playbook1.yml".to_owned(),
+                     ..AnsiblePlaybook::default()
+                 },
+                 AnsiblePlaybook {
+                     playbook: "playbook2.yml".to_owned(),
+                     ask_become_pass: Some(true),
+                 },
+            ])
+        );
         assert_eq!(
             pkg.dependencies,
             Some(vec![
