@@ -108,6 +108,9 @@ impl Package {
             log::info!("Skipping disabled {}", self.name());
             return Ok(());
         }
+        self.user_dependency
+            .install()
+            .context("failed to install user dependencies")?;
         self.configuration.pre_install()
     }
     pub fn install(&self, registry: &mut dyn Registry) -> Result<()> {
@@ -140,9 +143,6 @@ impl Package {
         }
         self.system_dependency
             .install()
-            .context("failed to install system dependencies")?;
-        self.user_dependency
-            .install()
-            .context("failed to install user dependencies")
+            .context("failed to install system dependencies")
     }
 }
