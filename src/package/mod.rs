@@ -16,6 +16,15 @@ trait Installer {
     fn install(&self) -> Result<()>;
 }
 
+impl<T: Installer> Installer for Vec<T> {
+    fn install(&self) -> Result<()> {
+        for installer in self.iter() {
+            installer.install()?;
+        }
+        Ok(())
+    }
+}
+
 pub struct Package {
     name: String,
     requires: Vec<String>,
@@ -23,8 +32,8 @@ pub struct Package {
     configuration: contents::Configuration,
     #[allow(dead_code)]
     dependencies: Vec<String>,
-    system_dependency: system::SystemDependencyGroup,
-    user_dependency: user::UserDependencyGroup,
+    system_dependency: Vec<system::SystemDependency>,
+    user_dependency: Vec<user::UserDependency>,
 }
 
 fn name_from_path(path: &Path) -> Result<String> {
@@ -64,14 +73,20 @@ impl Package {
             None => Vec::new(),
         };
         let system_dependency = match pkgconfig.system_dependencies {
-            Some(deps) => system::SystemDependencyGroup::new(&deps)
+            Some(deps) => deps
+                .iter()
+                .map(system::SystemDependency::new)
+                .collect::<Result<_>>()
                 .context("failed to parse system_dependencies")?,
-            None => system::SystemDependencyGroup::default(),
+            None => Vec::<system::SystemDependency>::default(),
         };
         let user_dependency = match pkgconfig.user_dependencies {
-            Some(deps) => user::UserDependencyGroup::new(&deps)
+            Some(deps) => deps
+                .iter()
+                .map(user::UserDependency::new)
+                .collect::<Result<_>>()
                 .context("failed to parse user_dependencies")?,
-            None => user::UserDependencyGroup::default(),
+            None => Vec::<user::UserDependency>::default(),
         };
         let configuration = if pkgconfig.has_contents {
             contents::Configuration::new(root)?

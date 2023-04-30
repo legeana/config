@@ -6,30 +6,6 @@ use super::config;
 use super::Installer;
 
 #[derive(Default)]
-pub struct UserDependencyGroup {
-    dependencies: Vec<UserDependency>,
-}
-
-impl UserDependencyGroup {
-    pub fn new(cfg: &[config::UserDependency]) -> Result<Self> {
-        let mut dependencies: Vec<UserDependency> = Vec::with_capacity(cfg.len());
-        for dependency in cfg.iter() {
-            dependencies.push(UserDependency::new(dependency)?);
-        }
-        Ok(Self { dependencies })
-    }
-}
-
-impl Installer for UserDependencyGroup {
-    fn install(&self) -> Result<()> {
-        for dependency in self.dependencies.iter() {
-            dependency.install()?;
-        }
-        Ok(())
-    }
-}
-
-#[derive(Default)]
 pub struct UserDependency {
     installers: Vec<Box<dyn Installer>>,
 }
