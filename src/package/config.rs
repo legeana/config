@@ -43,6 +43,7 @@ pub struct SystemDependency {
     /// Conflicting tags.
     pub conflicts: Option<Vec<String>>,
     // Package managers.
+    // It is expected that only one will be available at any time.
     pub any: Option<Vec<String>>,
     pub apt: Option<Vec<String>>,
     pub pacman: Option<Vec<String>>,
@@ -65,6 +66,8 @@ pub struct UserDependency {
     pub brew: Option<Vec<String>>,
     pub npm: Option<Vec<String>>,
     pub pip_user: Option<Vec<String>>,
+    pub ansible_galaxy_role: Option<Vec<String>>,
+    pub ansible_galaxy_collection: Option<Vec<String>>,
 }
 
 #[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
