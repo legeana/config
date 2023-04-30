@@ -7,7 +7,6 @@ use std::path::{Path, PathBuf};
 
 use crate::registry::Registry;
 use crate::tag_criteria;
-use crate::tag_util;
 
 use anyhow::{anyhow, Context, Result};
 
@@ -28,8 +27,7 @@ impl<T: Installer> Installer for Vec<T> {
 
 pub struct Package {
     name: String,
-    requires: Vec<String>,
-    conflicts: Vec<String>,
+    criteria: tag_criteria::Criteria,
     configuration: contents::Configuration,
     #[allow(dead_code)]
     dependencies: Vec<String>,
@@ -89,8 +87,10 @@ impl Package {
         };
         Ok(Package {
             name: pkgconfig.name.unwrap_or(backup_name),
-            requires: pkgconfig.requires.unwrap_or_default(),
-            conflicts: pkgconfig.conflicts.unwrap_or_default(),
+            criteria: tag_criteria::Criteria {
+                requires: pkgconfig.requires,
+                conflicts: pkgconfig.conflicts,
+            },
             configuration,
             dependencies,
             system_dependency,
@@ -101,13 +101,7 @@ impl Package {
         &self.name
     }
     fn enabled(&self) -> Result<bool> {
-        if !tag_util::has_all_tags(&self.requires).context("failed has_all_tags")? {
-            return Ok(false);
-        }
-        if tag_util::has_any_tags(&self.conflicts).context("failed has_any_tags")? {
-            return Ok(false);
-        }
-        Ok(true)
+        self.criteria.is_satisfied()
     }
     pub fn pre_install(&self) -> Result<()> {
         if !self
