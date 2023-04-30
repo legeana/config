@@ -5,10 +5,10 @@ mod user;
 
 use std::path::{Path, PathBuf};
 
+use anyhow::{anyhow, Context, Result};
+
 use crate::registry::Registry;
 use crate::tag_criteria;
-
-use anyhow::{anyhow, Context, Result};
 
 pub use contents::help as manifest_help;
 
