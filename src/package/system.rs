@@ -2,7 +2,7 @@ use std::ffi::OsStr;
 
 use anyhow::{anyhow, Context, Result};
 
-use crate::tag_util;
+use crate::tag_criteria;
 
 use super::config;
 use super::Installer;
@@ -15,19 +15,8 @@ pub struct SystemDependency {
 impl SystemDependency {
     pub fn new(cfg: &config::SystemDependency) -> Result<Self> {
         let mut installers: Vec<Box<dyn Installer>> = Vec::new();
-        if let Some(requires) = &cfg.requires {
-            if !tag_util::has_all_tags(requires)
-                .with_context(|| format!("failed to check tags {requires:?}"))?
-            {
-                return Ok(Self::default());
-            }
-        }
-        if let Some(conflicts) = &cfg.conflicts {
-            if tag_util::has_any_tags(conflicts)
-                .with_context(|| format!("failed to check tags {conflicts:?}"))?
-            {
-                return Ok(Self::default());
-            }
+        if !tag_criteria::is_satisfied(cfg).context("failed to check tags")? {
+            return Ok(Self::default());
         }
         if let Some(apt) = cfg.apt.clone().or_else(|| cfg.any.clone()) {
             installers.push(Box::new(Apt::new(apt)));

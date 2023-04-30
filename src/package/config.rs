@@ -3,6 +3,8 @@ use std::path::Path;
 use anyhow::{Context, Result};
 use serde::Deserialize;
 
+use crate::tag_criteria;
+
 const PACKAGE_CONFIG_NAME: &str = "package.toml";
 
 fn default_has_contents() -> bool {
@@ -24,6 +26,15 @@ pub struct Package {
     pub user_dependencies: Option<Vec<UserDependency>>,
 }
 
+impl tag_criteria::TagCriteria for Package {
+    fn requires(&self) -> Option<&[String]> {
+        self.requires.as_ref().map(|v| v.as_slice())
+    }
+    fn conflicts(&self) -> Option<&[String]> {
+        self.conflicts.as_ref().map(|v| v.as_slice())
+    }
+}
+
 #[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct Dependency {
@@ -32,6 +43,15 @@ pub struct Dependency {
     /// Conflicting tags.
     pub conflicts: Option<Vec<String>>,
     pub names: Vec<String>,
+}
+
+impl tag_criteria::TagCriteria for Dependency {
+    fn requires(&self) -> Option<&[String]> {
+        self.requires.as_ref().map(|v| v.as_slice())
+    }
+    fn conflicts(&self) -> Option<&[String]> {
+        self.conflicts.as_ref().map(|v| v.as_slice())
+    }
 }
 
 /// SystemDependency doesn't consider missing package manager a failure.
@@ -55,6 +75,15 @@ pub struct SystemDependency {
     pub bash: Option<String>,
 }
 
+impl tag_criteria::TagCriteria for SystemDependency {
+    fn requires(&self) -> Option<&[String]> {
+        self.requires.as_ref().map(|v| v.as_slice())
+    }
+    fn conflicts(&self) -> Option<&[String]> {
+        self.conflicts.as_ref().map(|v| v.as_slice())
+    }
+}
+
 #[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct UserDependency {
@@ -68,6 +97,15 @@ pub struct UserDependency {
     pub pip_user: Option<Vec<String>>,
     pub ansible_galaxy_role: Option<Vec<String>>,
     pub ansible_galaxy_collection: Option<Vec<String>>,
+}
+
+impl tag_criteria::TagCriteria for UserDependency {
+    fn requires(&self) -> Option<&[String]> {
+        self.requires.as_ref().map(|v| v.as_slice())
+    }
+    fn conflicts(&self) -> Option<&[String]> {
+        self.conflicts.as_ref().map(|v| v.as_slice())
+    }
 }
 
 #[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]

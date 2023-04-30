@@ -3,6 +3,7 @@ mod layout;
 mod package;
 mod registry;
 mod repository;
+mod tag_criteria;
 mod tag_util;
 mod uninstaller;
 

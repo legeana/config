@@ -3,8 +3,9 @@ mod config;
 use std::ffi::OsStr;
 use std::path::PathBuf;
 
+use crate::package::Package;
 use crate::registry::Registry;
-use crate::{package::Package, tag_util};
+use crate::tag_criteria;
 
 use anyhow::{anyhow, Context, Result};
 
@@ -60,19 +61,8 @@ impl Repository {
         self.packages.iter().map(|p| p.name().to_string()).collect()
     }
     pub fn enabled(&self) -> Result<bool> {
-        if let Some(requires) = &self.config.requires {
-            if !tag_util::has_all_tags(requires)
-                .with_context(|| format!("failed to check tags {requires:?}"))?
-            {
-                return Ok(false);
-            }
-        }
-        if let Some(conflicts) = &self.config.conflicts {
-            if tag_util::has_any_tags(conflicts)
-                .with_context(|| format!("failed to check tags {conflicts:?}"))?
-            {
-                return Ok(false);
-            }
+        if !tag_criteria::is_satisfied(&self.config).context("failed to check tags")? {
+            return Ok(false);
         }
         Ok(true)
     }

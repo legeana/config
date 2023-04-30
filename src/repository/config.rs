@@ -3,6 +3,8 @@ use std::path::Path;
 use anyhow::{Context, Result};
 use serde::Deserialize;
 
+use crate::tag_criteria;
+
 const REPOSITORY_CONFIG_NAME: &str = "repository.toml";
 
 /// repository.toml file definition
@@ -13,6 +15,15 @@ pub struct Repository {
     pub requires: Option<Vec<String>>,
     /// Conflicting tags.
     pub conflicts: Option<Vec<String>>,
+}
+
+impl tag_criteria::TagCriteria for Repository {
+    fn requires(&self) -> Option<&[String]> {
+        self.requires.as_ref().map(|v| v.as_slice())
+    }
+    fn conflicts(&self) -> Option<&[String]> {
+        self.conflicts.as_ref().map(|v| v.as_slice())
+    }
 }
 
 pub fn load_string(data: &str) -> Result<Repository> {
