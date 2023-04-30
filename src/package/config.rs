@@ -151,14 +151,14 @@ mod tests {
         assert_eq!(
             pkg.ansible_playbooks,
             Some(vec![
-                 AnsiblePlaybook {
-                     playbook: "playbook1.yml".to_owned(),
-                     ..AnsiblePlaybook::default()
-                 },
-                 AnsiblePlaybook {
-                     playbook: "playbook2.yml".to_owned(),
-                     ask_become_pass: Some(true),
-                 },
+                AnsiblePlaybook {
+                    playbook: "playbook1.yml".to_owned(),
+                    ..AnsiblePlaybook::default()
+                },
+                AnsiblePlaybook {
+                    playbook: "playbook2.yml".to_owned(),
+                    ask_become_pass: Some(true),
+                },
             ])
         );
         assert_eq!(
