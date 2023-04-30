@@ -5,10 +5,7 @@ use anyhow::{anyhow, Context, Result};
 use crate::tag_util;
 
 use super::config;
-
-trait Installer {
-    fn install(&self) -> Result<()>;
-}
+use super::Installer;
 
 #[derive(Default)]
 pub struct SystemDependencyGroup {

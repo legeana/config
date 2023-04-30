@@ -11,6 +11,10 @@ use anyhow::{anyhow, Context, Result};
 
 pub use contents::help as manifest_help;
 
+trait Installer {
+    fn install(&self) -> Result<()>;
+}
+
 pub struct Package {
     name: String,
     requires: Vec<String>,
