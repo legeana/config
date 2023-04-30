@@ -18,7 +18,10 @@ impl UserDependencyGroup {
         }
         Ok(Self { dependencies })
     }
-    pub fn install(&self) -> Result<()> {
+}
+
+impl Installer for UserDependencyGroup {
+    fn install(&self) -> Result<()> {
         for dependency in self.dependencies.iter() {
             dependency.install()?;
         }
@@ -59,7 +62,10 @@ impl UserDependency {
         }
         Ok(Self { installers })
     }
-    pub fn install(&self) -> Result<()> {
+}
+
+impl Installer for UserDependency {
+    fn install(&self) -> Result<()> {
         for installer in self.installers.iter() {
             installer.install()?
         }

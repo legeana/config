@@ -20,7 +20,10 @@ impl SystemDependencyGroup {
         }
         Ok(Self { dependencies })
     }
-    pub fn install(&self) -> Result<()> {
+}
+
+impl Installer for SystemDependencyGroup {
+    fn install(&self) -> Result<()> {
         for dependency in self.dependencies.iter() {
             dependency.install()?;
         }
@@ -61,7 +64,10 @@ impl SystemDependency {
         }
         Ok(Self { installers })
     }
-    pub fn install(&self) -> Result<()> {
+}
+
+impl Installer for SystemDependency {
+    fn install(&self) -> Result<()> {
         for installer in self.installers.iter() {
             installer.install()?
         }
