@@ -1,6 +1,7 @@
 mod config;
 mod contents;
 mod system;
+mod user;
 
 use std::path::{Path, PathBuf};
 
@@ -23,7 +24,7 @@ pub struct Package {
     #[allow(dead_code)]
     dependencies: Vec<String>,
     system_dependency: system::SystemDependencyGroup,
-    user_dependency: system::UserDependencyGroup,
+    user_dependency: user::UserDependencyGroup,
 }
 
 fn name_from_path(path: &Path) -> Result<String> {
@@ -68,9 +69,9 @@ impl Package {
             None => system::SystemDependencyGroup::default(),
         };
         let user_dependency = match pkgconfig.user_dependencies {
-            Some(deps) => system::UserDependencyGroup::new(&deps)
+            Some(deps) => user::UserDependencyGroup::new(&deps)
                 .context("failed to parse user_dependencies")?,
-            None => system::UserDependencyGroup::default(),
+            None => user::UserDependencyGroup::default(),
         };
         let configuration = if pkgconfig.has_contents {
             contents::Configuration::new(root)?

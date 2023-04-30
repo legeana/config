@@ -33,32 +33,6 @@ pub struct SystemDependency {
     installers: Vec<Box<dyn Installer>>,
 }
 
-#[derive(Default)]
-pub struct UserDependencyGroup {
-    dependencies: Vec<UserDependency>,
-}
-
-impl UserDependencyGroup {
-    pub fn new(cfg: &[config::UserDependency]) -> Result<Self> {
-        let mut dependencies: Vec<UserDependency> = Vec::with_capacity(cfg.len());
-        for dependency in cfg.iter() {
-            dependencies.push(UserDependency::new(dependency)?);
-        }
-        Ok(Self { dependencies })
-    }
-    pub fn install(&self) -> Result<()> {
-        for dependency in self.dependencies.iter() {
-            dependency.install()?;
-        }
-        Ok(())
-    }
-}
-
-#[derive(Default)]
-pub struct UserDependency {
-    installers: Vec<Box<dyn Installer>>,
-}
-
 impl SystemDependency {
     pub fn new(cfg: &config::SystemDependency) -> Result<Self> {
         let mut installers: Vec<Box<dyn Installer>> = Vec::new();
@@ -85,36 +59,6 @@ impl SystemDependency {
         if let Some(bash) = &cfg.bash {
             installers.push(Box::new(Bash::new(bash.clone())));
         }
-        Ok(Self { installers })
-    }
-    pub fn install(&self) -> Result<()> {
-        for installer in self.installers.iter() {
-            installer.install()?
-        }
-        Ok(())
-    }
-}
-
-impl UserDependency {
-    pub fn new(cfg: &config::UserDependency) -> Result<Self> {
-        let installers: Vec<Box<dyn Installer>> = Vec::new();
-        if let Some(requires) = &cfg.requires {
-            if !tag_util::has_all_tags(requires)
-                .with_context(|| format!("failed to check tags {requires:?}"))?
-            {
-                return Ok(Self::default());
-            }
-        }
-        if let Some(conflicts) = &cfg.conflicts {
-            if tag_util::has_any_tags(conflicts)
-                .with_context(|| format!("failed to check tags {conflicts:?}"))?
-            {
-                return Ok(Self::default());
-            }
-        }
-        // TODO brew
-        // TODO npm
-        // TODO pip_user
         Ok(Self { installers })
     }
     pub fn install(&self) -> Result<()> {
