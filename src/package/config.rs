@@ -108,11 +108,16 @@ impl tag_criteria::TagCriteria for UserDependency {
     }
 }
 
+fn default_ask_become_pass() -> bool {
+    false
+}
+
 #[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct AnsiblePlaybook {
-    pub playbook: String,
-    pub ask_become_pass: Option<bool>,
+    pub playbooks: Vec<String>,
+    #[serde(default = "default_ask_become_pass")]
+    pub ask_become_pass: bool,
 }
 
 pub fn load_string(data: &str) -> Result<Package> {
@@ -162,7 +167,7 @@ mod tests {
             playbook = 'playbook1.yml'
 
             [[ansible_playbooks]]
-            playbook = 'playbook2.yml'
+            playbooks = ['playbook2.yml']
             ask_become_pass = true
 
             [[dependencies]]
@@ -193,12 +198,12 @@ mod tests {
             pkg.ansible_playbooks,
             Some(vec![
                 AnsiblePlaybook {
-                    playbook: "playbook1.yml".to_owned(),
+                    playbooks: vec!["playbook1.yml".to_owned()],
                     ..AnsiblePlaybook::default()
                 },
                 AnsiblePlaybook {
-                    playbook: "playbook2.yml".to_owned(),
-                    ask_become_pass: Some(true),
+                    playbooks: vec!["playbook2.yml".to_owned()],
+                    ask_become_pass: true,
                 },
             ])
         );

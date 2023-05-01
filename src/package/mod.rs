@@ -1,3 +1,4 @@
+mod ansible;
 mod config;
 mod contents;
 mod system;
@@ -29,6 +30,7 @@ pub struct Package {
     name: String,
     criteria: tag_criteria::Criteria,
     configuration: contents::Configuration,
+    ansible_playbooks: Vec<ansible::AnsiblePlaybook>,
     #[allow(dead_code)]
     dependencies: Vec<String>,
     system_dependency: Vec<system::SystemDependency>,
@@ -81,9 +83,16 @@ impl Package {
             None => Vec::<user::UserDependency>::default(),
         };
         let configuration = if pkgconfig.has_contents {
-            contents::Configuration::new(root)?
+            contents::Configuration::new(root.clone())?
         } else {
-            contents::Configuration::new_empty(root)
+            contents::Configuration::new_empty(root.clone())
+        };
+        let ansible_playbooks = match pkgconfig.ansible_playbooks {
+            Some(playbooks) => playbooks
+                .iter()
+                .map(|pb| ansible::AnsiblePlaybook::new(root.clone(), pb.playbooks.clone(), pb.ask_become_pass))
+                .collect(),
+            None => Vec::<ansible::AnsiblePlaybook>::default(),
         };
         Ok(Package {
             name: pkgconfig.name.unwrap_or(backup_name),
@@ -92,6 +101,7 @@ impl Package {
                 conflicts: pkgconfig.conflicts,
             },
             configuration,
+            ansible_playbooks,
             dependencies,
             system_dependency,
             user_dependency,
@@ -114,6 +124,9 @@ impl Package {
         self.user_dependency
             .install()
             .context("failed to install user dependencies")?;
+        self.ansible_playbooks
+            .install()
+            .context("failed to execute ansible playbooks")?;
         self.configuration.pre_install()
     }
     pub fn install(&self, registry: &mut dyn Registry) -> Result<()> {
