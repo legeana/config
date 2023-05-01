@@ -8,7 +8,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{anyhow, Context, Result};
 
 use crate::registry::Registry;
-use crate::tag_criteria;
+use crate::tag_criteria::{self, TagCriteria};
 
 pub use contents::help as manifest_help;
 
@@ -46,7 +46,7 @@ fn name_from_path(path: &Path) -> Result<String> {
 fn filter_dependencies(dependencies: &[config::Dependency]) -> Result<Vec<String>> {
     let mut deps: Vec<String> = Vec::new();
     for dep in dependencies.iter() {
-        if !tag_criteria::is_satisfied(dep).context("failed to check tags")? {
+        if !dep.is_satisfied().context("failed to check tags")? {
             continue;
         }
         deps.extend(dep.names.iter().cloned());

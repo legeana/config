@@ -1,6 +1,6 @@
 use anyhow::{anyhow, Context, Result};
 
-use crate::tag_criteria;
+use crate::tag_criteria::TagCriteria;
 
 use super::config;
 use super::Installer;
@@ -13,7 +13,7 @@ pub struct UserDependency {
 impl UserDependency {
     pub fn new(cfg: &config::UserDependency) -> Result<Self> {
         let mut installers: Vec<Box<dyn Installer>> = Vec::new();
-        if !tag_criteria::is_satisfied(cfg).context("failed to check tags")? {
+        if !cfg.is_satisfied().context("failed to check tags")? {
             return Ok(Self::default());
         }
         if let Some(_) = &cfg.brew {

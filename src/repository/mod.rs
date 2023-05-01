@@ -3,11 +3,11 @@ mod config;
 use std::ffi::OsStr;
 use std::path::PathBuf;
 
+use anyhow::{anyhow, Context, Result};
+
 use crate::package::Package;
 use crate::registry::Registry;
-use crate::tag_criteria;
-
-use anyhow::{anyhow, Context, Result};
+use crate::tag_criteria::TagCriteria;
 
 pub use config::is_repository_dir;
 
@@ -61,7 +61,7 @@ impl Repository {
         self.packages.iter().map(|p| p.name().to_string()).collect()
     }
     pub fn enabled(&self) -> Result<bool> {
-        if !tag_criteria::is_satisfied(&self.config).context("failed to check tags")? {
+        if !self.config.is_satisfied().context("failed to check tags")? {
             return Ok(false);
         }
         Ok(true)
