@@ -1,6 +1,7 @@
 mod ansible;
 mod config;
 mod contents;
+mod installer;
 mod system;
 mod user;
 
@@ -8,23 +9,11 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Context, Result};
 
+use crate::package::installer::Installer;
 use crate::registry::Registry;
 use crate::tag_criteria::{self, TagCriteria};
 
 pub use contents::help as manifest_help;
-
-trait Installer {
-    fn install(&self) -> Result<()>;
-}
-
-impl<T: Installer> Installer for Vec<T> {
-    fn install(&self) -> Result<()> {
-        for installer in self.iter() {
-            installer.install()?;
-        }
-        Ok(())
-    }
-}
 
 pub struct Package {
     name: String,
