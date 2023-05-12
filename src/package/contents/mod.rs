@@ -17,8 +17,6 @@ mod tags;
 mod util;
 mod xdg_prefix;
 
-use crate::registry::Registry;
-
 use core::fmt;
 use std::fs::File;
 use std::io::BufReader;
@@ -26,6 +24,9 @@ use std::path::PathBuf;
 use std::{collections::hash_map::HashMap, io::BufRead};
 
 use anyhow::{anyhow, Context, Ok, Result};
+
+use crate::package::Module;
+use crate::registry::Registry;
 
 const MANIFEST: &str = "MANIFEST";
 
@@ -95,7 +96,10 @@ impl Configuration {
         }
         Ok(())
     }
-    pub fn pre_install(&self) -> Result<()> {
+}
+
+impl Module for Configuration {
+    fn pre_install(&self, registry: &mut dyn Registry) -> Result<()> {
         if !self.enabled {
             return Ok(());
         }
@@ -105,12 +109,12 @@ impl Configuration {
         }
         for (name, subdir) in self.subdirs.iter() {
             subdir
-                .pre_install()
+                .pre_install(registry)
                 .with_context(|| format!("failed to pre-install {name}"))?;
         }
         Ok(())
     }
-    pub fn install(&self, registry: &mut dyn Registry) -> Result<()> {
+    fn install(&self, registry: &mut dyn Registry) -> Result<()> {
         if !self.enabled {
             return Ok(());
         }
@@ -125,7 +129,7 @@ impl Configuration {
         }
         Ok(())
     }
-    pub fn post_install(&self) -> Result<()> {
+    fn post_install(&self, registry: &mut dyn Registry) -> Result<()> {
         if !self.enabled {
             return Ok(());
         }
@@ -135,9 +139,13 @@ impl Configuration {
         }
         for (name, subdir) in self.subdirs.iter() {
             subdir
-                .post_install()
+                .post_install(registry)
                 .with_context(|| format!("failed to post-install {name}"))?;
         }
+        Ok(())
+    }
+    fn system_install(&self) -> Result<()> {
+        // Configuration doesn't support system_install.
         Ok(())
     }
 }

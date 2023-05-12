@@ -5,7 +5,7 @@ use std::path::PathBuf;
 
 use anyhow::{anyhow, Context, Result};
 
-use crate::package::Package;
+use crate::package::{Package, Module};
 use crate::registry::Registry;
 use crate::tag_criteria::TagCriteria;
 
@@ -66,13 +66,13 @@ impl Repository {
         }
         Ok(true)
     }
-    pub fn pre_install_all(&self) -> Result<()> {
+    pub fn pre_install_all(&self, registry: &mut dyn Registry) -> Result<()> {
         if !self.enabled()? {
             return Ok(());
         }
         for package in self.packages.iter() {
             package
-                .pre_install()
+                .pre_install(registry)
                 .with_context(|| format!("failed to pre-install {}", package.name()))?;
         }
         Ok(())
@@ -88,13 +88,13 @@ impl Repository {
         }
         Ok(())
     }
-    pub fn post_install_all(&self) -> Result<()> {
+    pub fn post_install_all(&self, registry: &mut dyn Registry) -> Result<()> {
         if !self.enabled()? {
             return Ok(());
         }
         for package in self.packages.iter() {
             package
-                .post_install()
+                .post_install(registry)
                 .with_context(|| format!("failed to post-install {}", package.name()))?;
         }
         Ok(())

@@ -90,7 +90,7 @@ fn install(root: &Path) -> Result<()> {
         .uninstall()
         .context("failed to uninstall before installing")?;
     for repo in repos.iter() {
-        repo.pre_install_all()
+        repo.pre_install_all(&mut registry)
             .with_context(|| format!("failed to pre-install {}", repo.name()))?;
     }
     for repo in repos.iter() {
@@ -98,7 +98,7 @@ fn install(root: &Path) -> Result<()> {
             .with_context(|| format!("failed to install {}", repo.name()))?;
     }
     for repo in repos.iter() {
-        repo.post_install_all()
+        repo.post_install_all(&mut registry)
             .with_context(|| format!("failed to post-install {}", repo.name()))?;
     }
     Ok(())

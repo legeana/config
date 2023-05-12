@@ -2,6 +2,7 @@ mod ansible;
 mod config;
 mod contents;
 mod installer;
+mod module;
 mod system;
 mod user;
 
@@ -10,6 +11,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{anyhow, Context, Result};
 
 use crate::package::installer::Installer;
+pub use crate::package::module::Module;
 use crate::registry::Registry;
 use crate::tag_criteria::{self, TagCriteria};
 
@@ -102,7 +104,10 @@ impl Package {
     fn enabled(&self) -> Result<bool> {
         self.criteria.is_satisfied()
     }
-    pub fn pre_install(&self) -> Result<()> {
+}
+
+impl Module for Package {
+    fn pre_install(&self, registry: &mut dyn Registry) -> Result<()> {
         if !self
             .enabled()
             .with_context(|| format!("failed to check if {} is enabled", self.name()))?
@@ -116,9 +121,9 @@ impl Package {
         self.ansible_playbooks
             .install()
             .context("failed to execute ansible playbooks")?;
-        self.configuration.pre_install()
+        self.configuration.pre_install(registry)
     }
-    pub fn install(&self, registry: &mut dyn Registry) -> Result<()> {
+    fn install(&self, registry: &mut dyn Registry) -> Result<()> {
         if !self
             .enabled()
             .with_context(|| format!("failed to check if {} is enabled", self.name()))?
@@ -128,7 +133,7 @@ impl Package {
         }
         self.configuration.install(registry)
     }
-    pub fn post_install(&self) -> Result<()> {
+    fn post_install(&self, registry: &mut dyn Registry) -> Result<()> {
         if !self
             .enabled()
             .with_context(|| format!("failed to check if {} is enabled", self.name()))?
@@ -136,9 +141,9 @@ impl Package {
             log::info!("Skipping disabled {}", self.name());
             return Ok(());
         }
-        self.configuration.post_install()
+        self.configuration.post_install(registry)
     }
-    pub fn system_install(&self) -> Result<()> {
+    fn system_install(&self) -> Result<()> {
         if !self
             .enabled()
             .with_context(|| format!("failed to check if {} is enabled", self.name()))?
