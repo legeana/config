@@ -2,7 +2,9 @@ use std::path::PathBuf;
 
 use anyhow::{anyhow, Context, Result};
 
-use super::Installer;
+use crate::registry::Registry;
+
+use super::Module;
 
 pub struct AnsiblePlaybook {
     root: PathBuf,
@@ -20,8 +22,8 @@ impl AnsiblePlaybook {
     }
 }
 
-impl Installer for AnsiblePlaybook {
-    fn install(&self) -> Result<()> {
+impl Module for AnsiblePlaybook {
+    fn pre_install(&self, _: &mut dyn Registry) -> Result<()> {
         let flags = if self.ask_become_pass {
             vec!["--ask-become-pass".to_owned()]
         } else {

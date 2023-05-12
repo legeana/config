@@ -3,10 +3,21 @@ use anyhow::Result;
 use crate::registry::Registry;
 
 pub trait Module {
-    fn pre_install(&self, registry: &mut dyn Registry) -> Result<()>;
-    fn install(&self, registry: &mut dyn Registry) -> Result<()>;
-    fn post_install(&self, registry: &mut dyn Registry) -> Result<()>;
-    fn system_install(&self) -> Result<()>;
+    #[allow(unused_variables)]
+    fn pre_install(&self, registry: &mut dyn Registry) -> Result<()> {
+        Ok(())
+    }
+    #[allow(unused_variables)]
+    fn install(&self, registry: &mut dyn Registry) -> Result<()> {
+        Ok(())
+    }
+    #[allow(unused_variables)]
+    fn post_install(&self, registry: &mut dyn Registry) -> Result<()> {
+        Ok(())
+    }
+    fn system_install(&self) -> Result<()> {
+        Ok(())
+    }
 }
 
 impl<T: Module> Module for Vec<T> {

@@ -20,12 +20,9 @@ pub use contents::help as manifest_help;
 pub struct Package {
     name: String,
     criteria: tag_criteria::Criteria,
-    configuration: contents::Configuration,
-    ansible_playbooks: Vec<ansible::AnsiblePlaybook>,
+    modules: Vec<Box<dyn Module>>,
     #[allow(dead_code)]
     dependencies: Vec<String>,
-    system_dependency: Vec<system::SystemDependency>,
-    user_dependency: Vec<user::UserDependency>,
 }
 
 fn name_from_path(path: &Path) -> Result<String> {
@@ -97,11 +94,13 @@ impl Package {
                 requires: pkgconfig.requires,
                 conflicts: pkgconfig.conflicts,
             },
-            configuration,
-            ansible_playbooks,
+            modules: vec![
+                Box::new(configuration),
+                Box::new(ansible_playbooks),
+                Box::new(system_dependency),
+                Box::new(user_dependency),
+            ],
             dependencies,
-            system_dependency,
-            user_dependency,
         })
     }
     pub fn name(&self) -> &str {
@@ -121,13 +120,9 @@ impl Module for Package {
             log::info!("Skipping disabled {}", self.name());
             return Ok(());
         }
-        self.user_dependency
-            .install()
-            .context("failed to install user dependencies")?;
-        self.ansible_playbooks
-            .install()
-            .context("failed to execute ansible playbooks")?;
-        self.configuration.pre_install(registry)
+        self.modules
+            .pre_install(registry)
+            .with_context(|| format!("{}: failed pre_install", self.name()))
     }
     fn install(&self, registry: &mut dyn Registry) -> Result<()> {
         if !self
@@ -137,7 +132,9 @@ impl Module for Package {
             log::info!("Skipping disabled {}", self.name());
             return Ok(());
         }
-        self.configuration.install(registry)
+        self.modules
+            .install(registry)
+            .with_context(|| format!("{}: failed install", self.name()))
     }
     fn post_install(&self, registry: &mut dyn Registry) -> Result<()> {
         if !self
@@ -147,7 +144,9 @@ impl Module for Package {
             log::info!("Skipping disabled {}", self.name());
             return Ok(());
         }
-        self.configuration.post_install(registry)
+        self.modules
+            .post_install(registry)
+            .with_context(|| format!("{}: failed post_install", self.name()))
     }
     fn system_install(&self) -> Result<()> {
         if !self
@@ -157,8 +156,8 @@ impl Module for Package {
             log::info!("Skipping disabled {}", self.name());
             return Ok(());
         }
-        self.system_dependency
-            .install()
-            .context("failed to install system dependencies")
+        self.modules
+            .system_install()
+            .with_context(|| format!("{}: failed system_install", self.name()))
     }
 }

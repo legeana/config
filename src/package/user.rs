@@ -1,9 +1,11 @@
 use anyhow::{anyhow, Context, Result};
 
+use crate::registry::Registry;
 use crate::tag_criteria::TagCriteria;
 
 use super::config;
 use super::Installer;
+use super::Module;
 
 #[derive(Default)]
 pub struct UserDependency {
@@ -39,8 +41,8 @@ impl UserDependency {
     }
 }
 
-impl Installer for UserDependency {
-    fn install(&self) -> Result<()> {
+impl Module for UserDependency {
+    fn pre_install(&self, _: &mut dyn Registry) -> Result<()> {
         self.installers.install()
     }
 }

@@ -144,10 +144,6 @@ impl Module for Configuration {
         }
         Ok(())
     }
-    fn system_install(&self) -> Result<()> {
-        // Configuration doesn't support system_install.
-        Ok(())
-    }
 }
 
 impl fmt::Display for Configuration {

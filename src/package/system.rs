@@ -6,6 +6,7 @@ use crate::tag_criteria::TagCriteria;
 
 use super::config;
 use super::Installer;
+use super::Module;
 
 #[derive(Default)]
 pub struct SystemDependency {
@@ -31,8 +32,8 @@ impl SystemDependency {
     }
 }
 
-impl Installer for SystemDependency {
-    fn install(&self) -> Result<()> {
+impl Module for SystemDependency {
+    fn system_install(&self) -> Result<()> {
         self.installers.install()
     }
 }
