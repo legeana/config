@@ -109,55 +109,36 @@ impl Package {
     fn enabled(&self) -> Result<bool> {
         self.criteria.is_satisfied()
     }
+    fn run_if_enabled<F>(&self, mut f: F) -> Result<()>
+    where
+        F: FnMut() -> Result<()>,
+    {
+        if !self
+            .enabled()
+            .with_context(|| format!("failed to check if {} is enabled", self.name()))?
+        {
+            log::info!("Skipping disabled {}", self.name());
+            return Ok(());
+        }
+        f()
+    }
 }
 
 impl Module for Package {
     fn pre_install(&self, registry: &mut dyn Registry) -> Result<()> {
-        if !self
-            .enabled()
-            .with_context(|| format!("failed to check if {} is enabled", self.name()))?
-        {
-            log::info!("Skipping disabled {}", self.name());
-            return Ok(());
-        }
-        self.modules
-            .pre_install(registry)
+        self.run_if_enabled(|| self.modules.pre_install(registry))
             .with_context(|| format!("{}: failed pre_install", self.name()))
     }
     fn install(&self, registry: &mut dyn Registry) -> Result<()> {
-        if !self
-            .enabled()
-            .with_context(|| format!("failed to check if {} is enabled", self.name()))?
-        {
-            log::info!("Skipping disabled {}", self.name());
-            return Ok(());
-        }
-        self.modules
-            .install(registry)
+        self.run_if_enabled(|| self.modules.install(registry))
             .with_context(|| format!("{}: failed install", self.name()))
     }
     fn post_install(&self, registry: &mut dyn Registry) -> Result<()> {
-        if !self
-            .enabled()
-            .with_context(|| format!("failed to check if {} is enabled", self.name()))?
-        {
-            log::info!("Skipping disabled {}", self.name());
-            return Ok(());
-        }
-        self.modules
-            .post_install(registry)
+        self.run_if_enabled(|| self.modules.post_install(registry))
             .with_context(|| format!("{}: failed post_install", self.name()))
     }
     fn system_install(&self) -> Result<()> {
-        if !self
-            .enabled()
-            .with_context(|| format!("failed to check if {} is enabled", self.name()))?
-        {
-            log::info!("Skipping disabled {}", self.name());
-            return Ok(());
-        }
-        self.modules
-            .system_install()
+        self.run_if_enabled(|| self.modules.system_install())
             .with_context(|| format!("{}: failed system_install", self.name()))
     }
 }
