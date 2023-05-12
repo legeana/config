@@ -54,40 +54,37 @@ impl Package {
                 .with_context(|| format!("failed to get dependencies of {root:?}"))?,
             None => Vec::new(),
         };
-        let system_dependency = match pkgconfig.system_dependencies {
-            Some(deps) => deps
-                .iter()
-                .map(system::SystemDependency::new)
-                .collect::<Result<_>>()
-                .context("failed to parse system_dependencies")?,
-            None => Vec::<system::SystemDependency>::default(),
-        };
-        let user_dependency = match pkgconfig.user_dependencies {
-            Some(deps) => deps
-                .iter()
-                .map(user::UserDependency::new)
-                .collect::<Result<_>>()
-                .context("failed to parse user_dependencies")?,
-            None => Vec::<user::UserDependency>::default(),
-        };
+        let system_dependency: Vec<system::SystemDependency> = pkgconfig
+            .system_dependencies
+            .unwrap_or_default()
+            .iter()
+            .map(system::SystemDependency::new)
+            .collect::<Result<_>>()
+            .context("failed to parse system_dependencies")?;
+        let user_dependency: Vec<user::UserDependency> = pkgconfig
+            .user_dependencies
+            .unwrap_or_default()
+            .iter()
+            .map(user::UserDependency::new)
+            .collect::<Result<_>>()
+            .context("failed to parse user_dependencies")?;
         let configuration = if pkgconfig.has_contents {
             contents::Configuration::new(root.clone())?
         } else {
             contents::Configuration::new_empty(root.clone())
         };
-        let ansible_playbooks = match pkgconfig.ansible_playbooks {
-            Some(playbooks) => playbooks
-                .iter()
-                .map(|pb| {
-                    ansible::AnsiblePlaybook::new(
-                        root.clone(),
-                        pb.playbooks.clone(),
-                        pb.ask_become_pass,
-                    )
-                })
-                .collect(),
-            None => Vec::<ansible::AnsiblePlaybook>::default(),
-        };
+        let ansible_playbooks: Vec<ansible::AnsiblePlaybook> = pkgconfig
+            .ansible_playbooks
+            .unwrap_or_default()
+            .iter()
+            .map(|pb| {
+                ansible::AnsiblePlaybook::new(
+                    root.clone(),
+                    pb.playbooks.clone(),
+                    pb.ask_become_pass,
+                )
+            })
+            .collect();
         Ok(Package {
             name: pkgconfig.name.unwrap_or(backup_name),
             criteria: tag_criteria::Criteria {
