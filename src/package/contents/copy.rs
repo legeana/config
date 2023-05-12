@@ -19,8 +19,10 @@ struct CopyInstaller {
 impl super::FileInstaller for CopyInstaller {
     fn install(&self, registry: &mut dyn Registry) -> Result<()> {
         let state = file_util::make_local_state(registry, &self.dst)?;
-        if state.try_exists()
-            .with_context(|| format!("unable to check if {state:?} exists"))? {
+        if state
+            .try_exists()
+            .with_context(|| format!("unable to check if {state:?} exists"))?
+        {
             log::info!("Copy: skipping already existing state for {state:?}");
             return Ok(());
         }

@@ -81,7 +81,13 @@ impl Package {
         let ansible_playbooks = match pkgconfig.ansible_playbooks {
             Some(playbooks) => playbooks
                 .iter()
-                .map(|pb| ansible::AnsiblePlaybook::new(root.clone(), pb.playbooks.clone(), pb.ask_become_pass))
+                .map(|pb| {
+                    ansible::AnsiblePlaybook::new(
+                        root.clone(),
+                        pb.playbooks.clone(),
+                        pb.ask_become_pass,
+                    )
+                })
                 .collect(),
             None => Vec::<ansible::AnsiblePlaybook>::default(),
         };
