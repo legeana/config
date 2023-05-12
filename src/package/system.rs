@@ -33,10 +33,7 @@ impl SystemDependency {
 
 impl Installer for SystemDependency {
     fn install(&self) -> Result<()> {
-        for installer in self.installers.iter() {
-            installer.install()?
-        }
-        Ok(())
+        self.installers.install()
     }
 }
 

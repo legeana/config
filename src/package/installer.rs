@@ -12,3 +12,9 @@ impl<T: Installer> Installer for Vec<T> {
         Ok(())
     }
 }
+
+impl Installer for Box<dyn Installer> {
+    fn install(&self) -> Result<()> {
+        self.as_ref().install()
+    }
+}
