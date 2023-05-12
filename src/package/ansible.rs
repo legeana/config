@@ -20,10 +20,7 @@ impl AnsiblePlaybook {
             ask_become_pass,
         }
     }
-}
-
-impl Module for AnsiblePlaybook {
-    fn pre_install(&self, _: &mut dyn Registry) -> Result<()> {
+    fn run(&self) -> Result<()> {
         let flags = if self.ask_become_pass {
             vec!["--ask-become-pass".to_owned()]
         } else {
@@ -48,5 +45,20 @@ impl Module for AnsiblePlaybook {
             return Err(anyhow!("failed to execute {cmdline:?}"));
         }
         Ok(())
+    }
+}
+
+impl Module for AnsiblePlaybook {
+    fn pre_install(&self, _: &mut dyn Registry) -> Result<()> {
+        if self.ask_become_pass {
+            return Ok(());
+        }
+        self.run()
+    }
+    fn system_install(&self) -> Result<()> {
+        if !self.ask_become_pass {
+            return Ok(());
+        }
+        self.run()
     }
 }
