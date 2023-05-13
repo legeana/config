@@ -1,0 +1,14 @@
+- name: Install oh-my-fish
+  hosts: localhost
+
+  tasks:
+  - name: get oh-my-fish repo
+    git:
+      repo: 'https://github.com/oh-my-fish/oh-my-fish.git'
+      dest: ~/.local/share/git/oh-my-fish
+
+  - name: install oh-my-fish
+    shell:
+      cmd: fish bin/install --offline --noninteractive --yes
+      chdir: ~/.local/share/git/oh-my-fish
+      creates: ~/.local/share/omf/init.fish

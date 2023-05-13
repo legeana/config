@@ -1,2 +1,8 @@
+[[dependencies]]
+names = ["ansible"]
+
+[[ansible_playbooks]]
+playbooks = ["omf.yml"]
+
 [[system_dependencies]]
 any = ["fish", "moreutils"]
