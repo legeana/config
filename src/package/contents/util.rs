@@ -33,16 +33,18 @@ pub fn no_args(command: &str, args: &[&str]) -> Result<()> {
 }
 
 pub fn single_arg<'a>(command: &str, args: &[&'a str]) -> Result<&'a str> {
+    Ok(fixed_args(command, args, 1)?[0])
+}
+
+pub fn fixed_args<'a, 'b>(command: &str, args: &'a[&'b str], len: usize) -> Result<&'a[&'b str]> {
     let cmd_args = check_command(command, args)?;
-    if cmd_args.len() != 1 {
+    if cmd_args.len() != len {
         return Err(anyhow!(
-            "{} parser: want a single argument, got {}: {:?}",
-            command,
+            "{command} parser: want {len} arguments, got {}: {cmd_args:?}",
             cmd_args.len(),
-            cmd_args,
         ));
     }
-    Ok(args[1])
+    Ok(&cmd_args)
 }
 
 /// Returns (required_args, remainder_args).

@@ -9,6 +9,7 @@ mod mkdir;
 mod output_file;
 mod parser;
 mod prefix;
+mod set_contents;
 mod subdir;
 mod subdirs;
 mod symlink;
