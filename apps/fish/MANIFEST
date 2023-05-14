@@ -8,5 +8,10 @@ symlink functions
 symlink login.bash
 mkdir plugins
 
+prefix ~/.config/omf/themes
+symlink mytheme
+prefix ~/.config/omf
+set_contents theme mytheme
+
 prefix ~
 symlink .bashrc
