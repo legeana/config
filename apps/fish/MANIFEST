@@ -8,5 +8,8 @@ symlink functions
 symlink login.bash
 mkdir plugins
 
+# https://github.com/jorgebucaran/fisher#using-your-fish_plugins-file
+output_file fish_plugins
+
 prefix ~
 symlink .bashrc
