@@ -8,7 +8,7 @@ symlink gpg-agent-fix
 prefix ~/.config/systemd/user
 symlink ssh-agent.service
 
-prefix ~/.config/fish/plugins/ssh-agent/config.d
+prefix ~/.config/fish/plugins/ssh-agent/conf.d
 symlink ssh-agent.fish
 
 prefix ~/.config/sway/config.d
