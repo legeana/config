@@ -49,7 +49,10 @@ impl AnsiblePlaybook {
 }
 
 impl Module for AnsiblePlaybook {
-    fn pre_install(&self, _: &mut dyn Registry) -> Result<()> {
+    fn post_install(&self, _: &mut dyn Registry) -> Result<()> {
+        // Use post_install because MANIFEST should not have much logic if
+        // ansible is involved anyway. Install/link files first, then let
+        // ansible handle the rest.
         if self.ask_become_pass {
             return Ok(());
         }
