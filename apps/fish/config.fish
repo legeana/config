@@ -1,3 +1,2 @@
-load_d ~/.config/fish/config.d
-load_d ~/.config/fish/aliases
-load_plugins ~/.config/fish/plugins
+# Intentionally empty. All initialisation happens in conf.d.
+# See https://fishshell.com/docs/current/language.html#configuration.

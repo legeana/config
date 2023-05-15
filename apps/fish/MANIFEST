@@ -2,7 +2,7 @@ prefix ~/.config/fish
 
 symlink aliases
 symlink completions
-symlink config.d
+symlink conf.d
 symlink config.fish
 symlink functions
 symlink login.bash
