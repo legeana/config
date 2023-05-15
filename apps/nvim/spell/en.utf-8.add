@@ -10,6 +10,7 @@ algo
 alloc
 alnum
 alsologtostderr
+ansible
 apache
 api
 apis
@@ -46,6 +47,8 @@ clis
 cls
 cmake
 cmakedefine
+cmd
+cmdline
 cmp
 cond
 conf
@@ -81,6 +84,7 @@ denylisted
 dep
 deps
 deque
+dest
 devtools
 dhcp
 dicts
@@ -99,6 +103,7 @@ dsa
 dst
 dstdir
 dunder
+dyn
 ecommerce
 editorconfig
 eg
@@ -251,6 +256,7 @@ netrwhist
 nginx
 nodryrun
 nonblocking
+noninteractive
 nonprod
 noop
 noparent
@@ -262,6 +268,7 @@ nyc
 oauth
 oct
 ok
+omf
 omg
 onclick
 oneline
@@ -291,6 +298,7 @@ pika
 pikaconfig
 pikaplaylist
 pkgbuild
+pkgconfig
 pki
 pkill
 plugins
@@ -345,9 +353,9 @@ sendmsg
 serializer
 serializers
 server
-setattr
 setUp
 setUpModule
+setattr
 sha
 sha1
 sharded
@@ -371,6 +379,7 @@ ssd
 startswith
 staticmethod
 stderr
+stderrlog
 stdin
 stdout
 str
@@ -380,6 +389,7 @@ struct
 stylesheet
 subcmd
 subdir
+subdirs
 subpartition
 substr
 sudo
@@ -414,6 +424,7 @@ tmp
 tmpdir
 tmpl
 tmux
+toml
 toolchain
 traceback
 travis
