@@ -7,6 +7,14 @@ function fish_prompt --description 'Write out the prompt'
     if [ (count $__fish_prompt_cmd_duration) -eq 0 ]
         set __fish_prompt_cmd_duration 0
     end
+    set __fish_prompt_cmd_duration_ms (math $__fish_prompt_cmd_duration%1000)
+    set __fish_prompt_cmd_duration_s (math "floor($__fish_prompt_cmd_duration/1000)%60")
+    set __fish_prompt_cmd_duration_m (math "floor($__fish_prompt_cmd_duration/1000/60)")
+    set -g __fish_prompt_cmd_duration_text (string join '' -- \
+        {$__fish_prompt_cmd_duration_m}m \
+        (string pad -c 0 -w 2 $__fish_prompt_cmd_duration_s)s \
+        (string pad -c 0 -w 3 $__fish_prompt_cmd_duration_ms)ms
+    )
 
     __fish_prompt_profile begin
 
@@ -112,7 +120,7 @@ end
 
 function __fish_prompt_result
     set_color magenta
-    echo -s -n {$__fish_prompt_cmd_duration}ms ' '
+    echo -s -n $__fish_prompt_cmd_duration_text ' '
     set_color $__fish_prompt_color
     echo -n '<'
     echo -n $__fish_prompt_status
