@@ -9,10 +9,6 @@ function load_plugin
         if test -d $plugin/conf.d
             load_d $plugin/conf.d
         end
-        if test -d $plugin/config.d
-            # Deprecated. Do not use.
-            load_d $plugin/config.d
-        end
         if not test -d $plugin/functions
            and not test -d $plugin/conf.d
            and not test -d $plugin/config.d
