@@ -1,2 +1,2 @@
 [[system_dependencies]]
-any = ["fish", "moreutils"]
+any = ["batcat", "fish", "moreutils"]
