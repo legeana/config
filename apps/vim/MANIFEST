@@ -1,5 +1,7 @@
 prefix ~
 symlink .vimrc
-symlink .vim/plugin
+
+prefix ~/.vim
+symlink plugin
 
 subdir fish
