@@ -1,4 +1,8 @@
 requires = ['family=unix']
 
 [[system_dependencies]]
-any = ["batcat", "fish", "moreutils", "ripgrep"]
+any = ["fish", "moreutils", "ripgrep"]
+
+[[system_dependencies]]
+apt = ["batcat"]
+pacman = ["bat"]
