@@ -1,2 +1,2 @@
 [[system_dependencies]]
-any = ["batcat", "fish", "moreutils"]
+any = ["batcat", "fish", "moreutils", "ripgrep"]
