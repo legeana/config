@@ -13,3 +13,6 @@ output_file fish_plugins
 
 prefix ~
 symlink .bashrc
+
+post_install_exec fish -c 'fisher install patrickf1/fzf.fish'
+post_install_exec fish -c 'fisher update'
