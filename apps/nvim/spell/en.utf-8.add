@@ -17,6 +17,8 @@ apis
 appcontext
 archlinux
 arg
+arg0
+arg1
 argparse
 args
 argv
@@ -40,6 +42,7 @@ builtins
 buylist
 cdn
 certtool
+cfg
 chdir
 classmethod
 cli
@@ -140,6 +143,7 @@ fullpath
 fullscreen
 func
 functools
+fzf
 ge
 getattr
 getopt
@@ -218,6 +222,7 @@ linode
 linodes
 linux
 liri
+ln
 loadavg
 localhost
 localtime
@@ -325,6 +330,7 @@ pylint
 randr
 ratelimit
 rdiv
+readlink
 readonly
 readwrite
 rebase
@@ -335,6 +341,7 @@ regen
 reloadall
 repr
 returncode
+ripgrep
 rollout
 rollouts
 rpc
@@ -350,6 +357,7 @@ sbin
 sdk
 sendline
 sendmsg
+serde
 serializer
 serializers
 server
@@ -360,6 +368,7 @@ sha
 sha1
 sharded
 sharding
+shellexpand
 shlex
 shutil
 solarized
@@ -376,6 +385,8 @@ srcdir
 srcs
 srv
 ssd
+sshargs
+sshtm
 startswith
 staticmethod
 stderr
@@ -393,6 +404,7 @@ subdirs
 subpartition
 substr
 sudo
+svim
 symlink
 sys
 syscalls
@@ -416,14 +428,17 @@ textpb
 textproto
 textwrap
 tgif
+thiserror
 threadpool
 timeseries
 timestamp
 timestep
+tm
 tmp
 tmpdir
 tmpl
 tmux
+tmuxinator
 toml
 toolchain
 traceback
@@ -466,6 +481,7 @@ vimscript
 vlan
 vsync
 vulkan
+walkdir
 webtoon
 whitelist
 whitelisted
