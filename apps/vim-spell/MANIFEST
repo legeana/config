@@ -1,0 +1,15 @@
+xdg_config_prefix nvim/pack/spell_config/start/spell_config
+symlink plugin
+
+prefix ~/.vim/pack/spell_config/start/spell_config
+symlink plugin
+
+xdg_config_prefix vim-spell/draft
+set_contents en.utf-8.add ""
+output_file en.utf-8.add.spl
+
+xdg_config_prefix vim-spell/committed
+symlink en.utf-8.add
+output_file en.utf-8.add.spl
+
+post_install_exec vim -c PlugInstall -c PlugClean -c RegenSpellFiles -c qall

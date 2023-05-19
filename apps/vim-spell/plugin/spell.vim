@@ -8,7 +8,7 @@ else
     set spell
 end
 set spelllang=en
-set spellfile=$HOME/.config/nvim-local/spell/en.utf-8.add,$HOME/.config/nvim/spell/en.utf-8.add
+set spellfile=$HOME/.config/vim-spell/draft/en.utf-8.add,$HOME/.config/vim-spell/committed/en.utf-8.add
 hi clear SpellBad
 hi SpellBad cterm=underline ctermfg=red
 set spellcapcheck=

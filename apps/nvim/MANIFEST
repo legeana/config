@@ -7,10 +7,3 @@ symlink plugin
 symlink third_party
 
 subdir autoload
-subdir spell
-
-post_install_exec vim -c PlugInstall -c PlugClean -c RegenSpellFiles -c qall
-
-xdg_config_prefix nvim-local/spell
-set_contents en.utf-8.add ""
-output_file en.utf-8.add.spl
