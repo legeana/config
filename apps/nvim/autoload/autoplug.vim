@@ -2,7 +2,7 @@ let s:plug_url = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plu
 
 let s:xdg_cache_home = empty($XDG_CACHE_HOME) ? $HOME . '/.cache' : $XDG_CACHE_HOME
 let s:plug_dir = s:xdg_cache_home . '/vim-plug'
-execute 'set runtimepath+=' . s:plug_dir
+execute 'set runtimepath+=' . fnameescape(s:plug_dir)
 
 function! s:fetch(src, dst)
     silent exe '!curl -fL --create-dirs -o ' . a:dst . ' ' . a:src
