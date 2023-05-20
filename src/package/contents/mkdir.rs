@@ -10,11 +10,11 @@ pub struct MkDirParser {}
 
 const COMMAND: &str = "mkdir";
 
-struct MkDirInstaller {
+struct MkDir {
     dst: PathBuf,
 }
 
-impl super::FileInstaller for MkDirInstaller {
+impl super::Module for MkDir {
     fn install(&self, registry: &mut dyn Registry) -> Result<()> {
         std::fs::create_dir_all(&self.dst)
             .with_context(|| format!("unable to create {:?}", self.dst))?;
@@ -40,7 +40,7 @@ impl parser::Parser for MkDirParser {
         args: &[&str],
     ) -> Result<()> {
         let filename = util::single_arg(COMMAND, args)?;
-        configuration.files.push(Box::new(MkDirInstaller {
+        configuration.modules.push(Box::new(MkDir {
             dst: state.prefix.current.join(filename),
         }));
         Ok(())

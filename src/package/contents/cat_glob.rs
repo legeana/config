@@ -17,24 +17,18 @@ const COMMAND: &str = "cat_glob_into";
 // See https://github.com/rust-lang/rust/issues/94071.
 const PATH_SEP: &str = "/";
 
-struct CatGlobIntoInstaller {
+struct CatGlobInto {
     dst: PathBuf,
-}
-
-struct CatGlobIntoHook {
     globs: Vec<String>,
     output: PathBuf,
 }
 
-impl super::FileInstaller for CatGlobIntoInstaller {
+impl super::Module for CatGlobInto {
     fn install(&self, registry: &mut dyn Registry) -> Result<()> {
         file_util::make_local_state(registry, &self.dst)?;
         Ok(())
     }
-}
-
-impl super::Hook for CatGlobIntoHook {
-    fn execute(&self) -> Result<()> {
+    fn post_install(&self, _registry: &mut dyn Registry) -> Result<()> {
         let out_file = std::fs::File::create(&self.output)
             .with_context(|| format!("unable to create {:?}", self.output))?;
         let mut out = std::io::BufWriter::new(out_file);
@@ -85,10 +79,8 @@ impl parser::Parser for CatGlobIntoParser {
         let dst = state.prefix.current.join(filename);
         let output = local_state::state_path(&dst)
             .with_context(|| format!("failed to get state_path for {dst:?}"))?;
-        configuration
-            .files
-            .push(Box::new(CatGlobIntoInstaller { dst }));
-        configuration.post_hooks.push(Box::new(CatGlobIntoHook {
+        configuration.modules.push(Box::new(CatGlobInto {
+            dst,
             globs: concatenated_globs,
             output,
         }));

@@ -15,11 +15,7 @@ pub struct ImporterParser {}
 
 const COMMAND: &str = "import_from";
 
-struct ImporterInstaller {
-    dst: PathBuf,
-}
-
-struct ImporterHook {
+struct Importer {
     prefix: PathBuf,
     src: PathBuf,
     dst: PathBuf,
@@ -89,15 +85,12 @@ fn render<W: Write>(prefix: &Path, src: &Path, out: &mut W) -> Result<()> {
     Ok(())
 }
 
-impl super::FileInstaller for ImporterInstaller {
+impl super::Module for Importer {
     fn install(&self, registry: &mut dyn Registry) -> Result<()> {
         file_util::make_local_state(registry, &self.dst)?;
         Ok(())
     }
-}
-
-impl super::Hook for ImporterHook {
-    fn execute(&self) -> Result<()> {
+    fn post_install(&self, _registry: &mut dyn Registry) -> Result<()> {
         let f = File::create(&self.output)
             .with_context(|| format!("failed to open {:?}", self.output))?;
         let mut out = BufWriter::new(f);
@@ -132,10 +125,7 @@ impl parser::Parser for ImporterParser {
             .ok_or_else(|| anyhow!("failed to get parent of {dst:?}"))?;
         let output = local_state::state_path(&dst)
             .with_context(|| format!("failed to get state_path for {dst:?}"))?;
-        configuration
-            .files
-            .push(Box::new(ImporterInstaller { dst: dst.clone() }));
-        configuration.post_hooks.push(Box::new(ImporterHook {
+        configuration.modules.push(Box::new(Importer {
             prefix: prefix.to_owned(),
             src,
             dst,

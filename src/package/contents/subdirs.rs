@@ -43,10 +43,7 @@ impl parser::Parser for SubdirsParser {
                 prefix: state.prefix.join(subdir),
             };
             let subconf = super::Configuration::new_sub(&mut substate, subroot)?;
-            if configuration.subdirs.contains_key(subdir) {
-                return Err(anyhow!("{configuration} already includes {subdir}"));
-            }
-            configuration.subdirs.insert(subdir.to_owned(), subconf);
+            configuration.modules.push(Box::new(subconf));
         }
         Ok(())
     }

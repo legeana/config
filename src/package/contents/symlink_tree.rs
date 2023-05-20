@@ -12,12 +12,12 @@ pub struct SymlinkTreeParser {}
 
 const COMMAND: &str = "symlink_tree";
 
-struct SymlinkTreeInstaller {
+struct SymlinkTree {
     src: PathBuf,
     dst: PathBuf,
 }
 
-impl super::FileInstaller for SymlinkTreeInstaller {
+impl super::Module for SymlinkTree {
     fn install(&self, registry: &mut dyn Registry) -> Result<()> {
         for e in WalkDir::new(&self.src).sort_by_file_name() {
             let entry = e.with_context(|| format!("failed to read {:?}", self.src))?;
@@ -51,7 +51,7 @@ impl parser::Parser for SymlinkTreeParser {
         args: &[&str],
     ) -> Result<()> {
         let filename = util::single_arg(COMMAND, args)?;
-        configuration.files.push(Box::new(SymlinkTreeInstaller {
+        configuration.modules.push(Box::new(SymlinkTree {
             src: configuration.root.join(filename),
             dst: state.prefix.current.join(filename),
         }));

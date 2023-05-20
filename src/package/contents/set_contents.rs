@@ -11,12 +11,12 @@ pub struct SetContentsParser {}
 
 const COMMAND: &str = "set_contents";
 
-struct SetContentsInstaller {
+struct SetContents {
     dst: PathBuf,
     contents: String,
 }
 
-impl super::FileInstaller for SetContentsInstaller {
+impl super::Module for SetContents {
     fn install(&self, registry: &mut dyn Registry) -> Result<()> {
         let state = file_util::make_local_state(registry, &self.dst)?;
         if state
@@ -50,7 +50,7 @@ impl parser::Parser for SetContentsParser {
         assert_eq!(args.len(), 2);
         let filename = args[0];
         let contents = args[1];
-        configuration.files.push(Box::new(SetContentsInstaller {
+        configuration.modules.push(Box::new(SetContents {
             dst: state.prefix.current.join(filename),
             contents: contents.to_owned(),
         }));

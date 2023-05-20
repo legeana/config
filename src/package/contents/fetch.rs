@@ -18,7 +18,7 @@ struct FetchIntoInstaller {
     dst: PathBuf,
 }
 
-impl super::FileInstaller for FetchIntoInstaller {
+impl super::Module for FetchIntoInstaller {
     fn install(&self, registry: &mut dyn Registry) -> Result<()> {
         let state = file_util::make_local_state(registry, &self.dst)?;
         if state
@@ -32,8 +32,8 @@ impl super::FileInstaller for FetchIntoInstaller {
             .call()
             .with_context(|| format!("failed to fetch {:?}", self.url))?
             .into_reader();
-        let output = std::fs::File::create(&state)
-            .with_context(|| format!("failed to open {state:?}"))?;
+        let output =
+            std::fs::File::create(&state).with_context(|| format!("failed to open {state:?}"))?;
         let mut writer = std::io::BufWriter::new(output);
         std::io::copy(&mut reader, &mut writer)
             .with_context(|| format!("failed to write {state:?}"))?;
@@ -59,7 +59,7 @@ impl parser::Parser for FetchIntoParser {
         assert_eq!(args.len(), 2);
         let filename = args[0];
         let url = args[1];
-        configuration.files.push(Box::new(FetchIntoInstaller {
+        configuration.modules.push(Box::new(FetchIntoInstaller {
             url: url.to_owned(),
             dst: state.prefix.current.join(filename),
         }));

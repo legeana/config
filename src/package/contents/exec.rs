@@ -16,8 +16,8 @@ struct PostInstallExecHook {
     args: Vec<String>,
 }
 
-impl super::Hook for PostInstallExecHook {
-    fn execute(&self) -> Result<()> {
+impl super::Module for PostInstallExecHook {
+    fn post_install(&self, _registry: &mut dyn crate::registry::Registry) -> Result<()> {
         let cmdline = format!(
             "{:?} $ {} {}",
             self.current_dir,
@@ -59,7 +59,7 @@ impl parser::Parser for PostInstallExecParser {
             .map(shellexpand::tilde)
             .map(String::from)
             .collect();
-        configuration.post_hooks.push(Box::new(PostInstallExecHook {
+        configuration.modules.push(Box::new(PostInstallExecHook {
             current_dir: state.prefix.current.clone(),
             cmd: command[0].to_owned(),
             args,

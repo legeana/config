@@ -11,12 +11,12 @@ pub struct CopyParser {}
 
 const COMMAND: &str = "copy";
 
-struct CopyInstaller {
+struct Copy {
     src: PathBuf,
     dst: PathBuf,
 }
 
-impl super::FileInstaller for CopyInstaller {
+impl super::Module for Copy {
     fn install(&self, registry: &mut dyn Registry) -> Result<()> {
         let state = file_util::make_local_state(registry, &self.dst)?;
         if state
@@ -47,7 +47,7 @@ impl parser::Parser for CopyParser {
         args: &[&str],
     ) -> Result<()> {
         let filename = util::single_arg(COMMAND, args)?;
-        configuration.files.push(Box::new(CopyInstaller {
+        configuration.modules.push(Box::new(Copy {
             src: configuration.root.join(filename),
             dst: state.prefix.current.join(filename),
         }));

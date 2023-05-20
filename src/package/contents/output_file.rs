@@ -11,11 +11,11 @@ pub struct OutputFileParser {}
 
 const COMMAND: &str = "output_file";
 
-struct OutputFileInstaller {
+struct OutputFile {
     dst: PathBuf,
 }
 
-impl super::FileInstaller for OutputFileInstaller {
+impl super::Module for OutputFile {
     fn install(&self, registry: &mut dyn Registry) -> Result<()> {
         file_util::make_local_state(registry, &self.dst).map(|_| ())
     }
@@ -36,7 +36,7 @@ impl parser::Parser for OutputFileParser {
         args: &[&str],
     ) -> Result<()> {
         let filename = util::single_arg(COMMAND, args)?;
-        configuration.files.push(Box::new(OutputFileInstaller {
+        configuration.modules.push(Box::new(OutputFile {
             dst: state.prefix.current.join(filename),
         }));
         Ok(())

@@ -1,7 +1,7 @@
 use super::parser;
 use super::util;
 
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 
 pub struct SubdirParser {}
 
@@ -27,11 +27,7 @@ impl parser::Parser for SubdirParser {
             prefix: state.prefix.join(subdir),
         };
         let subconf = super::Configuration::new_sub(&mut substate, subroot)?;
-        // TODO: use try_insert when available
-        if configuration.subdirs.contains_key(subdir) {
-            return Err(anyhow!("{} already includes {}", configuration, subdir));
-        }
-        configuration.subdirs.insert(subdir.to_string(), subconf);
+        configuration.modules.push(Box::new(subconf));
         Ok(())
     }
 }

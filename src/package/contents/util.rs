@@ -36,7 +36,7 @@ pub fn single_arg<'a>(command: &str, args: &[&'a str]) -> Result<&'a str> {
     Ok(fixed_args(command, args, 1)?[0])
 }
 
-pub fn fixed_args<'a, 'b>(command: &str, args: &'a[&'b str], len: usize) -> Result<&'a[&'b str]> {
+pub fn fixed_args<'a, 'b>(command: &str, args: &'a [&'b str], len: usize) -> Result<&'a [&'b str]> {
     let cmd_args = check_command(command, args)?;
     if cmd_args.len() != len {
         return Err(anyhow!(

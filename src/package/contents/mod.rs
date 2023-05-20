@@ -21,9 +21,8 @@ mod xdg_prefix;
 
 use core::fmt;
 use std::fs::File;
-use std::io::BufReader;
+use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
-use std::{collections::hash_map::HashMap, io::BufRead};
 
 use anyhow::{anyhow, Context, Ok, Result};
 
@@ -34,22 +33,11 @@ const MANIFEST: &str = "MANIFEST";
 
 pub use parser::help;
 
-pub trait FileInstaller {
-    fn install(&self, registry: &mut dyn Registry) -> Result<()>;
-}
-
-pub trait Hook {
-    fn execute(&self) -> Result<()>;
-}
-
 #[derive(Default)]
 pub struct Configuration {
     enabled: bool,
     root: PathBuf,
-    subdirs: HashMap<String, Configuration>,
-    pre_hooks: Vec<Box<dyn Hook>>,
-    post_hooks: Vec<Box<dyn Hook>>,
-    files: Vec<Box<dyn FileInstaller>>,
+    modules: Vec<Box<dyn Module>>,
 }
 
 impl Configuration {
@@ -105,46 +93,25 @@ impl Module for Configuration {
         if !self.enabled {
             return Ok(());
         }
-        for hook in self.pre_hooks.iter() {
-            hook.execute()
-                .with_context(|| "failed to execute pre-install hook")?;
-        }
-        for (name, subdir) in self.subdirs.iter() {
-            subdir
-                .pre_install(registry)
-                .with_context(|| format!("failed to pre-install {name}"))?;
-        }
-        Ok(())
+        self.modules
+            .pre_install(registry)
+            .with_context(|| format!("failed pre_install in {:?}", self.root))
     }
     fn install(&self, registry: &mut dyn Registry) -> Result<()> {
         if !self.enabled {
             return Ok(());
         }
-        for file in self.files.iter() {
-            file.install(registry)
-                .context("failed to install file installer")?;
-        }
-        for (name, subdir) in self.subdirs.iter() {
-            subdir
-                .install(registry)
-                .with_context(|| format!("failed to install {name}"))?;
-        }
-        Ok(())
+        self.modules
+            .install(registry)
+            .with_context(|| format!("failed install in {:?}", self.root))
     }
     fn post_install(&self, registry: &mut dyn Registry) -> Result<()> {
         if !self.enabled {
             return Ok(());
         }
-        for hook in self.post_hooks.iter() {
-            hook.execute()
-                .context("failed to execute post-install hook")?;
-        }
-        for (name, subdir) in self.subdirs.iter() {
-            subdir
-                .post_install(registry)
-                .with_context(|| format!("failed to post-install {name}"))?;
-        }
-        Ok(())
+        self.modules
+            .post_install(registry)
+            .with_context(|| format!("failed post_install in {:?}", self.root))
     }
 }
 

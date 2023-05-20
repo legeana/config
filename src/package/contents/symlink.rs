@@ -11,12 +11,12 @@ pub struct SymlinkParser {}
 
 const COMMAND: &str = "symlink";
 
-struct SymlinkInstaller {
+struct Symlink {
     src: PathBuf,
     dst: PathBuf,
 }
 
-impl super::FileInstaller for SymlinkInstaller {
+impl super::Module for Symlink {
     fn install(&self, registry: &mut dyn Registry) -> Result<()> {
         file_util::make_symlink(registry, &self.src, &self.dst)
     }
@@ -37,7 +37,7 @@ impl parser::Parser for SymlinkParser {
         args: &[&str],
     ) -> Result<()> {
         let filename = util::single_arg(COMMAND, args)?;
-        configuration.files.push(Box::new(SymlinkInstaller {
+        configuration.modules.push(Box::new(Symlink {
             src: configuration.root.join(filename),
             dst: state.prefix.current.join(filename),
         }));
