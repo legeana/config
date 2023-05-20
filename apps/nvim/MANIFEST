@@ -1,6 +1,9 @@
 xdg_config_prefix nvim
-symlink autoload
 symlink init.vim
 symlink opt_plugin
 symlink plugin
 symlink third_party
+
+xdg_cache_prefix vim-plug/autoload
+fetch_into plug.vim https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+post_install_exec vim -c PlugInstall -c PlugClean -c qall
