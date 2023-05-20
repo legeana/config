@@ -1,2 +1,4 @@
+has_contents = false
+
 [[system_dependencies]]
 any = ["python3"]
