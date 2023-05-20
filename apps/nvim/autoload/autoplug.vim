@@ -1,18 +1,16 @@
 let s:plug_url = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 
-if has('nvim')
-    let s:config_dir = stdpath('config')
-else
-    let s:config_dir = expand('~/.config/nvim')
-endif
+let s:xdg_cache_home = empty($XDG_CACHE_HOME) ? $HOME . '/.cache' : $XDG_CACHE_HOME
+let s:plug_dir = s:xdg_cache_home . '/vim-plug'
+execute 'set runtimepath+=' . s:plug_dir
 
 function! s:fetch(src, dst)
     silent exe '!curl -fL --create-dirs -o ' . a:dst . ' ' . a:src
 endfunction
 
-function! autoplug#begin(...)
+function! autoplug#begin()
     let g:autoplug_install = 0
-    let autoload_plug_path = s:config_dir . '/autoload/plug.vim'
+    let autoload_plug_path = s:plug_dir . '/autoload/plug.vim'
     if !filereadable(autoload_plug_path)
         call s:fetch(s:plug_url, autoload_plug_path)
         execute 'source ' . fnameescape(autoload_plug_path)
@@ -20,7 +18,7 @@ function! autoplug#begin(...)
         let g:autoplug_install = 1
     endif
 
-    call call(function('plug#begin'), a:000)
+    call plug#begin(s:plug_dir . '/plugins')
 endfunction
 
 function autoplug#end()

@@ -1,4 +1,4 @@
-call autoplug#begin('~/.local/share/nvim-plug/plugins')
+call autoplug#begin()
 Plug 'tpope/vim-sensible'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'machakann/vim-highlightedyank'
