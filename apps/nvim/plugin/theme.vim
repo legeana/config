@@ -1,1 +1,1 @@
-colorscheme dracula
+silent! colorscheme dracula
