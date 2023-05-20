@@ -1,0 +1,5 @@
+# https://doc.rust-lang.org/cargo/reference/config.html
+# Windows: %USERPROFILE%\.cargo\config.toml
+# Unix: $HOME/.cargo/config.toml
+prefix ~/.config/cargo
+symlink config.toml
