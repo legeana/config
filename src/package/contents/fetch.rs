@@ -9,12 +9,12 @@ pub struct FetchIntoParser {}
 
 const COMMAND: &str = "fetch_into";
 
-struct FetchIntoInstaller {
+struct FetchInto {
     url: String,
     output: local_state::FileState,
 }
 
-impl super::Module for FetchIntoInstaller {
+impl super::Module for FetchInto {
     fn install(&self, registry: &mut dyn Registry) -> Result<()> {
         self.output.install(registry)?;
         let state = self.output.path();
@@ -43,7 +43,7 @@ impl parser::Parser for FetchIntoParser {
         COMMAND
     }
     fn help(&self) -> &'static str {
-        "fetch_into <url> <filename>
+        "fetch_into <filename> <url>
            downloads <url> into a local storage and installs a symlink to it"
     }
     fn parse(
@@ -59,7 +59,7 @@ impl parser::Parser for FetchIntoParser {
         let dst = state.prefix.current.join(filename);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
-        configuration.modules.push(Box::new(FetchIntoInstaller {
+        configuration.modules.push(Box::new(FetchInto {
             url: url.to_owned(),
             output,
         }));
