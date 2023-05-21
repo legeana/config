@@ -1,8 +1,6 @@
-use std::path::PathBuf;
+use anyhow::{Context, Result};
 
-use anyhow::Result;
-
-use crate::package::contents::file_util;
+use super::local_state;
 use crate::package::contents::parser;
 use crate::package::contents::util;
 use crate::registry::Registry;
@@ -12,12 +10,12 @@ pub struct OutputFileParser {}
 const COMMAND: &str = "output_file";
 
 struct OutputFile {
-    dst: PathBuf,
+    output: local_state::FileState,
 }
 
 impl super::Module for OutputFile {
     fn install(&self, registry: &mut dyn Registry) -> Result<()> {
-        file_util::make_local_state(registry, &self.dst).map(|_| ())
+        self.output.install(registry)
     }
 }
 
@@ -36,9 +34,10 @@ impl parser::Parser for OutputFileParser {
         args: &[&str],
     ) -> Result<()> {
         let filename = util::single_arg(COMMAND, args)?;
-        configuration.modules.push(Box::new(OutputFile {
-            dst: state.prefix.current.join(filename),
-        }));
+        let dst = state.prefix.current.join(filename);
+        let output = local_state::FileState::new(dst.clone())
+            .with_context(|| format!("failed to create FileState for {dst:?}"))?;
+        configuration.modules.push(Box::new(OutputFile { output }));
         Ok(())
     }
 }

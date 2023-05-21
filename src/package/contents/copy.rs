@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use super::file_util;
+use super::local_state;
 use super::parser;
 use super::util;
 use crate::registry::Registry;
@@ -13,12 +13,13 @@ const COMMAND: &str = "copy";
 
 struct Copy {
     src: PathBuf,
-    dst: PathBuf,
+    output: local_state::FileState,
 }
 
 impl super::Module for Copy {
     fn install(&self, registry: &mut dyn Registry) -> Result<()> {
-        let state = file_util::make_local_state(registry, &self.dst)?;
+        self.output.install(registry)?;
+        let state = self.output.path();
         if state
             .try_exists()
             .with_context(|| format!("unable to check if {state:?} exists"))?
@@ -47,9 +48,12 @@ impl parser::Parser for CopyParser {
         args: &[&str],
     ) -> Result<()> {
         let filename = util::single_arg(COMMAND, args)?;
+        let dst = state.prefix.current.join(filename);
+        let output = local_state::FileState::new(dst.clone())
+            .with_context(|| format!("failed to create FileState from {dst:?}"))?;
         configuration.modules.push(Box::new(Copy {
             src: configuration.root.join(filename),
-            dst: state.prefix.current.join(filename),
+            output,
         }));
         Ok(())
     }

@@ -2,7 +2,6 @@ use std::io::{BufRead, BufReader, BufWriter};
 use std::path::{Path, PathBuf};
 use std::{fs::File, io::Write};
 
-use super::file_util;
 use super::local_state;
 use super::parser;
 use super::util;
@@ -18,8 +17,7 @@ const COMMAND: &str = "import_from";
 struct Importer {
     prefix: PathBuf,
     src: PathBuf,
-    dst: PathBuf,
-    output: PathBuf,
+    output: local_state::FileState,
 }
 
 /// Returns true if parser matched.
@@ -87,17 +85,17 @@ fn render<W: Write>(prefix: &Path, src: &Path, out: &mut W) -> Result<()> {
 
 impl super::Module for Importer {
     fn install(&self, registry: &mut dyn Registry) -> Result<()> {
-        file_util::make_local_state(registry, &self.dst)?;
-        Ok(())
+        self.output.install(registry)
     }
     fn post_install(&self, _registry: &mut dyn Registry) -> Result<()> {
-        let f = File::create(&self.output)
-            .with_context(|| format!("failed to open {:?}", self.output))?;
+        let f = File::create(self.output.path())
+            .with_context(|| format!("failed to open {:?}", self.output.path()))?;
         let mut out = BufWriter::new(f);
         render(&self.prefix, &self.src, &mut out).with_context(|| {
             format!(
                 "failed to render state {:?} for {:?}",
-                self.output, self.dst,
+                self.output.path(),
+                self.output.link(),
             )
         })
     }
@@ -123,12 +121,11 @@ impl parser::Parser for ImporterParser {
         let prefix = dst
             .parent()
             .ok_or_else(|| anyhow!("failed to get parent of {dst:?}"))?;
-        let output = local_state::state_path(&dst)
-            .with_context(|| format!("failed to get state_path for {dst:?}"))?;
+        let output = local_state::FileState::new(dst.clone())
+            .with_context(|| format!("failed to create FileState for {dst:?}"))?;
         configuration.modules.push(Box::new(Importer {
             prefix: prefix.to_owned(),
             src,
-            dst,
             output,
         }));
         Ok(())

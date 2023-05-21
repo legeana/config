@@ -1,6 +1,6 @@
 use std::fs;
 use std::os::unix;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use anyhow::{anyhow, Context, Result};
 
@@ -26,11 +26,4 @@ pub fn make_symlink(registry: &mut dyn Registry, src: &Path, dst: &Path) -> Resu
         .with_context(|| format!("failed to register symlink {dst:?}"))?;
     log::info!("Symlink {src:?} -> {dst:?}");
     Ok(())
-}
-
-pub fn make_local_state(registry: &mut dyn Registry, dst: &Path) -> Result<PathBuf> {
-    let state = super::local_state::make_state(dst)
-        .with_context(|| format!("unable to make local state for {dst:?}"))?;
-    make_symlink(registry, &state, dst)?;
-    Ok(state)
 }

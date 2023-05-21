@@ -1,6 +1,5 @@
-use std::{io::Write, path::PathBuf};
+use std::io::Write;
 
-use super::file_util;
 use super::local_state;
 use super::parser;
 use super::util;
@@ -18,19 +17,17 @@ const COMMAND: &str = "cat_glob_into";
 const PATH_SEP: &str = "/";
 
 struct CatGlobInto {
-    dst: PathBuf,
     globs: Vec<String>,
-    output: PathBuf,
+    output: local_state::FileState,
 }
 
 impl super::Module for CatGlobInto {
     fn install(&self, registry: &mut dyn Registry) -> Result<()> {
-        file_util::make_local_state(registry, &self.dst)?;
-        Ok(())
+        self.output.install(registry)
     }
     fn post_install(&self, _registry: &mut dyn Registry) -> Result<()> {
-        let out_file = std::fs::File::create(&self.output)
-            .with_context(|| format!("unable to create {:?}", self.output))?;
+        let out_file = std::fs::File::create(self.output.path())
+            .with_context(|| format!("unable to create {:?}", self.output.path()))?;
         let mut out = std::io::BufWriter::new(out_file);
         for glob in self.globs.iter() {
             for entry in glob_iter(glob).with_context(|| format!("failed to glob {}", glob))? {
@@ -40,12 +37,12 @@ impl super::Module for CatGlobInto {
                     .with_context(|| format!("failed to open {path:?}"))?;
                 let mut inp = std::io::BufReader::new(inp_file);
                 std::io::copy(&mut inp, &mut out).with_context(|| {
-                    format!("failed to copy from {path:?} to {:?}", self.output)
+                    format!("failed to copy from {path:?} to {:?}", self.output.path())
                 })?;
             }
         }
         out.flush()
-            .with_context(|| format!("failed to flush {:?}", self.output))?;
+            .with_context(|| format!("failed to flush {:?}", self.output.path()))?;
         Ok(())
     }
 }
@@ -77,10 +74,9 @@ impl parser::Parser for CatGlobIntoParser {
         let concatenated_globs: Vec<String> =
             globs.iter().map(|g| glob_prefix.clone() + g).collect();
         let dst = state.prefix.current.join(filename);
-        let output = local_state::state_path(&dst)
-            .with_context(|| format!("failed to get state_path for {dst:?}"))?;
+        let output = local_state::FileState::new(dst.clone())
+            .with_context(|| format!("failed to create FileState for {dst:?}"))?;
         configuration.modules.push(Box::new(CatGlobInto {
-            dst,
             globs: concatenated_globs,
             output,
         }));

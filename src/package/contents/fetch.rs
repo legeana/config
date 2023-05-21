@@ -1,12 +1,11 @@
 use std::assert_eq;
-use std::path::PathBuf;
 
-use super::file_util;
+use anyhow::{self, Context, Result};
+
+use super::local_state;
 use super::parser;
 use super::util;
 use crate::registry::Registry;
-
-use anyhow::{self, Context, Result};
 
 pub struct FetchIntoParser {}
 
@@ -14,12 +13,13 @@ const COMMAND: &str = "fetch_into";
 
 struct FetchIntoInstaller {
     url: String,
-    dst: PathBuf,
+    output: local_state::FileState,
 }
 
 impl super::Module for FetchIntoInstaller {
     fn install(&self, registry: &mut dyn Registry) -> Result<()> {
-        let state = file_util::make_local_state(registry, &self.dst)?;
+        self.output.install(registry)?;
+        let state = self.output.path();
         if state
             .try_exists()
             .with_context(|| format!("unable to check if {state:?} exists"))?
@@ -58,9 +58,12 @@ impl parser::Parser for FetchIntoParser {
         assert_eq!(args.len(), 2);
         let filename = args[0];
         let url = args[1];
+        let dst = state.prefix.current.join(filename);
+        let output = local_state::FileState::new(dst.clone())
+            .with_context(|| format!("failed to create FileState from {dst:?}"))?;
         configuration.modules.push(Box::new(FetchIntoInstaller {
             url: url.to_owned(),
-            dst: state.prefix.current.join(filename),
+            output,
         }));
         Ok(())
     }

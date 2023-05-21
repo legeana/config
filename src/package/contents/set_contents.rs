@@ -1,6 +1,4 @@
-use std::path::PathBuf;
-
-use super::file_util;
+use super::local_state;
 use super::parser;
 use super::util;
 use crate::registry::Registry;
@@ -12,13 +10,14 @@ pub struct SetContentsParser {}
 const COMMAND: &str = "set_contents";
 
 struct SetContents {
-    dst: PathBuf,
+    output: local_state::FileState,
     contents: String,
 }
 
 impl super::Module for SetContents {
     fn install(&self, registry: &mut dyn Registry) -> Result<()> {
-        let state = file_util::make_local_state(registry, &self.dst)?;
+        self.output.install(registry)?;
+        let state = self.output.path();
         if state
             .try_exists()
             .with_context(|| format!("unable to check if {state:?} exists"))?
@@ -26,8 +25,8 @@ impl super::Module for SetContents {
             log::info!("Copy: skipping already existing state for {state:?}");
             return Ok(());
         }
-        std::fs::write(&self.dst, &self.contents)
-            .with_context(|| format!("unable to write {:?} to {:?}", self.contents, self.dst))?;
+        std::fs::write(state, &self.contents)
+            .with_context(|| format!("unable to write {:?} to {:?}", self.contents, state))?;
         Ok(())
     }
 }
@@ -50,8 +49,11 @@ impl parser::Parser for SetContentsParser {
         assert_eq!(args.len(), 2);
         let filename = args[0];
         let contents = args[1];
+        let dst = state.prefix.current.join(filename);
+        let output = local_state::FileState::new(dst.clone())
+            .with_context(|| format!("failed to create FileState for {dst:?}"))?;
         configuration.modules.push(Box::new(SetContents {
-            dst: state.prefix.current.join(filename),
+            output,
             contents: contents.to_owned(),
         }));
         Ok(())
