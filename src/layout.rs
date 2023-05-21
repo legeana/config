@@ -1,12 +1,12 @@
 use std::ffi::OsStr;
 use std::fs::DirEntry;
 use std::path::{Path, PathBuf};
-use std::process::Command;
 
+use crate::git_utils;
 use crate::repository;
 use crate::repository::Repository;
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result};
 
 const APPS: &str = "apps";
 const OVERLAY: &str = "overlay.d";
@@ -105,44 +105,10 @@ pub fn repositories(root: &Path) -> Result<Vec<Repository>> {
     Ok(result)
 }
 
-fn get_head(root: &Path) -> Result<String> {
-    let rev_parse = Command::new("git")
-        .args(["rev-parse", "HEAD"])
-        .current_dir(root)
-        .output()
-        .with_context(|| format!("{root:?} $ git rev-parse HEAD"))?;
-    if !rev_parse.status.success() {
-        let err = String::from_utf8_lossy(&rev_parse.stdout);
-        return Err(anyhow!("failed git rev-parse HEAD: {}", err));
-    }
-    let out = String::from_utf8(rev_parse.stdout.clone()).with_context(|| {
-        format!(
-            "failed to parse {root:?} $ git rev-parse HEAD output {:?}",
-            String::from_utf8_lossy(&rev_parse.stdout),
-        )
-    })?;
-    Ok(out.trim().to_string())
-}
-
-/// Returns whether pull changed HEAD.
-fn git_pull(root: &Path) -> Result<bool> {
-    let old_head = get_head(root)?;
-    let status = Command::new("git")
-        .args(["pull", "--ff-only"])
-        .current_dir(root)
-        .status()
-        .with_context(|| format!("{root:?} $ git pull --ff-only"))?;
-    if !status.success() {
-        return Err(anyhow!("{root:?} $ git pull --ff-only"));
-    }
-    let new_head = get_head(root)?;
-    Ok(old_head != new_head)
-}
-
 /// Returns true if restart is required.
 fn update_repository(root: &Path) -> Result<bool> {
     if root.join(GIT_DIR).is_dir() {
-        return git_pull(root);
+        return git_utils::git_pull(root);
     }
     // Unsupported version control system, if any. Skip.
     Ok(false)

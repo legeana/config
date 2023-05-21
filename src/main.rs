@@ -1,4 +1,5 @@
 mod file_registry;
+mod git_utils;
 mod layout;
 mod package;
 mod registry;
