@@ -1,5 +1,3 @@
-use std::assert_eq;
-
 use anyhow::{self, Context, Result};
 
 use super::local_state;
