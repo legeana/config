@@ -77,6 +77,7 @@ fn parsers() -> Vec<Box<dyn Parser>> {
         Box::new(super::set_contents::SetContentsParser {}),
         Box::new(super::importer::ImporterParser {}),
         Box::new(super::fetch::FetchIntoParser {}),
+        Box::new(super::git_clone::GitCloneParser {}),
         Box::new(super::exec::PostInstallExecParser {}),
         Box::new(super::deprecated::DeprecatedParser {}),
     ]

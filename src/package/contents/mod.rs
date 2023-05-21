@@ -4,6 +4,7 @@ mod deprecated;
 mod exec;
 mod fetch;
 mod file_util;
+mod git_clone;
 mod importer;
 mod local_state;
 mod mkdir;

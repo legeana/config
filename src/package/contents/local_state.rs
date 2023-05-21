@@ -6,7 +6,7 @@ use base64::Engine;
 use sha2::{Digest, Sha256};
 
 use super::file_util;
-use crate::{registry::Registry, package::Module};
+use crate::{package::Module, registry::Registry};
 
 type StateType = &'static str;
 const FILE_STATE: StateType = "output";
