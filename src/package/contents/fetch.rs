@@ -7,7 +7,6 @@ use super::util;
 use crate::registry::Registry;
 
 use anyhow::{self, Context, Result};
-use ureq;
 
 pub struct FetchIntoParser {}
 

@@ -28,10 +28,10 @@ pub struct Package {
 
 impl tag_criteria::TagCriteria for Package {
     fn requires(&self) -> Option<&[String]> {
-        self.requires.as_ref().map(|v| v.as_slice())
+        self.requires.as_deref()
     }
     fn conflicts(&self) -> Option<&[String]> {
-        self.conflicts.as_ref().map(|v| v.as_slice())
+        self.conflicts.as_deref()
     }
 }
 
@@ -47,10 +47,10 @@ pub struct Dependency {
 
 impl tag_criteria::TagCriteria for Dependency {
     fn requires(&self) -> Option<&[String]> {
-        self.requires.as_ref().map(|v| v.as_slice())
+        self.requires.as_deref()
     }
     fn conflicts(&self) -> Option<&[String]> {
-        self.conflicts.as_ref().map(|v| v.as_slice())
+        self.conflicts.as_deref()
     }
 }
 
@@ -77,10 +77,10 @@ pub struct SystemDependency {
 
 impl tag_criteria::TagCriteria for SystemDependency {
     fn requires(&self) -> Option<&[String]> {
-        self.requires.as_ref().map(|v| v.as_slice())
+        self.requires.as_deref()
     }
     fn conflicts(&self) -> Option<&[String]> {
-        self.conflicts.as_ref().map(|v| v.as_slice())
+        self.conflicts.as_deref()
     }
 }
 
@@ -101,10 +101,10 @@ pub struct UserDependency {
 
 impl tag_criteria::TagCriteria for UserDependency {
     fn requires(&self) -> Option<&[String]> {
-        self.requires.as_ref().map(|v| v.as_slice())
+        self.requires.as_deref()
     }
     fn conflicts(&self) -> Option<&[String]> {
-        self.conflicts.as_ref().map(|v| v.as_slice())
+        self.conflicts.as_deref()
     }
 }
 

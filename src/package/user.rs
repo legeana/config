@@ -18,13 +18,13 @@ impl UserDependency {
         if !cfg.is_satisfied().context("failed to check tags")? {
             return Ok(Self::default());
         }
-        if let Some(_) = &cfg.brew {
+        if cfg.brew.is_some() {
             return Err(anyhow!("brew is not supported yet"));
         }
-        if let Some(_) = &cfg.npm {
+        if cfg.npm.is_some() {
             return Err(anyhow!("npm is not supported yet"));
         }
-        if let Some(_) = &cfg.npm {
+        if cfg.npm.is_some() {
             return Err(anyhow!("pip_user is not supported yet"));
         }
         if let Some(ansible_galaxy_role) = &cfg.ansible_galaxy_role {

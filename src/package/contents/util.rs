@@ -44,7 +44,7 @@ pub fn fixed_args<'a, 'b>(command: &str, args: &'a [&'b str], len: usize) -> Res
             cmd_args.len(),
         ));
     }
-    Ok(&cmd_args)
+    Ok(cmd_args)
 }
 
 /// Returns (required_args, remainder_args).

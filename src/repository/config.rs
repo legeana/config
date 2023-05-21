@@ -19,10 +19,10 @@ pub struct Repository {
 
 impl tag_criteria::TagCriteria for Repository {
     fn requires(&self) -> Option<&[String]> {
-        self.requires.as_ref().map(|v| v.as_slice())
+        self.requires.as_deref()
     }
     fn conflicts(&self) -> Option<&[String]> {
-        self.conflicts.as_ref().map(|v| v.as_slice())
+        self.conflicts.as_deref()
     }
 }
 

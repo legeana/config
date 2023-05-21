@@ -20,7 +20,7 @@ pub trait TagCriteria {
                 return Ok(false);
             }
         }
-        return Ok(true);
+        Ok(true)
     }
 }
 
@@ -31,10 +31,10 @@ pub struct Criteria {
 
 impl TagCriteria for Criteria {
     fn requires(&self) -> Option<&[String]> {
-        self.requires.as_ref().map(|v| v.as_slice())
+        self.requires.as_deref()
     }
     fn conflicts(&self) -> Option<&[String]> {
-        self.conflicts.as_ref().map(|v| v.as_slice())
+        self.conflicts.as_deref()
     }
 }
 
