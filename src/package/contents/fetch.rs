@@ -30,7 +30,7 @@ impl super::Module for FetchIntoInstaller {
             .with_context(|| format!("failed to fetch {:?}", self.url))?
             .into_reader();
         let output =
-            std::fs::File::create(&state).with_context(|| format!("failed to open {state:?}"))?;
+            std::fs::File::create(state).with_context(|| format!("failed to open {state:?}"))?;
         let mut writer = std::io::BufWriter::new(output);
         std::io::copy(&mut reader, &mut writer)
             .with_context(|| format!("failed to write {state:?}"))?;

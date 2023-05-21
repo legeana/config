@@ -27,7 +27,7 @@ impl super::Module for Copy {
             log::info!("Copy: skipping already existing state for {state:?}");
             return Ok(());
         }
-        std::fs::copy(&self.src, &state)
+        std::fs::copy(&self.src, state)
             .with_context(|| format!("unable to copy {:?} to {state:?}", self.src))?;
         Ok(())
     }
