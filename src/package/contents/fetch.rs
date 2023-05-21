@@ -1,4 +1,4 @@
-use anyhow::{self, Context, Result};
+use anyhow::{Context, Result};
 
 use super::local_state;
 use super::parser;

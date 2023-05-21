@@ -3,7 +3,7 @@ use super::parser;
 use super::util;
 use crate::registry::Registry;
 
-use anyhow::{self, Context, Result};
+use anyhow::{Context, Result};
 
 pub struct SetContentsParser {}
 
