@@ -1,3 +1,5 @@
+PWD
+TODO
 abc
 absl
 abstractmethod
@@ -10,6 +12,7 @@ algo
 alloc
 alnum
 alsologtostderr
+amd64
 ansible
 apache
 api
@@ -34,6 +37,7 @@ backend
 backends
 basename
 basestring
+batcat
 blackbox
 blackhole
 bool
@@ -53,6 +57,7 @@ cmakedefine
 cmd
 cmdline
 cmp
+commandline
 cond
 conf
 confgen
@@ -96,6 +101,7 @@ dirname
 dirs
 dists
 django
+dlv
 dmarc
 dns
 docstring
@@ -144,6 +150,7 @@ fullscreen
 func
 functools
 fzf
+gc
 ge
 getattr
 getopt
@@ -162,6 +169,7 @@ gpg
 gpio
 gpiozero
 gz
+handoff
 hardcoded
 hasattr
 hashbang
@@ -170,6 +178,7 @@ hdd
 hexsha
 homedir
 hostbased
+hostinfo
 hostname
 hostnames
 hostport
@@ -191,6 +200,7 @@ io
 ioutil
 ip
 ipc
+iscsi
 isinstance
 issuecomment
 iter
@@ -246,6 +256,7 @@ mkdir
 mkmap
 modeline
 modeset
+moreutils
 moshtm
 mplayer
 mro
@@ -314,6 +325,7 @@ pragma
 precompute
 prefill
 presubmit
+printf
 procfs
 projectlist
 proto
@@ -322,11 +334,13 @@ protos
 prototext
 pubkey
 pusheen
+pwd
 py
 py3status
 pycache
 pyflags
 pylint
+python3
 randr
 ratelimit
 rdiv
@@ -340,6 +354,7 @@ refactorings
 regen
 reloadall
 repr
+resizer
 returncode
 ripgrep
 rollout
@@ -355,8 +370,10 @@ rustification
 safehtml
 sbin
 sdk
+sed
 sendline
 sendmsg
+sep
 serde
 serializer
 serializers
@@ -371,6 +388,7 @@ sharding
 shellexpand
 shlex
 shutil
+signame
 solarized
 spanielbot
 spellfile
@@ -401,6 +419,7 @@ stylesheet
 subcmd
 subdir
 subdirs
+subl
 subpartition
 substr
 sudo
@@ -486,6 +505,7 @@ webtoon
 whitelist
 whitelisted
 whitespace
+whitespaces
 wildcard
 wildcards
 winapi
