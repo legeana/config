@@ -41,10 +41,12 @@ pub fn git_pull(root: &Path) -> Result<bool> {
     Ok(old_head != new_head)
 }
 
-pub fn git_hard_pull(root: &Path) -> Result<()> {
+pub fn git_force_shallow_pull(root: &Path) -> Result<()> {
     process_utils::run(
         Command::new("git")
-            .args(["fetch", ORIGIN])
+            .arg("fetch")
+            .arg("--depth=1")
+            .arg(ORIGIN)
             .current_dir(root),
     )?;
     process_utils::run(
@@ -78,9 +80,10 @@ pub fn git_force_remote(root: &Path, remote: &Remote) -> Result<()> {
     Ok(())
 }
 
-pub fn git_clone(remote: &Remote, root: &Path) -> Result<()> {
+pub fn git_shallow_clone(remote: &Remote, root: &Path) -> Result<()> {
     let mut cmd = Command::new("git");
     cmd.arg("clone");
+    cmd.arg("--depth=1");
     if let Some(branch) = &remote.branch {
         cmd.arg(format!("--branch={branch}"));
     }

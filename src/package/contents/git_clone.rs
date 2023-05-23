@@ -16,12 +16,12 @@ struct GitClone {
 }
 
 impl GitClone {
-    fn hard_pull(&self) -> Result<()> {
+    fn force_pull(&self) -> Result<()> {
         git_utils::git_force_remote(self.output.path(), &self.remote)?;
-        git_utils::git_hard_pull(self.output.path())
+        git_utils::git_force_shallow_pull(self.output.path())
     }
     fn clone(&self) -> Result<()> {
-        git_utils::git_clone(&self.remote, self.output.path())
+        git_utils::git_shallow_clone(&self.remote, self.output.path())
     }
     fn is_empty(&self) -> Result<bool> {
         let count = std::fs::read_dir(self.output.path())
@@ -43,7 +43,7 @@ impl super::Module for GitClone {
                 )
             })
         } else {
-            self.hard_pull().with_context(|| {
+            self.force_pull().with_context(|| {
                 format!(
                     "failed to git pull {:?} for {:?}",
                     self.output.path(),
