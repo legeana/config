@@ -10,6 +10,7 @@ Plug 'kamykn/spelunker.vim'
 Plug 'dag/vim-fish'
 Plug 'itchyny/lightline.vim'
 Plug 'dracula/vim', { 'as': 'dracula' }
+Plug 'rust-lang/rust.vim'
 
 if executable("node")
     Plug 'neoclide/coc.nvim', {'branch': 'release'}
