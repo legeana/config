@@ -56,18 +56,13 @@ pub fn git_hard_pull(root: &Path) -> Result<()> {
 }
 
 pub fn git_clone(remote: &Remote, root: &Path) -> Result<()> {
-    let branch_args = match &remote.branch {
-        Some(branch) => vec![format!("--branch={branch}")],
-        None => Vec::new(),
-    };
-    process_utils::run(
-        Command::new("git")
-            .arg("clone")
-            .args(&branch_args)
-            .arg("--")
-            .arg(&remote.url)
-            .arg(root),
-    )
+    let mut cmd = Command::new("git");
+    cmd.arg("clone");
+    if let Some(branch) = &remote.branch {
+        cmd.arg(format!("--branch={branch}"));
+    }
+    cmd.arg("--").arg(&remote.url).arg(root);
+    process_utils::run(&mut cmd)
 }
 
 fn get_head(root: &Path) -> Result<String> {
