@@ -1,7 +1,7 @@
 use std::path::Path;
 use std::process::Command;
 
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 
 use crate::process_utils;
 
@@ -55,6 +55,29 @@ pub fn git_hard_pull(root: &Path) -> Result<()> {
     )
 }
 
+pub fn git_force_remote(root: &Path, remote: &Remote) -> Result<()> {
+    process_utils::run(
+        Command::new("git")
+            .arg("remote")
+            .arg("set-url")
+            .arg(ORIGIN)
+            .arg(&remote.url)
+            .current_dir(root),
+    )?;
+    let branch = match &remote.branch {
+        Some(branch) => branch.clone(),
+        None => get_remote_head(root)?,
+    };
+    process_utils::run(
+        Command::new("git")
+            .arg("checkout")
+            .arg("--force")
+            .arg(branch)
+            .current_dir(root),
+    )?;
+    Ok(())
+}
+
 pub fn git_clone(remote: &Remote, root: &Path) -> Result<()> {
     let mut cmd = Command::new("git");
     cmd.arg("clone");
@@ -72,6 +95,21 @@ fn get_head(root: &Path) -> Result<String> {
             .current_dir(root),
     )?;
     Ok(rev_parse.trim().to_string())
+}
+
+fn get_remote_head(root: &Path) -> Result<String> {
+    let symbolic_ref = process_utils::output(
+        Command::new("git")
+            .arg("symbolic-ref")
+            .arg(format!("refs/remotes/{ORIGIN}/{HEAD}"))
+            .current_dir(root),
+    )?;
+    Ok(symbolic_ref
+        .rsplit_once('/')
+        .ok_or_else(|| anyhow!("failed to parse {symbolic_ref}"))?
+        .1
+        .trim()
+        .to_string())
 }
 
 #[cfg(test)]

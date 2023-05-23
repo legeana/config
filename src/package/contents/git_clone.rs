@@ -17,6 +17,7 @@ struct GitClone {
 
 impl GitClone {
     fn hard_pull(&self) -> Result<()> {
+        git_utils::git_force_remote(self.output.path(), &self.remote)?;
         git_utils::git_hard_pull(self.output.path())
     }
     fn clone(&self) -> Result<()> {
