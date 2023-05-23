@@ -5,6 +5,27 @@ use anyhow::{anyhow, Context, Result};
 
 const ORIGIN: &str = "origin";
 const HEAD: &str = "HEAD";
+const BRANCH_SEP: char = '#';
+
+pub struct Remote {
+    pub url: String,
+    pub branch: Option<String>,
+}
+
+impl Remote {
+    pub fn new(addr: &str) -> Self {
+        match addr.rsplit_once(BRANCH_SEP) {
+            Some((url, branch)) => Self {
+                url: url.to_owned(),
+                branch: Some(branch.to_owned()),
+            },
+            None => Self {
+                url: addr.to_owned(),
+                branch: None,
+            },
+        }
+    }
+}
 
 /// Returns whether pull changed HEAD.
 pub fn git_pull(root: &Path) -> Result<bool> {
@@ -73,4 +94,30 @@ fn get_head(root: &Path) -> Result<String> {
         )
     })?;
     Ok(out.trim().to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_remote_without_branch() {
+        let remote = Remote::new("http://github.com/example/repo.git");
+        assert_eq!(remote.url, "http://github.com/example/repo.git");
+        assert_eq!(remote.branch, None);
+    }
+
+    #[test]
+    fn test_remote_with_branch() {
+        let remote = Remote::new("http://github.com/example/repo.git#branch");
+        assert_eq!(remote.url, "http://github.com/example/repo.git");
+        assert_eq!(remote.branch, Some("branch".to_owned()));
+    }
+
+    #[test]
+    fn test_remote_with_branch_and_hashes() {
+        let remote = Remote::new("http://github.com/#example/repo.git#branch");
+        assert_eq!(remote.url, "http://github.com/#example/repo.git");
+        assert_eq!(remote.branch, Some("branch".to_owned()));
+    }
 }

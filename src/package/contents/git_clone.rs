@@ -9,31 +9,9 @@ use crate::registry::Registry;
 pub struct GitCloneParser {}
 
 const COMMAND: &str = "git_clone";
-const BRANCH_SEP: char = '#';
-
-struct Remote {
-    url: String,
-    #[allow(dead_code)]
-    branch: Option<String>,
-}
-
-impl Remote {
-    fn new(addr: &str) -> Self {
-        match addr.rsplit_once(BRANCH_SEP) {
-            Some((url, branch)) => Self {
-                url: url.to_owned(),
-                branch: Some(branch.to_owned()),
-            },
-            None => Self {
-                url: addr.to_owned(),
-                branch: None,
-            },
-        }
-    }
-}
 
 struct GitClone {
-    remote: Remote,
+    remote: git_utils::Remote,
     output: local_state::DirectoryState,
 }
 
@@ -98,35 +76,9 @@ impl parser::Parser for GitCloneParser {
         let output = local_state::DirectoryState::new(dst.clone())
             .with_context(|| format!("failed to create DirectoryState from {dst:?}"))?;
         configuration.modules.push(Box::new(GitClone {
-            remote: Remote::new(url),
+            remote: git_utils::Remote::new(url),
             output,
         }));
         Ok(())
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_remote_without_branch() {
-        let remote = Remote::new("http://github.com/example/repo.git");
-        assert_eq!(remote.url, "http://github.com/example/repo.git");
-        assert_eq!(remote.branch, None);
-    }
-
-    #[test]
-    fn test_remote_with_branch() {
-        let remote = Remote::new("http://github.com/example/repo.git#branch");
-        assert_eq!(remote.url, "http://github.com/example/repo.git");
-        assert_eq!(remote.branch, Some("branch".to_owned()));
-    }
-
-    #[test]
-    fn test_remote_with_branch_and_hashes() {
-        let remote = Remote::new("http://github.com/#example/repo.git#branch");
-        assert_eq!(remote.url, "http://github.com/#example/repo.git");
-        assert_eq!(remote.branch, Some("branch".to_owned()));
     }
 }
