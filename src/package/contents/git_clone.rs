@@ -20,7 +20,7 @@ impl GitClone {
         git_utils::git_hard_pull(self.output.path())
     }
     fn clone(&self) -> Result<()> {
-        git_utils::git_clone(&self.remote.url, self.output.path())
+        git_utils::git_clone(&self.remote, self.output.path())
     }
     fn is_empty(&self) -> Result<bool> {
         let count = std::fs::read_dir(self.output.path())

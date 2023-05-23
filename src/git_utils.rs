@@ -63,16 +63,28 @@ pub fn git_hard_pull(root: &Path) -> Result<()> {
     Ok(())
 }
 
-pub fn git_clone(url: &str, root: &Path) -> Result<()> {
+pub fn git_clone(remote: &Remote, root: &Path) -> Result<()> {
+    let branch_args = match &remote.branch {
+        Some(branch) => vec![format!("--branch={branch}")],
+        None => Vec::new(),
+    };
+    let command = || {
+        // TODO: branch
+        format!(
+            "$ git clone -- {:?} {root:?}",
+            remote.url,
+        )
+    };
     let status = Command::new("git")
         .arg("clone")
+        .args(&branch_args)
         .arg("--")
-        .arg(url)
+        .arg(&remote.url)
         .arg(root)
         .status()
-        .with_context(|| format!("$ git clone {url:?} {root:?}"))?;
+        .with_context(command)?;
     if !status.success() {
-        return Err(anyhow!("$ git clone {url:?} {root:?}"));
+        return Err(anyhow!(command()));
     }
     Ok(())
 }
