@@ -164,7 +164,7 @@ mod tests {
             has_contents = false
 
             [[ansible_playbooks]]
-            playbook = 'playbook1.yml'
+            playbooks = ['playbook1.yml']
 
             [[ansible_playbooks]]
             playbooks = ['playbook2.yml']
