@@ -1,7 +1,9 @@
 use std::path::Path;
 use std::process::Command;
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::Result;
+
+use crate::process_utils;
 
 const ORIGIN: &str = "origin";
 const HEAD: &str = "HEAD";
@@ -30,37 +32,27 @@ impl Remote {
 /// Returns whether pull changed HEAD.
 pub fn git_pull(root: &Path) -> Result<bool> {
     let old_head = get_head(root)?;
-    let status = Command::new("git")
-        .args(["pull", "--ff-only"])
-        .current_dir(root)
-        .status()
-        .with_context(|| format!("{root:?} $ git pull --ff-only"))?;
-    if !status.success() {
-        return Err(anyhow!("{root:?} $ git pull --ff-only"));
-    }
+    process_utils::run(
+        Command::new("git")
+            .args(["pull", "--ff-only"])
+            .current_dir(root),
+    )?;
     let new_head = get_head(root)?;
     Ok(old_head != new_head)
 }
 
 pub fn git_hard_pull(root: &Path) -> Result<()> {
-    let status = Command::new("git")
-        .args(["fetch", ORIGIN])
-        .current_dir(root)
-        .status()
-        .with_context(|| format!("{root:?} $ git fetch {ORIGIN}"))?;
-    if !status.success() {
-        return Err(anyhow!("{root:?} $ git fetch {ORIGIN}"));
-    }
-    let status = Command::new("git")
-        .args(["reset", "--hard"])
-        .arg(format!("{ORIGIN}/{HEAD}"))
-        .current_dir(root)
-        .status()
-        .with_context(|| format!("{root:?} $ git reset --hard {ORIGIN}/{HEAD}"))?;
-    if !status.success() {
-        return Err(anyhow!("{root:?} $ git reset --hard {ORIGIN}/{HEAD}"));
-    }
-    Ok(())
+    process_utils::run(
+        Command::new("git")
+            .args(["fetch", ORIGIN])
+            .current_dir(root),
+    )?;
+    process_utils::run(
+        Command::new("git")
+            .args(["reset", "--hard"])
+            .arg(format!("{ORIGIN}/{HEAD}"))
+            .current_dir(root),
+    )
 }
 
 pub fn git_clone(remote: &Remote, root: &Path) -> Result<()> {
@@ -68,44 +60,23 @@ pub fn git_clone(remote: &Remote, root: &Path) -> Result<()> {
         Some(branch) => vec![format!("--branch={branch}")],
         None => Vec::new(),
     };
-    let command = || {
-        // TODO: branch
-        format!(
-            "$ git clone -- {:?} {root:?}",
-            remote.url,
-        )
-    };
-    let status = Command::new("git")
-        .arg("clone")
-        .args(&branch_args)
-        .arg("--")
-        .arg(&remote.url)
-        .arg(root)
-        .status()
-        .with_context(command)?;
-    if !status.success() {
-        return Err(anyhow!(command()));
-    }
-    Ok(())
+    process_utils::run(
+        Command::new("git")
+            .arg("clone")
+            .args(&branch_args)
+            .arg("--")
+            .arg(&remote.url)
+            .arg(root),
+    )
 }
 
 fn get_head(root: &Path) -> Result<String> {
-    let rev_parse = Command::new("git")
-        .args(["rev-parse", HEAD])
-        .current_dir(root)
-        .output()
-        .with_context(|| format!("{root:?} $ git rev-parse {HEAD}"))?;
-    if !rev_parse.status.success() {
-        let err = String::from_utf8_lossy(&rev_parse.stdout);
-        return Err(anyhow!("failed git rev-parse {HEAD}: {err}"));
-    }
-    let out = String::from_utf8(rev_parse.stdout.clone()).with_context(|| {
-        format!(
-            "failed to parse {root:?} $ git rev-parse {HEAD} output {:?}",
-            String::from_utf8_lossy(&rev_parse.stdout),
-        )
-    })?;
-    Ok(out.trim().to_string())
+    let rev_parse = process_utils::output(
+        Command::new("git")
+            .args(["rev-parse", HEAD])
+            .current_dir(root),
+    )?;
+    Ok(rev_parse.trim().to_string())
 }
 
 #[cfg(test)]

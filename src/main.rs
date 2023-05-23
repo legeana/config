@@ -2,6 +2,7 @@ mod file_registry;
 mod git_utils;
 mod layout;
 mod package;
+mod process_utils;
 mod registry;
 mod repository;
 mod tag_criteria;
