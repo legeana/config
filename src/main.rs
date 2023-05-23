@@ -61,14 +61,11 @@ fn reload() -> Result<()> {
     let setup = config_root()?.join("setup");
     let args: Vec<OsString> = env::args_os().skip(1).collect();
     log::info!("Restarting: $ {setup:?} {args:?}");
-    let exit_status = std::process::Command::new(&setup)
-        .args(args)
-        .env(NO_UPDATE_ENV, "yes")
-        .status()?;
-    if !exit_status.success() {
-        return Err(anyhow!("failed to run {setup:?}"));
-    }
-    Ok(())
+    process_utils::run(
+        std::process::Command::new(&setup)
+            .args(args)
+            .env(NO_UPDATE_ENV, "yes"),
+    )
 }
 
 fn registry(root: &Path) -> file_registry::FileRegistry {

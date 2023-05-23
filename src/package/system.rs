@@ -1,7 +1,8 @@
 use std::ffi::OsStr;
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result};
 
+use crate::process_utils;
 use crate::tag_criteria::TagCriteria;
 
 use super::config;
@@ -53,24 +54,14 @@ impl Installer for Apt {
         if !is_available("apt")? {
             return Ok(());
         }
-        let cmdline = format!(
-            "sudo apt install --yes -- {}",
-            shlex::join(self.packages.iter().map(|s| s.as_ref()))
-        );
-        println!("$ {cmdline}");
-        log::info!("Running $ {cmdline}");
-        let status = std::process::Command::new("sudo")
-            .arg("apt")
-            .arg("install")
-            .arg("--yes")
-            .arg("--")
-            .args(&self.packages)
-            .status()
-            .with_context(|| format!("failed to execute {cmdline:?}"))?;
-        if !status.success() {
-            return Err(anyhow!("failed to execute {cmdline:?}"));
-        }
-        Ok(())
+        process_utils::run_verbose(
+            std::process::Command::new("sudo")
+                .arg("apt")
+                .arg("install")
+                .arg("--yes")
+                .arg("--")
+                .args(&self.packages),
+        )
     }
 }
 
@@ -89,24 +80,14 @@ impl Installer for Pacman {
         if !is_available("pacman")? {
             return Ok(());
         }
-        let cmdline = format!(
-            "sudo pacman -S --needed -- {}",
-            shlex::join(self.packages.iter().map(|s| s.as_ref()))
-        );
-        println!("$ {cmdline}");
-        log::info!("Running $ {cmdline}");
-        let status = std::process::Command::new("sudo")
-            .arg("pacman")
-            .arg("-S")
-            .arg("--needed")
-            .arg("--")
-            .args(&self.packages)
-            .status()
-            .with_context(|| format!("failed to execute {cmdline:?}"))?;
-        if !status.success() {
-            return Err(anyhow!("failed to execute {cmdline:?}"));
-        }
-        Ok(())
+        process_utils::run_verbose(
+            std::process::Command::new("sudo")
+                .arg("pacman")
+                .arg("-S")
+                .arg("--needed")
+                .arg("--")
+                .args(&self.packages),
+        )
     }
 }
 
@@ -122,18 +103,11 @@ impl Bash {
 
 impl Installer for Bash {
     fn install(&self) -> Result<()> {
-        let cmdline = format!("bash -c {}", shlex::quote(&self.script));
-        println!("$ {cmdline}");
-        log::info!("Running $ {cmdline}");
-        let status = std::process::Command::new("bash")
-            .arg("-c")
-            .arg(&self.script)
-            .status()
-            .context("failed to execute bash")?;
-        if !status.success() {
-            return Err(anyhow!("failed to execute {cmdline:?}"));
-        }
-        Ok(())
+        process_utils::run_verbose(
+            std::process::Command::new("bash")
+                .arg("-c")
+                .arg(&self.script),
+        )
     }
 }
 

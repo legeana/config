@@ -1,10 +1,12 @@
 use std::path::PathBuf;
 use std::process;
 
+use crate::process_utils;
+
 use super::parser;
 use super::util;
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::Result;
 
 pub struct PostInstallExecParser;
 
@@ -18,23 +20,11 @@ struct PostInstallExecHook {
 
 impl super::Module for PostInstallExecHook {
     fn post_install(&self, _registry: &mut dyn crate::registry::Registry) -> Result<()> {
-        let cmdline = format!(
-            "{:?} $ {} {}",
-            self.current_dir,
-            shlex::quote(&self.cmd),
-            shlex::join(self.args.iter().map(String::as_str))
-        );
-        log::info!("Executing {cmdline}");
-        let status = process::Command::new(&self.cmd)
-            .args(&self.args)
-            .current_dir(&self.current_dir)
-            .status()
-            .with_context(|| cmdline.clone())?;
-        if !status.success() {
-            log::error!("failed to run {cmdline}");
-            return Err(anyhow!("failed to execute {cmdline}"));
-        }
-        Ok(())
+        process_utils::run(
+            process::Command::new(&self.cmd)
+                .args(&self.args)
+                .current_dir(&self.current_dir),
+        )
     }
 }
 
