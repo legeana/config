@@ -103,10 +103,10 @@ fn install(rules: &repository::Rules, root: &Path) -> Result<()> {
     Ok(())
 }
 
-fn system_install(rules: &repository::Rules, root: &Path, strict: bool) -> Result<()> {
+fn system_install(rules: &repository::Rules, root: &Path) -> Result<()> {
     let repos = layout::repositories(root)?;
     for repo in repos.iter() {
-        repo.system_install_all(rules, strict)
+        repo.system_install_all(rules)
             .with_context(|| format!("failed to system_install {}", repo.name()))?;
     }
     Ok(())
@@ -135,7 +135,9 @@ fn main() -> Result<()> {
         }
         Ok(false)
     };
-    let rules = repository::Rules {};
+    let rules = repository::Rules {
+        allow_package_install_failures: false,
+    };
     match args.command {
         Commands::Install {} => {
             if check_update()? {
@@ -147,7 +149,10 @@ fn main() -> Result<()> {
             if check_update()? {
                 return Ok(());
             }
-            system_install(&rules, &root, strict).context("failed to system_install")?;
+            let rules = repository::Rules {
+                allow_package_install_failures: !strict,
+            };
+            system_install(&rules, &root).context("failed to system_install")?;
         }
         Commands::Uninstall {} => {
             uninstall(&root).context("failed to uninstall")?;

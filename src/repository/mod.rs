@@ -100,7 +100,7 @@ impl Repository {
         }
         Ok(())
     }
-    pub fn system_install_all(&self, rules: &Rules, strict: bool) -> Result<()> {
+    pub fn system_install_all(&self, rules: &Rules) -> Result<()> {
         if !self.enabled()? {
             return Ok(());
         }
@@ -111,10 +111,10 @@ impl Repository {
             match result {
                 Ok(_) => (),
                 Err(err) => {
-                    if strict {
-                        return Err(err);
-                    } else {
+                    if rules.allow_package_install_failures {
                         log::error!("failed to install {}: {err}", package.name());
+                    } else {
+                        return Err(err);
                     }
                 }
             };

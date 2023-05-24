@@ -2,7 +2,9 @@ use anyhow::Result;
 
 use crate::registry::Registry;
 
-pub struct Rules {}
+pub struct Rules {
+    pub allow_package_install_failures: bool,
+}
 
 pub trait Module {
     #[allow(unused_variables)]
