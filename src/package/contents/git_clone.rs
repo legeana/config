@@ -43,6 +43,9 @@ impl super::Module for GitClone {
                 )
             })
         } else {
+            if !rules.force_download {
+                return Ok(());
+            }
             self.force_pull().with_context(|| {
                 format!(
                     "failed to git pull {:?} for {:?}",
