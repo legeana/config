@@ -5,6 +5,7 @@ use crate::registry::Registry;
 #[derive(Default)]
 pub struct Rules {
     pub allow_package_install_failures: bool,
+    pub force_download: bool,
 }
 
 pub trait Module {

@@ -46,7 +46,10 @@ struct Cli {
 
 #[derive(Debug, Subcommand)]
 enum Commands {
-    Install {},
+    Install {
+        #[clap(long, default_value_t = false, action = clap::ArgAction::Set)]
+        sync: bool,
+    },
     SystemInstall {
         #[clap(long, default_value_t = true, action = clap::ArgAction::Set)]
         strict: bool,
@@ -136,11 +139,12 @@ fn main() -> Result<()> {
         Ok(false)
     };
     match args.command {
-        Commands::Install {} => {
+        Commands::Install { sync } => {
             if check_update()? {
                 return Ok(());
             }
             let rules = repository::Rules {
+                force_download: sync,
                 ..repository::Rules::default()
             };
             install(&rules, &root).context("failed to install")?;
