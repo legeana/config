@@ -367,6 +367,7 @@ rstrip
 runfiles
 runtimepath
 rustification
+rustup
 safehtml
 sbin
 sdk
@@ -421,6 +422,7 @@ subdir
 subdirs
 subl
 subpartition
+subprefix
 substr
 sudo
 svim
@@ -509,6 +511,7 @@ whitespaces
 wildcard
 wildcards
 winapi
+workdir
 wrapdb
 wrapfile
 wrapweb
