@@ -18,7 +18,7 @@ struct SymlinkTree {
 }
 
 impl super::Module for SymlinkTree {
-    fn install(&self, registry: &mut dyn Registry) -> Result<()> {
+    fn install(&self, _rules: &super::Rules, registry: &mut dyn Registry) -> Result<()> {
         for e in WalkDir::new(&self.src).sort_by_file_name() {
             let entry = e.with_context(|| format!("failed to read {:?}", self.src))?;
             if entry.file_type().is_dir() {

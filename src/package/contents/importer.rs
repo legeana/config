@@ -84,10 +84,10 @@ fn render<W: Write>(prefix: &Path, src: &Path, out: &mut W) -> Result<()> {
 }
 
 impl super::Module for Importer {
-    fn install(&self, registry: &mut dyn Registry) -> Result<()> {
-        self.output.install(registry)
+    fn install(&self, rules: &super::Rules, registry: &mut dyn Registry) -> Result<()> {
+        self.output.install(rules, registry)
     }
-    fn post_install(&self, _registry: &mut dyn Registry) -> Result<()> {
+    fn post_install(&self, _rules: &super::Rules, _registry: &mut dyn Registry) -> Result<()> {
         let f = File::create(self.output.path())
             .with_context(|| format!("failed to open {:?}", self.output.path()))?;
         let mut out = BufWriter::new(f);

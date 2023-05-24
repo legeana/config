@@ -17,7 +17,7 @@ struct Symlink {
 }
 
 impl super::Module for Symlink {
-    fn install(&self, registry: &mut dyn Registry) -> Result<()> {
+    fn install(&self, _rules: &super::Rules, registry: &mut dyn Registry) -> Result<()> {
         file_util::make_symlink(registry, &self.src, &self.dst)
     }
 }

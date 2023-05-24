@@ -19,7 +19,11 @@ struct PostInstallExecHook {
 }
 
 impl super::Module for PostInstallExecHook {
-    fn post_install(&self, _registry: &mut dyn crate::registry::Registry) -> Result<()> {
+    fn post_install(
+        &self,
+        _rules: &super::Rules,
+        _registry: &mut dyn crate::registry::Registry,
+    ) -> Result<()> {
         process_utils::run(
             process::Command::new(&self.cmd)
                 .args(&self.args)

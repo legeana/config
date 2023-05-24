@@ -15,8 +15,8 @@ struct SetContents {
 }
 
 impl super::Module for SetContents {
-    fn install(&self, registry: &mut dyn Registry) -> Result<()> {
-        self.output.install(registry)?;
+    fn install(&self, rules: &super::Rules, registry: &mut dyn Registry) -> Result<()> {
+        self.output.install(rules, registry)?;
         let state = self.output.path();
         if state
             .try_exists()

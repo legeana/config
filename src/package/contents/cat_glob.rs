@@ -22,10 +22,10 @@ struct CatGlobInto {
 }
 
 impl super::Module for CatGlobInto {
-    fn install(&self, registry: &mut dyn Registry) -> Result<()> {
-        self.output.install(registry)
+    fn install(&self, rules: &super::Rules, registry: &mut dyn Registry) -> Result<()> {
+        self.output.install(rules, registry)
     }
-    fn post_install(&self, _registry: &mut dyn Registry) -> Result<()> {
+    fn post_install(&self, _rules: &super::Rules, _registry: &mut dyn Registry) -> Result<()> {
         let out_file = std::fs::File::create(self.output.path())
             .with_context(|| format!("unable to create {:?}", self.output.path()))?;
         let mut out = std::io::BufWriter::new(out_file);

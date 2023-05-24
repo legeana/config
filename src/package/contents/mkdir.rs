@@ -15,7 +15,7 @@ struct MkDir {
 }
 
 impl super::Module for MkDir {
-    fn install(&self, registry: &mut dyn Registry) -> Result<()> {
+    fn install(&self, _rules: &super::Rules, registry: &mut dyn Registry) -> Result<()> {
         std::fs::create_dir_all(&self.dst)
             .with_context(|| format!("unable to create {:?}", self.dst))?;
         registry

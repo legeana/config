@@ -5,7 +5,7 @@ use crate::tag_criteria::TagCriteria;
 
 use super::config;
 use super::Installer;
-use super::Module;
+use super::{Module, Rules};
 
 #[derive(Default)]
 pub struct UserDependency {
@@ -42,7 +42,7 @@ impl UserDependency {
 }
 
 impl Module for UserDependency {
-    fn pre_install(&self, _: &mut dyn Registry) -> Result<()> {
+    fn pre_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
         self.installers.install()
     }
 }

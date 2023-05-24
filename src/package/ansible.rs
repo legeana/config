@@ -5,7 +5,7 @@ use anyhow::Result;
 use crate::process_utils;
 use crate::registry::Registry;
 
-use super::Module;
+use super::{Module, Rules};
 
 pub struct AnsiblePlaybook {
     root: PathBuf,
@@ -38,7 +38,7 @@ impl AnsiblePlaybook {
 }
 
 impl Module for AnsiblePlaybook {
-    fn post_install(&self, _: &mut dyn Registry) -> Result<()> {
+    fn post_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
         // Use post_install because MANIFEST should not have much logic if
         // ansible is involved anyway. Install/link files first, then let
         // ansible handle the rest.
@@ -47,7 +47,7 @@ impl Module for AnsiblePlaybook {
         }
         self.run()
     }
-    fn system_install(&self) -> Result<()> {
+    fn system_install(&self, _rules: &Rules) -> Result<()> {
         if !self.ask_become_pass {
             return Ok(());
         }

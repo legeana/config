@@ -80,7 +80,7 @@ fn uninstall(root: &Path) -> Result<()> {
     Ok(())
 }
 
-fn install(root: &Path) -> Result<()> {
+fn install(rules: &repository::Rules, root: &Path) -> Result<()> {
     // Load repositories before uninstalling to abort early.
     // It's better to keep the old configuration than no configuration.
     let repos = layout::repositories(root)?;
@@ -89,24 +89,24 @@ fn install(root: &Path) -> Result<()> {
         .uninstall()
         .context("failed to uninstall before installing")?;
     for repo in repos.iter() {
-        repo.pre_install_all(&mut registry)
+        repo.pre_install_all(rules, &mut registry)
             .with_context(|| format!("failed to pre-install {}", repo.name()))?;
     }
     for repo in repos.iter() {
-        repo.install_all(&mut registry)
+        repo.install_all(rules, &mut registry)
             .with_context(|| format!("failed to install {}", repo.name()))?;
     }
     for repo in repos.iter() {
-        repo.post_install_all(&mut registry)
+        repo.post_install_all(rules, &mut registry)
             .with_context(|| format!("failed to post-install {}", repo.name()))?;
     }
     Ok(())
 }
 
-fn system_install(root: &Path, strict: bool) -> Result<()> {
+fn system_install(rules: &repository::Rules, root: &Path, strict: bool) -> Result<()> {
     let repos = layout::repositories(root)?;
     for repo in repos.iter() {
-        repo.system_install_all(strict)
+        repo.system_install_all(rules, strict)
             .with_context(|| format!("failed to system_install {}", repo.name()))?;
     }
     Ok(())
@@ -135,18 +135,19 @@ fn main() -> Result<()> {
         }
         Ok(false)
     };
+    let rules = repository::Rules {};
     match args.command {
         Commands::Install {} => {
             if check_update()? {
                 return Ok(());
             }
-            install(&root).context("failed to install")?;
+            install(&rules, &root).context("failed to install")?;
         }
         Commands::SystemInstall { strict } => {
             if check_update()? {
                 return Ok(());
             }
-            system_install(&root, strict).context("failed to system_install")?;
+            system_install(&rules, &root, strict).context("failed to system_install")?;
         }
         Commands::Uninstall {} => {
             uninstall(&root).context("failed to uninstall")?;

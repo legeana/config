@@ -11,7 +11,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{anyhow, Context, Result};
 
 use crate::package::installer::Installer;
-pub use crate::package::module::Module;
+pub use crate::package::module::{Module, Rules};
 use crate::registry::Registry;
 use crate::tag_criteria::{self, TagCriteria};
 
@@ -122,20 +122,20 @@ impl Package {
 }
 
 impl Module for Package {
-    fn pre_install(&self, registry: &mut dyn Registry) -> Result<()> {
-        self.run_if_enabled(|| self.modules.pre_install(registry))
+    fn pre_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+        self.run_if_enabled(|| self.modules.pre_install(rules, registry))
             .with_context(|| format!("{}: failed pre_install", self.name()))
     }
-    fn install(&self, registry: &mut dyn Registry) -> Result<()> {
-        self.run_if_enabled(|| self.modules.install(registry))
+    fn install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+        self.run_if_enabled(|| self.modules.install(rules, registry))
             .with_context(|| format!("{}: failed install", self.name()))
     }
-    fn post_install(&self, registry: &mut dyn Registry) -> Result<()> {
-        self.run_if_enabled(|| self.modules.post_install(registry))
+    fn post_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+        self.run_if_enabled(|| self.modules.post_install(rules, registry))
             .with_context(|| format!("{}: failed post_install", self.name()))
     }
-    fn system_install(&self) -> Result<()> {
-        self.run_if_enabled(|| self.modules.system_install())
+    fn system_install(&self, rules: &Rules) -> Result<()> {
+        self.run_if_enabled(|| self.modules.system_install(rules))
             .with_context(|| format!("{}: failed system_install", self.name()))
     }
 }

@@ -32,8 +32,8 @@ impl GitClone {
 }
 
 impl super::Module for GitClone {
-    fn install(&self, registry: &mut dyn Registry) -> Result<()> {
-        self.output.install(registry)?;
+    fn install(&self, rules: &super::Rules, registry: &mut dyn Registry) -> Result<()> {
+        self.output.install(rules, registry)?;
         if self.is_empty()? {
             self.clone().with_context(|| {
                 format!(

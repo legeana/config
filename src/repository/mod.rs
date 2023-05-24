@@ -5,6 +5,7 @@ use std::path::PathBuf;
 
 use anyhow::{anyhow, Context, Result};
 
+pub use crate::package::Rules;
 use crate::package::{Module, Package};
 use crate::registry::Registry;
 use crate::tag_criteria::TagCriteria;
@@ -66,46 +67,46 @@ impl Repository {
         }
         Ok(true)
     }
-    pub fn pre_install_all(&self, registry: &mut dyn Registry) -> Result<()> {
+    pub fn pre_install_all(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         if !self.enabled()? {
             return Ok(());
         }
         for package in self.packages.iter() {
             package
-                .pre_install(registry)
+                .pre_install(rules, registry)
                 .with_context(|| format!("failed to pre-install {}", package.name()))?;
         }
         Ok(())
     }
-    pub fn install_all(&self, registry: &mut dyn Registry) -> Result<()> {
+    pub fn install_all(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         if !self.enabled()? {
             return Ok(());
         }
         for package in self.packages.iter() {
             package
-                .install(registry)
+                .install(rules, registry)
                 .with_context(|| format!("failed to install {}", package.name()))?;
         }
         Ok(())
     }
-    pub fn post_install_all(&self, registry: &mut dyn Registry) -> Result<()> {
+    pub fn post_install_all(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         if !self.enabled()? {
             return Ok(());
         }
         for package in self.packages.iter() {
             package
-                .post_install(registry)
+                .post_install(rules, registry)
                 .with_context(|| format!("failed to post-install {}", package.name()))?;
         }
         Ok(())
     }
-    pub fn system_install_all(&self, strict: bool) -> Result<()> {
+    pub fn system_install_all(&self, rules: &Rules, strict: bool) -> Result<()> {
         if !self.enabled()? {
             return Ok(());
         }
         for package in self.packages.iter() {
             let result = package
-                .system_install()
+                .system_install(rules)
                 .with_context(|| format!("failed to system install {}", package.name()));
             match result {
                 Ok(_) => (),

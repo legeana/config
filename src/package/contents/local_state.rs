@@ -55,7 +55,7 @@ impl FileState {
 }
 
 impl Module for FileState {
-    fn install(&self, registry: &mut dyn Registry) -> Result<()> {
+    fn install(&self, _rules: &super::Rules, registry: &mut dyn Registry) -> Result<()> {
         let state_dir = self
             .state
             .parent()
@@ -86,7 +86,7 @@ impl DirectoryState {
 }
 
 impl Module for DirectoryState {
-    fn install(&self, registry: &mut dyn Registry) -> Result<()> {
+    fn install(&self, _rules: &super::Rules, registry: &mut dyn Registry) -> Result<()> {
         std::fs::create_dir_all(&self.state)
             .with_context(|| format!("failed to create {:?}", &self.state))?;
         file_util::make_symlink(registry, &self.state, &self.dst)

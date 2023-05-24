@@ -27,7 +27,7 @@ use std::path::PathBuf;
 
 use anyhow::{anyhow, Context, Ok, Result};
 
-use crate::package::Module;
+use crate::package::{Module, Rules};
 use crate::registry::Registry;
 
 const MANIFEST: &str = "MANIFEST";
@@ -90,28 +90,28 @@ impl Configuration {
 }
 
 impl Module for Configuration {
-    fn pre_install(&self, registry: &mut dyn Registry) -> Result<()> {
+    fn pre_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         if !self.enabled {
             return Ok(());
         }
         self.modules
-            .pre_install(registry)
+            .pre_install(rules, registry)
             .with_context(|| format!("failed pre_install in {:?}", self.root))
     }
-    fn install(&self, registry: &mut dyn Registry) -> Result<()> {
+    fn install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         if !self.enabled {
             return Ok(());
         }
         self.modules
-            .install(registry)
+            .install(rules, registry)
             .with_context(|| format!("failed install in {:?}", self.root))
     }
-    fn post_install(&self, registry: &mut dyn Registry) -> Result<()> {
+    fn post_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         if !self.enabled {
             return Ok(());
         }
         self.modules
-            .post_install(registry)
+            .post_install(rules, registry)
             .with_context(|| format!("failed post_install in {:?}", self.root))
     }
 }

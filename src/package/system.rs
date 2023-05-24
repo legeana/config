@@ -34,7 +34,7 @@ impl SystemDependency {
 }
 
 impl Module for SystemDependency {
-    fn system_install(&self) -> Result<()> {
+    fn system_install(&self, _rules: &super::Rules) -> Result<()> {
         self.installers.install()
     }
 }
