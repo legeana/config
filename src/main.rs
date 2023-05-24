@@ -9,6 +9,7 @@ mod tag_criteria;
 mod tag_util;
 mod uninstaller;
 
+use repository::Module;
 use uninstaller::Uninstaller;
 
 use anyhow::{anyhow, Context, Result};
@@ -92,15 +93,15 @@ fn install(rules: &repository::Rules, root: &Path) -> Result<()> {
         .uninstall()
         .context("failed to uninstall before installing")?;
     for repo in repos.iter() {
-        repo.pre_install_all(rules, &mut registry)
+        repo.pre_install(rules, &mut registry)
             .with_context(|| format!("failed to pre-install {}", repo.name()))?;
     }
     for repo in repos.iter() {
-        repo.install_all(rules, &mut registry)
+        repo.install(rules, &mut registry)
             .with_context(|| format!("failed to install {}", repo.name()))?;
     }
     for repo in repos.iter() {
-        repo.post_install_all(rules, &mut registry)
+        repo.post_install(rules, &mut registry)
             .with_context(|| format!("failed to post-install {}", repo.name()))?;
     }
     Ok(())
@@ -109,7 +110,7 @@ fn install(rules: &repository::Rules, root: &Path) -> Result<()> {
 fn system_install(rules: &repository::Rules, root: &Path) -> Result<()> {
     let repos = layout::repositories(root)?;
     for repo in repos.iter() {
-        repo.system_install_all(rules)
+        repo.system_install(rules)
             .with_context(|| format!("failed to system_install {}", repo.name()))?;
     }
     Ok(())

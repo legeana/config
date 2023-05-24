@@ -5,8 +5,8 @@ use std::path::PathBuf;
 
 use anyhow::{anyhow, Context, Result};
 
-pub use crate::package::Rules;
-use crate::package::{Module, Package};
+pub use crate::package::{Module, Rules};
+use crate::package::Package;
 use crate::registry::Registry;
 use crate::tag_criteria::TagCriteria;
 
@@ -67,7 +67,10 @@ impl Repository {
         }
         Ok(true)
     }
-    pub fn pre_install_all(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+}
+
+impl Module for Repository {
+    fn pre_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         if !self.enabled()? {
             return Ok(());
         }
@@ -78,7 +81,7 @@ impl Repository {
         }
         Ok(())
     }
-    pub fn install_all(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+    fn install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         if !self.enabled()? {
             return Ok(());
         }
@@ -89,7 +92,7 @@ impl Repository {
         }
         Ok(())
     }
-    pub fn post_install_all(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+    fn post_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         if !self.enabled()? {
             return Ok(());
         }
@@ -100,7 +103,7 @@ impl Repository {
         }
         Ok(())
     }
-    pub fn system_install_all(&self, rules: &Rules) -> Result<()> {
+    fn system_install(&self, rules: &Rules) -> Result<()> {
         if !self.enabled()? {
             return Ok(());
         }
