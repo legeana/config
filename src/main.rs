@@ -1,6 +1,7 @@
 mod file_registry;
 mod git_utils;
 mod layout;
+mod module;
 mod package;
 mod process_utils;
 mod registry;
@@ -9,7 +10,7 @@ mod tag_criteria;
 mod tag_util;
 mod uninstaller;
 
-use repository::Module;
+use module::{Module, Rules};
 use uninstaller::Uninstaller;
 
 use anyhow::{anyhow, Context, Result};
@@ -84,7 +85,7 @@ fn uninstall(root: &Path) -> Result<()> {
     Ok(())
 }
 
-fn install(rules: &repository::Rules, root: &Path) -> Result<()> {
+fn install(rules: &Rules, root: &Path) -> Result<()> {
     // Load repositories before uninstalling to abort early.
     // It's better to keep the old configuration than no configuration.
     let repos = layout::repositories(root)?;
@@ -107,7 +108,7 @@ fn install(rules: &repository::Rules, root: &Path) -> Result<()> {
     Ok(())
 }
 
-fn system_install(rules: &repository::Rules, root: &Path) -> Result<()> {
+fn system_install(rules: &Rules, root: &Path) -> Result<()> {
     let repos = layout::repositories(root)?;
     for repo in repos.iter() {
         repo.system_install(rules)
@@ -144,9 +145,9 @@ fn main() -> Result<()> {
             if check_update()? {
                 return Ok(());
             }
-            let rules = repository::Rules {
+            let rules = Rules {
                 force_download: sync,
-                ..repository::Rules::default()
+                ..Rules::default()
             };
             install(&rules, &root).context("failed to install")?;
         }
@@ -154,9 +155,9 @@ fn main() -> Result<()> {
             if check_update()? {
                 return Ok(());
             }
-            let rules = repository::Rules {
+            let rules = Rules {
                 allow_package_install_failures: !strict,
-                ..repository::Rules::default()
+                ..Rules::default()
             };
             system_install(&rules, &root).context("failed to system_install")?;
         }

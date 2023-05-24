@@ -2,10 +2,12 @@ use std::path::PathBuf;
 
 use anyhow::Result;
 
+use crate::module::{Module, Rules};
+use crate::registry::Registry;
+
 use super::file_util;
 use super::parser;
 use super::util;
-use crate::registry::Registry;
 
 pub struct SymlinkParser {}
 
@@ -16,8 +18,8 @@ struct Symlink {
     dst: PathBuf,
 }
 
-impl super::Module for Symlink {
-    fn install(&self, _rules: &super::Rules, registry: &mut dyn Registry) -> Result<()> {
+impl Module for Symlink {
+    fn install(&self, _rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         file_util::make_symlink(registry, &self.src, &self.dst)
     }
 }

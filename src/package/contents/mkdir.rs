@@ -1,8 +1,10 @@
 use std::path::PathBuf;
 
+use crate::module::{Module, Rules};
+use crate::registry::Registry;
+
 use super::parser;
 use super::util;
-use crate::registry::Registry;
 
 use anyhow::{Context, Result};
 
@@ -14,8 +16,8 @@ struct MkDir {
     dst: PathBuf,
 }
 
-impl super::Module for MkDir {
-    fn install(&self, _rules: &super::Rules, registry: &mut dyn Registry) -> Result<()> {
+impl Module for MkDir {
+    fn install(&self, _rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         std::fs::create_dir_all(&self.dst)
             .with_context(|| format!("unable to create {:?}", self.dst))?;
         registry

@@ -2,12 +2,12 @@ use std::ffi::OsStr;
 
 use anyhow::{Context, Result};
 
+use crate::module::{Module, Rules};
 use crate::process_utils;
 use crate::tag_criteria::TagCriteria;
 
 use super::config;
 use super::Installer;
-use super::Module;
 
 #[derive(Default)]
 pub struct SystemDependency {
@@ -34,7 +34,7 @@ impl SystemDependency {
 }
 
 impl Module for SystemDependency {
-    fn system_install(&self, _rules: &super::Rules) -> Result<()> {
+    fn system_install(&self, _rules: &Rules) -> Result<()> {
         self.installers.install()
     }
 }

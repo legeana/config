@@ -1,9 +1,11 @@
 use anyhow::{Context, Result};
 
-use super::local_state;
+use crate::module::{Module, Rules};
 use crate::package::contents::parser;
 use crate::package::contents::util;
 use crate::registry::Registry;
+
+use super::local_state;
 
 pub struct OutputFileParser {}
 
@@ -13,8 +15,8 @@ struct OutputFile {
     output: local_state::FileState,
 }
 
-impl super::Module for OutputFile {
-    fn install(&self, rules: &super::Rules, registry: &mut dyn Registry) -> Result<()> {
+impl Module for OutputFile {
+    fn install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         self.output.install(rules, registry)
     }
 }

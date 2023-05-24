@@ -1,9 +1,11 @@
 use std::io::Write;
 
+use crate::module::{Module, Rules};
+use crate::registry::Registry;
+
 use super::local_state;
 use super::parser;
 use super::util;
-use crate::registry::Registry;
 
 use anyhow::{anyhow, Context, Result};
 use glob::glob as glob_iter;
@@ -21,8 +23,8 @@ struct CatGlobInto {
     output: local_state::FileState,
 }
 
-impl super::Module for CatGlobInto {
-    fn install(&self, rules: &super::Rules, registry: &mut dyn Registry) -> Result<()> {
+impl Module for CatGlobInto {
+    fn install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         self.output.install(rules, registry)
     }
     fn post_install(&self, _rules: &super::Rules, _registry: &mut dyn Registry) -> Result<()> {

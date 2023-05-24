@@ -2,7 +2,6 @@ mod ansible;
 mod config;
 mod contents;
 mod installer;
-mod module;
 mod system;
 mod user;
 
@@ -10,8 +9,8 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Context, Result};
 
+use crate::module::{Module, Rules};
 use crate::package::installer::Installer;
-pub use crate::package::module::{Module, Rules};
 use crate::registry::Registry;
 use crate::tag_criteria::{self, TagCriteria};
 

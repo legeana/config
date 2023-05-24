@@ -1,9 +1,11 @@
 use std::path::PathBuf;
 
+use crate::module::{Module, Rules};
+use crate::registry::Registry;
+
 use super::file_util;
 use super::parser;
 use super::util;
-use crate::registry::Registry;
 
 use anyhow::{Context, Result};
 use walkdir::WalkDir;
@@ -17,8 +19,8 @@ struct SymlinkTree {
     dst: PathBuf,
 }
 
-impl super::Module for SymlinkTree {
-    fn install(&self, _rules: &super::Rules, registry: &mut dyn Registry) -> Result<()> {
+impl Module for SymlinkTree {
+    fn install(&self, _rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         for e in WalkDir::new(&self.src).sort_by_file_name() {
             let entry = e.with_context(|| format!("failed to read {:?}", self.src))?;
             if entry.file_type().is_dir() {

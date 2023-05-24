@@ -5,7 +5,7 @@ use std::path::PathBuf;
 
 use anyhow::{anyhow, Context, Result};
 
-pub use crate::package::{Module, Rules};
+use crate::module::{Module, Rules};
 use crate::package::Package;
 use crate::registry::Registry;
 use crate::tag_criteria::TagCriteria;

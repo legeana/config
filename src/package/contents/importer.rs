@@ -2,10 +2,12 @@ use std::io::{BufRead, BufReader, BufWriter};
 use std::path::{Path, PathBuf};
 use std::{fs::File, io::Write};
 
+use crate::module::{Module, Rules};
+use crate::registry::Registry;
+
 use super::local_state;
 use super::parser;
 use super::util;
-use crate::registry::Registry;
 
 use anyhow::{anyhow, Context, Result};
 use walkdir::WalkDir;
@@ -83,8 +85,8 @@ fn render<W: Write>(prefix: &Path, src: &Path, out: &mut W) -> Result<()> {
     Ok(())
 }
 
-impl super::Module for Importer {
-    fn install(&self, rules: &super::Rules, registry: &mut dyn Registry) -> Result<()> {
+impl Module for Importer {
+    fn install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         self.output.install(rules, registry)
     }
     fn post_install(&self, _rules: &super::Rules, _registry: &mut dyn Registry) -> Result<()> {

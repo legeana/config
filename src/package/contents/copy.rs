@@ -1,9 +1,11 @@
 use std::path::PathBuf;
 
+use crate::module::{Module, Rules};
+use crate::registry::Registry;
+
 use super::local_state;
 use super::parser;
 use super::util;
-use crate::registry::Registry;
 
 use anyhow::{Context, Result};
 
@@ -16,8 +18,8 @@ struct Copy {
     output: local_state::FileState,
 }
 
-impl super::Module for Copy {
-    fn install(&self, rules: &super::Rules, registry: &mut dyn Registry) -> Result<()> {
+impl Module for Copy {
+    fn install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         self.output.install(rules, registry)?;
         let state = self.output.path();
         if state

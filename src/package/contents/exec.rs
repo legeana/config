@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 use std::process;
 
+use crate::module::{Module, Rules};
 use crate::process_utils;
 
 use super::parser;
@@ -18,10 +19,10 @@ struct PostInstallExecHook {
     args: Vec<String>,
 }
 
-impl super::Module for PostInstallExecHook {
+impl Module for PostInstallExecHook {
     fn post_install(
         &self,
-        _rules: &super::Rules,
+        _rules: &Rules,
         _registry: &mut dyn crate::registry::Registry,
     ) -> Result<()> {
         process_utils::run(
