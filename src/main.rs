@@ -135,14 +135,14 @@ fn main() -> Result<()> {
         }
         Ok(false)
     };
-    let rules = repository::Rules {
-        allow_package_install_failures: false,
-    };
     match args.command {
         Commands::Install {} => {
             if check_update()? {
                 return Ok(());
             }
+            let rules = repository::Rules {
+                ..repository::Rules::default()
+            };
             install(&rules, &root).context("failed to install")?;
         }
         Commands::SystemInstall { strict } => {
@@ -151,6 +151,7 @@ fn main() -> Result<()> {
             }
             let rules = repository::Rules {
                 allow_package_install_failures: !strict,
+                ..repository::Rules::default()
             };
             system_install(&rules, &root).context("failed to system_install")?;
         }

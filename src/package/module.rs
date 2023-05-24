@@ -2,6 +2,7 @@ use anyhow::Result;
 
 use crate::registry::Registry;
 
+#[derive(Default)]
 pub struct Rules {
     pub allow_package_install_failures: bool,
 }
