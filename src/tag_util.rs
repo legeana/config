@@ -7,8 +7,8 @@ use sysinfo::{System, SystemExt};
 static SYSINFO: Lazy<SystemInfo> = Lazy::new(SystemInfo::new);
 
 pub fn has_tag(tag: &str) -> Result<bool> {
-    match tag.find('=') {
-        Some(pos) => Ok(has_tag_kv(&tag[..pos], &tag[pos + 1..])),
+    match tag.split_once('=') {
+        Some((key, value)) => Ok(has_tag_kv(key, value)),
         None => Err(anyhow!("invalid tag: must contain '=', got {tag}")),
     }
 }
