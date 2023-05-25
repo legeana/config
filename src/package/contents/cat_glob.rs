@@ -14,10 +14,6 @@ pub struct CatGlobIntoParser;
 
 const COMMAND: &str = "cat_glob_into";
 
-// TODO: use std::path::MAIN_SEPARATOR_STR when available
-// See https://github.com/rust-lang/rust/issues/94071.
-const PATH_SEP: &str = "/";
-
 struct CatGlobInto {
     globs: Vec<String>,
     output: local_state::FileState,
@@ -72,7 +68,7 @@ impl parser::Parser for CatGlobIntoParser {
                 &state.prefix.current
             )
         })?;
-        let glob_prefix = current_prefix.to_owned() + PATH_SEP;
+        let glob_prefix = current_prefix.to_owned() + std::path::MAIN_SEPARATOR_STR;
         let concatenated_globs: Vec<String> =
             globs.iter().map(|g| glob_prefix.clone() + g).collect();
         let dst = state.prefix.current.join(filename);
