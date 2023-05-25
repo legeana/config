@@ -1,8 +1,10 @@
 use anyhow::{Context, Result};
 
+use crate::module::Module;
+use crate::tag_util;
+
 use super::parser;
 use super::util;
-use crate::tag_util;
 
 pub struct RequiresParser;
 pub struct ConflictsParser;
@@ -21,9 +23,9 @@ impl parser::Parser for RequiresParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        _configuration: &mut super::Configuration,
+        _configuration: &super::Configuration,
         args: &[&str],
-    ) -> Result<()> {
+    ) -> Result<Option<Box<dyn Module>>> {
         let (_, tags) = util::multiple_args(REQUIRES_COMMAND, args, 0)?;
         for tag in tags.iter() {
             let has_tag =
@@ -32,7 +34,7 @@ impl parser::Parser for RequiresParser {
                 state.enabled = false;
             }
         }
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -47,9 +49,9 @@ impl parser::Parser for ConflictsParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        _configuration: &mut super::Configuration,
+        _configuration: &super::Configuration,
         args: &[&str],
-    ) -> Result<()> {
+    ) -> Result<Option<Box<dyn Module>>> {
         let (_, tags) = util::multiple_args(CONFLICTS_COMMAND, args, 0)?;
         for tag in tags.iter() {
             let has_tag =
@@ -58,6 +60,6 @@ impl parser::Parser for ConflictsParser {
                 state.enabled = false;
             }
         }
-        Ok(())
+        Ok(None)
     }
 }

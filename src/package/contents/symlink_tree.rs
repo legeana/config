@@ -49,14 +49,13 @@ impl parser::Parser for SymlinkTreeParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        configuration: &mut super::Configuration,
+        configuration: &super::Configuration,
         args: &[&str],
-    ) -> Result<()> {
+    ) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;
-        configuration.modules.push(Box::new(SymlinkTree {
+        Ok(Some(Box::new(SymlinkTree {
             src: configuration.root.join(filename),
             dst: state.prefix.current.join(filename),
-        }));
-        Ok(())
+        })))
     }
 }

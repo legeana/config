@@ -1,5 +1,7 @@
 use anyhow::Result;
 
+use crate::module::Module;
+
 use super::parser;
 use super::util::check_command;
 
@@ -17,9 +19,9 @@ impl parser::Parser for DeprecatedParser {
     fn parse(
         &self,
         _state: &mut parser::State,
-        _configuration: &mut super::Configuration,
+        _configuration: &super::Configuration,
         args: &[&str],
-    ) -> Result<()> {
+    ) -> Result<Option<Box<dyn Module>>> {
         /*if check_command("<deprecated>", args).is_ok() {
             log::warn!(
                 "{:?}: <deprecated> is unsupported",
@@ -27,6 +29,7 @@ impl parser::Parser for DeprecatedParser {
             );
             return Ok(());
         }*/
-        return check_command(COMMAND, args).map(|_| ());
+        check_command(COMMAND, args).map(|_| ())?;
+        Ok(None)
     }
 }

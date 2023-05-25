@@ -67,7 +67,10 @@ impl Configuration {
         }
         let args = shlex::split(line).ok_or_else(|| anyhow!("failed to split line {:?}", line))?;
         let arg_refs: Vec<&str> = args.iter().map(String::as_str).collect();
-        parser::parse(state, self, &arg_refs)
+        if let Some(m) = parser::parse(state, self, &arg_refs)? {
+            self.modules.push(m);
+        }
+        Ok(())
     }
     fn parse(&mut self, state: &mut parser::State, manifest_path: &PathBuf) -> Result<()> {
         let manifest = File::open(manifest_path)

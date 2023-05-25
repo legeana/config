@@ -1,9 +1,11 @@
 use std::path::PathBuf;
 
+use anyhow::{Context, Result};
+
+use crate::module::Module;
+
 use super::parser;
 use super::util;
-
-use anyhow::{Context, Result};
 
 trait XdgPrefixParser {
     fn name(&self) -> &'static str;
@@ -84,11 +86,11 @@ where
     fn parse(
         &self,
         state: &mut parser::State,
-        _configuration: &mut super::Configuration,
+        _configuration: &super::Configuration,
         args: &[&str],
-    ) -> Result<()> {
+    ) -> Result<Option<Box<dyn Module>>> {
         let path = util::single_arg(self.name(), args)?;
         state.prefix.set(self.xdg_prefix(path)?);
-        Ok(())
+        Ok(None)
     }
 }

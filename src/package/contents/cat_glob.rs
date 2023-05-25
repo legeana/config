@@ -60,9 +60,9 @@ impl parser::Parser for CatGlobIntoParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        configuration: &mut super::Configuration,
+        _configuration: &super::Configuration,
         args: &[&str],
-    ) -> Result<()> {
+    ) -> Result<Option<Box<dyn Module>>> {
         let (fname, globs) = util::multiple_args(COMMAND, args, 1)?;
         assert!(fname.len() == 1);
         let filename = fname[0];
@@ -78,10 +78,9 @@ impl parser::Parser for CatGlobIntoParser {
         let dst = state.prefix.current.join(filename);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
-        configuration.modules.push(Box::new(CatGlobInto {
+        Ok(Some(Box::new(CatGlobInto {
             globs: concatenated_globs,
             output,
-        }));
-        Ok(())
+        })))
     }
 }

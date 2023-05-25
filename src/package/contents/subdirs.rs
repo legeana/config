@@ -1,7 +1,9 @@
+use anyhow::{anyhow, Context, Result};
+
+use crate::module::Module;
+
 use super::parser;
 use super::util;
-
-use anyhow::{anyhow, Context, Result};
 
 pub struct SubdirsParser;
 
@@ -18,10 +20,11 @@ impl parser::Parser for SubdirsParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        configuration: &mut super::Configuration,
+        configuration: &super::Configuration,
         args: &[&str],
-    ) -> Result<()> {
+    ) -> Result<Option<Box<dyn Module>>> {
         util::no_args(COMMAND, args)?;
+        let mut modules: Vec<Box<dyn Module>> = Vec::new();
         for entry in configuration
             .root
             .read_dir()
@@ -44,8 +47,8 @@ impl parser::Parser for SubdirsParser {
                 prefix: state.prefix.join(subdir),
             };
             let subconf = super::Configuration::new_sub(&mut substate, subroot)?;
-            configuration.modules.push(Box::new(subconf));
+            modules.push(Box::new(subconf));
         }
-        Ok(())
+        Ok(Some(Box::new(modules)))
     }
 }

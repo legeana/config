@@ -46,17 +46,16 @@ impl parser::Parser for CopyParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        configuration: &mut super::Configuration,
+        configuration: &super::Configuration,
         args: &[&str],
-    ) -> Result<()> {
+    ) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;
         let dst = state.prefix.current.join(filename);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
-        configuration.modules.push(Box::new(Copy {
+        Ok(Some(Box::new(Copy {
             src: configuration.root.join(filename),
             output,
-        }));
-        Ok(())
+        })))
     }
 }

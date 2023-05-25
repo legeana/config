@@ -49,9 +49,9 @@ fn parse(
     exec_condition: ExecCondition,
     command_name: &'static str,
     state: &mut parser::State,
-    configuration: &mut super::Configuration,
+    _configuration: &super::Configuration,
     args: &[&str],
-) -> Result<()> {
+) -> Result<Option<Box<dyn Module>>> {
     let (command, args) = util::multiple_args(command_name, args, 1)?;
     assert!(command.len() == 1);
     let args: Vec<String> = args
@@ -59,13 +59,12 @@ fn parse(
         .map(shellexpand::tilde)
         .map(String::from)
         .collect();
-    configuration.modules.push(Box::new(PostInstallExec {
+    Ok(Some(Box::new(PostInstallExec {
         exec_condition,
         current_dir: state.prefix.current.clone(),
         cmd: command[0].to_owned(),
         args,
-    }));
-    Ok(())
+    })))
 }
 
 impl parser::Parser for PostInstallExecParser {
@@ -79,9 +78,9 @@ impl parser::Parser for PostInstallExecParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        configuration: &mut super::Configuration,
+        configuration: &super::Configuration,
         args: &[&str],
-    ) -> Result<()> {
+    ) -> Result<Option<Box<dyn Module>>> {
         parse(ExecCondition::Always, COMMAND, state, configuration, args)
     }
 }
@@ -98,9 +97,9 @@ impl parser::Parser for PostInstallUpdateParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        configuration: &mut super::Configuration,
+        configuration: &super::Configuration,
         args: &[&str],
-    ) -> Result<()> {
+    ) -> Result<Option<Box<dyn Module>>> {
         parse(
             ExecCondition::UpdateOnly,
             UPDATE_COMMAND,

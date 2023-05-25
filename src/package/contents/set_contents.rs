@@ -44,9 +44,9 @@ impl parser::Parser for SetContentsParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        configuration: &mut super::Configuration,
+        _configuration: &super::Configuration,
         args: &[&str],
-    ) -> Result<()> {
+    ) -> Result<Option<Box<dyn Module>>> {
         let args = util::fixed_args(COMMAND, args, 2)?;
         assert_eq!(args.len(), 2);
         let filename = args[0];
@@ -54,10 +54,9 @@ impl parser::Parser for SetContentsParser {
         let dst = state.prefix.current.join(filename);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
-        configuration.modules.push(Box::new(SetContents {
+        Ok(Some(Box::new(SetContents {
             output,
             contents: contents.to_owned(),
-        }));
-        Ok(())
+        })))
     }
 }

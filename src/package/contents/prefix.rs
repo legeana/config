@@ -1,5 +1,7 @@
 use anyhow::Result;
 
+use crate::module::Module;
+
 use super::parser;
 use super::util;
 
@@ -18,11 +20,11 @@ impl parser::Parser for PrefixParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        _configuration: &mut super::Configuration,
+        _configuration: &super::Configuration,
         args: &[&str],
-    ) -> Result<()> {
+    ) -> Result<Option<Box<dyn Module>>> {
         let prefix = util::single_arg(COMMAND, args)?;
         state.prefix.set(shellexpand::tilde(prefix).as_ref().into());
-        Ok(())
+        Ok(None)
     }
 }

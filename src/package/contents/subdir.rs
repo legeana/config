@@ -1,7 +1,9 @@
+use anyhow::Result;
+
+use crate::module::Module;
+
 use super::parser;
 use super::util;
-
-use anyhow::Result;
 
 pub struct SubdirParser {}
 
@@ -18,9 +20,9 @@ impl parser::Parser for SubdirParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        configuration: &mut super::Configuration,
+        configuration: &super::Configuration,
         args: &[&str],
-    ) -> Result<()> {
+    ) -> Result<Option<Box<dyn Module>>> {
         let subdir = util::single_arg(COMMAND, args)?;
         let subroot = configuration.root.clone().join(subdir);
         let mut substate = parser::State {
@@ -28,7 +30,6 @@ impl parser::Parser for SubdirParser {
             prefix: state.prefix.join(subdir),
         };
         let subconf = super::Configuration::new_sub(&mut substate, subroot)?;
-        configuration.modules.push(Box::new(subconf));
-        Ok(())
+        Ok(Some(Box::new(subconf)))
     }
 }

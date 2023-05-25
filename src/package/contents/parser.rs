@@ -3,6 +3,8 @@ use std::path::{Path, PathBuf};
 use anyhow::{anyhow, Result};
 use thiserror::Error;
 
+use crate::module::Module;
+
 #[derive(Error, Debug)]
 pub enum Error {
     #[error("parser {parser}: unsupported command {command}")]
@@ -54,9 +56,9 @@ pub trait Parser {
     fn parse(
         &self,
         state: &mut State,
-        configuration: &mut super::Configuration,
+        configuration: &super::Configuration,
         args: &[&str],
-    ) -> Result<()>;
+    ) -> Result<Option<Box<dyn Module>>>;
 }
 
 fn parsers() -> Vec<Box<dyn Parser>> {
@@ -88,37 +90,39 @@ fn parsers() -> Vec<Box<dyn Parser>> {
 
 pub fn parse(
     state: &mut State,
-    configuration: &mut super::Configuration,
+    configuration: &super::Configuration,
     args: &[&str],
-) -> Result<()> {
+) -> Result<Option<Box<dyn Module>>> {
     if !state.enabled {
-        return Ok(());
+        return Ok(None);
     }
-    let mut matched = Vec::<String>::new();
+    let mut matched = Vec::<(String, Option<Box<dyn Module>>)>::new();
     for parser in parsers() {
-        if let Err(err) = parser.parse(state, configuration, args) {
-            match err.downcast_ref::<Error>() {
-                Some(Error::UnsupportedCommand {
-                    parser: _,
-                    command: _,
-                }) => {
-                    // Try another parser.
-                    continue;
+        match parser.parse(state, configuration, args) {
+            Ok(m) => matched.push((parser.name().to_string(), m)),
+            Err(err) => {
+                match err.downcast_ref::<Error>() {
+                    Some(Error::UnsupportedCommand {
+                        parser: _,
+                        command: _,
+                    }) => {
+                        // Try another parser.
+                        continue;
+                    }
+                    _ => {
+                        return Err(err);
+                    }
                 }
-                _ => {
-                    return Err(err);
-                }
-            }
+            },
         }
-        matched.push(parser.name().to_string());
     }
     match matched.len() {
         0 => Err(anyhow!("unsupported command {:?}", args)),
-        1 => Ok(()),
+        1 => Ok(matched.pop().unwrap().1),
         _ => Err(anyhow!(
             "{:?} matched multiple parsers: {:?}",
             args,
-            matched,
+            matched.iter().map(|(parser, _)| parser).collect::<Vec<_>>(),
         )),
     }
 }

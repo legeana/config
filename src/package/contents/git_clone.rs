@@ -71,9 +71,9 @@ impl parser::Parser for GitCloneParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        configuration: &mut super::Configuration,
+        _configuration: &super::Configuration,
         args: &[&str],
-    ) -> Result<()> {
+    ) -> Result<Option<Box<dyn Module>>> {
         let args = util::fixed_args(COMMAND, args, 2)?;
         assert_eq!(args.len(), 2);
         let url = args[0];
@@ -81,10 +81,9 @@ impl parser::Parser for GitCloneParser {
         let dst = state.prefix.current.join(filename);
         let output = local_state::DirectoryState::new(dst.clone())
             .with_context(|| format!("failed to create DirectoryState from {dst:?}"))?;
-        configuration.modules.push(Box::new(GitClone {
+        Ok(Some(Box::new(GitClone {
             remote: git_utils::Remote::new(url),
             output,
-        }));
-        Ok(())
+        })))
     }
 }
