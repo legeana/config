@@ -20,8 +20,8 @@ impl parser::Parser for RequiresParser {
     }
     fn parse(
         &self,
-        _state: &mut parser::State,
-        configuration: &mut super::Configuration,
+        state: &mut parser::State,
+        _configuration: &mut super::Configuration,
         args: &[&str],
     ) -> Result<()> {
         let (_, tags) = util::multiple_args(REQUIRES_COMMAND, args, 0)?;
@@ -29,7 +29,7 @@ impl parser::Parser for RequiresParser {
             let has_tag =
                 tag_util::has_tag(tag).with_context(|| format!("failed to check tag {tag}"))?;
             if !has_tag {
-                configuration.enabled = false;
+                state.enabled = false;
             }
         }
         Ok(())
@@ -46,8 +46,8 @@ impl parser::Parser for ConflictsParser {
     }
     fn parse(
         &self,
-        _state: &mut parser::State,
-        configuration: &mut super::Configuration,
+        state: &mut parser::State,
+        _configuration: &mut super::Configuration,
         args: &[&str],
     ) -> Result<()> {
         let (_, tags) = util::multiple_args(CONFLICTS_COMMAND, args, 0)?;
@@ -55,7 +55,7 @@ impl parser::Parser for ConflictsParser {
             let has_tag =
                 tag_util::has_tag(tag).with_context(|| format!("failed to check tag {tag}"))?;
             if has_tag {
-                configuration.enabled = false;
+                state.enabled = false;
             }
         }
         Ok(())

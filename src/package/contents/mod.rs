@@ -36,7 +36,6 @@ pub use parser::help;
 
 #[derive(Default)]
 pub struct Configuration {
-    enabled: bool,
     root: PathBuf,
     modules: Vec<Box<dyn Module>>,
 }
@@ -44,7 +43,6 @@ pub struct Configuration {
 impl Configuration {
     pub fn new_empty(root: PathBuf) -> Self {
         Self {
-            enabled: false,
             root,
             ..Self::default()
         }
@@ -56,7 +54,6 @@ impl Configuration {
     pub fn new_sub(state: &mut parser::State, root: PathBuf) -> Result<Self> {
         let manifest = root.join(MANIFEST);
         let mut conf = Self {
-            enabled: true,
             root,
             ..Self::default()
         };
@@ -91,25 +88,16 @@ impl Configuration {
 
 impl Module for Configuration {
     fn pre_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-        if !self.enabled {
-            return Ok(());
-        }
         self.modules
             .pre_install(rules, registry)
             .with_context(|| format!("failed pre_install in {:?}", self.root))
     }
     fn install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-        if !self.enabled {
-            return Ok(());
-        }
         self.modules
             .install(rules, registry)
             .with_context(|| format!("failed install in {:?}", self.root))
     }
     fn post_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-        if !self.enabled {
-            return Ok(());
-        }
         self.modules
             .post_install(rules, registry)
             .with_context(|| format!("failed post_install in {:?}", self.root))

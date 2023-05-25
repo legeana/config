@@ -40,6 +40,7 @@ impl parser::Parser for SubdirsParser {
                 .ok_or_else(|| anyhow!("failed to parse {:?}", fname))?;
             let subroot = entry.path();
             let mut substate = parser::State {
+                enabled: true,
                 prefix: state.prefix.join(subdir),
             };
             let subconf = super::Configuration::new_sub(&mut substate, subroot)?;

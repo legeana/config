@@ -35,12 +35,14 @@ impl Prefix {
 }
 
 pub struct State {
+    pub enabled: bool,
     pub prefix: Prefix,
 }
 
 impl State {
     pub fn new() -> Self {
         Self {
+            enabled: true,
             prefix: Prefix::new(),
         }
     }
@@ -89,6 +91,9 @@ pub fn parse(
     configuration: &mut super::Configuration,
     args: &[&str],
 ) -> Result<()> {
+    if !state.enabled {
+        return Ok(());
+    }
     let mut matched = Vec::<String>::new();
     for parser in parsers() {
         if let Err(err) = parser.parse(state, configuration, args) {

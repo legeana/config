@@ -24,6 +24,7 @@ impl parser::Parser for SubdirParser {
         let subdir = util::single_arg(COMMAND, args)?;
         let subroot = configuration.root.clone().join(subdir);
         let mut substate = parser::State {
+            enabled: true,
             prefix: state.prefix.join(subdir),
         };
         let subconf = super::Configuration::new_sub(&mut substate, subroot)?;
