@@ -15,4 +15,4 @@ prefix ~
 symlink .bashrc
 
 post_install_exec fish -c 'fisher install patrickf1/fzf.fish'
-post_install_exec fish -c 'fisher update'
+post_install_update fish -c 'fisher update'
