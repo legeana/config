@@ -38,7 +38,6 @@ impl parser::Parser for MkDirParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        _configuration: &super::Configuration,
         args: &[&str],
     ) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;

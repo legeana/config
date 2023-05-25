@@ -56,7 +56,6 @@ impl parser::Parser for CatGlobIntoParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        _configuration: &super::Configuration,
         args: &[&str],
     ) -> Result<Option<Box<dyn Module>>> {
         let (fname, globs) = util::multiple_args(COMMAND, args, 1)?;

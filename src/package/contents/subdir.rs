@@ -20,7 +20,6 @@ impl parser::Parser for SubdirParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        _configuration: &super::Configuration,
         args: &[&str],
     ) -> Result<Option<Box<dyn Module>>> {
         let subdir = util::single_arg(COMMAND, args)?;

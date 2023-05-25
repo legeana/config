@@ -44,7 +44,6 @@ impl parser::Parser for SetContentsParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        _configuration: &super::Configuration,
         args: &[&str],
     ) -> Result<Option<Box<dyn Module>>> {
         let args = util::fixed_args(COMMAND, args, 2)?;

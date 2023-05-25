@@ -86,7 +86,6 @@ where
     fn parse(
         &self,
         state: &mut parser::State,
-        _configuration: &super::Configuration,
         args: &[&str],
     ) -> Result<Option<Box<dyn Module>>> {
         let path = util::single_arg(self.name(), args)?;

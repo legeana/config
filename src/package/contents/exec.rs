@@ -49,7 +49,6 @@ fn parse(
     exec_condition: ExecCondition,
     command_name: &'static str,
     state: &mut parser::State,
-    _configuration: &super::Configuration,
     args: &[&str],
 ) -> Result<Option<Box<dyn Module>>> {
     let (command, args) = util::multiple_args(command_name, args, 1)?;
@@ -78,10 +77,9 @@ impl parser::Parser for PostInstallExecParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        configuration: &super::Configuration,
         args: &[&str],
     ) -> Result<Option<Box<dyn Module>>> {
-        parse(ExecCondition::Always, COMMAND, state, configuration, args)
+        parse(ExecCondition::Always, COMMAND, state, args)
     }
 }
 
@@ -97,14 +95,12 @@ impl parser::Parser for PostInstallUpdateParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        configuration: &super::Configuration,
         args: &[&str],
     ) -> Result<Option<Box<dyn Module>>> {
         parse(
             ExecCondition::UpdateOnly,
             UPDATE_COMMAND,
             state,
-            configuration,
             args,
         )
     }

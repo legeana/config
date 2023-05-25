@@ -65,7 +65,6 @@ pub trait Parser {
     fn parse(
         &self,
         state: &mut State,
-        configuration: &super::Configuration,
         args: &[&str],
     ) -> Result<Option<Box<dyn Module>>>;
 }
@@ -99,7 +98,6 @@ fn parsers() -> Vec<Box<dyn Parser>> {
 
 pub fn parse(
     state: &mut State,
-    configuration: &super::Configuration,
     args: &[&str],
 ) -> Result<Option<Box<dyn Module>>> {
     if !state.enabled {
@@ -107,7 +105,7 @@ pub fn parse(
     }
     let mut matched = Vec::<(String, Option<Box<dyn Module>>)>::new();
     for parser in parsers() {
-        match parser.parse(state, configuration, args) {
+        match parser.parse(state, args) {
             Ok(m) => matched.push((parser.name().to_string(), m)),
             Err(err) => {
                 match err.downcast_ref::<Error>() {

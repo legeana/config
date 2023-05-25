@@ -19,7 +19,6 @@ impl parser::Parser for DeprecatedParser {
     fn parse(
         &self,
         _state: &mut parser::State,
-        _configuration: &super::Configuration,
         args: &[&str],
     ) -> Result<Option<Box<dyn Module>>> {
         /*if check_command("<deprecated>", args).is_ok() {

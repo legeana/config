@@ -20,7 +20,6 @@ impl parser::Parser for SubdirsParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        _configuration: &super::Configuration,
         args: &[&str],
     ) -> Result<Option<Box<dyn Module>>> {
         util::no_args(COMMAND, args)?;

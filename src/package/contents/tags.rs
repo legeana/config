@@ -23,7 +23,6 @@ impl parser::Parser for RequiresParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        _configuration: &super::Configuration,
         args: &[&str],
     ) -> Result<Option<Box<dyn Module>>> {
         let (_, tags) = util::multiple_args(REQUIRES_COMMAND, args, 0)?;
@@ -49,7 +48,6 @@ impl parser::Parser for ConflictsParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        _configuration: &super::Configuration,
         args: &[&str],
     ) -> Result<Option<Box<dyn Module>>> {
         let (_, tags) = util::multiple_args(CONFLICTS_COMMAND, args, 0)?;
