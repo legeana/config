@@ -67,6 +67,7 @@ pub trait Parser {
 
 fn parsers() -> Vec<Box<dyn Parser>> {
     vec![
+        // MANIFEST.
         Box::new(super::subdir::SubdirParser {}),
         Box::new(super::subdirs::SubdirsParser {}),
         Box::new(super::prefix::PrefixParser {}),
@@ -76,6 +77,7 @@ fn parsers() -> Vec<Box<dyn Parser>> {
         Box::new(super::xdg_prefix::XdgStatePrefixParser {}),
         Box::new(super::tags::RequiresParser {}),
         Box::new(super::tags::ConflictsParser {}),
+        // Files.
         Box::new(super::symlink::SymlinkParser {}),
         Box::new(super::symlink_tree::SymlinkTreeParser {}),
         Box::new(super::mkdir::MkDirParser {}),
@@ -84,10 +86,15 @@ fn parsers() -> Vec<Box<dyn Parser>> {
         Box::new(super::cat_glob::CatGlobIntoParser {}),
         Box::new(super::set_contents::SetContentsParser {}),
         Box::new(super::importer::ImporterParser {}),
+        // Downloads.
         Box::new(super::fetch::FetchIntoParser {}),
         Box::new(super::git_clone::GitCloneParser {}),
+        // Exec.
         Box::new(super::exec::PostInstallExecParser {}),
         Box::new(super::exec::PostInstallUpdateParser {}),
+        // Control.
+        Box::new(super::if_missing::IfMissingParser {}),
+        // Deprecation.
         Box::new(super::deprecated::DeprecatedParser {}),
     ]
 }
