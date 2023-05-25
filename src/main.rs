@@ -48,10 +48,8 @@ struct Cli {
 
 #[derive(Debug, Subcommand)]
 enum Commands {
-    Install {
-        #[clap(long, default_value_t = false, action = clap::ArgAction::Set)]
-        sync: bool,
-    },
+    Install {},
+    Update {},
     SystemInstall {
         #[clap(long, default_value_t = true, action = clap::ArgAction::Set)]
         strict: bool,
@@ -141,12 +139,22 @@ fn main() -> Result<()> {
         Ok(false)
     };
     match args.command {
-        Commands::Install { sync } => {
+        Commands::Install {} => {
             if check_update()? {
                 return Ok(());
             }
             let rules = Rules {
-                force_download: sync,
+                force_download: false,
+                ..Rules::default()
+            };
+            install(&rules, &root).context("failed to install")?;
+        }
+        Commands::Update {} => {
+            if check_update()? {
+                return Ok(());
+            }
+            let rules = Rules {
+                force_download: true,
                 ..Rules::default()
             };
             install(&rules, &root).context("failed to install")?;
