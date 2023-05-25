@@ -62,11 +62,7 @@ impl State {
 pub trait Parser {
     fn name(&self) -> &'static str;
     fn help(&self) -> &'static str;
-    fn parse(
-        &self,
-        state: &mut State,
-        args: &[&str],
-    ) -> Result<Option<Box<dyn Module>>>;
+    fn parse(&self, state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>>;
 }
 
 fn parsers() -> Vec<Box<dyn Parser>> {
@@ -96,10 +92,7 @@ fn parsers() -> Vec<Box<dyn Parser>> {
     ]
 }
 
-pub fn parse(
-    state: &mut State,
-    args: &[&str],
-) -> Result<Option<Box<dyn Module>>> {
+pub fn parse(state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
     if !state.enabled {
         return Ok(None);
     }

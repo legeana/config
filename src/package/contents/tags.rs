@@ -20,11 +20,7 @@ impl parser::Parser for RequiresParser {
         "requires <tags>
            do not process current directory if any of the tags is not present"
     }
-    fn parse(
-        &self,
-        state: &mut parser::State,
-        args: &[&str],
-    ) -> Result<Option<Box<dyn Module>>> {
+    fn parse(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let (_, tags) = util::multiple_args(REQUIRES_COMMAND, args, 0)?;
         for tag in tags.iter() {
             let has_tag =
@@ -45,11 +41,7 @@ impl parser::Parser for ConflictsParser {
         "conflicts <tags>
            do not process current directory if any of the tags is present"
     }
-    fn parse(
-        &self,
-        state: &mut parser::State,
-        args: &[&str],
-    ) -> Result<Option<Box<dyn Module>>> {
+    fn parse(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let (_, tags) = util::multiple_args(CONFLICTS_COMMAND, args, 0)?;
         for tag in tags.iter() {
             let has_tag =

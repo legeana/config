@@ -74,11 +74,7 @@ impl parser::Parser for PostInstallExecParser {
         "post_install_exec <arg0> [<arg1>...]
            execute a command in a post-install phase"
     }
-    fn parse(
-        &self,
-        state: &mut parser::State,
-        args: &[&str],
-    ) -> Result<Option<Box<dyn Module>>> {
+    fn parse(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         parse(ExecCondition::Always, COMMAND, state, args)
     }
 }
@@ -92,16 +88,7 @@ impl parser::Parser for PostInstallUpdateParser {
            execute a command in a post-install phase
            only if executed via 'setup update' command"
     }
-    fn parse(
-        &self,
-        state: &mut parser::State,
-        args: &[&str],
-    ) -> Result<Option<Box<dyn Module>>> {
-        parse(
-            ExecCondition::UpdateOnly,
-            UPDATE_COMMAND,
-            state,
-            args,
-        )
+    fn parse(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+        parse(ExecCondition::UpdateOnly, UPDATE_COMMAND, state, args)
     }
 }

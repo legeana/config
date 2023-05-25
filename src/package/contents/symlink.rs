@@ -32,11 +32,7 @@ impl parser::Parser for SymlinkParser {
         "symlink <filename>
            create a symlink for filename in prefix"
     }
-    fn parse(
-        &self,
-        state: &mut parser::State,
-        args: &[&str],
-    ) -> Result<Option<Box<dyn Module>>> {
+    fn parse(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;
         Ok(Some(Box::new(Symlink {
             src: state.prefix.src_path(filename),

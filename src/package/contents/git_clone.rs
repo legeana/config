@@ -68,11 +68,7 @@ impl parser::Parser for GitCloneParser {
            git clone <url> into a local storage and installs a symlink to it
            if <branch> is specified clone <branch> instead of default HEAD"
     }
-    fn parse(
-        &self,
-        state: &mut parser::State,
-        args: &[&str],
-    ) -> Result<Option<Box<dyn Module>>> {
+    fn parse(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let args = util::fixed_args(COMMAND, args, 2)?;
         assert_eq!(args.len(), 2);
         let url = args[0];

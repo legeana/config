@@ -35,11 +35,7 @@ impl parser::Parser for MkDirParser {
         "mkdir <directory>
            create a directory in prefix"
     }
-    fn parse(
-        &self,
-        state: &mut parser::State,
-        args: &[&str],
-    ) -> Result<Option<Box<dyn Module>>> {
+    fn parse(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;
         Ok(Some(Box::new(MkDir {
             dst: state.prefix.dst_path(filename),

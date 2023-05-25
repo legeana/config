@@ -53,11 +53,7 @@ impl parser::Parser for CatGlobIntoParser {
         "cat_glob_into <filename> <glob1> [<glob2> ...]
            create filename in local storage by concatenating globs"
     }
-    fn parse(
-        &self,
-        state: &mut parser::State,
-        args: &[&str],
-    ) -> Result<Option<Box<dyn Module>>> {
+    fn parse(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let (fname, globs) = util::multiple_args(COMMAND, args, 1)?;
         assert!(fname.len() == 1);
         let filename = fname[0];
