@@ -48,7 +48,7 @@ impl Configuration {
         }
     }
     pub fn new(root: PathBuf) -> Result<Self> {
-        let mut state = parser::State::new();
+        let mut state = parser::State::new(root.clone());
         Self::new_sub(&mut state, root)
     }
     pub fn new_sub(state: &mut parser::State, root: PathBuf) -> Result<Self> {

@@ -12,26 +12,24 @@ pub enum Error {
 }
 
 pub struct Prefix {
-    pub base: PathBuf,
+    src_dir: PathBuf,
     pub current: PathBuf,
 }
 
 impl Prefix {
-    fn new() -> Self {
-        let home = dirs::home_dir().expect("failed to determine home dir");
+    fn new(src_dir: PathBuf) -> Self {
         Self {
-            base: home.clone(),
-            current: home,
+            src_dir,
+            current: dirs::home_dir().expect("failed to determine home dir"),
         }
     }
     pub fn set(&mut self, current: PathBuf) {
         self.current = current;
     }
     pub fn join<P: AsRef<Path>>(&self, subdir: P) -> Self {
-        let sub = self.current.join(subdir);
         Self {
-            base: sub.clone(),
-            current: sub,
+            src_dir: self.src_dir.join(subdir.as_ref()),
+            current: self.current.join(subdir.as_ref()),
         }
     }
 }
@@ -42,10 +40,10 @@ pub struct State {
 }
 
 impl State {
-    pub fn new() -> Self {
+    pub fn new(src: PathBuf) -> Self {
         Self {
             enabled: true,
-            prefix: Prefix::new(),
+            prefix: Prefix::new(src),
         }
     }
 }
