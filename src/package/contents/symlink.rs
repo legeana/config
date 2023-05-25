@@ -35,13 +35,13 @@ impl parser::Parser for SymlinkParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        configuration: &super::Configuration,
+        _configuration: &super::Configuration,
         args: &[&str],
     ) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;
         Ok(Some(Box::new(Symlink {
-            src: configuration.root.join(filename),
-            dst: state.prefix.current.join(filename),
+            src: state.prefix.src_path(filename),
+            dst: state.prefix.dst_path(filename),
         })))
     }
 }

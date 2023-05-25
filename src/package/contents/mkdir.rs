@@ -43,7 +43,7 @@ impl parser::Parser for MkDirParser {
     ) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;
         Ok(Some(Box::new(MkDir {
-            dst: state.prefix.current.join(filename),
+            dst: state.prefix.dst_path(filename),
         })))
     }
 }

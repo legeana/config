@@ -114,12 +114,11 @@ impl parser::Parser for ImporterParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        configuration: &super::Configuration,
+        _configuration: &super::Configuration,
         args: &[&str],
     ) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;
-        let src = configuration.root.join(filename);
-        let dst = state.prefix.current.join(filename);
+        let dst = state.prefix.dst_path(filename);
         let prefix = dst
             .parent()
             .ok_or_else(|| anyhow!("failed to get parent of {dst:?}"))?;
@@ -127,7 +126,7 @@ impl parser::Parser for ImporterParser {
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
         Ok(Some(Box::new(Importer {
             prefix: prefix.to_owned(),
-            src,
+            src: state.prefix.src_path(filename),
             output,
         })))
     }

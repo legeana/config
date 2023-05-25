@@ -11,26 +11,37 @@ pub enum Error {
     UnsupportedCommand { parser: String, command: String },
 }
 
+struct PrefixNewGuard;
+
 pub struct Prefix {
-    src_dir: PathBuf,
-    pub current: PathBuf,
+    _private_constructor_helper: PrefixNewGuard,
+    pub src_dir: PathBuf,
+    pub dst_dir: PathBuf,
 }
 
 impl Prefix {
     fn new(src_dir: PathBuf) -> Self {
         Self {
+            _private_constructor_helper: PrefixNewGuard,
             src_dir,
-            current: dirs::home_dir().expect("failed to determine home dir"),
+            dst_dir: dirs::home_dir().expect("failed to determine home dir"),
         }
     }
-    pub fn set(&mut self, current: PathBuf) {
-        self.current = current;
+    pub fn set(&mut self, dst_dir: PathBuf) {
+        self.dst_dir = dst_dir;
     }
     pub fn join<P: AsRef<Path>>(&self, subdir: P) -> Self {
         Self {
-            src_dir: self.src_dir.join(subdir.as_ref()),
-            current: self.current.join(subdir.as_ref()),
+            _private_constructor_helper: PrefixNewGuard,
+            src_dir: self.src_path(subdir.as_ref()),
+            dst_dir: self.dst_path(subdir.as_ref()),
         }
+    }
+    pub fn src_path<P: AsRef<Path>>(&self, path: P) -> PathBuf {
+        self.src_dir.join(path)
+    }
+    pub fn dst_path<P: AsRef<Path>>(&self, path: P) -> PathBuf {
+        self.dst_dir.join(path)
     }
 }
 
@@ -111,7 +122,7 @@ pub fn parse(
                         return Err(err);
                     }
                 }
-            },
+            }
         }
     }
     match matched.len() {

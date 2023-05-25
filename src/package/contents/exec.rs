@@ -61,7 +61,7 @@ fn parse(
         .collect();
     Ok(Some(Box::new(PostInstallExec {
         exec_condition,
-        current_dir: state.prefix.current.clone(),
+        current_dir: state.prefix.dst_dir.clone(),
         cmd: command[0].to_owned(),
         args,
     })))

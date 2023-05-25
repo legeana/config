@@ -58,7 +58,7 @@ impl parser::Parser for FetchIntoParser {
         assert_eq!(args.len(), 2);
         let filename = args[0];
         let url = args[1];
-        let dst = state.prefix.current.join(filename);
+        let dst = state.prefix.dst_path(filename);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
         Ok(Some(Box::new(FetchInto {

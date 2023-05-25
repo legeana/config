@@ -20,15 +20,15 @@ impl parser::Parser for SubdirParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        configuration: &super::Configuration,
+        _configuration: &super::Configuration,
         args: &[&str],
     ) -> Result<Option<Box<dyn Module>>> {
         let subdir = util::single_arg(COMMAND, args)?;
-        let subroot = configuration.root.clone().join(subdir);
         let mut substate = parser::State {
             enabled: true,
             prefix: state.prefix.join(subdir),
         };
+        let subroot = substate.prefix.src_dir.clone();
         let subconf = super::Configuration::new_sub(&mut substate, subroot)?;
         Ok(Some(Box::new(subconf)))
     }

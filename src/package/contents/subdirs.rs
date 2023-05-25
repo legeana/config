@@ -20,18 +20,19 @@ impl parser::Parser for SubdirsParser {
     fn parse(
         &self,
         state: &mut parser::State,
-        configuration: &super::Configuration,
+        _configuration: &super::Configuration,
         args: &[&str],
     ) -> Result<Option<Box<dyn Module>>> {
         util::no_args(COMMAND, args)?;
         let mut modules: Vec<Box<dyn Module>> = Vec::new();
-        for entry in configuration
-            .root
+        for entry in state
+            .prefix
+            .src_dir
             .read_dir()
-            .with_context(|| format!("failed to read {:?}", configuration.root))?
+            .with_context(|| format!("failed to read {:?}", state.prefix.src_dir))?
         {
             let entry =
-                entry.with_context(|| format!("failed to read {:?}", configuration.root))?;
+                entry.with_context(|| format!("failed to read {:?}", state.prefix.src_dir))?;
             let md = std::fs::metadata(entry.path())
                 .with_context(|| format!("failed to read metadata for {:?}", entry.path()))?;
             if !md.is_dir() {
