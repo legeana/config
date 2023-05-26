@@ -2,14 +2,14 @@ use anyhow::{anyhow, Context, Result};
 
 use crate::module::Module;
 
-use super::parser;
+use super::builder;
 use super::util;
 
 pub struct SubdirsBuilder;
 
 const COMMAND: &str = "subdirs";
 
-impl parser::Builder for SubdirsBuilder {
+impl builder::Builder for SubdirsBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }
@@ -17,7 +17,7 @@ impl parser::Builder for SubdirsBuilder {
         "subdirs
            load all subdirectories recursively"
     }
-    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         util::no_args(COMMAND, args)?;
         let mut modules: Vec<Box<dyn Module>> = Vec::new();
         for entry in state
@@ -38,7 +38,7 @@ impl parser::Builder for SubdirsBuilder {
                 .to_str()
                 .ok_or_else(|| anyhow!("failed to parse {:?}", fname))?;
             let subroot = entry.path();
-            let mut substate = parser::State {
+            let mut substate = builder::State {
                 enabled: true,
                 prefix: state.prefix.join(subdir),
             };

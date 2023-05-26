@@ -4,8 +4,8 @@ use crate::git_utils;
 use crate::module::{Module, Rules};
 use crate::registry::Registry;
 
+use super::builder;
 use super::local_state;
-use super::parser;
 use super::util;
 
 pub struct GitCloneBuilder;
@@ -59,7 +59,7 @@ impl Module for GitClone {
     }
 }
 
-impl parser::Builder for GitCloneBuilder {
+impl builder::Builder for GitCloneBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }
@@ -68,7 +68,7 @@ impl parser::Builder for GitCloneBuilder {
            git clone <url> into a local storage and installs a symlink to it
            if <branch> is specified clone <branch> instead of default HEAD"
     }
-    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let args = util::fixed_args(COMMAND, args, 2)?;
         assert_eq!(args.len(), 2);
         let url = args[0];

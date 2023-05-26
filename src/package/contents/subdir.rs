@@ -2,14 +2,14 @@ use anyhow::Result;
 
 use crate::module::Module;
 
-use super::parser;
+use super::builder;
 use super::util;
 
 pub struct SubdirBuilder;
 
 const COMMAND: &str = "subdir";
 
-impl parser::Builder for SubdirBuilder {
+impl builder::Builder for SubdirBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }
@@ -17,9 +17,9 @@ impl parser::Builder for SubdirBuilder {
         "subdir <subdirectory>
            load subdirectory configuration recursively"
     }
-    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let subdir = util::single_arg(COMMAND, args)?;
-        let mut substate = parser::State {
+        let mut substate = builder::State {
             enabled: true,
             prefix: state.prefix.join(subdir),
         };

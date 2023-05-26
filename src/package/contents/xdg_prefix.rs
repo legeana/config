@@ -4,7 +4,7 @@ use anyhow::{Context, Result};
 
 use crate::module::Module;
 
-use super::parser;
+use super::builder;
 use super::util;
 
 trait XdgPrefixBuilder {
@@ -73,7 +73,7 @@ impl XdgPrefixBuilder for XdgStatePrefixBuilder {
     }
 }
 
-impl<T> parser::Builder for T
+impl<T> builder::Builder for T
 where
     T: XdgPrefixBuilder,
 {
@@ -83,7 +83,7 @@ where
     fn help(&self) -> &'static str {
         self.help()
     }
-    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let path = util::single_arg(self.name(), args)?;
         state.prefix.set(self.xdg_prefix(path)?);
         Ok(None)

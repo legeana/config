@@ -1,3 +1,4 @@
+mod builder;
 mod cat_glob;
 mod copy;
 mod deprecated;
@@ -10,7 +11,6 @@ mod importer;
 mod local_state;
 mod mkdir;
 mod output_file;
-mod parser;
 mod prefix;
 mod set_contents;
 mod subdir;
@@ -33,7 +33,7 @@ use crate::registry::Registry;
 
 const MANIFEST: &str = "MANIFEST";
 
-pub use parser::help;
+pub use builder::help;
 
 #[derive(Default)]
 pub struct Configuration {
@@ -49,10 +49,10 @@ impl Configuration {
         }
     }
     pub fn new(root: PathBuf) -> Result<Self> {
-        let mut state = parser::State::new(root.clone());
+        let mut state = builder::State::new(root.clone());
         Self::new_sub(&mut state, root)
     }
-    pub fn new_sub(state: &mut parser::State, root: PathBuf) -> Result<Self> {
+    pub fn new_sub(state: &mut builder::State, root: PathBuf) -> Result<Self> {
         let manifest = root.join(MANIFEST);
         let mut conf = Self {
             root,
@@ -62,18 +62,18 @@ impl Configuration {
             .with_context(|| format!("failed to load {manifest:?}"))?;
         Ok(conf)
     }
-    fn parse_line(&mut self, state: &mut parser::State, line: &str) -> Result<()> {
+    fn parse_line(&mut self, state: &mut builder::State, line: &str) -> Result<()> {
         if line.is_empty() || line.starts_with('#') {
             return Ok(());
         }
         let args = shlex::split(line).ok_or_else(|| anyhow!("failed to split line {:?}", line))?;
         let arg_refs: Vec<&str> = args.iter().map(String::as_str).collect();
-        if let Some(m) = parser::build(state, &arg_refs)? {
+        if let Some(m) = builder::build(state, &arg_refs)? {
             self.modules.push(m);
         }
         Ok(())
     }
-    fn parse(&mut self, state: &mut parser::State, manifest_path: &PathBuf) -> Result<()> {
+    fn parse(&mut self, state: &mut builder::State, manifest_path: &PathBuf) -> Result<()> {
         let manifest = File::open(manifest_path)
             .with_context(|| format!("failed to open {manifest_path:?}"))?;
         let reader = BufReader::new(manifest);

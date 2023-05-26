@@ -3,8 +3,8 @@ use std::path::PathBuf;
 use crate::module::{Module, Rules};
 use crate::registry::Registry;
 
+use super::builder;
 use super::file_util;
-use super::parser;
 use super::util;
 
 use anyhow::{Context, Result};
@@ -38,7 +38,7 @@ impl Module for SymlinkTree {
     }
 }
 
-impl parser::Builder for SymlinkTreeBuilder {
+impl builder::Builder for SymlinkTreeBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }
@@ -46,7 +46,7 @@ impl parser::Builder for SymlinkTreeBuilder {
         "symlink_tree <directory>
            create a symlink for every file in a directory recursively"
     }
-    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;
         Ok(Some(Box::new(SymlinkTree {
             src: state.prefix.src_path(filename),

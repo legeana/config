@@ -3,8 +3,8 @@ use anyhow::{Context, Result};
 use crate::module::{Module, Rules};
 use crate::registry::Registry;
 
+use super::builder;
 use super::local_state;
-use super::parser;
 use super::util;
 
 pub struct FetchIntoBuilder;
@@ -40,7 +40,7 @@ impl Module for FetchInto {
     }
 }
 
-impl parser::Builder for FetchIntoBuilder {
+impl builder::Builder for FetchIntoBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }
@@ -48,7 +48,7 @@ impl parser::Builder for FetchIntoBuilder {
         "fetch_into <filename> <url>
            downloads <url> into a local storage and installs a symlink to it"
     }
-    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let args = util::fixed_args(COMMAND, args, 2)?;
         assert_eq!(args.len(), 2);
         let filename = args[0];

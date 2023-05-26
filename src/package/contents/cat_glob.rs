@@ -3,8 +3,8 @@ use std::io::Write;
 use crate::module::{Module, Rules};
 use crate::registry::Registry;
 
+use super::builder;
 use super::local_state;
-use super::parser;
 use super::util;
 
 use anyhow::{anyhow, Context, Result};
@@ -45,7 +45,7 @@ impl Module for CatGlobInto {
     }
 }
 
-impl parser::Builder for CatGlobIntoBuilder {
+impl builder::Builder for CatGlobIntoBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }
@@ -53,7 +53,7 @@ impl parser::Builder for CatGlobIntoBuilder {
         "cat_glob_into <filename> <glob1> [<glob2> ...]
            create filename in local storage by concatenating globs"
     }
-    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let (fname, globs) = util::multiple_args(COMMAND, args, 1)?;
         assert!(fname.len() == 1);
         let filename = fname[0];

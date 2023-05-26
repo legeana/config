@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use crate::module::{Module, Rules};
 use crate::registry::Registry;
 
-use super::parser;
+use super::builder;
 use super::util;
 
 use anyhow::{Context, Result};
@@ -27,7 +27,7 @@ impl Module for MkDir {
     }
 }
 
-impl parser::Builder for MkDirBuilder {
+impl builder::Builder for MkDirBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }
@@ -35,7 +35,7 @@ impl parser::Builder for MkDirBuilder {
         "mkdir <directory>
            create a directory in prefix"
     }
-    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;
         Ok(Some(Box::new(MkDir {
             dst: state.prefix.dst_path(filename),

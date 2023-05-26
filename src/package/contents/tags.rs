@@ -3,7 +3,7 @@ use anyhow::{Context, Result};
 use crate::module::Module;
 use crate::tag_util;
 
-use super::parser;
+use super::builder;
 use super::util;
 
 pub struct RequiresBuilder;
@@ -12,7 +12,7 @@ pub struct ConflictsBuilder;
 const REQUIRES_COMMAND: &str = "requires";
 const CONFLICTS_COMMAND: &str = "conflicts";
 
-impl parser::Builder for RequiresBuilder {
+impl builder::Builder for RequiresBuilder {
     fn name(&self) -> &'static str {
         REQUIRES_COMMAND
     }
@@ -20,7 +20,7 @@ impl parser::Builder for RequiresBuilder {
         "requires <tags>
            do not process current directory if any of the tags is not present"
     }
-    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let (_, tags) = util::multiple_args(REQUIRES_COMMAND, args, 0)?;
         for tag in tags.iter() {
             let has_tag =
@@ -33,7 +33,7 @@ impl parser::Builder for RequiresBuilder {
     }
 }
 
-impl parser::Builder for ConflictsBuilder {
+impl builder::Builder for ConflictsBuilder {
     fn name(&self) -> &'static str {
         CONFLICTS_COMMAND
     }
@@ -41,7 +41,7 @@ impl parser::Builder for ConflictsBuilder {
         "conflicts <tags>
            do not process current directory if any of the tags is present"
     }
-    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let (_, tags) = util::multiple_args(CONFLICTS_COMMAND, args, 0)?;
         for tag in tags.iter() {
             let has_tag =

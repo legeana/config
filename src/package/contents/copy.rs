@@ -3,8 +3,8 @@ use std::path::PathBuf;
 use crate::module::{Module, Rules};
 use crate::registry::Registry;
 
+use super::builder;
 use super::local_state;
-use super::parser;
 use super::util;
 
 use anyhow::{Context, Result};
@@ -35,7 +35,7 @@ impl Module for Copy {
     }
 }
 
-impl parser::Builder for CopyBuilder {
+impl builder::Builder for CopyBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }
@@ -43,7 +43,7 @@ impl parser::Builder for CopyBuilder {
         "copy <filename>
            create a copy of a filename in local storage and install a symlink to it"
     }
-    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;
         let dst = state.prefix.dst_path(filename);
         let output = local_state::FileState::new(dst.clone())

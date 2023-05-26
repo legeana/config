@@ -1,4 +1,4 @@
-use super::parser;
+use super::builder;
 
 use anyhow::{anyhow, Result};
 
@@ -10,7 +10,7 @@ pub fn check_command<'a, 'b>(command: &str, args: &'a [&'b str]) -> Result<&'a [
     let cmd = args[0];
     let cmd_args = &args[1..];
     if command != cmd {
-        return Err(parser::Error::UnsupportedCommand {
+        return Err(builder::Error::UnsupportedCommand {
             parser: command.to_owned(),
             command: cmd.to_owned(),
         }

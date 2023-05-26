@@ -5,8 +5,8 @@ use std::{fs::File, io::Write};
 use crate::module::{Module, Rules};
 use crate::registry::Registry;
 
+use super::builder;
 use super::local_state;
-use super::parser;
 use super::util;
 
 use anyhow::{anyhow, Context, Result};
@@ -103,7 +103,7 @@ impl Module for Importer {
     }
 }
 
-impl parser::Builder for ImporterBuilder {
+impl builder::Builder for ImporterBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }
@@ -111,7 +111,7 @@ impl parser::Builder for ImporterBuilder {
         "import_from <filename>
            create a symlink for filename in prefix to a local persistent state"
     }
-    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;
         let dst = state.prefix.dst_path(filename);
         let prefix = dst

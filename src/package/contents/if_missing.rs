@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use crate::module::{Module, Rules};
 
-use super::parser;
+use super::builder;
 use super::util;
 
 use anyhow::{Context, Result};
@@ -52,7 +52,7 @@ impl Module for IfMissing {
     }
 }
 
-impl parser::Builder for IfMissingBuilder {
+impl builder::Builder for IfMissingBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }
@@ -60,11 +60,11 @@ impl parser::Builder for IfMissingBuilder {
         "if_missing <path> <command> [<args>...]
            execute a MANIFEST <command> only if <path> is missing"
     }
-    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let (path, cmd_args) = util::multiple_args(COMMAND, args, 1)?;
         assert_eq!(path.len(), 1);
         let path: PathBuf = shellexpand::tilde(path[0]).as_ref().into();
-        match parser::build(state, cmd_args)? {
+        match builder::build(state, cmd_args)? {
             Some(cmd) => Ok(Some(Box::new(IfMissing { path, cmd }))),
             None => Ok(None),
         }

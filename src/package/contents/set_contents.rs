@@ -3,8 +3,8 @@ use anyhow::{Context, Result};
 use crate::module::{Module, Rules};
 use crate::registry::Registry;
 
+use super::builder;
 use super::local_state;
-use super::parser;
 use super::util;
 
 pub struct SetContentsBuilder;
@@ -33,7 +33,7 @@ impl Module for SetContents {
     }
 }
 
-impl parser::Builder for SetContentsBuilder {
+impl builder::Builder for SetContentsBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }
@@ -41,7 +41,7 @@ impl parser::Builder for SetContentsBuilder {
         "set_contents <filename> <contents>
            overwrites <filename> with <contents>"
     }
-    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let args = util::fixed_args(COMMAND, args, 2)?;
         assert_eq!(args.len(), 2);
         let filename = args[0];

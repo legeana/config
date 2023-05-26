@@ -4,7 +4,7 @@ use std::process;
 use crate::module::{Module, Rules};
 use crate::process_utils;
 
-use super::parser;
+use super::builder;
 use super::util;
 
 use anyhow::Result;
@@ -48,7 +48,7 @@ impl Module for PostInstallExec {
 fn build(
     exec_condition: ExecCondition,
     command_name: &'static str,
-    state: &mut parser::State,
+    state: &mut builder::State,
     args: &[&str],
 ) -> Result<Option<Box<dyn Module>>> {
     let (command, args) = util::multiple_args(command_name, args, 1)?;
@@ -66,7 +66,7 @@ fn build(
     })))
 }
 
-impl parser::Builder for PostInstallExecBuilder {
+impl builder::Builder for PostInstallExecBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }
@@ -74,12 +74,12 @@ impl parser::Builder for PostInstallExecBuilder {
         "post_install_exec <arg0> [<arg1>...]
            execute a command in a post-install phase"
     }
-    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         build(ExecCondition::Always, COMMAND, state, args)
     }
 }
 
-impl parser::Builder for PostInstallUpdateBuilder {
+impl builder::Builder for PostInstallUpdateBuilder {
     fn name(&self) -> &'static str {
         UPDATE_COMMAND
     }
@@ -88,7 +88,7 @@ impl parser::Builder for PostInstallUpdateBuilder {
            execute a command in a post-install phase
            only if executed via 'setup update' command"
     }
-    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         build(ExecCondition::UpdateOnly, UPDATE_COMMAND, state, args)
     }
 }

@@ -1,10 +1,10 @@
 use anyhow::{Context, Result};
 
 use crate::module::{Module, Rules};
-use crate::package::contents::parser;
 use crate::package::contents::util;
 use crate::registry::Registry;
 
+use super::builder;
 use super::local_state;
 
 pub struct OutputFileBuilder {}
@@ -21,7 +21,7 @@ impl Module for OutputFile {
     }
 }
 
-impl parser::Builder for OutputFileBuilder {
+impl builder::Builder for OutputFileBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }
@@ -29,7 +29,7 @@ impl parser::Builder for OutputFileBuilder {
         "output_file <filename>
            create a symlink for filename in prefix to a local persistent state"
     }
-    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;
         let dst = state.prefix.dst_path(filename);
         let output = local_state::FileState::new(dst.clone())
