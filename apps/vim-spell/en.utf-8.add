@@ -57,7 +57,9 @@ cmakedefine
 cmd
 cmdline
 cmp
+colorscheme
 commandline
+compat
 cond
 conf
 confgen
@@ -92,6 +94,7 @@ denylisted
 dep
 deps
 deque
+deref
 dest
 devtools
 dhcp
@@ -139,6 +142,8 @@ fixup
 flaskutil
 fmt
 fn
+fname
+fnameescape
 foreach
 frontend
 frozenset
@@ -160,6 +165,7 @@ gigasecond
 gitconfig
 github
 githubdb
+githubusercontent
 gitignore
 gitlab
 gitutils
@@ -176,6 +182,7 @@ hashbang
 hashlib
 hdd
 hexsha
+homebrew
 homedir
 hostbased
 hostinfo
@@ -216,11 +223,13 @@ jvm
 keepalive
 keybase
 keygrip
+keymap
 kubernetes
 kwargs
 lang
 legeana
 len
+lesskey
 letsencrypt
 lgtm
 lib
@@ -234,6 +243,7 @@ linux
 liri
 ln
 loadavg
+localectl
 localhost
 localtime
 loglevel
@@ -296,6 +306,8 @@ openssh
 orgmode
 os
 osx
+packadd
+packpath
 pacman
 param
 params
@@ -319,6 +331,7 @@ pki
 pkill
 plugins
 png
+polybar
 popen
 pprint
 pragma
@@ -354,9 +367,11 @@ refactorings
 regen
 reloadall
 repr
+reqwest
 resizer
 returncode
 ripgrep
+rlua
 rollout
 rollouts
 rpc
@@ -412,6 +427,7 @@ stderr
 stderrlog
 stdin
 stdout
+stdpath
 str
 strictyaml
 stringset
@@ -462,6 +478,7 @@ tmux
 tmuxinator
 toml
 toolchain
+tpope
 traceback
 travis
 ttl
@@ -481,6 +498,7 @@ unmarshalling
 unparseable
 unpause
 unregister
+ureq
 url
 urllib
 useragent
@@ -492,6 +510,7 @@ utils
 uwsgi
 varargs
 variadic
+vcat
 vcc
 vendored
 vesa
@@ -515,6 +534,7 @@ workdir
 wrapdb
 wrapfile
 wrapweb
+writeln
 www
 x11
 xargs
