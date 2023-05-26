@@ -65,10 +65,7 @@ impl parser::Parser for IfMissingParser {
         assert_eq!(path.len(), 1);
         let path: PathBuf = shellexpand::tilde(path[0]).as_ref().into();
         match parser::parse(state, cmd_args)? {
-            Some(cmd) => Ok(Some(Box::new(IfMissing {
-                path,
-                cmd,
-            }))),
+            Some(cmd) => Ok(Some(Box::new(IfMissing { path, cmd }))),
             None => Ok(None),
         }
     }
