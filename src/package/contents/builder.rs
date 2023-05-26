@@ -129,7 +129,10 @@ pub fn build(state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>
         _ => Err(anyhow!(
             "{:?} matched multiple builders: {:?}",
             args,
-            matched.iter().map(|(builder, _)| builder).collect::<Vec<_>>(),
+            matched
+                .iter()
+                .map(|(builder, _)| builder)
+                .collect::<Vec<_>>(),
         )),
     }
 }
