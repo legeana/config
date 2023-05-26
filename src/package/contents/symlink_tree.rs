@@ -46,7 +46,7 @@ impl parser::Builder for SymlinkTreeBuilder {
         "symlink_tree <directory>
            create a symlink for every file in a directory recursively"
     }
-    fn parse(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;
         Ok(Some(Box::new(SymlinkTree {
             src: state.prefix.src_path(filename),

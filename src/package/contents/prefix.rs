@@ -17,7 +17,7 @@ impl parser::Builder for PrefixBuilder {
         "prefix <directory>
            set current installation prefix to <directory>"
     }
-    fn parse(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let prefix = util::single_arg(COMMAND, args)?;
         state.prefix.set(shellexpand::tilde(prefix).as_ref().into());
         Ok(None)

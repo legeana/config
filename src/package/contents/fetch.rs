@@ -48,7 +48,7 @@ impl parser::Builder for FetchIntoBuilder {
         "fetch_into <filename> <url>
            downloads <url> into a local storage and installs a symlink to it"
     }
-    fn parse(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let args = util::fixed_args(COMMAND, args, 2)?;
         assert_eq!(args.len(), 2);
         let filename = args[0];

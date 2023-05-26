@@ -41,7 +41,7 @@ impl parser::Builder for SetContentsBuilder {
         "set_contents <filename> <contents>
            overwrites <filename> with <contents>"
     }
-    fn parse(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let args = util::fixed_args(COMMAND, args, 2)?;
         assert_eq!(args.len(), 2);
         let filename = args[0];

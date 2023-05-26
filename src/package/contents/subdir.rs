@@ -17,7 +17,7 @@ impl parser::Builder for SubdirBuilder {
         "subdir <subdirectory>
            load subdirectory configuration recursively"
     }
-    fn parse(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let subdir = util::single_arg(COMMAND, args)?;
         let mut substate = parser::State {
             enabled: true,

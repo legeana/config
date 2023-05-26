@@ -16,7 +16,7 @@ impl parser::Builder for DeprecatedBuilder {
     fn help(&self) -> &'static str {
         "DEPRECATED: N/A"
     }
-    fn parse(&self, _state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, _state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         /*if check_command("<deprecated>", args).is_ok() {
             log::warn!(
                 "{:?}: <deprecated> is unsupported",

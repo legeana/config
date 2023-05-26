@@ -43,7 +43,7 @@ impl parser::Builder for CopyBuilder {
         "copy <filename>
            create a copy of a filename in local storage and install a symlink to it"
     }
-    fn parse(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;
         let dst = state.prefix.dst_path(filename);
         let output = local_state::FileState::new(dst.clone())

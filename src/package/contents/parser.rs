@@ -62,10 +62,10 @@ impl State {
 pub trait Builder {
     fn name(&self) -> &'static str;
     fn help(&self) -> &'static str;
-    fn parse(&self, state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>>;
+    fn build(&self, state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>>;
 }
 
-fn parsers() -> Vec<Box<dyn Builder>> {
+fn builders() -> Vec<Box<dyn Builder>> {
     vec![
         // MANIFEST.
         Box::new(super::subdir::SubdirBuilder {}),
@@ -99,13 +99,13 @@ fn parsers() -> Vec<Box<dyn Builder>> {
     ]
 }
 
-pub fn parse(state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+pub fn build(state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
     if !state.enabled {
         return Ok(None);
     }
     let mut matched = Vec::<(String, Option<Box<dyn Module>>)>::new();
-    for parser in parsers() {
-        match parser.parse(state, args) {
+    for parser in builders() {
+        match parser.build(state, args) {
             Ok(m) => matched.push((parser.name().to_string(), m)),
             Err(err) => {
                 match err.downcast_ref::<Error>() {
@@ -136,7 +136,7 @@ pub fn parse(state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>
 
 pub fn help() -> String {
     let mut help = String::new();
-    for parser in parsers() {
+    for parser in builders() {
         help.push_str(parser.help());
         help.push('\n');
     }

@@ -29,7 +29,7 @@ impl parser::Builder for OutputFileBuilder {
         "output_file <filename>
            create a symlink for filename in prefix to a local persistent state"
     }
-    fn parse(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;
         let dst = state.prefix.dst_path(filename);
         let output = local_state::FileState::new(dst.clone())

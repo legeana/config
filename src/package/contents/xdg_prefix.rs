@@ -83,7 +83,7 @@ where
     fn help(&self) -> &'static str {
         self.help()
     }
-    fn parse(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let path = util::single_arg(self.name(), args)?;
         state.prefix.set(self.xdg_prefix(path)?);
         Ok(None)

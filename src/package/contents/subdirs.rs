@@ -17,7 +17,7 @@ impl parser::Builder for SubdirsBuilder {
         "subdirs
            load all subdirectories recursively"
     }
-    fn parse(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn build(&self, state: &mut parser::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         util::no_args(COMMAND, args)?;
         let mut modules: Vec<Box<dyn Module>> = Vec::new();
         for entry in state
