@@ -88,6 +88,7 @@ fn builders() -> Vec<Box<dyn Builder>> {
         Box::new(super::importer::ImporterBuilder {}),
         // Downloads.
         Box::new(super::fetch::FetchIntoBuilder {}),
+        Box::new(super::fetch::FetchExeIntoBuilder {}),
         Box::new(super::git_clone::GitCloneBuilder {}),
         // Exec.
         Box::new(super::exec::PostInstallExecBuilder {}),
