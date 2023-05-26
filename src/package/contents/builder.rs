@@ -7,8 +7,8 @@ use crate::module::Module;
 
 #[derive(Error, Debug)]
 pub enum Error {
-    #[error("parser {parser}: unsupported command {command}")]
-    UnsupportedCommand { parser: String, command: String },
+    #[error("builder {builder}: unsupported command {command}")]
+    UnsupportedCommand { builder: String, command: String },
 }
 
 struct PrefixNewGuard;
@@ -104,16 +104,16 @@ pub fn build(state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>
         return Ok(None);
     }
     let mut matched = Vec::<(String, Option<Box<dyn Module>>)>::new();
-    for parser in builders() {
-        match parser.build(state, args) {
-            Ok(m) => matched.push((parser.name().to_string(), m)),
+    for builder in builders() {
+        match builder.build(state, args) {
+            Ok(m) => matched.push((builder.name().to_string(), m)),
             Err(err) => {
                 match err.downcast_ref::<Error>() {
                     Some(Error::UnsupportedCommand {
-                        parser: _,
+                        builder: _,
                         command: _,
                     }) => {
-                        // Try another parser.
+                        // Try another builder.
                         continue;
                     }
                     _ => {
@@ -127,17 +127,17 @@ pub fn build(state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>
         0 => Err(anyhow!("unsupported command {:?}", args)),
         1 => Ok(matched.pop().unwrap().1),
         _ => Err(anyhow!(
-            "{:?} matched multiple parsers: {:?}",
+            "{:?} matched multiple builders: {:?}",
             args,
-            matched.iter().map(|(parser, _)| parser).collect::<Vec<_>>(),
+            matched.iter().map(|(builder, _)| builder).collect::<Vec<_>>(),
         )),
     }
 }
 
 pub fn help() -> String {
     let mut help = String::new();
-    for parser in builders() {
-        help.push_str(parser.help());
+    for builder in builders() {
+        help.push_str(builder.help());
         help.push('\n');
     }
     help

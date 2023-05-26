@@ -5,13 +5,13 @@ use anyhow::{anyhow, Result};
 /// Checks that the first argument is command and returns a slice of command arguments.
 pub fn check_command<'a, 'b>(command: &str, args: &'a [&'b str]) -> Result<&'a [&'b str]> {
     if args.is_empty() {
-        return Err(anyhow!("{} parser: got empty list", command));
+        return Err(anyhow!("{} builder: got empty list", command));
     }
     let cmd = args[0];
     let cmd_args = &args[1..];
     if command != cmd {
         return Err(builder::Error::UnsupportedCommand {
-            parser: command.to_owned(),
+            builder: command.to_owned(),
             command: cmd.to_owned(),
         }
         .into());
@@ -23,7 +23,7 @@ pub fn no_args(command: &str, args: &[&str]) -> Result<()> {
     let cmd_args = check_command(command, args)?;
     if !cmd_args.is_empty() {
         return Err(anyhow!(
-            "{} parser: want no arguments, got {}: {:?}",
+            "{} builder: want no arguments, got {}: {:?}",
             command,
             cmd_args.len(),
             cmd_args,
@@ -40,7 +40,7 @@ pub fn fixed_args<'a, 'b>(command: &str, args: &'a [&'b str], len: usize) -> Res
     let cmd_args = check_command(command, args)?;
     if cmd_args.len() != len {
         return Err(anyhow!(
-            "{command} parser: want {len} arguments, got {}: {cmd_args:?}",
+            "{command} builder: want {len} arguments, got {}: {cmd_args:?}",
             cmd_args.len(),
         ));
     }
@@ -56,7 +56,7 @@ pub fn multiple_args<'a, 'b>(
     let cmd_args = check_command(command, args)?;
     if cmd_args.len() < required {
         return Err(anyhow!(
-            "{} parser: want at least {} arguments, got {}: {:?}",
+            "{} builder: want at least {} arguments, got {}: {:?}",
             command,
             required,
             cmd_args.len(),
