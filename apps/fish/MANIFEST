@@ -14,5 +14,6 @@ output_file fish_plugins
 prefix ~
 symlink .bashrc
 
-if_missing ~/.local/share/fisher/conf.d/fzf.fish post_install_exec fish -c 'fisher install patrickf1/fzf.fish'
+if_missing ~/.local/share/fisher/conf.d/fzf.fish \
+    post_install_exec fish -c 'fisher install patrickf1/fzf.fish'
 post_install_update fish -c 'fisher update'
