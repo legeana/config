@@ -7,14 +7,14 @@ use crate::module::Module;
 use super::parser;
 use super::util;
 
-trait XdgPrefixParser {
+trait XdgPrefixBuilder {
     fn name(&self) -> &'static str;
     fn help(&self) -> &'static str;
     fn xdg_prefix(&self, path: &str) -> Result<PathBuf>;
 }
 
-pub struct XdgCachePrefixParser {}
-impl XdgPrefixParser for XdgCachePrefixParser {
+pub struct XdgCachePrefixBuilder;
+impl XdgPrefixBuilder for XdgCachePrefixBuilder {
     fn name(&self) -> &'static str {
         "xdg_cache_prefix"
     }
@@ -28,8 +28,8 @@ impl XdgPrefixParser for XdgCachePrefixParser {
     }
 }
 
-pub struct XdgConfigPrefixParser {}
-impl XdgPrefixParser for XdgConfigPrefixParser {
+pub struct XdgConfigPrefixBuilder;
+impl XdgPrefixBuilder for XdgConfigPrefixBuilder {
     fn name(&self) -> &'static str {
         "xdg_config_prefix"
     }
@@ -43,8 +43,8 @@ impl XdgPrefixParser for XdgConfigPrefixParser {
     }
 }
 
-pub struct XdgDataPrefixParser {}
-impl XdgPrefixParser for XdgDataPrefixParser {
+pub struct XdgDataPrefixBuilder;
+impl XdgPrefixBuilder for XdgDataPrefixBuilder {
     fn name(&self) -> &'static str {
         "xdg_data_prefix"
     }
@@ -58,8 +58,8 @@ impl XdgPrefixParser for XdgDataPrefixParser {
     }
 }
 
-pub struct XdgStatePrefixParser {}
-impl XdgPrefixParser for XdgStatePrefixParser {
+pub struct XdgStatePrefixBuilder;
+impl XdgPrefixBuilder for XdgStatePrefixBuilder {
     fn name(&self) -> &'static str {
         "xdg_state_prefix"
     }
@@ -73,9 +73,9 @@ impl XdgPrefixParser for XdgStatePrefixParser {
     }
 }
 
-impl<T> parser::Parser for T
+impl<T> parser::Builder for T
 where
-    T: XdgPrefixParser,
+    T: XdgPrefixBuilder,
 {
     fn name(&self) -> &'static str {
         self.name()

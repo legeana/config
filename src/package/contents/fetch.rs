@@ -7,7 +7,7 @@ use super::local_state;
 use super::parser;
 use super::util;
 
-pub struct FetchIntoParser {}
+pub struct FetchIntoBuilder;
 
 const COMMAND: &str = "fetch_into";
 
@@ -40,7 +40,7 @@ impl Module for FetchInto {
     }
 }
 
-impl parser::Parser for FetchIntoParser {
+impl parser::Builder for FetchIntoBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }

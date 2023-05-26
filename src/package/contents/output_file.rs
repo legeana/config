@@ -7,7 +7,7 @@ use crate::registry::Registry;
 
 use super::local_state;
 
-pub struct OutputFileParser {}
+pub struct OutputFileBuilder {}
 
 const COMMAND: &str = "output_file";
 
@@ -21,7 +21,7 @@ impl Module for OutputFile {
     }
 }
 
-impl parser::Parser for OutputFileParser {
+impl parser::Builder for OutputFileBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }

@@ -9,7 +9,7 @@ use super::file_util;
 use super::parser;
 use super::util;
 
-pub struct SymlinkParser {}
+pub struct SymlinkBuilder;
 
 const COMMAND: &str = "symlink";
 
@@ -24,7 +24,7 @@ impl Module for Symlink {
     }
 }
 
-impl parser::Parser for SymlinkParser {
+impl parser::Builder for SymlinkBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }

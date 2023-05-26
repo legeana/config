@@ -9,7 +9,7 @@ use super::util;
 
 use anyhow::{Context, Result};
 
-pub struct CopyParser {}
+pub struct CopyBuilder;
 
 const COMMAND: &str = "copy";
 
@@ -35,7 +35,7 @@ impl Module for Copy {
     }
 }
 
-impl parser::Parser for CopyParser {
+impl parser::Builder for CopyBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }

@@ -9,8 +9,8 @@ use super::util;
 
 use anyhow::Result;
 
-pub struct PostInstallExecParser;
-pub struct PostInstallUpdateParser;
+pub struct PostInstallExecBuilder;
+pub struct PostInstallUpdateBuilder;
 
 const COMMAND: &str = "post_install_exec";
 const UPDATE_COMMAND: &str = "post_install_update";
@@ -66,7 +66,7 @@ fn parse(
     })))
 }
 
-impl parser::Parser for PostInstallExecParser {
+impl parser::Builder for PostInstallExecBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }
@@ -79,7 +79,7 @@ impl parser::Parser for PostInstallExecParser {
     }
 }
 
-impl parser::Parser for PostInstallUpdateParser {
+impl parser::Builder for PostInstallUpdateBuilder {
     fn name(&self) -> &'static str {
         UPDATE_COMMAND
     }

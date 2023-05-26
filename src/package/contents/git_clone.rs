@@ -8,7 +8,7 @@ use super::local_state;
 use super::parser;
 use super::util;
 
-pub struct GitCloneParser {}
+pub struct GitCloneBuilder;
 
 const COMMAND: &str = "git_clone";
 
@@ -59,7 +59,7 @@ impl Module for GitClone {
     }
 }
 
-impl parser::Parser for GitCloneParser {
+impl parser::Builder for GitCloneBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }

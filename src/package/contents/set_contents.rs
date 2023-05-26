@@ -7,7 +7,7 @@ use super::local_state;
 use super::parser;
 use super::util;
 
-pub struct SetContentsParser {}
+pub struct SetContentsBuilder;
 
 const COMMAND: &str = "set_contents";
 
@@ -33,7 +33,7 @@ impl Module for SetContents {
     }
 }
 
-impl parser::Parser for SetContentsParser {
+impl parser::Builder for SetContentsBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }

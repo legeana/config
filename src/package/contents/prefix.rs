@@ -5,11 +5,11 @@ use crate::module::Module;
 use super::parser;
 use super::util;
 
-pub struct PrefixParser {}
+pub struct PrefixBuilder;
 
 const COMMAND: &str = "prefix";
 
-impl parser::Parser for PrefixParser {
+impl parser::Builder for PrefixBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }

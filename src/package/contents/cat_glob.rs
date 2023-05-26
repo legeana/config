@@ -10,7 +10,7 @@ use super::util;
 use anyhow::{anyhow, Context, Result};
 use glob::glob as glob_iter;
 
-pub struct CatGlobIntoParser;
+pub struct CatGlobIntoBuilder;
 
 const COMMAND: &str = "cat_glob_into";
 
@@ -45,7 +45,7 @@ impl Module for CatGlobInto {
     }
 }
 
-impl parser::Parser for CatGlobIntoParser {
+impl parser::Builder for CatGlobIntoBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }

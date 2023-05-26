@@ -10,7 +10,7 @@ use super::util;
 use anyhow::{Context, Result};
 use walkdir::WalkDir;
 
-pub struct SymlinkTreeParser {}
+pub struct SymlinkTreeBuilder;
 
 const COMMAND: &str = "symlink_tree";
 
@@ -38,7 +38,7 @@ impl Module for SymlinkTree {
     }
 }
 
-impl parser::Parser for SymlinkTreeParser {
+impl parser::Builder for SymlinkTreeBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }

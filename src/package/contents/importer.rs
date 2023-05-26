@@ -12,7 +12,7 @@ use super::util;
 use anyhow::{anyhow, Context, Result};
 use walkdir::WalkDir;
 
-pub struct ImporterParser {}
+pub struct ImporterBuilder;
 
 const COMMAND: &str = "import_from";
 
@@ -103,7 +103,7 @@ impl Module for Importer {
     }
 }
 
-impl parser::Parser for ImporterParser {
+impl parser::Builder for ImporterBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }

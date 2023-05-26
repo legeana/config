@@ -6,13 +6,13 @@ use crate::tag_util;
 use super::parser;
 use super::util;
 
-pub struct RequiresParser;
-pub struct ConflictsParser;
+pub struct RequiresBuilder;
+pub struct ConflictsBuilder;
 
 const REQUIRES_COMMAND: &str = "requires";
 const CONFLICTS_COMMAND: &str = "conflicts";
 
-impl parser::Parser for RequiresParser {
+impl parser::Builder for RequiresBuilder {
     fn name(&self) -> &'static str {
         REQUIRES_COMMAND
     }
@@ -33,7 +33,7 @@ impl parser::Parser for RequiresParser {
     }
 }
 
-impl parser::Parser for ConflictsParser {
+impl parser::Builder for ConflictsBuilder {
     fn name(&self) -> &'static str {
         CONFLICTS_COMMAND
     }

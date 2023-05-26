@@ -5,11 +5,11 @@ use crate::module::Module;
 use super::parser;
 use super::util::check_command;
 
-pub struct DeprecatedParser;
+pub struct DeprecatedBuilder;
 
 const COMMAND: &str = "deprecated commands, do not use";
 
-impl parser::Parser for DeprecatedParser {
+impl parser::Builder for DeprecatedBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }

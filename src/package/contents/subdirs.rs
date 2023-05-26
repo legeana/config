@@ -5,11 +5,11 @@ use crate::module::Module;
 use super::parser;
 use super::util;
 
-pub struct SubdirsParser;
+pub struct SubdirsBuilder;
 
 const COMMAND: &str = "subdirs";
 
-impl parser::Parser for SubdirsParser {
+impl parser::Builder for SubdirsBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }

@@ -7,7 +7,7 @@ use super::util;
 
 use anyhow::{Context, Result};
 
-pub struct IfMissingParser;
+pub struct IfMissingBuilder;
 
 const COMMAND: &str = "if_missing";
 
@@ -52,7 +52,7 @@ impl Module for IfMissing {
     }
 }
 
-impl parser::Parser for IfMissingParser {
+impl parser::Builder for IfMissingBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }

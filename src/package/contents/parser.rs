@@ -59,43 +59,43 @@ impl State {
     }
 }
 
-pub trait Parser {
+pub trait Builder {
     fn name(&self) -> &'static str;
     fn help(&self) -> &'static str;
     fn parse(&self, state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>>;
 }
 
-fn parsers() -> Vec<Box<dyn Parser>> {
+fn parsers() -> Vec<Box<dyn Builder>> {
     vec![
         // MANIFEST.
-        Box::new(super::subdir::SubdirParser {}),
-        Box::new(super::subdirs::SubdirsParser {}),
-        Box::new(super::prefix::PrefixParser {}),
-        Box::new(super::xdg_prefix::XdgCachePrefixParser {}),
-        Box::new(super::xdg_prefix::XdgConfigPrefixParser {}),
-        Box::new(super::xdg_prefix::XdgDataPrefixParser {}),
-        Box::new(super::xdg_prefix::XdgStatePrefixParser {}),
-        Box::new(super::tags::RequiresParser {}),
-        Box::new(super::tags::ConflictsParser {}),
+        Box::new(super::subdir::SubdirBuilder {}),
+        Box::new(super::subdirs::SubdirsBuilder {}),
+        Box::new(super::prefix::PrefixBuilder {}),
+        Box::new(super::xdg_prefix::XdgCachePrefixBuilder {}),
+        Box::new(super::xdg_prefix::XdgConfigPrefixBuilder {}),
+        Box::new(super::xdg_prefix::XdgDataPrefixBuilder {}),
+        Box::new(super::xdg_prefix::XdgStatePrefixBuilder {}),
+        Box::new(super::tags::RequiresBuilder {}),
+        Box::new(super::tags::ConflictsBuilder {}),
         // Files.
-        Box::new(super::symlink::SymlinkParser {}),
-        Box::new(super::symlink_tree::SymlinkTreeParser {}),
-        Box::new(super::mkdir::MkDirParser {}),
-        Box::new(super::copy::CopyParser {}),
-        Box::new(super::output_file::OutputFileParser {}),
-        Box::new(super::cat_glob::CatGlobIntoParser {}),
-        Box::new(super::set_contents::SetContentsParser {}),
-        Box::new(super::importer::ImporterParser {}),
+        Box::new(super::symlink::SymlinkBuilder {}),
+        Box::new(super::symlink_tree::SymlinkTreeBuilder {}),
+        Box::new(super::mkdir::MkDirBuilder {}),
+        Box::new(super::copy::CopyBuilder {}),
+        Box::new(super::output_file::OutputFileBuilder {}),
+        Box::new(super::cat_glob::CatGlobIntoBuilder {}),
+        Box::new(super::set_contents::SetContentsBuilder {}),
+        Box::new(super::importer::ImporterBuilder {}),
         // Downloads.
-        Box::new(super::fetch::FetchIntoParser {}),
-        Box::new(super::git_clone::GitCloneParser {}),
+        Box::new(super::fetch::FetchIntoBuilder {}),
+        Box::new(super::git_clone::GitCloneBuilder {}),
         // Exec.
-        Box::new(super::exec::PostInstallExecParser {}),
-        Box::new(super::exec::PostInstallUpdateParser {}),
+        Box::new(super::exec::PostInstallExecBuilder {}),
+        Box::new(super::exec::PostInstallUpdateBuilder {}),
         // Control.
-        Box::new(super::if_missing::IfMissingParser {}),
+        Box::new(super::if_missing::IfMissingBuilder {}),
         // Deprecation.
-        Box::new(super::deprecated::DeprecatedParser {}),
+        Box::new(super::deprecated::DeprecatedBuilder {}),
     ]
 }
 

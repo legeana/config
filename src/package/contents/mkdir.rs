@@ -8,7 +8,7 @@ use super::util;
 
 use anyhow::{Context, Result};
 
-pub struct MkDirParser {}
+pub struct MkDirBuilder;
 
 const COMMAND: &str = "mkdir";
 
@@ -27,7 +27,7 @@ impl Module for MkDir {
     }
 }
 
-impl parser::Parser for MkDirParser {
+impl parser::Builder for MkDirBuilder {
     fn name(&self) -> &'static str {
         COMMAND
     }
