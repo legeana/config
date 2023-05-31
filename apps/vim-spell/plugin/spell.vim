@@ -8,6 +8,7 @@ else
     set spell
 end
 set spelllang=en
+set spelloptions=camel
 set spellfile^=$HOME/.config/vim-spell/draft/en.utf-8.add,$HOME/.config/vim-spell/committed/en.utf-8.add
 hi clear SpellBad
 hi SpellBad cterm=underline ctermfg=red
