@@ -6,7 +6,6 @@ call plug#begin(s:plug_dir . '/plugins')
 Plug 'tpope/vim-sensible'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'machakann/vim-highlightedyank'
-Plug 'kamykn/spelunker.vim'
 Plug 'dag/vim-fish'
 Plug 'itchyny/lightline.vim'
 Plug 'dracula/vim', { 'as': 'dracula' }
