@@ -8,6 +8,7 @@ accum
 acl
 acls
 addr
+alacritty
 algo
 alloc
 alnum
@@ -26,6 +27,7 @@ argparse
 args
 argv
 ascii
+asdict
 async
 asyncio
 attr
@@ -95,6 +97,9 @@ dep
 deps
 deque
 deref
+deregister
+deschedule
+deserialize
 dest
 devtools
 dhcp
@@ -174,6 +179,7 @@ googler
 gpg
 gpio
 gpiozero
+gunzip
 gz
 handoff
 hardcoded
@@ -190,6 +196,7 @@ hostname
 hostnames
 hostport
 hotspotting
+hotswap
 hpp
 href
 hsync
@@ -224,6 +231,7 @@ keepalive
 keybase
 keygrip
 keymap
+konsole
 kubernetes
 kwargs
 lang
@@ -251,12 +259,14 @@ logname
 logtostderr
 lstrip
 lt
+mapreduce
 md
 mesonbuild
 mesondefine
 mesonwrap
 messagediff
 metaclass
+milli
 mimetype
 minecraft
 mit
@@ -319,6 +329,7 @@ password
 pathlib
 pathspec
 paxos
+pbtxt
 pem
 pexpect
 pid
@@ -356,6 +367,7 @@ pylint
 python3
 randr
 ratelimit
+rawproto
 rdiv
 readlink
 readonly
@@ -387,6 +399,7 @@ safehtml
 sbin
 sdk
 sed
+selfhosted
 sendline
 sendmsg
 sep
@@ -421,6 +434,7 @@ srv
 ssd
 sshargs
 sshtm
+sstable
 startswith
 staticmethod
 stderr
@@ -501,6 +515,7 @@ unregister
 ureq
 url
 urllib
+usec
 useragent
 usr
 utc
