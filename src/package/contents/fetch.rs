@@ -67,7 +67,11 @@ impl Module for FetchInto {
     }
 }
 
-fn build(command: &str, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+fn build(
+    command: &str,
+    state: &mut builder::State,
+    args: &[&str],
+) -> Result<Option<Box<dyn Module>>> {
     let args = util::fixed_args(command, args, 2)?;
     assert_eq!(args.len(), 2);
     let filename = args[0];

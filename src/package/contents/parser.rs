@@ -51,15 +51,15 @@ impl<B: BufRead> Iterator for LineIterator<B> {
                         buffer.push(line);
                         break;
                     }
-                },
+                }
                 Some((line_idx, Err(err))) => {
                     self.end = true;
                     return Some((line_idx, Err(err.into())));
-                },
+                }
                 None => {
                     self.end = true;
                     break;
-                },
+                }
             }
         }
         if buffer.is_empty() {
