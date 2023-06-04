@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 
 use anyhow::{Context, Result};
+use indoc::formatdoc;
 
 use crate::module::Module;
 
@@ -8,20 +9,18 @@ use super::builder;
 use super::util;
 
 trait XdgPrefixBuilder {
-    fn name(&self) -> String;
-    fn help(&self) -> String;
+    fn name(&self) -> &str;
+    fn var(&self) -> &str;
     fn xdg_prefix(&self, path: &str) -> Result<PathBuf>;
 }
 
 pub struct XdgCachePrefixBuilder;
 impl XdgPrefixBuilder for XdgCachePrefixBuilder {
-    fn name(&self) -> String {
-        "xdg_cache_prefix".to_owned()
+    fn name(&self) -> &str {
+        "xdg_cache_prefix"
     }
-    fn help(&self) -> String {
-        "xdg_cache_prefix <directory>
-           set current installation prefix to $XDG_CACHE_HOME/<directory>"
-           .to_owned()
+    fn var(&self) -> &str {
+        "XDG_CACHE_HOME"
     }
     fn xdg_prefix(&self, path: &str) -> Result<PathBuf> {
         let base = xdg::BaseDirectories::new().context("failed to parse XDG_CACHE_HOME")?;
@@ -31,13 +30,11 @@ impl XdgPrefixBuilder for XdgCachePrefixBuilder {
 
 pub struct XdgConfigPrefixBuilder;
 impl XdgPrefixBuilder for XdgConfigPrefixBuilder {
-    fn name(&self) -> String {
-        "xdg_config_prefix".to_owned()
+    fn name(&self) -> &str {
+        "xdg_config_prefix"
     }
-    fn help(&self) -> String {
-        "xdg_config_prefix <directory>
-           set current installation prefix to $XDG_CONFIG_HOME/<directory>"
-           .to_owned()
+    fn var(&self) -> &str {
+        "XDG_CONFIG_HOME"
     }
     fn xdg_prefix(&self, path: &str) -> Result<PathBuf> {
         let base = xdg::BaseDirectories::new().context("failed to parse XDG_CONFIG_HOME")?;
@@ -47,13 +44,11 @@ impl XdgPrefixBuilder for XdgConfigPrefixBuilder {
 
 pub struct XdgDataPrefixBuilder;
 impl XdgPrefixBuilder for XdgDataPrefixBuilder {
-    fn name(&self) -> String {
-        "xdg_data_prefix".to_owned()
+    fn name(&self) -> &str {
+        "xdg_data_prefix"
     }
-    fn help(&self) -> String {
-        "xdg_data_prefix <directory>
-           set current installation prefix to $XDG_DATA_HOME/<directory>"
-           .to_owned()
+    fn var(&self) -> &str {
+        "XDG_DATA_HOME"
     }
     fn xdg_prefix(&self, path: &str) -> Result<PathBuf> {
         let base = xdg::BaseDirectories::new().context("failed to parse XDG_DATA_HOME")?;
@@ -63,13 +58,11 @@ impl XdgPrefixBuilder for XdgDataPrefixBuilder {
 
 pub struct XdgStatePrefixBuilder;
 impl XdgPrefixBuilder for XdgStatePrefixBuilder {
-    fn name(&self) -> String {
-        "xdg_state_prefix".to_owned()
+    fn name(&self) -> &str {
+        "xdg_state_prefix"
     }
-    fn help(&self) -> String {
-        "xdg_state_prefix <directory>
-           set current installation prefix to $XDG_STATE_HOME/<directory>"
-           .to_owned()
+    fn var(&self) -> &str {
+        "XDG_STATE_HOME"
     }
     fn xdg_prefix(&self, path: &str) -> Result<PathBuf> {
         let base = xdg::BaseDirectories::new().context("failed to parse XDG_STATE_HOME")?;
@@ -82,13 +75,16 @@ where
     T: XdgPrefixBuilder,
 {
     fn name(&self) -> String {
-        self.name()
+        self.name().to_owned()
     }
     fn help(&self) -> String {
-        self.help()
+        formatdoc! {"
+            {command} <directory>
+                set current installation prefix to ${var}/<directory>
+        ", command=self.name(), var=self.var()}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        let path = util::single_arg(&self.name(), args)?;
+        let path = util::single_arg(self.name(), args)?;
         state.prefix.set(self.xdg_prefix(path)?);
         Ok(None)
     }

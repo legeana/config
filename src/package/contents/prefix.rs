@@ -1,4 +1,5 @@
 use anyhow::Result;
+use indoc::formatdoc;
 
 use crate::module::Module;
 
@@ -14,8 +15,10 @@ impl builder::Builder for PrefixBuilder {
         COMMAND.to_owned()
     }
     fn help(&self) -> String {
-        format!("{COMMAND} <directory>
-           set current installation prefix to <directory>")
+        formatdoc! {"
+            {COMMAND} <directory>
+                set current installation prefix to <directory>
+        "}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let prefix = util::single_arg(COMMAND, args)?;

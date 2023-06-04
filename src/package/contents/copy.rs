@@ -8,6 +8,7 @@ use super::local_state;
 use super::util;
 
 use anyhow::{Context, Result};
+use indoc::formatdoc;
 
 pub struct CopyBuilder;
 
@@ -40,8 +41,10 @@ impl builder::Builder for CopyBuilder {
         COMMAND.to_owned()
     }
     fn help(&self) -> String {
-        format!("{COMMAND} <filename>
-           create a copy of a filename in local storage and install a symlink to it")
+        formatdoc! {"
+            {COMMAND} <filename>
+                create a copy of a filename in local storage and install a symlink to it
+        "}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;

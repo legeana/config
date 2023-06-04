@@ -2,6 +2,7 @@
 use std::os::unix::fs::PermissionsExt;
 
 use anyhow::{Context, Result};
+use indoc::formatdoc;
 
 use crate::module::{Module, Rules};
 use crate::registry::Registry;
@@ -91,8 +92,11 @@ impl builder::Builder for FetchIntoBuilder {
         COMMAND.to_owned()
     }
     fn help(&self) -> String {
-        format!("{COMMAND} <filename> <url>
-           downloads <url> into a local storage and installs a symlink to it")
+        formatdoc! {"
+            {COMMAND} <filename> <url>
+                downloads <url> into a local storage
+                and installs a symlink to it
+        "}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         build(COMMAND, state, args)
@@ -104,8 +108,11 @@ impl builder::Builder for FetchExeIntoBuilder {
         EXE_COMMAND.to_owned()
     }
     fn help(&self) -> String {
-        format!("{EXE_COMMAND} <filename> <url>
-           downloads <url> into a local storage (with executable bit) and installs a symlink to it")
+        formatdoc! {"
+            {EXE_COMMAND} <filename> <url>
+                downloads <url> into a local storage (with executable bit)
+                and installs a symlink to it
+        "}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         build(EXE_COMMAND, state, args)

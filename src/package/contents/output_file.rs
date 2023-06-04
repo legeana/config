@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use indoc::formatdoc;
 
 use crate::module::{Module, Rules};
 use crate::package::contents::util;
@@ -26,8 +27,10 @@ impl builder::Builder for OutputFileBuilder {
         COMMAND.to_owned()
     }
     fn help(&self) -> String {
-        format!("{COMMAND} <filename>
-           create a symlink for filename in prefix to a local persistent state")
+        formatdoc! {"
+            {COMMAND} <filename>
+                create a symlink for filename in prefix to a local persistent state
+        "}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;

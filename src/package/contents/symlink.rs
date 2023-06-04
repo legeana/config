@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 
 use anyhow::Result;
+use indoc::formatdoc;
 
 use crate::module::{Module, Rules};
 use crate::registry::Registry;
@@ -29,8 +30,10 @@ impl builder::Builder for SymlinkBuilder {
         COMMAND.to_owned()
     }
     fn help(&self) -> String {
-        format!("{COMMAND} <filename>
-           create a symlink for filename in prefix")
+        formatdoc! {"
+            {COMMAND} <filename>
+                create a symlink for filename in prefix
+        "}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;

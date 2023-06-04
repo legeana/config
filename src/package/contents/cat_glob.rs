@@ -9,6 +9,7 @@ use super::util;
 
 use anyhow::{anyhow, Context, Result};
 use glob::glob as glob_iter;
+use indoc::formatdoc;
 
 pub struct CatGlobIntoBuilder;
 
@@ -50,8 +51,10 @@ impl builder::Builder for CatGlobIntoBuilder {
         COMMAND.to_owned()
     }
     fn help(&self) -> String {
-        format!("{COMMAND} <filename> <glob1> [<glob2> ...]
-           create filename in local storage by concatenating globs")
+        formatdoc! {"
+            {COMMAND} <filename> <glob1> [<glob2> ...]
+                create filename in local storage by concatenating globs
+        "}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let (fname, globs) = util::multiple_args(COMMAND, args, 1)?;

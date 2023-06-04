@@ -8,6 +8,7 @@ use super::builder;
 use super::util;
 
 use anyhow::Result;
+use indoc::formatdoc;
 
 pub struct PostInstallExecBuilder;
 pub struct PostInstallUpdateBuilder;
@@ -71,8 +72,10 @@ impl builder::Builder for PostInstallExecBuilder {
         COMMAND.to_owned()
     }
     fn help(&self) -> String {
-        format!("{COMMAND} <arg0> [<arg1>...]
-           execute a command in a post-install phase")
+        formatdoc! {"
+            {COMMAND} <arg0> [<arg1>...]
+                execute a command in a post-install phase
+        "}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         build(ExecCondition::Always, COMMAND, state, args)
@@ -84,9 +87,11 @@ impl builder::Builder for PostInstallUpdateBuilder {
         UPDATE_COMMAND.to_owned()
     }
     fn help(&self) -> String {
-        format!("{UPDATE_COMMAND} <arg0> [<arg1>...]
-           execute a command in a post-install phase
-           only if executed via 'setup update' command")
+        formatdoc! {"
+            {UPDATE_COMMAND} <arg0> [<arg1>...]
+                execute a command in a post-install phase
+                only if executed via 'setup update' command
+        "}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         build(ExecCondition::UpdateOnly, UPDATE_COMMAND, state, args)

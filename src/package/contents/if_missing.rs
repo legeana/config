@@ -6,6 +6,7 @@ use super::builder;
 use super::util;
 
 use anyhow::{Context, Result};
+use indoc::formatdoc;
 
 pub struct IfMissingBuilder;
 
@@ -57,8 +58,10 @@ impl builder::Builder for IfMissingBuilder {
         COMMAND.to_owned()
     }
     fn help(&self) -> String {
-        format!("{COMMAND} <path> <command> [<args>...]
-           execute a MANIFEST <command> only if <path> is missing")
+        formatdoc! {"
+            {COMMAND} <path> <command> [<args>...]
+                execute a MANIFEST <command> only if <path> is missing
+        "}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let (path, cmd_args) = util::multiple_args(COMMAND, args, 1)?;

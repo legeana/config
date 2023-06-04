@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use indoc::formatdoc;
 
 use crate::git_utils;
 use crate::module::{Module, Rules};
@@ -64,9 +65,11 @@ impl builder::Builder for GitCloneBuilder {
         COMMAND.to_owned()
     }
     fn help(&self) -> String {
-        format!("{COMMAND} <url>[#<branch>] <directory>
-           git clone <url> into a local storage and installs a symlink to it
-           if <branch> is specified clone <branch> instead of default HEAD")
+        formatdoc! {"
+            {COMMAND} <url>[#<branch>] <directory>
+                git clone <url> into a local storage and installs a symlink to it
+                if <branch> is specified clone <branch> instead of default HEAD
+        "}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let args = util::fixed_args(COMMAND, args, 2)?;

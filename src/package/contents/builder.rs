@@ -141,7 +141,7 @@ pub fn build(state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>
 pub fn help() -> String {
     let mut help = String::new();
     for builder in builders() {
-        help.push_str(&builder.help());
+        help.push_str(&builder.help().trim_end());
         help.push('\n');
     }
     help

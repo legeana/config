@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use indoc::formatdoc;
 
 use crate::module::Module;
 use crate::tag_util;
@@ -17,8 +18,10 @@ impl builder::Builder for RequiresBuilder {
         REQUIRES_COMMAND.to_owned()
     }
     fn help(&self) -> String {
-        format!("{REQUIRES_COMMAND} <tags>
-           do not process current directory if any of the tags is not present")
+        formatdoc! {"
+            {REQUIRES_COMMAND} <tags>
+                do not process current directory if any of the tags is not present
+        "}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let (_, tags) = util::multiple_args(REQUIRES_COMMAND, args, 0)?;
@@ -38,8 +41,10 @@ impl builder::Builder for ConflictsBuilder {
         CONFLICTS_COMMAND.to_owned()
     }
     fn help(&self) -> String {
-        format!("{CONFLICTS_COMMAND} <tags>
-           do not process current directory if any of the tags is present")
+        formatdoc! {"
+            {CONFLICTS_COMMAND} <tags>
+                do not process current directory if any of the tags is present
+        "}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let (_, tags) = util::multiple_args(CONFLICTS_COMMAND, args, 0)?;

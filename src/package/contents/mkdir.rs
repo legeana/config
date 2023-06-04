@@ -7,6 +7,7 @@ use super::builder;
 use super::util;
 
 use anyhow::{Context, Result};
+use indoc::formatdoc;
 
 pub struct MkDirBuilder;
 
@@ -32,8 +33,10 @@ impl builder::Builder for MkDirBuilder {
         COMMAND.to_owned()
     }
     fn help(&self) -> String {
-        format!("{COMMAND} <directory>
-           create a directory in prefix")
+        formatdoc! {"
+            {COMMAND} <directory>
+                create a directory in prefix
+        "}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;

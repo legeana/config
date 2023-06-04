@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use indoc::formatdoc;
 
 use crate::module::{Module, Rules};
 use crate::registry::Registry;
@@ -38,8 +39,10 @@ impl builder::Builder for SetContentsBuilder {
         COMMAND.to_owned()
     }
     fn help(&self) -> String {
-        format!("{COMMAND} <filename> <contents>
-           overwrites <filename> with <contents>")
+        formatdoc! {"
+            {COMMAND} <filename> <contents>
+                overwrites <filename> with <contents>
+        "}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let args = util::fixed_args(COMMAND, args, 2)?;

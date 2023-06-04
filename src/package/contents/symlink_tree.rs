@@ -8,6 +8,7 @@ use super::file_util;
 use super::util;
 
 use anyhow::{Context, Result};
+use indoc::formatdoc;
 use walkdir::WalkDir;
 
 pub struct SymlinkTreeBuilder;
@@ -43,8 +44,10 @@ impl builder::Builder for SymlinkTreeBuilder {
         COMMAND.to_owned()
     }
     fn help(&self) -> String {
-        format!("{COMMAND} <directory>
-           create a symlink for every file in a directory recursively")
+        formatdoc! {"
+            {COMMAND} <directory>
+                create a symlink for every file in a directory recursively
+        "}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;

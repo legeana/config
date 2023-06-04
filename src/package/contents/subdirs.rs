@@ -1,4 +1,5 @@
 use anyhow::{anyhow, Context, Result};
+use indoc::formatdoc;
 
 use crate::module::Module;
 
@@ -14,8 +15,10 @@ impl builder::Builder for SubdirsBuilder {
         COMMAND.to_owned()
     }
     fn help(&self) -> String {
-        format!("{COMMAND}
-           load all subdirectories recursively")
+        formatdoc! {"
+            {COMMAND}
+                load all subdirectories recursively
+        "}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         util::no_args(COMMAND, args)?;
