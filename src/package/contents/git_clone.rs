@@ -60,13 +60,13 @@ impl Module for GitClone {
 }
 
 impl builder::Builder for GitCloneBuilder {
-    fn name(&self) -> &'static str {
-        COMMAND
+    fn name(&self) -> String {
+        COMMAND.to_owned()
     }
-    fn help(&self) -> &'static str {
-        "git_clone <url>[#<branch>] <directory>
+    fn help(&self) -> String {
+        format!("{COMMAND} <url>[#<branch>] <directory>
            git clone <url> into a local storage and installs a symlink to it
-           if <branch> is specified clone <branch> instead of default HEAD"
+           if <branch> is specified clone <branch> instead of default HEAD")
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let args = util::fixed_args(COMMAND, args, 2)?;

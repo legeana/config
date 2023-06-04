@@ -60,8 +60,8 @@ impl State {
 }
 
 pub trait Builder {
-    fn name(&self) -> &'static str;
-    fn help(&self) -> &'static str;
+    fn name(&self) -> String;
+    fn help(&self) -> String;
     fn build(&self, state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>>;
 }
 
@@ -107,7 +107,7 @@ pub fn build(state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>
     let mut matched = Vec::<(String, Option<Box<dyn Module>>)>::new();
     for builder in builders() {
         match builder.build(state, args) {
-            Ok(m) => matched.push((builder.name().to_string(), m)),
+            Ok(m) => matched.push((builder.name(), m)),
             Err(err) => {
                 match err.downcast_ref::<Error>() {
                     Some(Error::UnsupportedCommand {
@@ -141,7 +141,7 @@ pub fn build(state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>
 pub fn help() -> String {
     let mut help = String::new();
     for builder in builders() {
-        help.push_str(builder.help());
+        help.push_str(&builder.help());
         help.push('\n');
     }
     help

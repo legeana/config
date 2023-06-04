@@ -10,12 +10,12 @@ pub struct PrefixBuilder;
 const COMMAND: &str = "prefix";
 
 impl builder::Builder for PrefixBuilder {
-    fn name(&self) -> &'static str {
-        COMMAND
+    fn name(&self) -> String {
+        COMMAND.to_owned()
     }
-    fn help(&self) -> &'static str {
-        "prefix <directory>
-           set current installation prefix to <directory>"
+    fn help(&self) -> String {
+        format!("{COMMAND} <directory>
+           set current installation prefix to <directory>")
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let prefix = util::single_arg(COMMAND, args)?;

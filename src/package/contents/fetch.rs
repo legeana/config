@@ -87,12 +87,12 @@ fn build(
 }
 
 impl builder::Builder for FetchIntoBuilder {
-    fn name(&self) -> &'static str {
-        COMMAND
+    fn name(&self) -> String {
+        COMMAND.to_owned()
     }
-    fn help(&self) -> &'static str {
-        "fetch_into <filename> <url>
-           downloads <url> into a local storage and installs a symlink to it"
+    fn help(&self) -> String {
+        format!("{COMMAND} <filename> <url>
+           downloads <url> into a local storage and installs a symlink to it")
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         build(COMMAND, state, args)
@@ -100,12 +100,12 @@ impl builder::Builder for FetchIntoBuilder {
 }
 
 impl builder::Builder for FetchExeIntoBuilder {
-    fn name(&self) -> &'static str {
-        EXE_COMMAND
+    fn name(&self) -> String {
+        EXE_COMMAND.to_owned()
     }
-    fn help(&self) -> &'static str {
-        "fetch_exe_into <filename> <url>
-           downloads <url> into a local storage (with executable bit) and installs a symlink to it"
+    fn help(&self) -> String {
+        format!("{EXE_COMMAND} <filename> <url>
+           downloads <url> into a local storage (with executable bit) and installs a symlink to it")
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         build(EXE_COMMAND, state, args)

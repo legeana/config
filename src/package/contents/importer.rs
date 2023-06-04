@@ -104,12 +104,12 @@ impl Module for Importer {
 }
 
 impl builder::Builder for ImporterBuilder {
-    fn name(&self) -> &'static str {
-        COMMAND
+    fn name(&self) -> String {
+        COMMAND.to_owned()
     }
-    fn help(&self) -> &'static str {
-        "import_from <filename>
-           create a symlink for filename in prefix to a local persistent state"
+    fn help(&self) -> String {
+        format!("{COMMAND} <filename>
+           create a symlink for filename in prefix to a local persistent state")
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;

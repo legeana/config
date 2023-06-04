@@ -53,12 +53,12 @@ impl Module for IfMissing {
 }
 
 impl builder::Builder for IfMissingBuilder {
-    fn name(&self) -> &'static str {
-        COMMAND
+    fn name(&self) -> String {
+        COMMAND.to_owned()
     }
-    fn help(&self) -> &'static str {
-        "if_missing <path> <command> [<args>...]
-           execute a MANIFEST <command> only if <path> is missing"
+    fn help(&self) -> String {
+        format!("{COMMAND} <path> <command> [<args>...]
+           execute a MANIFEST <command> only if <path> is missing")
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let (path, cmd_args) = util::multiple_args(COMMAND, args, 1)?;

@@ -46,12 +46,12 @@ impl Module for CatGlobInto {
 }
 
 impl builder::Builder for CatGlobIntoBuilder {
-    fn name(&self) -> &'static str {
-        COMMAND
+    fn name(&self) -> String {
+        COMMAND.to_owned()
     }
-    fn help(&self) -> &'static str {
-        "cat_glob_into <filename> <glob1> [<glob2> ...]
-           create filename in local storage by concatenating globs"
+    fn help(&self) -> String {
+        format!("{COMMAND} <filename> <glob1> [<glob2> ...]
+           create filename in local storage by concatenating globs")
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let (fname, globs) = util::multiple_args(COMMAND, args, 1)?;

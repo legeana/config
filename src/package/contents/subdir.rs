@@ -10,12 +10,12 @@ pub struct SubdirBuilder;
 const COMMAND: &str = "subdir";
 
 impl builder::Builder for SubdirBuilder {
-    fn name(&self) -> &'static str {
-        COMMAND
+    fn name(&self) -> String {
+        COMMAND.to_owned()
     }
-    fn help(&self) -> &'static str {
-        "subdir <subdirectory>
-           load subdirectory configuration recursively"
+    fn help(&self) -> String {
+        format!("{COMMAND} <subdirectory>
+           load subdirectory configuration recursively")
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let subdir = util::single_arg(COMMAND, args)?;

@@ -67,12 +67,12 @@ fn build(
 }
 
 impl builder::Builder for PostInstallExecBuilder {
-    fn name(&self) -> &'static str {
-        COMMAND
+    fn name(&self) -> String {
+        COMMAND.to_owned()
     }
-    fn help(&self) -> &'static str {
-        "post_install_exec <arg0> [<arg1>...]
-           execute a command in a post-install phase"
+    fn help(&self) -> String {
+        format!("{COMMAND} <arg0> [<arg1>...]
+           execute a command in a post-install phase")
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         build(ExecCondition::Always, COMMAND, state, args)
@@ -80,13 +80,13 @@ impl builder::Builder for PostInstallExecBuilder {
 }
 
 impl builder::Builder for PostInstallUpdateBuilder {
-    fn name(&self) -> &'static str {
-        UPDATE_COMMAND
+    fn name(&self) -> String {
+        UPDATE_COMMAND.to_owned()
     }
-    fn help(&self) -> &'static str {
-        "post_install_update <arg0> [<arg1>...]
+    fn help(&self) -> String {
+        format!("{UPDATE_COMMAND} <arg0> [<arg1>...]
            execute a command in a post-install phase
-           only if executed via 'setup update' command"
+           only if executed via 'setup update' command")
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         build(ExecCondition::UpdateOnly, UPDATE_COMMAND, state, args)

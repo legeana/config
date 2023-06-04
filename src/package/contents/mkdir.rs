@@ -28,12 +28,12 @@ impl Module for MkDir {
 }
 
 impl builder::Builder for MkDirBuilder {
-    fn name(&self) -> &'static str {
-        COMMAND
+    fn name(&self) -> String {
+        COMMAND.to_owned()
     }
-    fn help(&self) -> &'static str {
-        "mkdir <directory>
-           create a directory in prefix"
+    fn help(&self) -> String {
+        format!("{COMMAND} <directory>
+           create a directory in prefix")
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;

@@ -13,12 +13,12 @@ const REQUIRES_COMMAND: &str = "requires";
 const CONFLICTS_COMMAND: &str = "conflicts";
 
 impl builder::Builder for RequiresBuilder {
-    fn name(&self) -> &'static str {
-        REQUIRES_COMMAND
+    fn name(&self) -> String {
+        REQUIRES_COMMAND.to_owned()
     }
-    fn help(&self) -> &'static str {
-        "requires <tags>
-           do not process current directory if any of the tags is not present"
+    fn help(&self) -> String {
+        format!("{REQUIRES_COMMAND} <tags>
+           do not process current directory if any of the tags is not present")
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let (_, tags) = util::multiple_args(REQUIRES_COMMAND, args, 0)?;
@@ -34,12 +34,12 @@ impl builder::Builder for RequiresBuilder {
 }
 
 impl builder::Builder for ConflictsBuilder {
-    fn name(&self) -> &'static str {
-        CONFLICTS_COMMAND
+    fn name(&self) -> String {
+        CONFLICTS_COMMAND.to_owned()
     }
-    fn help(&self) -> &'static str {
-        "conflicts <tags>
-           do not process current directory if any of the tags is present"
+    fn help(&self) -> String {
+        format!("{CONFLICTS_COMMAND} <tags>
+           do not process current directory if any of the tags is present")
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let (_, tags) = util::multiple_args(CONFLICTS_COMMAND, args, 0)?;

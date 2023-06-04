@@ -36,12 +36,12 @@ impl Module for Copy {
 }
 
 impl builder::Builder for CopyBuilder {
-    fn name(&self) -> &'static str {
-        COMMAND
+    fn name(&self) -> String {
+        COMMAND.to_owned()
     }
-    fn help(&self) -> &'static str {
-        "copy <filename>
-           create a copy of a filename in local storage and install a symlink to it"
+    fn help(&self) -> String {
+        format!("{COMMAND} <filename>
+           create a copy of a filename in local storage and install a symlink to it")
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;

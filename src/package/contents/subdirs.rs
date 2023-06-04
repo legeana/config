@@ -10,12 +10,12 @@ pub struct SubdirsBuilder;
 const COMMAND: &str = "subdirs";
 
 impl builder::Builder for SubdirsBuilder {
-    fn name(&self) -> &'static str {
-        COMMAND
+    fn name(&self) -> String {
+        COMMAND.to_owned()
     }
-    fn help(&self) -> &'static str {
-        "subdirs
-           load all subdirectories recursively"
+    fn help(&self) -> String {
+        format!("{COMMAND}
+           load all subdirectories recursively")
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         util::no_args(COMMAND, args)?;

@@ -39,12 +39,12 @@ impl Module for SymlinkTree {
 }
 
 impl builder::Builder for SymlinkTreeBuilder {
-    fn name(&self) -> &'static str {
-        COMMAND
+    fn name(&self) -> String {
+        COMMAND.to_owned()
     }
-    fn help(&self) -> &'static str {
-        "symlink_tree <directory>
-           create a symlink for every file in a directory recursively"
+    fn help(&self) -> String {
+        format!("{COMMAND} <directory>
+           create a symlink for every file in a directory recursively")
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let filename = util::single_arg(COMMAND, args)?;
