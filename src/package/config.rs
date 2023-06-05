@@ -120,13 +120,13 @@ pub struct AnsiblePlaybook {
     pub ask_become_pass: bool,
 }
 
-pub fn load_string(data: &str) -> Result<Package> {
+fn load_string(data: &str) -> Result<Package> {
     let deserializer = toml::Deserializer::new(data);
     let pkg = Package::deserialize(deserializer).context("failed to deserialize Package")?;
     Ok(pkg)
 }
 
-pub fn load_file(config_path: &Path) -> Result<Package> {
+fn load_file(config_path: &Path) -> Result<Package> {
     let raw_input =
         std::fs::read(config_path).with_context(|| format!("failed to read {config_path:?}"))?;
     let input = String::from_utf8(raw_input)

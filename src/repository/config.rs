@@ -26,13 +26,13 @@ impl tag_criteria::TagCriteria for Repository {
     }
 }
 
-pub fn load_string(data: &str) -> Result<Repository> {
+fn load_string(data: &str) -> Result<Repository> {
     let deserializer = toml::Deserializer::new(data);
     let pkg = Repository::deserialize(deserializer).context("failed to deserialize Repository")?;
     Ok(pkg)
 }
 
-pub fn load_file(config_path: &Path) -> Result<Repository> {
+fn load_file(config_path: &Path) -> Result<Repository> {
     let raw_input =
         std::fs::read(config_path).with_context(|| format!("failed to read {config_path:?}"))?;
     let input = String::from_utf8(raw_input)
