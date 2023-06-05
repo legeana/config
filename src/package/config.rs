@@ -122,9 +122,7 @@ pub struct AnsiblePlaybook {
 }
 
 fn load_string_toml(data: &str) -> Result<Package> {
-    let deserializer = toml::Deserializer::new(data);
-    let pkg = Package::deserialize(deserializer).context("failed to deserialize Package")?;
-    Ok(pkg)
+    toml::from_str(data).context("failed to deserialize Package")
 }
 
 fn try_load_file_toml(config_path: &Path) -> Result<Option<Package>> {

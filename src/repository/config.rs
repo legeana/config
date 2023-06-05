@@ -28,9 +28,7 @@ impl tag_criteria::TagCriteria for Repository {
 }
 
 fn load_string_toml(data: &str) -> Result<Repository> {
-    let deserializer = toml::Deserializer::new(data);
-    let cfg = Repository::deserialize(deserializer).context("failed to deserialize Repository")?;
-    Ok(cfg)
+    toml::from_str(data).context("failed to deserialize Repository")
 }
 
 fn try_load_file_toml(config_path: &Path) -> Result<Option<Repository>> {
