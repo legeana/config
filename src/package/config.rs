@@ -1,8 +1,9 @@
 use std::path::Path;
 
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Context, Result};
 use serde::Deserialize;
 
+use crate::file_util;
 use crate::tag_criteria;
 
 const PACKAGE_CONFIG_TOML: &str = "package.toml";
@@ -126,23 +127,26 @@ fn load_string_toml(data: &str) -> Result<Package> {
     Ok(pkg)
 }
 
-fn load_data(config_path: &Path) -> Result<String> {
-    let raw_input =
-        std::fs::read(config_path).with_context(|| format!("failed to read {config_path:?}"))?;
-    let input = String::from_utf8(raw_input)
-        .with_context(|| format!("failed to convert {config_path:?} to utf8"))?;
-    Ok(input)
-}
-
-fn load_file_toml(config_path: &Path) -> Result<Package> {
-    let input = load_data(config_path)?;
+fn try_load_file_toml(config_path: &Path) -> Result<Option<Package>> {
+    let maybe_input = file_util::try_read_to_string(config_path)
+        .with_context(|| format!("failed to read {config_path:?}"))?;
+    let Some(input) = maybe_input else {
+        return Ok(None);
+    };
     let pkg =
         load_string_toml(&input).with_context(|| format!("failed to parse {config_path:?}"))?;
-    Ok(pkg)
+    Ok(Some(pkg))
 }
 
-pub fn load_package(config_path: &Path) -> Result<Package> {
-    load_file_toml(&config_path.join(PACKAGE_CONFIG_TOML))
+fn try_load_package(root: &Path) -> Result<Option<Package>> {
+    try_load_file_toml(&root.join(PACKAGE_CONFIG_TOML))
+}
+
+pub fn load_package(root: &Path) -> Result<Package> {
+    let Some(pkg) = try_load_package(root)? else {
+        return Err(anyhow!("{root:?} is not a package"))
+    };
+    Ok(pkg)
 }
 
 #[cfg(test)]

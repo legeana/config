@@ -1,8 +1,9 @@
 use std::path::Path;
 
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Context, Result};
 use serde::Deserialize;
 
+use crate::file_util;
 use crate::tag_criteria;
 
 const REPOSITORY_CONFIG_TOML: &str = "repository.toml";
@@ -28,27 +29,30 @@ impl tag_criteria::TagCriteria for Repository {
 
 fn load_string_toml(data: &str) -> Result<Repository> {
     let deserializer = toml::Deserializer::new(data);
-    let pkg = Repository::deserialize(deserializer).context("failed to deserialize Repository")?;
-    Ok(pkg)
+    let cfg = Repository::deserialize(deserializer).context("failed to deserialize Repository")?;
+    Ok(cfg)
 }
 
-fn load_data(config_path: &Path) -> Result<String> {
-    let raw_input =
-        std::fs::read(config_path).with_context(|| format!("failed to read {config_path:?}"))?;
-    let input = String::from_utf8(raw_input)
-        .with_context(|| format!("failed to convert {config_path:?} to utf8"))?;
-    Ok(input)
-}
-
-fn load_file_toml(config_path: &Path) -> Result<Repository> {
-    let input = load_data(config_path)?;
-    let pkg =
+fn try_load_file_toml(config_path: &Path) -> Result<Option<Repository>> {
+    let maybe_input = file_util::try_read_to_string(config_path)
+        .with_context(|| format!("failed to read {config_path:?}"))?;
+    let Some(input) = maybe_input else {
+        return Ok(None);
+    };
+    let cfg =
         load_string_toml(&input).with_context(|| format!("failed to parse {config_path:?}"))?;
-    Ok(pkg)
+    Ok(Some(cfg))
+}
+
+fn try_load_repository(root: &Path) -> Result<Option<Repository>> {
+    try_load_file_toml(&root.join(REPOSITORY_CONFIG_TOML))
 }
 
 pub fn load_repository(root: &Path) -> Result<Repository> {
-    load_file_toml(&root.join(REPOSITORY_CONFIG_TOML))
+    let Some(cfg) = try_load_repository(root)? else {
+        return Err(anyhow!("{root:?} is not a repository"));
+    };
+    Ok(cfg)
 }
 
 pub fn is_repository_dir(root: &Path) -> Result<bool> {
