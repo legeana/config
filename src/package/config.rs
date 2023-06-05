@@ -126,18 +126,23 @@ fn load_string_toml(data: &str) -> Result<Package> {
     Ok(pkg)
 }
 
-fn load_file(config_path: &Path) -> Result<Package> {
+fn load_data(config_path: &Path) -> Result<String> {
     let raw_input =
         std::fs::read(config_path).with_context(|| format!("failed to read {config_path:?}"))?;
     let input = String::from_utf8(raw_input)
         .with_context(|| format!("failed to convert {config_path:?} to utf8"))?;
+    Ok(input)
+}
+
+fn load_file_toml(config_path: &Path) -> Result<Package> {
+    let input = load_data(config_path)?;
     let pkg =
-        load_string_toml(&input).with_context(|| format!("failed to load {config_path:?}"))?;
+        load_string_toml(&input).with_context(|| format!("failed to parse {config_path:?}"))?;
     Ok(pkg)
 }
 
 pub fn load_package(config_path: &Path) -> Result<Package> {
-    load_file(&config_path.join(PACKAGE_CONFIG_TOML))
+    load_file_toml(&config_path.join(PACKAGE_CONFIG_TOML))
 }
 
 #[cfg(test)]

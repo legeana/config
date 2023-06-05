@@ -32,18 +32,23 @@ fn load_string_toml(data: &str) -> Result<Repository> {
     Ok(pkg)
 }
 
-fn load_file(config_path: &Path) -> Result<Repository> {
+fn load_data(config_path: &Path) -> Result<String> {
     let raw_input =
         std::fs::read(config_path).with_context(|| format!("failed to read {config_path:?}"))?;
     let input = String::from_utf8(raw_input)
         .with_context(|| format!("failed to convert {config_path:?} to utf8"))?;
+    Ok(input)
+}
+
+fn load_file_toml(config_path: &Path) -> Result<Repository> {
+    let input = load_data(config_path)?;
     let pkg =
-        load_string_toml(&input).with_context(|| format!("failed to load {config_path:?}"))?;
+        load_string_toml(&input).with_context(|| format!("failed to parse {config_path:?}"))?;
     Ok(pkg)
 }
 
 pub fn load_repository(root: &Path) -> Result<Repository> {
-    load_file(&root.join(REPOSITORY_CONFIG_TOML))
+    load_file_toml(&root.join(REPOSITORY_CONFIG_TOML))
 }
 
 pub fn is_repository_dir(root: &Path) -> Result<bool> {
