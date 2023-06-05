@@ -7,6 +7,7 @@ use crate::file_util;
 use crate::tag_criteria;
 
 const PACKAGE_CONFIG_TOML: &str = "package.toml";
+const PACKAGE_CONFIG_YAML: &str = "package.yaml";
 
 fn default_has_contents() -> bool {
     true
@@ -125,17 +126,32 @@ fn load_toml_string(data: &str) -> Result<Package> {
     toml::from_str(data).context("failed to deserialize Package")
 }
 
+fn load_yaml_string(data: &str) -> Result<Package> {
+    serde_yaml::from_str(data).context("failed to deserialize Package")
+}
+
 fn load_toml_file(config_path: &Path) -> Result<Package> {
     let input = std::fs::read_to_string(config_path)
         .with_context(|| format!("failed to read {config_path:?}"))?;
     load_toml_string(&input).with_context(|| format!("failed to parse {config_path:?}"))
 }
 
+fn load_yaml_file(config_path: &Path) -> Result<Package> {
+    let input = std::fs::read_to_string(config_path)
+        .with_context(|| format!("failed to read {config_path:?}"))?;
+    load_yaml_string(&input).with_context(|| format!("failed to parse {config_path:?}"))
+}
+
 pub fn load_package(root: &Path) -> Result<Package> {
-    let Some(pkg) = file_util::if_found(load_toml_file(&root.join(PACKAGE_CONFIG_TOML)))? else {
-        return Err(anyhow!("{root:?} is not a package"))
-    };
-    Ok(pkg)
+    let mut packages: Vec<Package> = vec![
+        file_util::if_found(load_toml_file(&root.join(PACKAGE_CONFIG_TOML)))?,
+        file_util::if_found(load_yaml_file(&root.join(PACKAGE_CONFIG_YAML)))?,
+    ].into_iter().filter_map(|pkg| pkg).collect();
+    match packages.len() {
+        0 => Err(anyhow!("{root:?} is not a package")),
+        1 => Ok(packages.pop().expect("must not be empty")),
+        _ => Err(anyhow!("{root:?} has multiple package.* files")),
+    }
 }
 
 #[cfg(test)]
