@@ -5,7 +5,7 @@ use serde::Deserialize;
 
 use crate::tag_criteria;
 
-const PACKAGE_CONFIG_NAME: &str = "package.toml";
+const PACKAGE_CONFIG_TOML: &str = "package.toml";
 
 fn default_has_contents() -> bool {
     true
@@ -120,7 +120,7 @@ pub struct AnsiblePlaybook {
     pub ask_become_pass: bool,
 }
 
-fn load_string(data: &str) -> Result<Package> {
+fn load_string_toml(data: &str) -> Result<Package> {
     let deserializer = toml::Deserializer::new(data);
     let pkg = Package::deserialize(deserializer).context("failed to deserialize Package")?;
     Ok(pkg)
@@ -131,12 +131,13 @@ fn load_file(config_path: &Path) -> Result<Package> {
         std::fs::read(config_path).with_context(|| format!("failed to read {config_path:?}"))?;
     let input = String::from_utf8(raw_input)
         .with_context(|| format!("failed to convert {config_path:?} to utf8"))?;
-    let pkg = load_string(&input).with_context(|| format!("failed to load {config_path:?}"))?;
+    let pkg =
+        load_string_toml(&input).with_context(|| format!("failed to load {config_path:?}"))?;
     Ok(pkg)
 }
 
 pub fn load_package(config_path: &Path) -> Result<Package> {
-    load_file(&config_path.join(PACKAGE_CONFIG_NAME))
+    load_file(&config_path.join(PACKAGE_CONFIG_TOML))
 }
 
 #[cfg(test)]
@@ -145,7 +146,7 @@ mod tests {
 
     #[test]
     fn test_load_empty_string() {
-        let pkg = load_string("").expect("load_string");
+        let pkg = load_string_toml("").expect("load_string_toml");
         assert_eq!(pkg.name, None);
         assert_eq!(pkg.requires, None);
         assert_eq!(pkg.conflicts, None);
@@ -156,7 +157,7 @@ mod tests {
 
     #[test]
     fn test_load_example() {
-        let pkg = load_string(
+        let pkg = load_string_toml(
             "
             name = 'test'
             requires = ['r1', 'r2']
@@ -189,7 +190,7 @@ mod tests {
             pip_user = ['pkg1-pip', 'pkg2-pip']
         ",
         )
-        .expect("load_string");
+        .expect("load_string_toml");
         assert_eq!(pkg.name, Some("test".to_owned()));
         assert_eq!(pkg.requires, Some(vec!["r1".to_owned(), "r2".to_owned()]));
         assert_eq!(pkg.conflicts, Some(vec!["c1".to_owned(), "c2".to_owned()]));
