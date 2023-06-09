@@ -7,6 +7,7 @@ use crate::file_util;
 use crate::tag_criteria;
 
 const REPOSITORY_CONFIG_TOML: &str = "repository.toml";
+const REPOSITORY_CONFIG_YAML: &str = "repository.yaml";
 
 /// repository.toml file definition
 #[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
@@ -31,21 +32,41 @@ fn load_toml_string(data: &str) -> Result<Repository> {
     toml::from_str(data).context("failed to deserialize Repository")
 }
 
+fn load_yaml_string(data: &str) -> Result<Repository> {
+    serde_yaml::from_str(data).context("failed to deserialize Repository")
+}
+
 fn load_toml_file(config_path: &Path) -> Result<Repository> {
     let input = std::fs::read_to_string(config_path)
         .with_context(|| format!("failed to read {config_path:?}"))?;
     load_toml_string(&input).with_context(|| format!("failed to parse {config_path:?}"))
 }
 
+fn load_yaml_file(config_path: &Path) -> Result<Repository> {
+    let input = std::fs::read_to_string(config_path)
+        .with_context(|| format!("failed to read {config_path:?}"))?;
+    load_yaml_string(&input).with_context(|| format!("failed to parse {config_path:?}"))
+}
+
 pub fn load_repository(root: &Path) -> Result<Repository> {
-    let Some(cfg) = file_util::if_found(load_toml_file(&root.join(REPOSITORY_CONFIG_TOML)))? else {
-        return Err(anyhow!("{root:?} is not a repository"));
-    };
-    Ok(cfg)
+    let mut repos: Vec<Repository> = vec![
+        file_util::if_found(load_toml_file(&root.join(REPOSITORY_CONFIG_TOML)))?,
+        file_util::if_found(load_yaml_file(&root.join(REPOSITORY_CONFIG_YAML)))?,
+    ]
+    .into_iter()
+    .filter_map(|repo| repo)
+    .collect();
+    match repos.len() {
+        0 => Err(anyhow!("{root:?} is not a repository")),
+        1 => Ok(repos.pop().expect("must not be empty")),
+        _ => Err(anyhow!("{root:?} has multiple repository.* files")),
+    }
 }
 
 pub fn is_repository_dir(root: &Path) -> Result<bool> {
-    Ok(root.join(REPOSITORY_CONFIG_TOML).try_exists()?)
+    let toml = root.join(REPOSITORY_CONFIG_TOML).try_exists()?;
+    let yaml = root.join(REPOSITORY_CONFIG_YAML).try_exists()?;
+    Ok(toml || yaml)
 }
 
 #[cfg(test)]

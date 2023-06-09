@@ -146,7 +146,10 @@ pub fn load_package(root: &Path) -> Result<Package> {
     let mut packages: Vec<Package> = vec![
         file_util::if_found(load_toml_file(&root.join(PACKAGE_CONFIG_TOML)))?,
         file_util::if_found(load_yaml_file(&root.join(PACKAGE_CONFIG_YAML)))?,
-    ].into_iter().filter_map(|pkg| pkg).collect();
+    ]
+    .into_iter()
+    .filter_map(|pkg| pkg)
+    .collect();
     match packages.len() {
         0 => Err(anyhow!("{root:?} is not a package")),
         1 => Ok(packages.pop().expect("must not be empty")),
