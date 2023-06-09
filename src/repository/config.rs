@@ -54,7 +54,7 @@ pub fn load_repository(root: &Path) -> Result<Repository> {
         file_util::if_found(load_yaml_file(&root.join(REPOSITORY_CONFIG_YAML)))?,
     ]
     .into_iter()
-    .filter_map(|repo| repo)
+    .flatten()
     .collect();
     match repos.len() {
         0 => Err(anyhow!("{root:?} is not a repository")),

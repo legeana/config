@@ -148,7 +148,7 @@ pub fn load_package(root: &Path) -> Result<Package> {
         file_util::if_found(load_yaml_file(&root.join(PACKAGE_CONFIG_YAML)))?,
     ]
     .into_iter()
-    .filter_map(|pkg| pkg)
+    .flatten()
     .collect();
     match packages.len() {
         0 => Err(anyhow!("{root:?} is not a package")),
