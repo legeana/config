@@ -27,27 +27,18 @@ impl tag_criteria::TagCriteria for Repository {
     }
 }
 
-fn load_string_toml(data: &str) -> Result<Repository> {
+fn load_toml_string(data: &str) -> Result<Repository> {
     toml::from_str(data).context("failed to deserialize Repository")
 }
 
-fn try_load_file_toml(config_path: &Path) -> Result<Option<Repository>> {
-    let maybe_input = file_util::try_read_to_string(config_path)
+fn load_toml_file(config_path: &Path) -> Result<Repository> {
+    let input = std::fs::read_to_string(config_path)
         .with_context(|| format!("failed to read {config_path:?}"))?;
-    let Some(input) = maybe_input else {
-        return Ok(None);
-    };
-    let cfg =
-        load_string_toml(&input).with_context(|| format!("failed to parse {config_path:?}"))?;
-    Ok(Some(cfg))
-}
-
-fn try_load_repository(root: &Path) -> Result<Option<Repository>> {
-    try_load_file_toml(&root.join(REPOSITORY_CONFIG_TOML))
+    load_toml_string(&input).with_context(|| format!("failed to parse {config_path:?}"))
 }
 
 pub fn load_repository(root: &Path) -> Result<Repository> {
-    let Some(cfg) = try_load_repository(root)? else {
+    let Some(cfg) = file_util::if_found(load_toml_file(&root.join(REPOSITORY_CONFIG_TOML)))? else {
         return Err(anyhow!("{root:?} is not a repository"));
     };
     Ok(cfg)
@@ -63,20 +54,20 @@ mod tests {
 
     #[test]
     fn test_load_empty_string() {
-        let repo = load_string_toml("").expect("load_string_toml");
+        let repo = load_toml_string("").expect("load_toml_string");
         assert_eq!(repo.requires, None);
         assert_eq!(repo.conflicts, None);
     }
 
     #[test]
     fn test_load_example() {
-        let repo = load_string_toml(
+        let repo = load_toml_string(
             "
             requires = ['r1', 'r2']
             conflicts = ['c1', 'c2']
             ",
         )
-        .expect("load_string_toml");
+        .expect("load_toml_string");
 
         assert_eq!(repo.requires, Some(vec!["r1".to_owned(), "r2".to_owned()]));
         assert_eq!(repo.conflicts, Some(vec!["c1".to_owned(), "c2".to_owned()]));

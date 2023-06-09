@@ -1,16 +1,24 @@
-use std::fs;
 use std::io;
-use std::path::Path;
 
-use anyhow::Result;
+use anyhow::{Error, Result};
 
-/// Same as std::fs::read_to_string() but returns None if the file doesn't exist.
-pub fn try_read_to_string(path: &Path) -> Result<Option<String>> {
-    match fs::read_to_string(path) {
-        Ok(data) => Ok(Some(data)),
-        Err(err) => match err.kind() {
-            io::ErrorKind::NotFound => Ok(None),
-            _ => Err(err.into()),
-        },
+pub fn is_not_found(err: &Error) -> bool {
+    match err.downcast_ref::<io::Error>() {
+        Some(err) => err.kind() == io::ErrorKind::NotFound,
+        None => false,
+    }
+}
+
+/// Returns Ok(None) on std::io::ErrorKind::NotFound, result otherwise.
+pub fn if_found<T>(result: Result<T>) -> Result<Option<T>> {
+    match result {
+        Ok(t) => Ok(Some(t)),
+        Err(err) => {
+            if is_not_found(&err) {
+                Ok(None)
+            } else {
+                Err(err)
+            }
+        }
     }
 }
