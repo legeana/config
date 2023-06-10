@@ -4,6 +4,7 @@ use anyhow::{anyhow, Context, Result};
 use serde::Deserialize;
 
 use crate::file_util;
+use crate::iter_util;
 use crate::tag_criteria;
 
 const REPOSITORY_CONFIG_TOML: &str = "repository.toml";
@@ -49,19 +50,16 @@ fn load_yaml_file(config_path: &Path) -> Result<Repository> {
 }
 
 pub fn load_repository(root: &Path) -> Result<Repository> {
-    let mut repos: Vec<Repository> = [
+    let repos: Vec<Repository> = [
         file_util::skip_not_found(load_toml_file(&root.join(REPOSITORY_CONFIG_TOML)))?,
         file_util::skip_not_found(load_yaml_file(&root.join(REPOSITORY_CONFIG_YAML)))?,
     ]
     .into_iter()
     .flatten()
     .collect();
-    // TODO: write a helper
-    match repos.len() {
-        0 => Err(anyhow!("{root:?} is not a repository")),
-        1 => Ok(repos.pop().expect("must not be empty")),
-        _ => Err(anyhow!("{root:?} has multiple repository.* files")),
-    }
+    iter_util::to_option(repos)
+        .with_context(|| format!("{root:?} has multiple repository.* files"))?
+        .ok_or_else(|| anyhow!("{root:?} is not a repository"))
 }
 
 pub fn is_repository_dir(root: &Path) -> Result<bool> {

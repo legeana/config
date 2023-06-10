@@ -4,6 +4,7 @@ use anyhow::{anyhow, Context, Result};
 use serde::Deserialize;
 
 use crate::file_util;
+use crate::iter_util;
 use crate::tag_criteria;
 
 const PACKAGE_CONFIG_TOML: &str = "package.toml";
@@ -143,19 +144,16 @@ fn load_yaml_file(config_path: &Path) -> Result<Package> {
 }
 
 pub fn load_package(root: &Path) -> Result<Package> {
-    let mut packages: Vec<Package> = [
+    let packages: Vec<Package> = [
         file_util::skip_not_found(load_toml_file(&root.join(PACKAGE_CONFIG_TOML)))?,
         file_util::skip_not_found(load_yaml_file(&root.join(PACKAGE_CONFIG_YAML)))?,
     ]
     .into_iter()
     .flatten()
     .collect();
-    // TODO: write a helper
-    match packages.len() {
-        0 => Err(anyhow!("{root:?} is not a package")),
-        1 => Ok(packages.pop().expect("must not be empty")),
-        _ => Err(anyhow!("{root:?} has multiple package.* files")),
-    }
+    iter_util::to_option(packages)
+        .with_context(|| format!("{root:?} has multiple package.* files"))?
+        .ok_or_else(|| anyhow!("{root:?} is not a package"))
 }
 
 #[cfg(test)]

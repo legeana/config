@@ -1,6 +1,7 @@
 mod file_registry;
 mod file_util;
 mod git_utils;
+mod iter_util;
 mod layout;
 mod module;
 mod package;
