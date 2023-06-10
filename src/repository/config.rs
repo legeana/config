@@ -56,6 +56,7 @@ pub fn load_repository(root: &Path) -> Result<Repository> {
     .into_iter()
     .flatten()
     .collect();
+    // TODO: write a helper
     match repos.len() {
         0 => Err(anyhow!("{root:?} is not a repository")),
         1 => Ok(repos.pop().expect("must not be empty")),

@@ -150,6 +150,7 @@ pub fn load_package(root: &Path) -> Result<Package> {
     .into_iter()
     .flatten()
     .collect();
+    // TODO: write a helper
     match packages.len() {
         0 => Err(anyhow!("{root:?} is not a package")),
         1 => Ok(packages.pop().expect("must not be empty")),
