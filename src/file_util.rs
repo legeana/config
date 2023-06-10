@@ -10,7 +10,7 @@ pub fn is_not_found(err: &Error) -> bool {
 }
 
 /// Returns Ok(None) on std::io::ErrorKind::NotFound, result otherwise.
-pub fn if_found<T>(result: Result<T>) -> Result<Option<T>> {
+pub fn skip_not_found<T>(result: Result<T>) -> Result<Option<T>> {
     match result {
         Ok(t) => Ok(Some(t)),
         Err(err) => {

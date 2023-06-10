@@ -143,9 +143,9 @@ fn load_yaml_file(config_path: &Path) -> Result<Package> {
 }
 
 pub fn load_package(root: &Path) -> Result<Package> {
-    let mut packages: Vec<Package> = vec![
-        file_util::if_found(load_toml_file(&root.join(PACKAGE_CONFIG_TOML)))?,
-        file_util::if_found(load_yaml_file(&root.join(PACKAGE_CONFIG_YAML)))?,
+    let mut packages: Vec<Package> = [
+        file_util::skip_not_found(load_toml_file(&root.join(PACKAGE_CONFIG_TOML)))?,
+        file_util::skip_not_found(load_yaml_file(&root.join(PACKAGE_CONFIG_YAML)))?,
     ]
     .into_iter()
     .flatten()

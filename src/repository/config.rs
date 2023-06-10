@@ -49,9 +49,9 @@ fn load_yaml_file(config_path: &Path) -> Result<Repository> {
 }
 
 pub fn load_repository(root: &Path) -> Result<Repository> {
-    let mut repos: Vec<Repository> = vec![
-        file_util::if_found(load_toml_file(&root.join(REPOSITORY_CONFIG_TOML)))?,
-        file_util::if_found(load_yaml_file(&root.join(REPOSITORY_CONFIG_YAML)))?,
+    let mut repos: Vec<Repository> = [
+        file_util::skip_not_found(load_toml_file(&root.join(REPOSITORY_CONFIG_TOML)))?,
+        file_util::skip_not_found(load_yaml_file(&root.join(REPOSITORY_CONFIG_YAML)))?,
     ]
     .into_iter()
     .flatten()
