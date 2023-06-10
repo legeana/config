@@ -1,0 +1,2 @@
+xdg_config_prefix wezterm
+symlink wezterm.lua
