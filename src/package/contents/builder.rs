@@ -95,6 +95,10 @@ fn builders() -> Vec<Box<dyn Builder>> {
         Box::new(super::exec::PostInstallUpdateBuilder {}),
         // Control.
         Box::new(super::if_missing::IfMissingBuilder {}),
+        super::if_os::if_macos(),
+        super::if_os::if_linux(),
+        super::if_os::if_unix(),
+        super::if_os::if_windows(),
         // Deprecation.
         Box::new(super::deprecated::DeprecatedBuilder {}),
     ]
