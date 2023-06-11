@@ -73,10 +73,7 @@ fn build(
     state: &mut builder::State,
     args: &[&str],
 ) -> Result<Option<Box<dyn Module>>> {
-    let args = util::fixed_args(command, args, 2)?;
-    assert_eq!(args.len(), 2);
-    let filename = args[0];
-    let url = args[1];
+    let (filename, url) = util::double_arg(command, args)?;
     let dst = state.prefix.dst_path(filename);
     let output = local_state::FileState::new(dst.clone())
         .with_context(|| format!("failed to create FileState from {dst:?}"))?;

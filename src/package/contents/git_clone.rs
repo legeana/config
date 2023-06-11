@@ -72,10 +72,7 @@ impl builder::Builder for GitCloneBuilder {
         "}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        let args = util::fixed_args(COMMAND, args, 2)?;
-        assert_eq!(args.len(), 2);
-        let url = args[0];
-        let filename = args[1];
+        let (url, filename) = util::double_arg(COMMAND, args)?;
         let dst = state.prefix.dst_path(filename);
         let output = local_state::DirectoryState::new(dst.clone())
             .with_context(|| format!("failed to create DirectoryState from {dst:?}"))?;
