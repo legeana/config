@@ -79,6 +79,7 @@ fn builders() -> Vec<Box<dyn Builder>> {
         Box::new(super::tags::ConflictsBuilder {}),
         // Files.
         Box::new(super::symlink::SymlinkBuilder {}),
+        Box::new(super::symlink::SymlinkToBuilder {}),
         Box::new(super::symlink_tree::SymlinkTreeBuilder {}),
         Box::new(super::mkdir::MkDirBuilder {}),
         Box::new(super::copy::CopyBuilder {}),
