@@ -8,14 +8,14 @@ use crate::module::Module;
 use super::builder;
 use super::util;
 
-trait XdgPrefixBuilder {
+trait XdgPrefix {
     fn name(&self) -> &str;
     fn var(&self) -> &str;
     fn xdg_prefix(&self, path: &str) -> Result<PathBuf>;
 }
 
-pub struct XdgCachePrefixBuilder;
-impl XdgPrefixBuilder for XdgCachePrefixBuilder {
+struct XdgCachePrefixBuilder;
+impl XdgPrefix for XdgCachePrefixBuilder {
     fn name(&self) -> &str {
         "xdg_cache_prefix"
     }
@@ -28,8 +28,8 @@ impl XdgPrefixBuilder for XdgCachePrefixBuilder {
     }
 }
 
-pub struct XdgConfigPrefixBuilder;
-impl XdgPrefixBuilder for XdgConfigPrefixBuilder {
+struct XdgConfigPrefixBuilder;
+impl XdgPrefix for XdgConfigPrefixBuilder {
     fn name(&self) -> &str {
         "xdg_config_prefix"
     }
@@ -42,8 +42,8 @@ impl XdgPrefixBuilder for XdgConfigPrefixBuilder {
     }
 }
 
-pub struct XdgDataPrefixBuilder;
-impl XdgPrefixBuilder for XdgDataPrefixBuilder {
+struct XdgDataPrefixBuilder;
+impl XdgPrefix for XdgDataPrefixBuilder {
     fn name(&self) -> &str {
         "xdg_data_prefix"
     }
@@ -56,8 +56,8 @@ impl XdgPrefixBuilder for XdgDataPrefixBuilder {
     }
 }
 
-pub struct XdgStatePrefixBuilder;
-impl XdgPrefixBuilder for XdgStatePrefixBuilder {
+struct XdgStatePrefixBuilder;
+impl XdgPrefix for XdgStatePrefixBuilder {
     fn name(&self) -> &str {
         "xdg_state_prefix"
     }
@@ -70,22 +70,42 @@ impl XdgPrefixBuilder for XdgStatePrefixBuilder {
     }
 }
 
-impl<T> builder::Builder for T
+struct XdgPrefixBuilder<T>(T)
 where
-    T: XdgPrefixBuilder,
+    T: XdgPrefix;
+
+impl<T> builder::Builder for XdgPrefixBuilder<T>
+where
+    T: XdgPrefix,
 {
     fn name(&self) -> String {
-        self.name().to_owned()
+        self.0.name().to_owned()
     }
     fn help(&self) -> String {
         formatdoc! {"
             {command} <directory>
                 set current installation prefix to ${var}/<directory>
-        ", command=self.name(), var=self.var()}
+        ", command=self.name(), var=self.0.var()}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        let path = util::single_arg(self.name(), args)?;
-        state.prefix.set(self.xdg_prefix(path)?);
+        let path = util::single_arg(self.0.name(), args)?;
+        state.prefix.set(self.0.xdg_prefix(path)?);
         Ok(None)
     }
+}
+
+pub fn xdg_cache_prefix() -> Box<dyn builder::Builder> {
+    Box::new(XdgPrefixBuilder(XdgCachePrefixBuilder {}))
+}
+
+pub fn xdg_config_prefix() -> Box<dyn builder::Builder> {
+    Box::new(XdgPrefixBuilder(XdgConfigPrefixBuilder {}))
+}
+
+pub fn xdg_data_prefix() -> Box<dyn builder::Builder> {
+    Box::new(XdgPrefixBuilder(XdgDataPrefixBuilder {}))
+}
+
+pub fn xdg_state_prefix() -> Box<dyn builder::Builder> {
+    Box::new(XdgPrefixBuilder(XdgStatePrefixBuilder {}))
 }
