@@ -1,4 +1,4 @@
-use crate::module::{Module, Rules};
+use crate::module::Module;
 
 use super::builder;
 use super::util;
@@ -6,51 +6,16 @@ use super::util;
 use anyhow::Result;
 use indoc::formatdoc;
 
-struct IfOs {
-    want_os: &'static str,
-    cmd: Box<dyn Module>,
-}
-
-impl IfOs {
-    fn is_os(&self) -> bool {
-        self.want_os == std::env::consts::FAMILY || self.want_os == std::env::consts::OS
-    }
-    fn run<F>(&self, f: F) -> Result<()>
-    where
-        F: FnOnce() -> Result<()>,
-    {
-        if !self.is_os() {
-            return Ok(());
-        }
-        f()
-    }
-}
-
-impl Module for IfOs {
-    fn pre_install(
-        &self,
-        rules: &Rules,
-        registry: &mut dyn crate::registry::Registry,
-    ) -> Result<()> {
-        self.run(|| self.cmd.pre_install(rules, registry))
-    }
-    fn install(&self, rules: &Rules, registry: &mut dyn crate::registry::Registry) -> Result<()> {
-        self.run(|| self.cmd.install(rules, registry))
-    }
-    fn post_install(
-        &self,
-        rules: &Rules,
-        registry: &mut dyn crate::registry::Registry,
-    ) -> Result<()> {
-        self.run(|| self.cmd.post_install(rules, registry))
-    }
-}
-
 struct IfOsBuilder {
     os: &'static str,
 }
 
 impl IfOsBuilder {
+    fn is_os(&self) -> bool {
+        // We don't have to check this in runtime as this never changes.
+        // In fact, it's even beneficial to check this during build to support *Prefix.
+        self.os == std::env::consts::FAMILY || self.os == std::env::consts::OS
+    }
     fn command(&self) -> String {
         format!("if_{}", self.os)
     }
@@ -69,13 +34,10 @@ impl builder::Builder for IfOsBuilder {
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let (empty, cmd_args) = util::multiple_args(&self.command(), args, 0)?;
         assert!(empty.is_empty());
-        match builder::build(state, cmd_args)? {
-            Some(cmd) => Ok(Some(Box::new(IfOs {
-                want_os: self.os,
-                cmd,
-            }))),
-            None => Ok(None),
+        if !self.is_os() {
+            return Ok(None);
         }
+        builder::build(state, cmd_args)
     }
 }
 
