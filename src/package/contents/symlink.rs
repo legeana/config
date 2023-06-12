@@ -10,8 +10,8 @@ use super::builder;
 use super::file_util;
 use super::util;
 
-pub struct SymlinkBuilder;
-pub struct SymlinkToBuilder;
+struct SymlinkBuilder;
+struct SymlinkToBuilder;
 
 struct Symlink {
     src: PathBuf,
@@ -60,4 +60,8 @@ impl builder::Builder for SymlinkToBuilder {
             dst: state.prefix.dst_path(dst),
         })))
     }
+}
+
+pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+    vec![Box::new(SymlinkBuilder {}), Box::new(SymlinkToBuilder {})]
 }

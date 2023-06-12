@@ -10,8 +10,8 @@ use super::util;
 use anyhow::Result;
 use indoc::formatdoc;
 
-pub struct PostInstallExecBuilder;
-pub struct PostInstallUpdateBuilder;
+struct PostInstallExecBuilder;
+struct PostInstallUpdateBuilder;
 
 #[derive(PartialEq)]
 enum ExecCondition {
@@ -93,4 +93,11 @@ impl builder::Builder for PostInstallUpdateBuilder {
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         build(ExecCondition::UpdateOnly, &self.name(), state, args)
     }
+}
+
+pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+    vec![
+        Box::new(PostInstallExecBuilder {}),
+        Box::new(PostInstallUpdateBuilder {}),
+    ]
 }

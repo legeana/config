@@ -7,8 +7,8 @@ use crate::tag_util;
 use super::builder;
 use super::util;
 
-pub struct RequiresBuilder;
-pub struct ConflictsBuilder;
+struct RequiresBuilder;
+struct ConflictsBuilder;
 
 impl builder::Builder for RequiresBuilder {
     fn name(&self) -> String {
@@ -54,4 +54,8 @@ impl builder::Builder for ConflictsBuilder {
         }
         Ok(None)
     }
+}
+
+pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+    vec![Box::new(RequiresBuilder {}), Box::new(ConflictsBuilder {})]
 }

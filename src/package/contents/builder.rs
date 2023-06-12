@@ -74,14 +74,10 @@ fn builders() -> Vec<Box<dyn Builder>> {
             Box::new(super::prefix::PrefixBuilder {}),
         ],
         super::xdg_prefix::commands(),
-        vec![
-            Box::new(super::tags::RequiresBuilder {}),
-            Box::new(super::tags::ConflictsBuilder {}),
-        ],
+        super::tags::commands(),
         // Files.
+        super::symlink::commands(),
         vec![
-            Box::new(super::symlink::SymlinkBuilder {}),
-            Box::new(super::symlink::SymlinkToBuilder {}),
             Box::new(super::symlink_tree::SymlinkTreeBuilder {}),
             Box::new(super::mkdir::MkDirBuilder {}),
             Box::new(super::copy::CopyBuilder {}),
@@ -97,10 +93,7 @@ fn builders() -> Vec<Box<dyn Builder>> {
             Box::new(super::git_clone::GitCloneBuilder {}),
         ],
         // Exec.
-        vec![
-            Box::new(super::exec::PostInstallExecBuilder {}),
-            Box::new(super::exec::PostInstallUpdateBuilder {}),
-        ],
+        super::exec::commands(),
         // Control.
         vec![Box::new(super::if_missing::IfMissingBuilder {})],
         super::if_os::commands(),
