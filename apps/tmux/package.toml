@@ -1,2 +1,4 @@
+requires = ['famliy=unix']
+
 [[system_dependencies]]
 any = ["tmux"]
