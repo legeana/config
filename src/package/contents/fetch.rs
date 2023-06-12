@@ -1,6 +1,3 @@
-#[cfg(unix)]
-use std::os::unix::fs::PermissionsExt;
-
 use anyhow::{Context, Result};
 use indoc::formatdoc;
 
@@ -23,6 +20,7 @@ struct FetchInto {
 impl FetchInto {
     #[cfg(unix)]
     fn set_executable(&self, f: &std::fs::File) -> Result<()> {
+        use std::os::unix::fs::PermissionsExt;
         let metadata = f.metadata()?;
         let mut permissions = metadata.permissions();
         permissions.set_mode(permissions.mode() | 0o111);
