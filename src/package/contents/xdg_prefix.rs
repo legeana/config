@@ -1,16 +1,16 @@
-use std::path::PathBuf;
-
-use anyhow::{Context, Result};
-use indoc::formatdoc;
-
-use crate::module::Module;
-
 use super::builder;
-use super::util;
 
 #[cfg(unix)]
 mod unix_only {
-    use super::*;
+    use std::path::PathBuf;
+
+    use anyhow::{Context, Result};
+    use indoc::formatdoc;
+
+    use crate::module::Module;
+
+    use crate::package::contents::builder;
+    use crate::package::contents::util;
 
     trait XdgPrefix {
         fn name(&self) -> &str;
@@ -91,7 +91,11 @@ mod unix_only {
                     set current installation prefix to ${var}/<directory>
             ", command=self.name(), var=self.0.var()}
         }
-        fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+        fn build(
+            &self,
+            state: &mut builder::State,
+            args: &[&str],
+        ) -> Result<Option<Box<dyn Module>>> {
             let path = util::single_arg(self.0.name(), args)?;
             state.prefix.set(self.0.xdg_prefix(path)?);
             Ok(None)
