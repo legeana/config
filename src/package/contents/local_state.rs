@@ -25,10 +25,19 @@ fn path_hash(path: &Path) -> Result<PathBuf> {
     Ok(URL_SAFE.encode(result).into())
 }
 
+#[cfg(unix)]
+fn state_dir() -> Option<PathBuf> {
+    dirs::state_dir()
+}
+
+#[cfg(windows)]
+fn state_dir() -> Option<PathBuf> {
+    dirs::data_local_dir()
+}
+
 fn state_path(path: &Path, state_type: StateType) -> Result<PathBuf> {
     let hash = path_hash(path).with_context(|| format!("unable to make hash of {path:?}"))?;
-    // TODO: Windows/MacOS
-    let output_state = dirs::state_dir()
+    let output_state = state_dir()
         .ok_or_else(|| anyhow!("failed to get state dir"))?
         .join("pikaconfig")
         .join(state_type);
