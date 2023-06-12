@@ -94,18 +94,11 @@ where
     }
 }
 
-pub fn xdg_cache_prefix() -> Box<dyn builder::Builder> {
-    Box::new(XdgPrefixBuilder(XdgCachePrefixBuilder {}))
-}
-
-pub fn xdg_config_prefix() -> Box<dyn builder::Builder> {
-    Box::new(XdgPrefixBuilder(XdgConfigPrefixBuilder {}))
-}
-
-pub fn xdg_data_prefix() -> Box<dyn builder::Builder> {
-    Box::new(XdgPrefixBuilder(XdgDataPrefixBuilder {}))
-}
-
-pub fn xdg_state_prefix() -> Box<dyn builder::Builder> {
-    Box::new(XdgPrefixBuilder(XdgStatePrefixBuilder {}))
+pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+    vec![
+        Box::new(XdgPrefixBuilder(XdgCachePrefixBuilder {})),
+        Box::new(XdgPrefixBuilder(XdgConfigPrefixBuilder {})),
+        Box::new(XdgPrefixBuilder(XdgDataPrefixBuilder {})),
+        Box::new(XdgPrefixBuilder(XdgStatePrefixBuilder {})),
+    ]
 }

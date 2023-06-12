@@ -36,8 +36,7 @@ pub fn make_symlink(registry: &mut dyn Registry, src: &Path, dst: &Path) -> Resu
         .parent()
         .ok_or_else(|| anyhow!("unable to get parent of {dst:?}"))?;
     fs::create_dir_all(parent).with_context(|| format!("failed to create {parent:?}"))?;
-    symlink(src, dst)
-        .with_context(|| format!("failed to create a symlink {src:?} -> {dst:?}"))?;
+    symlink(src, dst).with_context(|| format!("failed to create a symlink {src:?} -> {dst:?}"))?;
     registry
         .register(dst)
         .with_context(|| format!("failed to register symlink {dst:?}"))?;

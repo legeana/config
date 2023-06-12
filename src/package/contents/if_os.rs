@@ -41,18 +41,11 @@ impl builder::Builder for IfOsBuilder {
     }
 }
 
-pub fn if_macos() -> Box<dyn builder::Builder> {
-    Box::new(IfOsBuilder { os: "macos" })
-}
-
-pub fn if_linux() -> Box<dyn builder::Builder> {
-    Box::new(IfOsBuilder { os: "linux" })
-}
-
-pub fn if_unix() -> Box<dyn builder::Builder> {
-    Box::new(IfOsBuilder { os: "unix" })
-}
-
-pub fn if_windows() -> Box<dyn builder::Builder> {
-    Box::new(IfOsBuilder { os: "windows" })
+pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+    vec![
+        Box::new(IfOsBuilder { os: "macos" }),
+        Box::new(IfOsBuilder { os: "linux" }),
+        Box::new(IfOsBuilder { os: "unix" }),
+        Box::new(IfOsBuilder { os: "windows" }),
+    ]
 }

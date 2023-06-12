@@ -66,43 +66,48 @@ pub trait Builder {
 }
 
 fn builders() -> Vec<Box<dyn Builder>> {
-    vec![
+    let result: Vec<Vec<Box<dyn Builder>>> = vec![
         // MANIFEST.
-        Box::new(super::subdir::SubdirBuilder {}),
-        Box::new(super::subdirs::SubdirsBuilder {}),
-        Box::new(super::prefix::PrefixBuilder {}),
-        super::xdg_prefix::xdg_cache_prefix(),
-        super::xdg_prefix::xdg_config_prefix(),
-        super::xdg_prefix::xdg_data_prefix(),
-        super::xdg_prefix::xdg_state_prefix(),
-        Box::new(super::tags::RequiresBuilder {}),
-        Box::new(super::tags::ConflictsBuilder {}),
+        vec![
+            Box::new(super::subdir::SubdirBuilder {}),
+            Box::new(super::subdirs::SubdirsBuilder {}),
+            Box::new(super::prefix::PrefixBuilder {}),
+        ],
+        super::xdg_prefix::commands(),
+        vec![
+            Box::new(super::tags::RequiresBuilder {}),
+            Box::new(super::tags::ConflictsBuilder {}),
+        ],
         // Files.
-        Box::new(super::symlink::SymlinkBuilder {}),
-        Box::new(super::symlink::SymlinkToBuilder {}),
-        Box::new(super::symlink_tree::SymlinkTreeBuilder {}),
-        Box::new(super::mkdir::MkDirBuilder {}),
-        Box::new(super::copy::CopyBuilder {}),
-        Box::new(super::output_file::OutputFileBuilder {}),
-        Box::new(super::cat_glob::CatGlobIntoBuilder {}),
-        Box::new(super::set_contents::SetContentsBuilder {}),
-        Box::new(super::importer::ImporterBuilder {}),
+        vec![
+            Box::new(super::symlink::SymlinkBuilder {}),
+            Box::new(super::symlink::SymlinkToBuilder {}),
+            Box::new(super::symlink_tree::SymlinkTreeBuilder {}),
+            Box::new(super::mkdir::MkDirBuilder {}),
+            Box::new(super::copy::CopyBuilder {}),
+            Box::new(super::output_file::OutputFileBuilder {}),
+            Box::new(super::cat_glob::CatGlobIntoBuilder {}),
+            Box::new(super::set_contents::SetContentsBuilder {}),
+            Box::new(super::importer::ImporterBuilder {}),
+        ],
         // Downloads.
-        Box::new(super::fetch::FetchIntoBuilder {}),
-        Box::new(super::fetch::FetchExeIntoBuilder {}),
-        Box::new(super::git_clone::GitCloneBuilder {}),
+        vec![
+            Box::new(super::fetch::FetchIntoBuilder {}),
+            Box::new(super::fetch::FetchExeIntoBuilder {}),
+            Box::new(super::git_clone::GitCloneBuilder {}),
+        ],
         // Exec.
-        Box::new(super::exec::PostInstallExecBuilder {}),
-        Box::new(super::exec::PostInstallUpdateBuilder {}),
+        vec![
+            Box::new(super::exec::PostInstallExecBuilder {}),
+            Box::new(super::exec::PostInstallUpdateBuilder {}),
+        ],
         // Control.
-        Box::new(super::if_missing::IfMissingBuilder {}),
-        super::if_os::if_macos(),
-        super::if_os::if_linux(),
-        super::if_os::if_unix(),
-        super::if_os::if_windows(),
+        vec![Box::new(super::if_missing::IfMissingBuilder {})],
+        super::if_os::commands(),
         // Deprecation.
-        Box::new(super::deprecated::DeprecatedBuilder {}),
-    ]
+        vec![Box::new(super::deprecated::DeprecatedBuilder {})],
+    ];
+    result.into_iter().flatten().collect()
 }
 
 pub fn build(state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
