@@ -13,7 +13,7 @@ fn symlink(src: &Path, dst: &Path) -> Result<()> {
 }
 
 #[cfg(windows)]
-fn symlink(src: &Path, dst: Path) -> Result<()> {
+fn symlink(src: &Path, dst: &Path) -> Result<()> {
     use std::os::windows::fs;
     if src.is_dir() {
         fs::symlink_dir(src, dst)?;
