@@ -13,8 +13,6 @@ use indoc::formatdoc;
 
 pub struct CatGlobIntoBuilder;
 
-const COMMAND: &str = "cat_glob_into";
-
 struct CatGlobInto {
     globs: Vec<String>,
     output: local_state::FileState,
@@ -48,16 +46,16 @@ impl Module for CatGlobInto {
 
 impl builder::Builder for CatGlobIntoBuilder {
     fn name(&self) -> String {
-        COMMAND.to_owned()
+        "cat_glob_into".to_owned()
     }
     fn help(&self) -> String {
         formatdoc! {"
-            {COMMAND} <filename> <glob1> [<glob2> ...]
+            {command} <filename> <glob1> [<glob2> ...]
                 create filename in local storage by concatenating globs
-        "}
+        ", command=self.name()}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        let (fname, globs) = util::multiple_args(COMMAND, args, 1)?;
+        let (fname, globs) = util::multiple_args(&self.name(), args, 1)?;
         assert!(fname.len() == 1);
         let filename = fname[0];
         let current_prefix = state.prefix.dst_dir.to_str().ok_or_else(|| {

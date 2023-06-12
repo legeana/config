@@ -10,21 +10,18 @@ use super::util;
 pub struct RequiresBuilder;
 pub struct ConflictsBuilder;
 
-const REQUIRES_COMMAND: &str = "requires";
-const CONFLICTS_COMMAND: &str = "conflicts";
-
 impl builder::Builder for RequiresBuilder {
     fn name(&self) -> String {
-        REQUIRES_COMMAND.to_owned()
+        "requires".to_owned()
     }
     fn help(&self) -> String {
         formatdoc! {"
-            {REQUIRES_COMMAND} <tags>
+            {command} <tags>
                 do not process current directory if any of the tags is not present
-        "}
+        ", command=self.name()}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        let (_, tags) = util::multiple_args(REQUIRES_COMMAND, args, 0)?;
+        let (_, tags) = util::multiple_args(&self.name(), args, 0)?;
         for tag in tags.iter() {
             let has_tag =
                 tag_util::has_tag(tag).with_context(|| format!("failed to check tag {tag}"))?;
@@ -38,16 +35,16 @@ impl builder::Builder for RequiresBuilder {
 
 impl builder::Builder for ConflictsBuilder {
     fn name(&self) -> String {
-        CONFLICTS_COMMAND.to_owned()
+        "conflicts".to_owned()
     }
     fn help(&self) -> String {
         formatdoc! {"
-            {CONFLICTS_COMMAND} <tags>
+            {command} <tags>
                 do not process current directory if any of the tags is present
-        "}
+        ", command=self.name()}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        let (_, tags) = util::multiple_args(CONFLICTS_COMMAND, args, 0)?;
+        let (_, tags) = util::multiple_args(&self.name(), args, 0)?;
         for tag in tags.iter() {
             let has_tag =
                 tag_util::has_tag(tag).with_context(|| format!("failed to check tag {tag}"))?;

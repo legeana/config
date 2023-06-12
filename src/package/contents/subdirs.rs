@@ -8,20 +8,18 @@ use super::util;
 
 pub struct SubdirsBuilder;
 
-const COMMAND: &str = "subdirs";
-
 impl builder::Builder for SubdirsBuilder {
     fn name(&self) -> String {
-        COMMAND.to_owned()
+        "subdirs".to_owned()
     }
     fn help(&self) -> String {
         formatdoc! {"
-            {COMMAND}
+            {command}
                 load all subdirectories recursively
-        "}
+        ", command=self.name()}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        util::no_args(COMMAND, args)?;
+        util::no_args(&self.name(), args)?;
         let mut modules: Vec<Box<dyn Module>> = Vec::new();
         for entry in state
             .prefix

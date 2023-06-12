@@ -10,8 +10,6 @@ use indoc::formatdoc;
 
 pub struct IfMissingBuilder;
 
-const COMMAND: &str = "if_missing";
-
 struct IfMissing {
     path: PathBuf,
     cmd: Box<dyn Module>,
@@ -55,16 +53,16 @@ impl Module for IfMissing {
 
 impl builder::Builder for IfMissingBuilder {
     fn name(&self) -> String {
-        COMMAND.to_owned()
+        "if_missing".to_owned()
     }
     fn help(&self) -> String {
         formatdoc! {"
-            {COMMAND} <path> <command> [<args>...]
+            {command} <path> <command> [<args>...]
                 execute a MANIFEST <command> only if <path> is missing
-        "}
+        ", command=self.name()}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        let (path, cmd_args) = util::multiple_args(COMMAND, args, 1)?;
+        let (path, cmd_args) = util::multiple_args(&self.name(), args, 1)?;
         assert_eq!(path.len(), 1);
         let path: PathBuf = shellexpand::tilde(path[0]).as_ref().into();
         match builder::build(state, cmd_args)? {

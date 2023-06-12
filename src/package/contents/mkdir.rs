@@ -11,8 +11,6 @@ use indoc::formatdoc;
 
 pub struct MkDirBuilder;
 
-const COMMAND: &str = "mkdir";
-
 struct MkDir {
     dst: PathBuf,
 }
@@ -30,16 +28,16 @@ impl Module for MkDir {
 
 impl builder::Builder for MkDirBuilder {
     fn name(&self) -> String {
-        COMMAND.to_owned()
+        "mkdir".to_owned()
     }
     fn help(&self) -> String {
         formatdoc! {"
-            {COMMAND} <directory>
+            {command} <directory>
                 create a directory in prefix
-        "}
+        ", command=self.name()}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        let filename = util::single_arg(COMMAND, args)?;
+        let filename = util::single_arg(&self.name(), args)?;
         Ok(Some(Box::new(MkDir {
             dst: state.prefix.dst_path(filename),
         })))

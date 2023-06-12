@@ -14,9 +14,6 @@ use super::util;
 pub struct FetchIntoBuilder;
 pub struct FetchExeIntoBuilder;
 
-const COMMAND: &str = "fetch_into";
-const EXE_COMMAND: &str = "fetch_exe_into";
-
 struct FetchInto {
     executable: bool,
     url: String,
@@ -72,13 +69,14 @@ fn build(
     command: &str,
     state: &mut builder::State,
     args: &[&str],
+    executable: bool,
 ) -> Result<Option<Box<dyn Module>>> {
     let (filename, url) = util::double_arg(command, args)?;
     let dst = state.prefix.dst_path(filename);
     let output = local_state::FileState::new(dst.clone())
         .with_context(|| format!("failed to create FileState from {dst:?}"))?;
     Ok(Some(Box::new(FetchInto {
-        executable: command == EXE_COMMAND,
+        executable,
         url: url.to_owned(),
         output,
     })))
@@ -86,32 +84,32 @@ fn build(
 
 impl builder::Builder for FetchIntoBuilder {
     fn name(&self) -> String {
-        COMMAND.to_owned()
+        "fetch_into".to_owned()
     }
     fn help(&self) -> String {
         formatdoc! {"
-            {COMMAND} <filename> <url>
+            {command} <filename> <url>
                 downloads <url> into a local storage
                 and installs a symlink to it
-        "}
+        ", command=self.name()}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        build(COMMAND, state, args)
+        build(&self.name(), state, args, false)
     }
 }
 
 impl builder::Builder for FetchExeIntoBuilder {
     fn name(&self) -> String {
-        EXE_COMMAND.to_owned()
+        "fetch_exe_into".to_owned()
     }
     fn help(&self) -> String {
         formatdoc! {"
-            {EXE_COMMAND} <filename> <url>
+            {command} <filename> <url>
                 downloads <url> into a local storage (with executable bit)
                 and installs a symlink to it
-        "}
+        ", command=self.name()}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        build(EXE_COMMAND, state, args)
+        build(&self.name(), state, args, true)
     }
 }

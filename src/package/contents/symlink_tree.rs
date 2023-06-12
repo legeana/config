@@ -13,8 +13,6 @@ use walkdir::WalkDir;
 
 pub struct SymlinkTreeBuilder;
 
-const COMMAND: &str = "symlink_tree";
-
 struct SymlinkTree {
     src: PathBuf,
     dst: PathBuf,
@@ -41,16 +39,16 @@ impl Module for SymlinkTree {
 
 impl builder::Builder for SymlinkTreeBuilder {
     fn name(&self) -> String {
-        COMMAND.to_owned()
+        "symlink_tree".to_owned()
     }
     fn help(&self) -> String {
         formatdoc! {"
-            {COMMAND} <directory>
+            {command} <directory>
                 create a symlink for every file in a directory recursively
-        "}
+        ", command=self.name()}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        let filename = util::single_arg(COMMAND, args)?;
+        let filename = util::single_arg(&self.name(), args)?;
         Ok(Some(Box::new(SymlinkTree {
             src: state.prefix.src_path(filename),
             dst: state.prefix.dst_path(filename),

@@ -10,8 +10,6 @@ use super::util;
 
 pub struct SetContentsBuilder;
 
-const COMMAND: &str = "set_contents";
-
 struct SetContents {
     output: local_state::FileState,
     contents: String,
@@ -36,16 +34,16 @@ impl Module for SetContents {
 
 impl builder::Builder for SetContentsBuilder {
     fn name(&self) -> String {
-        COMMAND.to_owned()
+        "set_contents".to_owned()
     }
     fn help(&self) -> String {
         formatdoc! {"
-            {COMMAND} <filename> <contents>
+            {command} <filename> <contents>
                 overwrites <filename> with <contents>
-        "}
+        ", command=self.name()}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        let (filename, contents) = util::double_arg(COMMAND, args)?;
+        let (filename, contents) = util::double_arg(&self.name(), args)?;
         let dst = state.prefix.dst_path(filename);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;

@@ -11,8 +11,6 @@ use super::util;
 
 pub struct GitCloneBuilder;
 
-const COMMAND: &str = "git_clone";
-
 struct GitClone {
     remote: git_utils::Remote,
     output: local_state::DirectoryState,
@@ -62,17 +60,17 @@ impl Module for GitClone {
 
 impl builder::Builder for GitCloneBuilder {
     fn name(&self) -> String {
-        COMMAND.to_owned()
+        "git_clone".to_owned()
     }
     fn help(&self) -> String {
         formatdoc! {"
-            {COMMAND} <url>[#<branch>] <directory>
+            {command} <url>[#<branch>] <directory>
                 git clone <url> into a local storage and installs a symlink to it
                 if <branch> is specified clone <branch> instead of default HEAD
-        "}
+        ", command=self.name()}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        let (url, filename) = util::double_arg(COMMAND, args)?;
+        let (url, filename) = util::double_arg(&self.name(), args)?;
         let dst = state.prefix.dst_path(filename);
         let output = local_state::DirectoryState::new(dst.clone())
             .with_context(|| format!("failed to create DirectoryState from {dst:?}"))?;

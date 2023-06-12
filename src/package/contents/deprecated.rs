@@ -7,11 +7,9 @@ use super::util::check_command;
 
 pub struct DeprecatedBuilder;
 
-const COMMAND: &str = "deprecated commands, do not use";
-
 impl builder::Builder for DeprecatedBuilder {
     fn name(&self) -> String {
-        COMMAND.to_owned()
+        "deprecated commands, do not use".to_owned()
     }
     fn help(&self) -> String {
         "DEPRECATED: N/A".to_owned()
@@ -24,7 +22,7 @@ impl builder::Builder for DeprecatedBuilder {
             );
             return Ok(());
         }*/
-        check_command(COMMAND, args).map(|_| ())?;
+        check_command(&self.name(), args).map(|_| ())?;
         Ok(None)
     }
 }

@@ -12,8 +12,6 @@ use indoc::formatdoc;
 
 pub struct CopyBuilder;
 
-const COMMAND: &str = "copy";
-
 struct Copy {
     src: PathBuf,
     output: local_state::FileState,
@@ -38,16 +36,16 @@ impl Module for Copy {
 
 impl builder::Builder for CopyBuilder {
     fn name(&self) -> String {
-        COMMAND.to_owned()
+        "copy".to_owned()
     }
     fn help(&self) -> String {
         formatdoc! {"
-            {COMMAND} <filename>
+            {command} <filename>
                 create a copy of a filename in local storage and install a symlink to it
-        "}
+        ", command=self.name()}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        let filename = util::single_arg(COMMAND, args)?;
+        let filename = util::single_arg(&self.name(), args)?;
         let dst = state.prefix.dst_path(filename);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;

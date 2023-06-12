@@ -13,9 +13,6 @@ use indoc::formatdoc;
 pub struct PostInstallExecBuilder;
 pub struct PostInstallUpdateBuilder;
 
-const COMMAND: &str = "post_install_exec";
-const UPDATE_COMMAND: &str = "post_install_update";
-
 #[derive(PartialEq)]
 enum ExecCondition {
     Always,
@@ -48,7 +45,7 @@ impl Module for PostInstallExec {
 
 fn build(
     exec_condition: ExecCondition,
-    command_name: &'static str,
+    command_name: &str,
     state: &mut builder::State,
     args: &[&str],
 ) -> Result<Option<Box<dyn Module>>> {
@@ -69,31 +66,31 @@ fn build(
 
 impl builder::Builder for PostInstallExecBuilder {
     fn name(&self) -> String {
-        COMMAND.to_owned()
+        "post_install_exec".to_owned()
     }
     fn help(&self) -> String {
         formatdoc! {"
-            {COMMAND} <arg0> [<arg1>...]
+            {command} <arg0> [<arg1>...]
                 execute a command in a post-install phase
-        "}
+        ", command=self.name()}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        build(ExecCondition::Always, COMMAND, state, args)
+        build(ExecCondition::Always, &self.name(), state, args)
     }
 }
 
 impl builder::Builder for PostInstallUpdateBuilder {
     fn name(&self) -> String {
-        UPDATE_COMMAND.to_owned()
+        "post_install_update".to_owned()
     }
     fn help(&self) -> String {
         formatdoc! {"
-            {UPDATE_COMMAND} <arg0> [<arg1>...]
+            {command} <arg0> [<arg1>...]
                 execute a command in a post-install phase
                 only if executed via 'setup update' command
-        "}
+        ", command=self.name()}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        build(ExecCondition::UpdateOnly, UPDATE_COMMAND, state, args)
+        build(ExecCondition::UpdateOnly, &self.name(), state, args)
     }
 }

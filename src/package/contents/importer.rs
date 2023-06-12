@@ -15,8 +15,6 @@ use walkdir::WalkDir;
 
 pub struct ImporterBuilder;
 
-const COMMAND: &str = "import_from";
-
 struct Importer {
     prefix: PathBuf,
     src: PathBuf,
@@ -106,16 +104,16 @@ impl Module for Importer {
 
 impl builder::Builder for ImporterBuilder {
     fn name(&self) -> String {
-        COMMAND.to_owned()
+        "import_from".to_owned()
     }
     fn help(&self) -> String {
         formatdoc! {"
-            {COMMAND} <filename>
+            {command} <filename>
                 create a symlink for filename in prefix to a local persistent state
-        "}
+        ", command=self.name()}
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        let filename = util::single_arg(COMMAND, args)?;
+        let filename = util::single_arg(&self.name(), args)?;
         let dst = state.prefix.dst_path(filename);
         let prefix = dst
             .parent()
