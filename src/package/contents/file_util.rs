@@ -1,10 +1,27 @@
 use std::fs;
-use std::os::unix;
 use std::path::Path;
 
 use anyhow::{anyhow, Context, Result};
 
 use crate::registry::Registry;
+
+#[cfg(unix)]
+fn symlink(src: &Path, dst: &Path) -> Result<()> {
+    use std::os::unix;
+    unix::fs::symlink(src, dst)?;
+    Ok(())
+}
+
+#[cfg(windows)]
+fn symlink(src: &Path, dst: Path) -> Result<()> {
+    use std::os::windows::fs;
+    if src.is_dir() {
+        fs::symlink_dir(src, dst)?;
+    } else {
+        fs::symlink_file(src, dst)?;
+    }
+    Ok(())
+}
 
 pub fn make_symlink(registry: &mut dyn Registry, src: &Path, dst: &Path) -> Result<()> {
     if dst.exists() {
@@ -19,7 +36,7 @@ pub fn make_symlink(registry: &mut dyn Registry, src: &Path, dst: &Path) -> Resu
         .parent()
         .ok_or_else(|| anyhow!("unable to get parent of {dst:?}"))?;
     fs::create_dir_all(parent).with_context(|| format!("failed to create {parent:?}"))?;
-    unix::fs::symlink(src, dst)
+    symlink(src, dst)
         .with_context(|| format!("failed to create a symlink {src:?} -> {dst:?}"))?;
     registry
         .register(dst)
