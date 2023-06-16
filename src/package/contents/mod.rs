@@ -34,7 +34,6 @@ const MANIFEST: &str = "MANIFEST";
 
 pub use builder::help;
 
-#[derive(Default)]
 pub struct Configuration {
     root: PathBuf,
     modules: Vec<Box<dyn Module>>,
@@ -44,7 +43,7 @@ impl Configuration {
     pub fn new_empty(root: PathBuf) -> Self {
         Self {
             root,
-            ..Self::default()
+            modules: Vec::default(),
         }
     }
     pub fn new(root: PathBuf) -> Result<Self> {
