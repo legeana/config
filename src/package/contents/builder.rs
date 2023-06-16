@@ -69,7 +69,6 @@ fn builders() -> Vec<Box<dyn Builder>> {
     let result: Vec<Vec<Box<dyn Builder>>> = vec![
         // MANIFEST.
         super::subdir::commands(),
-        super::subdirs::commands(),
         super::prefix::commands(),
         super::xdg_prefix::commands(),
         super::tags::commands(),

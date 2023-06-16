@@ -16,7 +16,6 @@ mod parser;
 mod prefix;
 mod set_contents;
 mod subdir;
-mod subdirs;
 mod symlink;
 mod symlink_tree;
 mod tags;
