@@ -120,31 +120,11 @@ fn parsers() -> Vec<Box<dyn Parser>> {
     result.into_iter().flatten().collect()
 }
 
-struct DelegateBuilder {
-    args: Vec<String>,
-}
-
-impl Builder for DelegateBuilder {
-    fn build(&self, state: &mut State) -> Result<Option<Box<dyn Module>>> {
-        let args: Vec<_> = self.args.iter().map(String::as_ref).collect();
-        build(state, &args)
-    }
-}
-
 pub fn parse(args: &[&str]) -> Result<Box<dyn Builder>> {
-    Ok(Box::new(DelegateBuilder {
-        args: args.iter().map(|&s| s.to_owned()).collect(),
-    }))
-}
-
-pub fn build(state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-    if !state.enabled {
-        return Ok(None);
-    }
-    let mut matched = Vec::<(String, Option<Box<dyn Module>>)>::new();
+    let mut matched: Vec<(String, Box<dyn Builder>)> = Vec::new();
     for parser in parsers() {
-        match parser.build(state, args) {
-            Ok(m) => matched.push((parser.name(), m)),
+        match parser.parse(args) {
+            Ok(builder) => matched.push((parser.name(), builder)),
             Err(err) => {
                 match err.downcast_ref::<Error>() {
                     Some(Error::UnsupportedCommand {
@@ -165,14 +145,19 @@ pub fn build(state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>
         0 => Err(anyhow!("unsupported command {:?}", args)),
         1 => Ok(matched.pop().unwrap().1),
         _ => Err(anyhow!(
-            "{:?} matched multiple builders: {:?}",
+            "{:?} matched multiple parsers: {:?}",
             args,
-            matched
-                .iter()
-                .map(|(builder, _)| builder)
-                .collect::<Vec<_>>(),
+            matched.iter().map(|(parser, _)| parser).collect::<Vec<_>>(),
         )),
     }
+}
+
+// TODO: remove
+pub fn build(state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    if !state.enabled {
+        return Ok(None);
+    }
+    parse(args)?.build(state)
 }
 
 pub fn help() -> String {
