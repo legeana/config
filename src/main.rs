@@ -1,4 +1,3 @@
-mod box_clone;
 mod file_registry;
 mod file_util;
 mod git_utils;
