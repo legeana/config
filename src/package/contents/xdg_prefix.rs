@@ -15,8 +15,8 @@ trait XdgPrefix {
 }
 
 #[derive(Clone)]
-struct XdgCachePrefixBuilder;
-impl XdgPrefix for XdgCachePrefixBuilder {
+struct XdgCachePrefix;
+impl XdgPrefix for XdgCachePrefix {
     fn name(&self) -> &str {
         "xdg_cache_prefix"
     }
@@ -30,8 +30,8 @@ impl XdgPrefix for XdgCachePrefixBuilder {
 }
 
 #[derive(Clone)]
-struct XdgConfigPrefixBuilder;
-impl XdgPrefix for XdgConfigPrefixBuilder {
+struct XdgConfigPrefix;
+impl XdgPrefix for XdgConfigPrefix {
     fn name(&self) -> &str {
         "xdg_config_prefix"
     }
@@ -45,8 +45,8 @@ impl XdgPrefix for XdgConfigPrefixBuilder {
 }
 
 #[derive(Clone)]
-struct XdgDataPrefixBuilder;
-impl XdgPrefix for XdgDataPrefixBuilder {
+struct XdgDataPrefix;
+impl XdgPrefix for XdgDataPrefix {
     fn name(&self) -> &str {
         "xdg_data_prefix"
     }
@@ -60,8 +60,8 @@ impl XdgPrefix for XdgDataPrefixBuilder {
 }
 
 #[derive(Clone)]
-struct XdgStatePrefixBuilder;
-impl XdgPrefix for XdgStatePrefixBuilder {
+struct XdgStatePrefix;
+impl XdgPrefix for XdgStatePrefix {
     fn name(&self) -> &str {
         "xdg_state_prefix"
     }
@@ -101,9 +101,9 @@ where
 
 pub fn commands() -> Vec<Box<dyn builder::Parser>> {
     vec![
-        Box::new(XdgPrefixBuilder(XdgCachePrefixBuilder {})),
-        Box::new(XdgPrefixBuilder(XdgConfigPrefixBuilder {})),
-        Box::new(XdgPrefixBuilder(XdgDataPrefixBuilder {})),
-        Box::new(XdgPrefixBuilder(XdgStatePrefixBuilder {})),
+        Box::new(XdgPrefixBuilder(XdgCachePrefix {})),
+        Box::new(XdgPrefixBuilder(XdgConfigPrefix {})),
+        Box::new(XdgPrefixBuilder(XdgDataPrefix {})),
+        Box::new(XdgPrefixBuilder(XdgStatePrefix {})),
     ]
 }
