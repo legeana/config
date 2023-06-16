@@ -18,6 +18,17 @@ fn make_subdir(state: &mut builder::State, subdir: &Path) -> Result<Box<dyn Modu
     Ok(Box::new(subconf))
 }
 
+#[derive(Debug)]
+struct SubdirBuilder {
+    subdir: String,
+}
+
+impl builder::Builder for SubdirBuilder {
+    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+        Ok(Some(make_subdir(state, Path::new(&self.subdir))?))
+    }
+}
+
 #[derive(Clone)]
 struct SubdirParser;
 
@@ -31,27 +42,17 @@ impl builder::Parser for SubdirParser {
                 load subdirectory configuration recursively
         ", command=self.name()}
     }
-    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        let subdir = util::single_arg(&self.name(), args)?;
-        Ok(Some(make_subdir(state, Path::new(subdir))?))
+    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+        let subdir = util::single_arg(&self.name(), args)?.to_owned();
+        Ok(Box::new(SubdirBuilder { subdir }))
     }
 }
 
-#[derive(Clone)]
-struct SubdirsParser;
+#[derive(Debug)]
+struct SubdirsBuilder;
 
-impl builder::Parser for SubdirsParser {
-    fn name(&self) -> String {
-        "subdirs".to_owned()
-    }
-    fn help(&self) -> String {
-        formatdoc! {"
-            {command}
-                load all subdirectories recursively
-        ", command=self.name()}
-    }
-    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        util::no_args(&self.name(), args)?;
+impl builder::Builder for SubdirsBuilder {
+    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         let mut modules: Vec<Box<dyn Module>> = Vec::new();
         for entry in state
             .prefix
@@ -70,6 +71,25 @@ impl builder::Parser for SubdirsParser {
             modules.push(make_subdir(state, Path::new(&fname))?);
         }
         Ok(Some(Box::new(modules)))
+    }
+}
+
+#[derive(Clone)]
+struct SubdirsParser;
+
+impl builder::Parser for SubdirsParser {
+    fn name(&self) -> String {
+        "subdirs".to_owned()
+    }
+    fn help(&self) -> String {
+        formatdoc! {"
+            {command}
+                load all subdirectories recursively
+        ", command=self.name()}
+    }
+    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+        util::no_args(&self.name(), args)?;
+        Ok(Box::new(SubdirsBuilder {}))
     }
 }
 
