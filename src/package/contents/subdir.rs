@@ -42,7 +42,7 @@ impl builder::Parser for SubdirParser {
                 load subdirectory configuration recursively
         ", command=self.name()}
     }
-    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let subdir = util::single_arg(&self.name(), args)?.to_owned();
         Ok(Box::new(SubdirBuilder { subdir }))
     }
@@ -87,7 +87,7 @@ impl builder::Parser for SubdirsParser {
                 load all subdirectories recursively
         ", command=self.name()}
     }
-    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         util::no_args(&self.name(), args)?;
         Ok(Box::new(SubdirsBuilder {}))
     }

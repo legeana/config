@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use anyhow::Result;
 use indoc::formatdoc;
 
@@ -33,7 +35,7 @@ impl builder::Parser for PrefixParser {
                 set current installation prefix to <directory>
         ", command=self.name()}
     }
-    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let prefix = util::single_arg(&self.name(), args)?.to_owned();
         Ok(Box::new(PrefixBuilder { prefix }))
     }

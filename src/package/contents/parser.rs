@@ -69,13 +69,13 @@ impl<B: BufRead> Iterator for LineIterator<B> {
     }
 }
 
-fn parse_line(line: &str) -> Result<Option<Box<dyn builder::Builder>>> {
+fn parse_line(workdir: &Path, line: &str) -> Result<Option<Box<dyn builder::Builder>>> {
     if line.is_empty() || line.starts_with('#') {
         return Ok(None);
     }
     let args = shlex::split(line).ok_or_else(|| anyhow!("failed to split line {:?}", line))?;
     let arg_refs: Vec<&str> = args.iter().map(String::as_str).collect();
-    Ok(Some(builder::parse(&arg_refs)?))
+    Ok(Some(builder::parse(workdir, &arg_refs)?))
 }
 
 #[derive(Debug)]
@@ -99,7 +99,7 @@ impl builder::Builder for ParsedBuilder {
     }
 }
 
-pub fn parse(manifest_path: &Path) -> Result<Vec<Box<dyn builder::Builder>>> {
+pub fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<Box<dyn builder::Builder>>> {
     let manifest =
         File::open(manifest_path).with_context(|| format!("failed to open {manifest_path:?}"))?;
     let reader = BufReader::new(manifest);
@@ -108,7 +108,7 @@ pub fn parse(manifest_path: &Path) -> Result<Vec<Box<dyn builder::Builder>>> {
         let line_num = line_idx + 1;
         let line = line_or
             .with_context(|| format!("failed to read line {line_num} from {manifest_path:?}"))?;
-        if let Some(builder) = parse_line(&line).with_context(|| {
+        if let Some(builder) = parse_line(workdir, &line).with_context(|| {
             format!("failed to parse line {line_num} {line:?} from {manifest_path:?}")
         })? {
             builders.push(Box::new(ParsedBuilder {

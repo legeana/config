@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use anyhow::{Context, Result};
 use indoc::formatdoc;
 
@@ -38,7 +40,7 @@ impl builder::Parser for RequiresParser {
                 do not process current directory if any of the tags is not present
         ", command=self.name()}
     }
-    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let (_, tags) = util::multiple_args(&self.name(), args, 0)?;
         Ok(Box::new(RequiresBuilder {
             tags: tags.iter().map(|&s| s.to_owned()).collect(),
@@ -77,7 +79,7 @@ impl builder::Parser for ConflictsParser {
                 do not process current directory if any of the tags is present
         ", command=self.name()}
     }
-    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let (_, tags) = util::multiple_args(&self.name(), args, 0)?;
         Ok(Box::new(ConflictsBuilder {
             tags: tags.iter().map(|&s| s.to_owned()).collect(),

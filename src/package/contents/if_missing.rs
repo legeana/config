@@ -1,3 +1,4 @@
+use std::path::Path;
 use std::path::PathBuf;
 
 use crate::module::{Module, Rules};
@@ -78,12 +79,12 @@ impl builder::Parser for IfMissingParser {
                 execute a MANIFEST <command> only if <path> is missing
         ", command=self.name()}
     }
-    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let (path, cmd_args) = util::multiple_args(&self.name(), args, 1)?;
         assert_eq!(path.len(), 1);
         Ok(Box::new(IfMissingBuilder {
             path: path[0].to_owned(),
-            cmd: builder::parse(cmd_args)?,
+            cmd: builder::parse(workdir, cmd_args)?,
         }))
     }
 }

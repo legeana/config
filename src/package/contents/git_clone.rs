@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use anyhow::{Context, Result};
 use indoc::formatdoc;
 
@@ -88,7 +90,7 @@ impl builder::Parser for GitCloneParser {
                 if <branch> is specified clone <branch> instead of default HEAD
         ", command=self.name()}
     }
-    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let (url, dst) = util::double_arg(&self.name(), args)?;
         Ok(Box::new(GitCloneBuilder {
             url: url.to_owned(),

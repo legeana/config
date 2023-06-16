@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use anyhow::Result;
 
 use crate::module::Module;
@@ -24,7 +26,7 @@ impl builder::Parser for DeprecatedParser {
     fn help(&self) -> String {
         "DEPRECATED: N/A".to_owned()
     }
-    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         /*if check_command("<deprecated>", args).is_ok() {
             log::warn!(
                 "{:?}: <deprecated> is unsupported",

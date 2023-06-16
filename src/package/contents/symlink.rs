@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 use indoc::formatdoc;
@@ -49,7 +49,7 @@ impl builder::Parser for SymlinkParser {
                 create a symlink for filename in prefix
         ", command=self.name()}
     }
-    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let filename = util::single_arg(&self.name(), args)?;
         Ok(Box::new(SymlinkBuilder {
             src: filename.to_owned(),
@@ -71,7 +71,7 @@ impl builder::Parser for SymlinkToParser {
                 create a symlink for filename in prefix
         ", command=self.name()}
     }
-    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let (dst, src) = util::double_arg(&self.name(), args)?;
         Ok(Box::new(SymlinkBuilder {
             src: src.to_owned(),

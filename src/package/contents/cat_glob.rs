@@ -1,4 +1,5 @@
 use std::io::Write;
+use std::path::Path;
 
 use crate::module::{Module, Rules};
 use crate::registry::Registry;
@@ -82,7 +83,7 @@ impl builder::Parser for CatGlobIntoParser {
                 create filename in local storage by concatenating globs
         ", command=self.name()}
     }
-    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let (fname, globs) = util::multiple_args(&self.name(), args, 1)?;
         assert!(fname.len() == 1);
         let filename = fname[0].to_owned();

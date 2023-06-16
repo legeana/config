@@ -1,3 +1,4 @@
+use std::path::Path;
 use std::path::PathBuf;
 
 use anyhow::Result;
@@ -137,7 +138,7 @@ where
                 set current installation prefix to ${var}/<directory>
         ", command=self.name(), var=self.0.var()}
     }
-    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let path = util::single_arg(self.0.name(), args)?.to_owned();
         Ok(Box::new(XdgPrefixBuilder {
             prefix: self.0.clone(),

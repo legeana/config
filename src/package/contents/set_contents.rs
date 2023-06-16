@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use anyhow::{Context, Result};
 use indoc::formatdoc;
 
@@ -61,7 +63,7 @@ impl builder::Parser for SetContentsParser {
                 overwrites <filename> with <contents>
         ", command=self.name()}
     }
-    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let (filename, contents) = util::double_arg(&self.name(), args)?;
         Ok(Box::new(SetContentsBuilder {
             filename: filename.to_owned(),

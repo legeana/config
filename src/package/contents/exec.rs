@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process;
 
 use crate::module::{Module, Rules};
@@ -77,7 +77,7 @@ impl builder::Parser for PostInstallExecParser {
                 execute a command in a post-install phase
         ", command=self.name()}
     }
-    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let (command, args) = util::multiple_args(&self.name(), args, 1)?;
         assert!(command.len() == 1);
         Ok(Box::new(PostInstallBuilder {
@@ -102,7 +102,7 @@ impl builder::Parser for PostInstallUpdateParser {
                 only if executed via 'setup update' command
         ", command=self.name()}
     }
-    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let (command, args) = util::multiple_args(&self.name(), args, 1)?;
         assert!(command.len() == 1);
         Ok(Box::new(PostInstallBuilder {

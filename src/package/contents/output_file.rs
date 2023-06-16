@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use anyhow::{Context, Result};
 use indoc::formatdoc;
 
@@ -45,7 +47,7 @@ impl builder::Parser for OutputFileParser {
                 create a symlink for filename in prefix to a local persistent state
         ", command=self.name()}
     }
-    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let filename = util::single_arg(&self.name(), args)?.to_owned();
         Ok(Box::new(OutputFileBuilder { filename }))
     }

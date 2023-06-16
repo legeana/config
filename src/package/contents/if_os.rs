@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use crate::module::Module;
 
 use super::builder;
@@ -50,12 +52,12 @@ impl builder::Parser for IfOsParser {
                 execute a MANIFEST <command> only if os (or family) is {os}
         ", os=self.os, command=self.command()}
     }
-    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let (empty, cmd_args) = util::multiple_args(&self.command(), args, 0)?;
         assert!(empty.is_empty());
         Ok(Box::new(IfOsBuilder {
             os: self.os,
-            cmd: builder::parse(cmd_args)?,
+            cmd: builder::parse(workdir, cmd_args)?,
         }))
     }
 }

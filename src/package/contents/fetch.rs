@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use anyhow::{Context, Result};
 use indoc::formatdoc;
 
@@ -94,7 +96,7 @@ impl builder::Parser for FetchIntoParser {
                 and installs a symlink to it
         ", command=self.name()}
     }
-    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let (filename, url) = util::double_arg(&self.name(), args)?;
         Ok(Box::new(FetchIntoBuilder {
             filename: filename.to_owned(),
@@ -118,7 +120,7 @@ impl builder::Parser for FetchExeIntoParser {
                 and installs a symlink to it
         ", command=self.name()}
     }
-    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let (filename, url) = util::double_arg(&self.name(), args)?;
         Ok(Box::new(FetchIntoBuilder {
             filename: filename.to_owned(),

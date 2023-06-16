@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use crate::module::{Module, Rules};
 use crate::registry::Registry;
@@ -62,7 +62,7 @@ impl builder::Parser for CopyParser {
                 create a copy of a filename in local storage and install a symlink to it
         ", command=self.name()}
     }
-    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let filename = util::single_arg(&self.name(), args)?.to_owned();
         Ok(Box::new(CopyBuilder { filename }))
     }

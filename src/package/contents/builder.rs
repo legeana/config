@@ -77,7 +77,7 @@ where
 pub trait Parser: BoxParserClone {
     fn name(&self) -> String;
     fn help(&self) -> String;
-    fn parse(&self, args: &[&str]) -> Result<Box<dyn Builder>>;
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn Builder>>;
 }
 
 /// Builder is creates a Module or modifies State.
@@ -115,10 +115,10 @@ fn parsers() -> Vec<Box<dyn Parser>> {
     result.into_iter().flatten().collect()
 }
 
-pub fn parse(args: &[&str]) -> Result<Box<dyn Builder>> {
+pub fn parse(workdir: &Path, args: &[&str]) -> Result<Box<dyn Builder>> {
     let mut matched: Vec<(String, Box<dyn Builder>)> = Vec::new();
     for parser in parsers() {
-        match parser.parse(args) {
+        match parser.parse(workdir, args) {
             Ok(builder) => matched.push((parser.name(), builder)),
             Err(err) => {
                 match err.downcast_ref::<Error>() {

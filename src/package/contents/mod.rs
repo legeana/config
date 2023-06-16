@@ -109,11 +109,10 @@ impl Builder for ConfigurationBuilder {
 
 // Analogous to builder::Parser, but can only be called from code.
 impl ConfigurationBuilder {
-    // TODO: this is different from Parser::parse() that doesn't carry path.
     pub fn parse(root: PathBuf) -> Result<Box<dyn Builder>> {
         let manifest = root.join(MANIFEST);
-        let builders =
-            parser::parse(&manifest).with_context(|| format!("failed to load {manifest:?}"))?;
+        let builders = parser::parse(&root, &manifest)
+            .with_context(|| format!("failed to load {manifest:?}"))?;
         Ok(Box::new(ConfigurationBuilder { root, builders }))
     }
 }
