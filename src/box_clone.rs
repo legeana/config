@@ -22,7 +22,9 @@ mod tests {
 
     #[test]
     fn test_box_clone() {
-        let t = Test { x: "test".to_owned() };
+        let t = Test {
+            x: "test".to_owned(),
+        };
         let b = t.box_clone();
         assert_eq!(b.x, "test".to_owned());
     }
