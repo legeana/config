@@ -30,6 +30,24 @@ impl Module for SetContents {
     }
 }
 
+#[derive(Debug)]
+struct SetContentsBuilder {
+    filename: String,
+    contents: String,
+}
+
+impl builder::Builder for SetContentsBuilder {
+    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+        let dst = state.prefix.dst_path(&self.filename);
+        let output = local_state::FileState::new(dst.clone())
+            .with_context(|| format!("failed to create FileState for {dst:?}"))?;
+        Ok(Some(Box::new(SetContents {
+            output,
+            contents: self.contents.clone(),
+        })))
+    }
+}
+
 #[derive(Clone)]
 struct SetContentsParser;
 
@@ -43,15 +61,12 @@ impl builder::Parser for SetContentsParser {
                 overwrites <filename> with <contents>
         ", command=self.name()}
     }
-    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let (filename, contents) = util::double_arg(&self.name(), args)?;
-        let dst = state.prefix.dst_path(filename);
-        let output = local_state::FileState::new(dst.clone())
-            .with_context(|| format!("failed to create FileState for {dst:?}"))?;
-        Ok(Some(Box::new(SetContents {
-            output,
+        Ok(Box::new(SetContentsBuilder {
+            filename: filename.to_owned(),
             contents: contents.to_owned(),
-        })))
+        }))
     }
 }
 
