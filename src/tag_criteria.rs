@@ -47,7 +47,7 @@ mod tests {
     // TODO: Make more generic tests.
     #[cfg(target_os = "linux")]
     #[test]
-    fn test_satisfied() -> Result<()> {
+    fn test_linux_satisfied() -> Result<()> {
         let tags = Criteria {
             requires: Some(vec!["os=linux".to_owned()]),
             conflicts: Some(vec!["os=windows".to_owned()]),
@@ -58,7 +58,7 @@ mod tests {
 
     #[cfg(target_os = "linux")]
     #[test]
-    fn test_not_satisfied_requires() -> Result<()> {
+    fn test_linux_not_satisfied_requires() -> Result<()> {
         let tags = Criteria {
             requires: Some(vec!["os=windows".to_owned()]),
             conflicts: None,
@@ -69,12 +69,23 @@ mod tests {
 
     #[cfg(target_os = "linux")]
     #[test]
-    fn test_not_satisfied_conflicts() -> Result<()> {
+    fn test_linux_not_satisfied_conflicts() -> Result<()> {
         let tags = Criteria {
             requires: None,
             conflicts: Some(vec!["os=linux".to_owned()]),
         };
         assert!(!tags.is_satisfied()?);
+        Ok(())
+    }
+
+    #[cfg(target_family = "unix")]
+    #[test]
+    fn test_unix_satisfied() -> Result<()> {
+        let tags = Criteria {
+            requires: Some(vec!["family=unix".to_owned()]),
+            conflicts: Some(Vec::new()),
+        };
+        assert!(tags.is_satisfied()?);
         Ok(())
     }
 }
