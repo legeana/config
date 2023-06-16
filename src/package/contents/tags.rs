@@ -8,9 +8,9 @@ use super::builder;
 use super::util;
 
 #[derive(Clone)]
-struct RequiresBuilder;
+struct RequiresParser;
 
-impl builder::Builder for RequiresBuilder {
+impl builder::Parser for RequiresParser {
     fn name(&self) -> String {
         "requires".to_owned()
     }
@@ -34,9 +34,9 @@ impl builder::Builder for RequiresBuilder {
 }
 
 #[derive(Clone)]
-struct ConflictsBuilder;
+struct ConflictsParser;
 
-impl builder::Builder for ConflictsBuilder {
+impl builder::Parser for ConflictsParser {
     fn name(&self) -> String {
         "conflicts".to_owned()
     }
@@ -60,5 +60,5 @@ impl builder::Builder for ConflictsBuilder {
 }
 
 pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(RequiresBuilder {}), Box::new(ConflictsBuilder {})]
+    vec![Box::new(RequiresParser {}), Box::new(ConflictsParser {})]
 }

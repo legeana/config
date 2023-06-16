@@ -7,11 +7,11 @@ use anyhow::Result;
 use indoc::formatdoc;
 
 #[derive(Clone)]
-struct IfOsBuilder {
+struct IfOsParser {
     os: &'static str,
 }
 
-impl IfOsBuilder {
+impl IfOsParser {
     fn is_os(&self) -> bool {
         // We don't have to check this in runtime as this never changes.
         // In fact, it's even beneficial to check this during build to support *Prefix.
@@ -22,7 +22,7 @@ impl IfOsBuilder {
     }
 }
 
-impl builder::Builder for IfOsBuilder {
+impl builder::Parser for IfOsParser {
     fn name(&self) -> String {
         self.command()
     }
@@ -44,9 +44,9 @@ impl builder::Builder for IfOsBuilder {
 
 pub fn commands() -> Vec<Box<dyn builder::Parser>> {
     vec![
-        Box::new(IfOsBuilder { os: "macos" }),
-        Box::new(IfOsBuilder { os: "linux" }),
-        Box::new(IfOsBuilder { os: "unix" }),
-        Box::new(IfOsBuilder { os: "windows" }),
+        Box::new(IfOsParser { os: "macos" }),
+        Box::new(IfOsParser { os: "linux" }),
+        Box::new(IfOsParser { os: "unix" }),
+        Box::new(IfOsParser { os: "windows" }),
     ]
 }

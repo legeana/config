@@ -31,9 +31,9 @@ impl Module for SetContents {
 }
 
 #[derive(Clone)]
-struct SetContentsBuilder;
+struct SetContentsParser;
 
-impl builder::Builder for SetContentsBuilder {
+impl builder::Parser for SetContentsParser {
     fn name(&self) -> String {
         "set_contents".to_owned()
     }
@@ -56,5 +56,5 @@ impl builder::Builder for SetContentsBuilder {
 }
 
 pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(SetContentsBuilder {})]
+    vec![Box::new(SetContentsParser {})]
 }

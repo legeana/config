@@ -43,9 +43,9 @@ impl Module for CatGlobInto {
 }
 
 #[derive(Clone)]
-struct CatGlobIntoBuilder;
+struct CatGlobIntoParser;
 
-impl builder::Builder for CatGlobIntoBuilder {
+impl builder::Parser for CatGlobIntoParser {
     fn name(&self) -> String {
         "cat_glob_into".to_owned()
     }
@@ -79,5 +79,5 @@ impl builder::Builder for CatGlobIntoBuilder {
 }
 
 pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(CatGlobIntoBuilder {})]
+    vec![Box::new(CatGlobIntoParser {})]
 }

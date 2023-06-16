@@ -101,9 +101,9 @@ impl Module for Importer {
 }
 
 #[derive(Clone)]
-struct ImporterBuilder;
+struct ImporterParser;
 
-impl builder::Builder for ImporterBuilder {
+impl builder::Parser for ImporterParser {
     fn name(&self) -> String {
         "import_from".to_owned()
     }
@@ -130,5 +130,5 @@ impl builder::Builder for ImporterBuilder {
 }
 
 pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(ImporterBuilder {})]
+    vec![Box::new(ImporterParser {})]
 }

@@ -19,9 +19,9 @@ fn make_subdir(state: &mut builder::State, subdir: &Path) -> Result<Box<dyn Modu
 }
 
 #[derive(Clone)]
-struct SubdirBuilder;
+struct SubdirParser;
 
-impl builder::Builder for SubdirBuilder {
+impl builder::Parser for SubdirParser {
     fn name(&self) -> String {
         "subdir".to_owned()
     }
@@ -38,9 +38,9 @@ impl builder::Builder for SubdirBuilder {
 }
 
 #[derive(Clone)]
-struct SubdirsBuilder;
+struct SubdirsParser;
 
-impl builder::Builder for SubdirsBuilder {
+impl builder::Parser for SubdirsParser {
     fn name(&self) -> String {
         "subdirs".to_owned()
     }
@@ -74,5 +74,5 @@ impl builder::Builder for SubdirsBuilder {
 }
 
 pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(SubdirBuilder {}), Box::new(SubdirsBuilder {})]
+    vec![Box::new(SubdirParser {}), Box::new(SubdirsParser {})]
 }

@@ -59,13 +59,6 @@ impl State {
     }
 }
 
-// TODO: replace by Parser + Builder2
-pub trait Builder {
-    fn name(&self) -> String;
-    fn help(&self) -> String;
-    fn build(&self, state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>>;
-}
-
 pub trait BoxParserClone {
     fn parser_clone(&self) -> Box<dyn Parser>;
 }
@@ -93,21 +86,6 @@ pub trait Parser: BoxParserClone {
     }
     // Compatibility functions.
     fn build(&self, state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>>;
-}
-
-impl<T> Parser for T
-where
-    T: Builder + Clone + 'static,
-{
-    fn name(&self) -> String {
-        self.name()
-    }
-    fn help(&self) -> String {
-        self.help()
-    }
-    fn build(&self, state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        self.build(state, args)
-    }
 }
 
 /// Builder is creates a Module or modifies State.

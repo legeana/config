@@ -33,9 +33,9 @@ impl Module for Copy {
 }
 
 #[derive(Clone)]
-struct CopyBuilder;
+struct CopyParser;
 
-impl builder::Builder for CopyBuilder {
+impl builder::Parser for CopyParser {
     fn name(&self) -> String {
         "copy".to_owned()
     }
@@ -58,5 +58,5 @@ impl builder::Builder for CopyBuilder {
 }
 
 pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(CopyBuilder {})]
+    vec![Box::new(CopyParser {})]
 }

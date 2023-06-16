@@ -36,9 +36,9 @@ impl Module for SymlinkTree {
 }
 
 #[derive(Clone)]
-struct SymlinkTreeBuilder;
+struct SymlinkTreeParser;
 
-impl builder::Builder for SymlinkTreeBuilder {
+impl builder::Parser for SymlinkTreeParser {
     fn name(&self) -> String {
         "symlink_tree".to_owned()
     }
@@ -58,5 +58,5 @@ impl builder::Builder for SymlinkTreeBuilder {
 }
 
 pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(SymlinkTreeBuilder {})]
+    vec![Box::new(SymlinkTreeParser {})]
 }

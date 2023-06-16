@@ -78,9 +78,9 @@ fn build(
 }
 
 #[derive(Clone)]
-struct FetchIntoBuilder;
+struct FetchIntoParser;
 
-impl builder::Builder for FetchIntoBuilder {
+impl builder::Parser for FetchIntoParser {
     fn name(&self) -> String {
         "fetch_into".to_owned()
     }
@@ -97,9 +97,9 @@ impl builder::Builder for FetchIntoBuilder {
 }
 
 #[derive(Clone)]
-struct FetchExeIntoBuilder;
+struct FetchExeIntoParser;
 
-impl builder::Builder for FetchExeIntoBuilder {
+impl builder::Parser for FetchExeIntoParser {
     fn name(&self) -> String {
         "fetch_exe_into".to_owned()
     }
@@ -117,7 +117,7 @@ impl builder::Builder for FetchExeIntoBuilder {
 
 pub fn commands() -> Vec<Box<dyn builder::Parser>> {
     vec![
-        Box::new(FetchIntoBuilder {}),
-        Box::new(FetchExeIntoBuilder {}),
+        Box::new(FetchIntoParser {}),
+        Box::new(FetchExeIntoParser {}),
     ]
 }

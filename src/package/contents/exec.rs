@@ -62,9 +62,9 @@ fn build(
 }
 
 #[derive(Clone)]
-struct PostInstallExecBuilder;
+struct PostInstallExecParser;
 
-impl builder::Builder for PostInstallExecBuilder {
+impl builder::Parser for PostInstallExecParser {
     fn name(&self) -> String {
         "post_install_exec".to_owned()
     }
@@ -80,9 +80,9 @@ impl builder::Builder for PostInstallExecBuilder {
 }
 
 #[derive(Clone)]
-struct PostInstallUpdateBuilder;
+struct PostInstallUpdateParser;
 
-impl builder::Builder for PostInstallUpdateBuilder {
+impl builder::Parser for PostInstallUpdateParser {
     fn name(&self) -> String {
         "post_install_update".to_owned()
     }
@@ -100,7 +100,7 @@ impl builder::Builder for PostInstallUpdateBuilder {
 
 pub fn commands() -> Vec<Box<dyn builder::Parser>> {
     vec![
-        Box::new(PostInstallExecBuilder {}),
-        Box::new(PostInstallUpdateBuilder {}),
+        Box::new(PostInstallExecParser {}),
+        Box::new(PostInstallUpdateParser {}),
     ]
 }

@@ -57,9 +57,9 @@ impl Module for GitClone {
 }
 
 #[derive(Clone)]
-struct GitCloneBuilder;
+struct GitCloneParser;
 
-impl builder::Builder for GitCloneBuilder {
+impl builder::Parser for GitCloneParser {
     fn name(&self) -> String {
         "git_clone".to_owned()
     }
@@ -83,5 +83,5 @@ impl builder::Builder for GitCloneBuilder {
 }
 
 pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(GitCloneBuilder {})]
+    vec![Box::new(GitCloneParser {})]
 }

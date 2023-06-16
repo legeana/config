@@ -7,9 +7,9 @@ use super::builder;
 use super::util;
 
 #[derive(Clone)]
-struct PrefixBuilder;
+struct PrefixParser;
 
-impl builder::Builder for PrefixBuilder {
+impl builder::Parser for PrefixParser {
     fn name(&self) -> String {
         "prefix".to_owned()
     }
@@ -27,5 +27,5 @@ impl builder::Builder for PrefixBuilder {
 }
 
 pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(PrefixBuilder {})]
+    vec![Box::new(PrefixParser {})]
 }

@@ -25,9 +25,9 @@ impl Module for MkDir {
 }
 
 #[derive(Clone)]
-struct MkDirBuilder;
+struct MkDirParser;
 
-impl builder::Builder for MkDirBuilder {
+impl builder::Parser for MkDirParser {
     fn name(&self) -> String {
         "mkdir".to_owned()
     }
@@ -46,5 +46,5 @@ impl builder::Builder for MkDirBuilder {
 }
 
 pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(MkDirBuilder {})]
+    vec![Box::new(MkDirParser {})]
 }

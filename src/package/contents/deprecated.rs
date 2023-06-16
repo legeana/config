@@ -6,9 +6,9 @@ use super::builder;
 use super::util::check_command;
 
 #[derive(Clone)]
-struct DeprecatedBuilder;
+struct DeprecatedParser;
 
-impl builder::Builder for DeprecatedBuilder {
+impl builder::Parser for DeprecatedParser {
     fn name(&self) -> String {
         "deprecated commands, do not use".to_owned()
     }
@@ -29,5 +29,5 @@ impl builder::Builder for DeprecatedBuilder {
 }
 
 pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(DeprecatedBuilder {})]
+    vec![Box::new(DeprecatedParser {})]
 }

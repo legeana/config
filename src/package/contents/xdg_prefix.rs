@@ -75,11 +75,11 @@ impl XdgPrefix for XdgStatePrefix {
 }
 
 #[derive(Clone)]
-struct XdgPrefixBuilder<T>(T)
+struct XdgPrefixParser<T>(T)
 where
     T: XdgPrefix + Clone + 'static;
 
-impl<T> builder::Builder for XdgPrefixBuilder<T>
+impl<T> builder::Parser for XdgPrefixParser<T>
 where
     T: XdgPrefix + Clone + 'static,
 {
@@ -101,9 +101,9 @@ where
 
 pub fn commands() -> Vec<Box<dyn builder::Parser>> {
     vec![
-        Box::new(XdgPrefixBuilder(XdgCachePrefix {})),
-        Box::new(XdgPrefixBuilder(XdgConfigPrefix {})),
-        Box::new(XdgPrefixBuilder(XdgDataPrefix {})),
-        Box::new(XdgPrefixBuilder(XdgStatePrefix {})),
+        Box::new(XdgPrefixParser(XdgCachePrefix {})),
+        Box::new(XdgPrefixParser(XdgConfigPrefix {})),
+        Box::new(XdgPrefixParser(XdgDataPrefix {})),
+        Box::new(XdgPrefixParser(XdgStatePrefix {})),
     ]
 }

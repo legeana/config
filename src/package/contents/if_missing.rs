@@ -50,9 +50,9 @@ impl Module for IfMissing {
 }
 
 #[derive(Clone)]
-struct IfMissingBuilder;
+struct IfMissingParser;
 
-impl builder::Builder for IfMissingBuilder {
+impl builder::Parser for IfMissingParser {
     fn name(&self) -> String {
         "if_missing".to_owned()
     }
@@ -74,5 +74,5 @@ impl builder::Builder for IfMissingBuilder {
 }
 
 pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(IfMissingBuilder {})]
+    vec![Box::new(IfMissingParser {})]
 }

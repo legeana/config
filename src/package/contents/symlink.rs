@@ -22,9 +22,9 @@ impl Module for Symlink {
 }
 
 #[derive(Clone)]
-struct SymlinkBuilder;
+struct SymlinkParser;
 
-impl builder::Builder for SymlinkBuilder {
+impl builder::Parser for SymlinkParser {
     fn name(&self) -> String {
         "symlink".to_owned()
     }
@@ -44,9 +44,9 @@ impl builder::Builder for SymlinkBuilder {
 }
 
 #[derive(Clone)]
-struct SymlinkToBuilder;
+struct SymlinkToParser;
 
-impl builder::Builder for SymlinkToBuilder {
+impl builder::Parser for SymlinkToParser {
     fn name(&self) -> String {
         "symlink_to".to_owned()
     }
@@ -66,5 +66,5 @@ impl builder::Builder for SymlinkToBuilder {
 }
 
 pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(SymlinkBuilder {}), Box::new(SymlinkToBuilder {})]
+    vec![Box::new(SymlinkParser {}), Box::new(SymlinkToParser {})]
 }

@@ -19,9 +19,9 @@ impl Module for OutputFile {
 }
 
 #[derive(Clone)]
-struct OutputFileBuilder;
+struct OutputFileParser;
 
-impl builder::Builder for OutputFileBuilder {
+impl builder::Parser for OutputFileParser {
     fn name(&self) -> String {
         "output_file".to_owned()
     }
@@ -41,5 +41,5 @@ impl builder::Builder for OutputFileBuilder {
 }
 
 pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(OutputFileBuilder {})]
+    vec![Box::new(OutputFileParser {})]
 }
