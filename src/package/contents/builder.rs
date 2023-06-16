@@ -138,6 +138,23 @@ fn parsers() -> Vec<Box<dyn Parser>> {
     result.into_iter().flatten().collect()
 }
 
+struct DelegateBuilder {
+    args: Vec<String>,
+}
+
+impl Builder for DelegateBuilder {
+    fn build(&self, state: &mut State) -> Result<Option<Box<dyn Module>>> {
+        let args: Vec<_> = self.args.iter().map(String::as_ref).collect();
+        build(state, &args)
+    }
+}
+
+pub fn parse(args: &[&str]) -> Result<Box<dyn Builder>> {
+    Ok(Box::new(DelegateBuilder {
+        args: args.iter().map(|&s| s.to_owned()).collect(),
+    }))
+}
+
 pub fn build(state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
     if !state.enabled {
         return Ok(None);
