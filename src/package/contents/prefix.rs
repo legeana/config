@@ -6,7 +6,7 @@ use crate::module::Module;
 use super::builder;
 use super::util;
 
-#[derive(Clone)]
+#[derive(Debug)]
 struct PrefixBuilder {
     prefix: String,
 }

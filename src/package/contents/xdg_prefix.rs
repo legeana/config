@@ -8,13 +8,13 @@ use crate::module::Module;
 use super::builder;
 use super::util;
 
-trait XdgPrefix {
+trait XdgPrefix: std::fmt::Debug {
     fn name(&self) -> &str;
     fn var(&self) -> &str;
     fn xdg_prefix(&self, path: &str) -> Result<PathBuf>;
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct XdgCachePrefix;
 impl XdgPrefix for XdgCachePrefix {
     fn name(&self) -> &str {
@@ -29,7 +29,7 @@ impl XdgPrefix for XdgCachePrefix {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct XdgConfigPrefix;
 impl XdgPrefix for XdgConfigPrefix {
     fn name(&self) -> &str {
@@ -44,7 +44,7 @@ impl XdgPrefix for XdgConfigPrefix {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct XdgDataPrefix;
 impl XdgPrefix for XdgDataPrefix {
     fn name(&self) -> &str {
@@ -59,7 +59,7 @@ impl XdgPrefix for XdgDataPrefix {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct XdgStatePrefix;
 impl XdgPrefix for XdgStatePrefix {
     fn name(&self) -> &str {

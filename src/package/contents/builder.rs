@@ -86,7 +86,7 @@ pub trait Parser: BoxParserClone {
 }
 
 /// Builder is creates a Module or modifies State.
-pub trait Builder {
+pub trait Builder: std::fmt::Debug {
     fn build(&self, state: &mut State) -> Result<Option<Box<dyn Module>>>;
 }
 

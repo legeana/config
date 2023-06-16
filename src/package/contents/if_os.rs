@@ -6,7 +6,7 @@ use super::util;
 use anyhow::Result;
 use indoc::formatdoc;
 
-// TODO: #[derive(Debug)]
+#[derive(Debug)]
 struct IfOsBuilder {
     os: &'static str,
     cmd: Box<dyn builder::Builder>,

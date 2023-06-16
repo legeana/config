@@ -49,7 +49,7 @@ impl Module for IfMissing {
     }
 }
 
-// TODO: #[derive(Debug)]
+#[derive(Debug)]
 struct IfMissingBuilder {
     path: String,
     cmd: Box<dyn builder::Builder>,
