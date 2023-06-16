@@ -49,6 +49,24 @@ impl Module for IfMissing {
     }
 }
 
+#[derive(Debug)]
+struct IfMissingBuilder {
+    path: String,
+    // TODO cmd: Box<dyn Module>
+    cmd_args: Vec<String>,
+}
+
+impl builder::Builder for IfMissingBuilder {
+    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+        let path: PathBuf = shellexpand::tilde(&self.path).as_ref().into();
+        let cmd_args: Vec<_> = self.cmd_args.iter().map(String::as_str).collect();
+        match builder::build(state, &cmd_args)? {
+            Some(cmd) => Ok(Some(Box::new(IfMissing { path, cmd }))),
+            None => Ok(None),
+        }
+    }
+}
+
 #[derive(Clone)]
 struct IfMissingParser;
 
@@ -62,14 +80,13 @@ impl builder::Parser for IfMissingParser {
                 execute a MANIFEST <command> only if <path> is missing
         ", command=self.name()}
     }
-    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let (path, cmd_args) = util::multiple_args(&self.name(), args, 1)?;
         assert_eq!(path.len(), 1);
-        let path: PathBuf = shellexpand::tilde(path[0]).as_ref().into();
-        match builder::build(state, cmd_args)? {
-            Some(cmd) => Ok(Some(Box::new(IfMissing { path, cmd }))),
-            None => Ok(None),
-        }
+        Ok(Box::new(IfMissingBuilder {
+            path: path[0].to_owned(),
+            cmd_args: cmd_args.iter().map(|&s| s.to_owned()).collect(),
+        }))
     }
 }
 
