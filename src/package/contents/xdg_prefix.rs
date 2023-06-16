@@ -74,6 +74,25 @@ impl XdgPrefix for XdgStatePrefix {
     }
 }
 
+#[derive(Debug)]
+struct XdgPrefixBuilder<T>
+where
+    T: XdgPrefix + Clone + 'static,
+{
+    prefix: T,
+    path: String,
+}
+
+impl<T> builder::Builder for XdgPrefixBuilder<T>
+where
+    T: XdgPrefix + Clone + 'static,
+{
+    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+        state.prefix.set(self.prefix.xdg_prefix(&self.path)?);
+        Ok(None)
+    }
+}
+
 #[derive(Clone)]
 struct XdgPrefixParser<T>(T)
 where
@@ -92,10 +111,12 @@ where
                 set current installation prefix to ${var}/<directory>
         ", command=self.name(), var=self.0.var()}
     }
-    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        let path = util::single_arg(self.0.name(), args)?;
-        state.prefix.set(self.0.xdg_prefix(path)?);
-        Ok(None)
+    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+        let path = util::single_arg(self.0.name(), args)?.to_owned();
+        Ok(Box::new(XdgPrefixBuilder {
+            prefix: self.0.clone(),
+            path,
+        }))
     }
 }
 
