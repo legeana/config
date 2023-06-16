@@ -32,6 +32,7 @@ impl Module for Copy {
     }
 }
 
+#[derive(Clone)]
 struct CopyBuilder;
 
 impl builder::Builder for CopyBuilder {
@@ -56,6 +57,6 @@ impl builder::Builder for CopyBuilder {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+pub fn commands() -> Vec<Box<dyn builder::Parser>> {
     vec![Box::new(CopyBuilder {})]
 }

@@ -6,6 +6,7 @@ use crate::module::Module;
 use super::builder;
 use super::util;
 
+#[derive(Clone)]
 struct PrefixBuilder;
 
 impl builder::Builder for PrefixBuilder {
@@ -25,6 +26,6 @@ impl builder::Builder for PrefixBuilder {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+pub fn commands() -> Vec<Box<dyn builder::Parser>> {
     vec![Box::new(PrefixBuilder {})]
 }

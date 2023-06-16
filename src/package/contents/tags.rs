@@ -7,6 +7,7 @@ use crate::tag_util;
 use super::builder;
 use super::util;
 
+#[derive(Clone)]
 struct RequiresBuilder;
 
 impl builder::Builder for RequiresBuilder {
@@ -32,6 +33,7 @@ impl builder::Builder for RequiresBuilder {
     }
 }
 
+#[derive(Clone)]
 struct ConflictsBuilder;
 
 impl builder::Builder for ConflictsBuilder {
@@ -57,6 +59,6 @@ impl builder::Builder for ConflictsBuilder {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+pub fn commands() -> Vec<Box<dyn builder::Parser>> {
     vec![Box::new(RequiresBuilder {}), Box::new(ConflictsBuilder {})]
 }

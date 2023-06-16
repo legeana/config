@@ -6,6 +6,7 @@ use super::util;
 use anyhow::Result;
 use indoc::formatdoc;
 
+#[derive(Clone)]
 struct IfOsBuilder {
     os: &'static str,
 }
@@ -41,7 +42,7 @@ impl builder::Builder for IfOsBuilder {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+pub fn commands() -> Vec<Box<dyn builder::Parser>> {
     vec![
         Box::new(IfOsBuilder { os: "macos" }),
         Box::new(IfOsBuilder { os: "linux" }),

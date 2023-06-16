@@ -21,6 +21,7 @@ impl Module for Symlink {
     }
 }
 
+#[derive(Clone)]
 struct SymlinkBuilder;
 
 impl builder::Builder for SymlinkBuilder {
@@ -42,6 +43,7 @@ impl builder::Builder for SymlinkBuilder {
     }
 }
 
+#[derive(Clone)]
 struct SymlinkToBuilder;
 
 impl builder::Builder for SymlinkToBuilder {
@@ -63,6 +65,6 @@ impl builder::Builder for SymlinkToBuilder {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+pub fn commands() -> Vec<Box<dyn builder::Parser>> {
     vec![Box::new(SymlinkBuilder {}), Box::new(SymlinkToBuilder {})]
 }

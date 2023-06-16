@@ -56,6 +56,7 @@ impl Module for GitClone {
     }
 }
 
+#[derive(Clone)]
 struct GitCloneBuilder;
 
 impl builder::Builder for GitCloneBuilder {
@@ -81,6 +82,6 @@ impl builder::Builder for GitCloneBuilder {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+pub fn commands() -> Vec<Box<dyn builder::Parser>> {
     vec![Box::new(GitCloneBuilder {})]
 }

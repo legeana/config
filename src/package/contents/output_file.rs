@@ -18,6 +18,7 @@ impl Module for OutputFile {
     }
 }
 
+#[derive(Clone)]
 struct OutputFileBuilder;
 
 impl builder::Builder for OutputFileBuilder {
@@ -39,6 +40,6 @@ impl builder::Builder for OutputFileBuilder {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+pub fn commands() -> Vec<Box<dyn builder::Parser>> {
     vec![Box::new(OutputFileBuilder {})]
 }

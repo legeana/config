@@ -59,14 +59,67 @@ impl State {
     }
 }
 
+// TODO: replace by Parser + Builder2
 pub trait Builder {
     fn name(&self) -> String;
     fn help(&self) -> String;
     fn build(&self, state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>>;
 }
 
-fn builders() -> Vec<Box<dyn Builder>> {
-    let result: Vec<Vec<Box<dyn Builder>>> = vec![
+/// Parser transforms a statement into a Builder.
+/// This should be purely syntactical.
+pub trait Parser {
+    fn name(&self) -> String;
+    fn help(&self) -> String;
+    fn parse(&self, args: &[&str]) -> Result<Box<dyn Builder2>> {
+        let args: Vec<String> = args.iter().map(|s| String::from(*s)).collect();
+        Ok(Box::new(CompatBuilder2 {
+            args,
+            parser: self.box_clone(),
+        }))
+    }
+    // Compatibility functions.
+    fn box_clone(&self) -> Box<dyn Parser>;
+    fn build(&self, state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>>;
+}
+
+impl<T> Parser for T
+where
+    T: Builder + Clone + 'static,
+{
+    fn name(&self) -> String {
+        self.name()
+    }
+    fn help(&self) -> String {
+        self.help()
+    }
+    fn box_clone(&self) -> Box<dyn Parser> {
+        Box::new(self.clone())
+    }
+    fn build(&self, state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+        self.build(state, args)
+    }
+}
+
+/// Builder is creates a Module or modifies State.
+pub trait Builder2 {
+    fn build(&self, state: &mut State) -> Result<Option<Box<dyn Module>>>;
+}
+
+struct CompatBuilder2 {
+    args: Vec<String>,
+    parser: Box<dyn Parser>,
+}
+
+impl Builder2 for CompatBuilder2 {
+    fn build(&self, state: &mut State) -> Result<Option<Box<dyn Module>>> {
+        let args: Vec<_> = self.args.iter().map(String::as_str).collect();
+        self.parser.build(state, &args)
+    }
+}
+
+fn parsers() -> Vec<Box<dyn Parser>> {
+    let result: Vec<Vec<Box<dyn Parser>>> = vec![
         // MANIFEST.
         super::subdir::commands(),
         super::prefix::commands(),
@@ -100,9 +153,9 @@ pub fn build(state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>
         return Ok(None);
     }
     let mut matched = Vec::<(String, Option<Box<dyn Module>>)>::new();
-    for builder in builders() {
-        match builder.build(state, args) {
-            Ok(m) => matched.push((builder.name(), m)),
+    for parser in parsers() {
+        match parser.build(state, args) {
+            Ok(m) => matched.push((parser.name(), m)),
             Err(err) => {
                 match err.downcast_ref::<Error>() {
                     Some(Error::UnsupportedCommand {
@@ -135,8 +188,8 @@ pub fn build(state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>
 
 pub fn help() -> String {
     let mut help = String::new();
-    for builder in builders() {
-        help.push_str(builder.help().trim_end());
+    for parser in parsers() {
+        help.push_str(parser.help().trim_end());
         help.push('\n');
     }
     help

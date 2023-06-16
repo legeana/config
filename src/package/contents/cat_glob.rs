@@ -42,6 +42,7 @@ impl Module for CatGlobInto {
     }
 }
 
+#[derive(Clone)]
 struct CatGlobIntoBuilder;
 
 impl builder::Builder for CatGlobIntoBuilder {
@@ -77,6 +78,6 @@ impl builder::Builder for CatGlobIntoBuilder {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+pub fn commands() -> Vec<Box<dyn builder::Parser>> {
     vec![Box::new(CatGlobIntoBuilder {})]
 }

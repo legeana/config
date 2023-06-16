@@ -100,6 +100,7 @@ impl Module for Importer {
     }
 }
 
+#[derive(Clone)]
 struct ImporterBuilder;
 
 impl builder::Builder for ImporterBuilder {
@@ -128,6 +129,6 @@ impl builder::Builder for ImporterBuilder {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+pub fn commands() -> Vec<Box<dyn builder::Parser>> {
     vec![Box::new(ImporterBuilder {})]
 }

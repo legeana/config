@@ -30,6 +30,7 @@ impl Module for SetContents {
     }
 }
 
+#[derive(Clone)]
 struct SetContentsBuilder;
 
 impl builder::Builder for SetContentsBuilder {
@@ -54,6 +55,6 @@ impl builder::Builder for SetContentsBuilder {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+pub fn commands() -> Vec<Box<dyn builder::Parser>> {
     vec![Box::new(SetContentsBuilder {})]
 }

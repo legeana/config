@@ -18,6 +18,7 @@ fn make_subdir(state: &mut builder::State, subdir: &Path) -> Result<Box<dyn Modu
     Ok(Box::new(subconf))
 }
 
+#[derive(Clone)]
 struct SubdirBuilder;
 
 impl builder::Builder for SubdirBuilder {
@@ -36,6 +37,7 @@ impl builder::Builder for SubdirBuilder {
     }
 }
 
+#[derive(Clone)]
 struct SubdirsBuilder;
 
 impl builder::Builder for SubdirsBuilder {
@@ -71,6 +73,6 @@ impl builder::Builder for SubdirsBuilder {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+pub fn commands() -> Vec<Box<dyn builder::Parser>> {
     vec![Box::new(SubdirBuilder {}), Box::new(SubdirsBuilder {})]
 }

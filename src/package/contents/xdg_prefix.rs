@@ -14,6 +14,7 @@ trait XdgPrefix {
     fn xdg_prefix(&self, path: &str) -> Result<PathBuf>;
 }
 
+#[derive(Clone)]
 struct XdgCachePrefixBuilder;
 impl XdgPrefix for XdgCachePrefixBuilder {
     fn name(&self) -> &str {
@@ -28,6 +29,7 @@ impl XdgPrefix for XdgCachePrefixBuilder {
     }
 }
 
+#[derive(Clone)]
 struct XdgConfigPrefixBuilder;
 impl XdgPrefix for XdgConfigPrefixBuilder {
     fn name(&self) -> &str {
@@ -42,6 +44,7 @@ impl XdgPrefix for XdgConfigPrefixBuilder {
     }
 }
 
+#[derive(Clone)]
 struct XdgDataPrefixBuilder;
 impl XdgPrefix for XdgDataPrefixBuilder {
     fn name(&self) -> &str {
@@ -56,6 +59,7 @@ impl XdgPrefix for XdgDataPrefixBuilder {
     }
 }
 
+#[derive(Clone)]
 struct XdgStatePrefixBuilder;
 impl XdgPrefix for XdgStatePrefixBuilder {
     fn name(&self) -> &str {
@@ -70,13 +74,14 @@ impl XdgPrefix for XdgStatePrefixBuilder {
     }
 }
 
+#[derive(Clone)]
 struct XdgPrefixBuilder<T>(T)
 where
-    T: XdgPrefix;
+    T: XdgPrefix + Clone + 'static;
 
 impl<T> builder::Builder for XdgPrefixBuilder<T>
 where
-    T: XdgPrefix,
+    T: XdgPrefix + Clone + 'static,
 {
     fn name(&self) -> String {
         self.0.name().to_owned()
@@ -94,7 +99,7 @@ where
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+pub fn commands() -> Vec<Box<dyn builder::Parser>> {
     vec![
         Box::new(XdgPrefixBuilder(XdgCachePrefixBuilder {})),
         Box::new(XdgPrefixBuilder(XdgConfigPrefixBuilder {})),

@@ -5,6 +5,7 @@ use crate::module::Module;
 use super::builder;
 use super::util::check_command;
 
+#[derive(Clone)]
 struct DeprecatedBuilder;
 
 impl builder::Builder for DeprecatedBuilder {
@@ -27,6 +28,6 @@ impl builder::Builder for DeprecatedBuilder {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+pub fn commands() -> Vec<Box<dyn builder::Parser>> {
     vec![Box::new(DeprecatedBuilder {})]
 }

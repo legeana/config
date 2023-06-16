@@ -35,6 +35,7 @@ impl Module for SymlinkTree {
     }
 }
 
+#[derive(Clone)]
 struct SymlinkTreeBuilder;
 
 impl builder::Builder for SymlinkTreeBuilder {
@@ -56,6 +57,6 @@ impl builder::Builder for SymlinkTreeBuilder {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+pub fn commands() -> Vec<Box<dyn builder::Parser>> {
     vec![Box::new(SymlinkTreeBuilder {})]
 }

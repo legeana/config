@@ -77,6 +77,7 @@ fn build(
     })))
 }
 
+#[derive(Clone)]
 struct FetchIntoBuilder;
 
 impl builder::Builder for FetchIntoBuilder {
@@ -95,6 +96,7 @@ impl builder::Builder for FetchIntoBuilder {
     }
 }
 
+#[derive(Clone)]
 struct FetchExeIntoBuilder;
 
 impl builder::Builder for FetchExeIntoBuilder {
@@ -113,7 +115,7 @@ impl builder::Builder for FetchExeIntoBuilder {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+pub fn commands() -> Vec<Box<dyn builder::Parser>> {
     vec![
         Box::new(FetchIntoBuilder {}),
         Box::new(FetchExeIntoBuilder {}),

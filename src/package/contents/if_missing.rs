@@ -49,6 +49,7 @@ impl Module for IfMissing {
     }
 }
 
+#[derive(Clone)]
 struct IfMissingBuilder;
 
 impl builder::Builder for IfMissingBuilder {
@@ -72,6 +73,6 @@ impl builder::Builder for IfMissingBuilder {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+pub fn commands() -> Vec<Box<dyn builder::Parser>> {
     vec![Box::new(IfMissingBuilder {})]
 }

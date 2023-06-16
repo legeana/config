@@ -61,6 +61,7 @@ fn build(
     })))
 }
 
+#[derive(Clone)]
 struct PostInstallExecBuilder;
 
 impl builder::Builder for PostInstallExecBuilder {
@@ -78,6 +79,7 @@ impl builder::Builder for PostInstallExecBuilder {
     }
 }
 
+#[derive(Clone)]
 struct PostInstallUpdateBuilder;
 
 impl builder::Builder for PostInstallUpdateBuilder {
@@ -96,7 +98,7 @@ impl builder::Builder for PostInstallUpdateBuilder {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+pub fn commands() -> Vec<Box<dyn builder::Parser>> {
     vec![
         Box::new(PostInstallExecBuilder {}),
         Box::new(PostInstallUpdateBuilder {}),
