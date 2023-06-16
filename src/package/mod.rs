@@ -114,6 +114,7 @@ impl Package {
             .with_context(|| format!("failed to check if {} is enabled", self.name()))?
         {
             log::info!("Skipping disabled {}", self.name());
+            log::debug!("{} is disabled: {:?}", self.name(), self.criteria);
             return Ok(());
         }
         f()

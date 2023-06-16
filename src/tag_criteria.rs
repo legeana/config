@@ -24,6 +24,7 @@ pub trait TagCriteria {
     }
 }
 
+#[derive(Debug)]
 pub struct Criteria {
     pub requires: Option<Vec<String>>,
     pub conflicts: Option<Vec<String>>,
