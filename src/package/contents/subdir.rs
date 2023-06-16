@@ -9,33 +9,19 @@ use crate::module::Module;
 use super::builder;
 use super::util;
 
-fn make_subdir(
-    state: &mut builder::State,
-    workdir: &Path,
-    subdir: &Path,
-) -> Result<Box<dyn Module>> {
-    let mut substate = builder::State {
-        enabled: true,
-        prefix: state.prefix.join(subdir),
-    };
-    let subroot = workdir.join(subdir);
-    let subconf = super::Configuration::new_sub(&mut substate, subroot)?;
-    Ok(Box::new(subconf))
-}
-
 #[derive(Debug)]
 struct SubdirBuilder {
-    workdir: PathBuf,
-    subdir: String,
+    subdir: PathBuf,
+    config: Box<dyn builder::Builder>,
 }
 
 impl builder::Builder for SubdirBuilder {
     fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
-        Ok(Some(make_subdir(
-            state,
-            &self.workdir,
-            Path::new(&self.subdir),
-        )?))
+        let mut substate = builder::State {
+            enabled: true,
+            prefix: state.prefix.join(&self.subdir),
+        };
+        self.config.build(&mut substate)
     }
 }
 
@@ -53,35 +39,27 @@ impl builder::Parser for SubdirParser {
         ", command=self.name()}
     }
     fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
-        let subdir = util::single_arg(&self.name(), args)?.to_owned();
+        let subdir = util::single_arg(&self.name(), args)?;
+        let subroot = workdir.join(subdir);
         Ok(Box::new(SubdirBuilder {
-            workdir: workdir.to_owned(),
-            subdir,
+            subdir: subdir.into(),
+            config: super::ConfigurationBuilder::parse(subroot)?,
         }))
     }
 }
 
 #[derive(Debug)]
 struct SubdirsBuilder {
-    workdir: PathBuf,
+    subdirs: Vec<SubdirBuilder>,
 }
 
 impl builder::Builder for SubdirsBuilder {
     fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         let mut modules: Vec<Box<dyn Module>> = Vec::new();
-        for entry in self
-            .workdir
-            .read_dir()
-            .with_context(|| format!("failed to read {:?}", self.workdir))?
-        {
-            let entry = entry.with_context(|| format!("failed to read {:?}", self.workdir))?;
-            let md = std::fs::metadata(entry.path())
-                .with_context(|| format!("failed to read metadata for {:?}", entry.path()))?;
-            if !md.is_dir() {
-                continue;
+        for subdir in self.subdirs.iter() {
+            if let Some(m) = subdir.build(state)? {
+                modules.push(m);
             }
-            let fname = entry.file_name();
-            modules.push(make_subdir(state, &self.workdir, Path::new(&fname))?);
         }
         Ok(Some(Box::new(modules)))
     }
@@ -102,9 +80,24 @@ impl builder::Parser for SubdirsParser {
     }
     fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         util::no_args(&self.name(), args)?;
-        Ok(Box::new(SubdirsBuilder {
-            workdir: workdir.to_owned(),
-        }))
+        let mut subdirs: Vec<SubdirBuilder> = Vec::new();
+        for entry in workdir
+            .read_dir()
+            .with_context(|| format!("failed to read {:?}", workdir))?
+        {
+            let entry = entry.with_context(|| format!("failed to read {:?}", workdir))?;
+            let md = std::fs::metadata(entry.path())
+                .with_context(|| format!("failed to read metadata for {:?}", entry.path()))?;
+            if !md.is_dir() {
+                continue;
+            }
+            let fname = entry.file_name();
+            subdirs.push(SubdirBuilder {
+                subdir: fname.into(),
+                config: super::ConfigurationBuilder::parse(entry.path())?,
+            });
+        }
+        Ok(Box::new(SubdirsBuilder { subdirs }))
     }
 }
 
