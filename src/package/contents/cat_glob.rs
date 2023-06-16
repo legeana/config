@@ -42,6 +42,33 @@ impl Module for CatGlobInto {
     }
 }
 
+#[derive(Debug)]
+struct CatGlobIntoBuilder {
+    filename: String,
+    globs: Vec<String>,
+}
+
+impl builder::Builder for CatGlobIntoBuilder {
+    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+        let current_prefix = state.prefix.dst_dir.to_str().ok_or_else(|| {
+            anyhow!(
+                "failed to represent current prefix {:?} as a string",
+                &state.prefix.dst_dir
+            )
+        })?;
+        let glob_prefix = current_prefix.to_owned() + std::path::MAIN_SEPARATOR_STR;
+        let concatenated_globs: Vec<String> =
+            self.globs.iter().map(|g| glob_prefix.clone() + g).collect();
+        let dst = state.prefix.dst_path(&self.filename);
+        let output = local_state::FileState::new(dst.clone())
+            .with_context(|| format!("failed to create FileState for {dst:?}"))?;
+        Ok(Some(Box::new(CatGlobInto {
+            globs: concatenated_globs,
+            output,
+        })))
+    }
+}
+
 #[derive(Clone)]
 struct CatGlobIntoParser;
 
@@ -55,26 +82,16 @@ impl builder::Parser for CatGlobIntoParser {
                 create filename in local storage by concatenating globs
         ", command=self.name()}
     }
-    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let (fname, globs) = util::multiple_args(&self.name(), args, 1)?;
         assert!(fname.len() == 1);
-        let filename = fname[0];
-        let current_prefix = state.prefix.dst_dir.to_str().ok_or_else(|| {
-            anyhow!(
-                "failed to represent current prefix {:?} as a string",
-                &state.prefix.dst_dir
-            )
-        })?;
-        let glob_prefix = current_prefix.to_owned() + std::path::MAIN_SEPARATOR_STR;
-        let concatenated_globs: Vec<String> =
-            globs.iter().map(|g| glob_prefix.clone() + g).collect();
-        let dst = state.prefix.dst_path(filename);
-        let output = local_state::FileState::new(dst.clone())
-            .with_context(|| format!("failed to create FileState for {dst:?}"))?;
-        Ok(Some(Box::new(CatGlobInto {
-            globs: concatenated_globs,
-            output,
-        })))
+        let filename = fname[0].to_owned();
+        let globs: Vec<_> = globs
+            .iter()
+            .map(|&s| s.to_owned())
+            //.map(String::from)
+            .collect();
+        Ok(Box::new(CatGlobIntoBuilder { filename, globs }))
     }
 }
 
