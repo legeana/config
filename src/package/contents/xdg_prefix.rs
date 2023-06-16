@@ -1,7 +1,13 @@
 use std::path::PathBuf;
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use indoc::formatdoc;
+
+#[cfg(unix)]
+use anyhow::Context;
+
+#[cfg(windows)]
+use anyhow::anyhow;
 
 use crate::module::Module;
 
@@ -30,7 +36,6 @@ impl XdgPrefix for XdgCachePrefix {
     }
     #[cfg(windows)]
     fn xdg_prefix(&self, _path: &str) -> Result<PathBuf> {
-        use anyhow::anyhow;
         Err(anyhow!("{} is not supported on Windows", self.name()))
     }
 }
@@ -51,7 +56,6 @@ impl XdgPrefix for XdgConfigPrefix {
     }
     #[cfg(windows)]
     fn xdg_prefix(&self, _path: &str) -> Result<PathBuf> {
-        use anyhow::anyhow;
         Err(anyhow!("{} is not supported on Windows", self.name()))
     }
 }
@@ -72,7 +76,6 @@ impl XdgPrefix for XdgDataPrefix {
     }
     #[cfg(windows)]
     fn xdg_prefix(&self, _path: &str) -> Result<PathBuf> {
-        use anyhow::anyhow;
         Err(anyhow!("{} is not supported on Windows", self.name()))
     }
 }
@@ -93,7 +96,6 @@ impl XdgPrefix for XdgStatePrefix {
     }
     #[cfg(windows)]
     fn xdg_prefix(&self, _path: &str) -> Result<PathBuf> {
-        use anyhow::anyhow;
         Err(anyhow!("{} is not supported on Windows", self.name()))
     }
 }
