@@ -15,15 +15,13 @@ struct PrefixNewGuard;
 
 pub struct Prefix {
     _private_constructor_helper: PrefixNewGuard,
-    pub src_dir: PathBuf,
     pub dst_dir: PathBuf,
 }
 
 impl Prefix {
-    fn new(src_dir: PathBuf) -> Self {
+    fn new() -> Self {
         Self {
             _private_constructor_helper: PrefixNewGuard,
-            src_dir,
             dst_dir: dirs::home_dir().expect("failed to determine home dir"),
         }
     }
@@ -33,12 +31,8 @@ impl Prefix {
     pub fn join<P: AsRef<Path>>(&self, subdir: P) -> Self {
         Self {
             _private_constructor_helper: PrefixNewGuard,
-            src_dir: self.src_path(subdir.as_ref()),
             dst_dir: self.dst_path(subdir.as_ref()),
         }
-    }
-    pub fn src_path<P: AsRef<Path>>(&self, path: P) -> PathBuf {
-        self.src_dir.join(path)
     }
     pub fn dst_path<P: AsRef<Path>>(&self, path: P) -> PathBuf {
         self.dst_dir.join(path)
@@ -51,10 +45,10 @@ pub struct State {
 }
 
 impl State {
-    pub fn new(src: PathBuf) -> Self {
+    pub fn new() -> Self {
         Self {
             enabled: true,
-            prefix: Prefix::new(src),
+            prefix: Prefix::new(),
         }
     }
 }

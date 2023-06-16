@@ -37,13 +37,14 @@ impl Module for SymlinkTree {
 
 #[derive(Debug)]
 struct SymlinkTreeBuilder {
+    workdir: PathBuf,
     directory: String,
 }
 
 impl builder::Builder for SymlinkTreeBuilder {
     fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         Ok(Some(Box::new(SymlinkTree {
-            src: state.prefix.src_path(&self.directory),
+            src: self.workdir.join(&self.directory),
             dst: state.prefix.dst_path(&self.directory),
         })))
     }
@@ -62,9 +63,12 @@ impl builder::Parser for SymlinkTreeParser {
                 create a symlink for every file in a directory recursively
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let directory = util::single_arg(&self.name(), args)?.to_owned();
-        Ok(Box::new(SymlinkTreeBuilder { directory }))
+        Ok(Box::new(SymlinkTreeBuilder {
+            workdir: workdir.to_owned(),
+            directory,
+        }))
     }
 }
 

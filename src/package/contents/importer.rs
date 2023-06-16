@@ -102,6 +102,7 @@ impl Module for Importer {
 
 #[derive(Debug)]
 struct ImporterBuilder {
+    workdir: PathBuf,
     filename: String,
 }
 
@@ -115,7 +116,7 @@ impl builder::Builder for ImporterBuilder {
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
         Ok(Some(Box::new(Importer {
             prefix: prefix.to_owned(),
-            src: state.prefix.src_path(&self.filename),
+            src: self.workdir.join(&self.filename),
             output,
         })))
     }
@@ -134,9 +135,12 @@ impl builder::Parser for ImporterParser {
                 create a symlink for filename in prefix to a local persistent state
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let filename = util::single_arg(&self.name(), args)?.to_owned();
-        Ok(Box::new(ImporterBuilder { filename }))
+        Ok(Box::new(ImporterBuilder {
+            workdir: workdir.to_owned(),
+            filename,
+        }))
     }
 }
 

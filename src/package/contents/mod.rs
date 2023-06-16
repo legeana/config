@@ -49,7 +49,7 @@ impl Configuration {
     }
     #[allow(clippy::new_ret_no_self)]
     pub fn new(root: PathBuf) -> Result<Box<dyn Module>> {
-        let mut state = builder::State::new(root.clone());
+        let mut state = builder::State::new();
         Self::new_sub(&mut state, root)
     }
     pub fn new_sub(state: &mut builder::State, root: PathBuf) -> Result<Box<dyn Module>> {
