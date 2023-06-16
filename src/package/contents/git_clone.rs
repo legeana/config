@@ -56,6 +56,24 @@ impl Module for GitClone {
     }
 }
 
+#[derive(Debug)]
+struct GitCloneBuilder {
+    url: String,
+    dst: String,
+}
+
+impl builder::Builder for GitCloneBuilder {
+    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+        let dst = state.prefix.dst_path(&self.dst);
+        let output = local_state::DirectoryState::new(dst.clone())
+            .with_context(|| format!("failed to create DirectoryState from {dst:?}"))?;
+        Ok(Some(Box::new(GitClone {
+            remote: git_utils::Remote::new(&self.url),
+            output,
+        })))
+    }
+}
+
 #[derive(Clone)]
 struct GitCloneParser;
 
@@ -70,15 +88,12 @@ impl builder::Parser for GitCloneParser {
                 if <branch> is specified clone <branch> instead of default HEAD
         ", command=self.name()}
     }
-    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        let (url, filename) = util::double_arg(&self.name(), args)?;
-        let dst = state.prefix.dst_path(filename);
-        let output = local_state::DirectoryState::new(dst.clone())
-            .with_context(|| format!("failed to create DirectoryState from {dst:?}"))?;
-        Ok(Some(Box::new(GitClone {
-            remote: git_utils::Remote::new(url),
-            output,
-        })))
+    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+        let (url, dst) = util::double_arg(&self.name(), args)?;
+        Ok(Box::new(GitCloneBuilder {
+            url: url.to_owned(),
+            dst: dst.to_owned(),
+        }))
     }
 }
 
