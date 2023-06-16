@@ -60,21 +60,24 @@ impl Module for FetchInto {
     }
 }
 
-fn build(
-    command: &str,
-    state: &mut builder::State,
-    args: &[&str],
+#[derive(Debug)]
+struct FetchIntoBuilder {
+    filename: String,
+    url: String,
     executable: bool,
-) -> Result<Option<Box<dyn Module>>> {
-    let (filename, url) = util::double_arg(command, args)?;
-    let dst = state.prefix.dst_path(filename);
-    let output = local_state::FileState::new(dst.clone())
-        .with_context(|| format!("failed to create FileState from {dst:?}"))?;
-    Ok(Some(Box::new(FetchInto {
-        executable,
-        url: url.to_owned(),
-        output,
-    })))
+}
+
+impl builder::Builder for FetchIntoBuilder {
+    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+        let dst = state.prefix.dst_path(&self.filename);
+        let output = local_state::FileState::new(dst.clone())
+            .with_context(|| format!("failed to create FileState from {dst:?}"))?;
+        Ok(Some(Box::new(FetchInto {
+            executable: self.executable,
+            url: self.url.clone(),
+            output,
+        })))
+    }
 }
 
 #[derive(Clone)]
@@ -91,8 +94,13 @@ impl builder::Parser for FetchIntoParser {
                 and installs a symlink to it
         ", command=self.name()}
     }
-    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        build(&self.name(), state, args, false)
+    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+        let (filename, url) = util::double_arg(&self.name(), args)?;
+        Ok(Box::new(FetchIntoBuilder {
+            filename: filename.to_owned(),
+            url: url.to_owned(),
+            executable: false,
+        }))
     }
 }
 
@@ -110,8 +118,13 @@ impl builder::Parser for FetchExeIntoParser {
                 and installs a symlink to it
         ", command=self.name()}
     }
-    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        build(&self.name(), state, args, true)
+    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+        let (filename, url) = util::double_arg(&self.name(), args)?;
+        Ok(Box::new(FetchIntoBuilder {
+            filename: filename.to_owned(),
+            url: url.to_owned(),
+            executable: true,
+        }))
     }
 }
 
