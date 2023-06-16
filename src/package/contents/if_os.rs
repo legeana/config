@@ -6,17 +6,35 @@ use super::util;
 use anyhow::Result;
 use indoc::formatdoc;
 
+// TODO: #[derive(Debug)]
+struct IfOsBuilder {
+    os: &'static str,
+    cmd: Box<dyn builder::Builder>,
+}
+
+impl IfOsBuilder {
+    fn is_os(&self) -> bool {
+        // We don't have to check this in runtime as this never changes.
+        // In fact, it's even beneficial to check this during build to support *Prefix.
+        self.os == std::env::consts::FAMILY || self.os == std::env::consts::OS
+    }
+}
+
+impl builder::Builder for IfOsBuilder {
+    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+        if !self.is_os() {
+            return Ok(None);
+        }
+        self.cmd.build(state)
+    }
+}
+
 #[derive(Clone)]
 struct IfOsParser {
     os: &'static str,
 }
 
 impl IfOsParser {
-    fn is_os(&self) -> bool {
-        // We don't have to check this in runtime as this never changes.
-        // In fact, it's even beneficial to check this during build to support *Prefix.
-        self.os == std::env::consts::FAMILY || self.os == std::env::consts::OS
-    }
     fn command(&self) -> String {
         format!("if_{}", self.os)
     }
@@ -32,13 +50,13 @@ impl builder::Parser for IfOsParser {
                 execute a MANIFEST <command> only if os (or family) is {os}
         ", os=self.os, command=self.command()}
     }
-    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let (empty, cmd_args) = util::multiple_args(&self.command(), args, 0)?;
         assert!(empty.is_empty());
-        if !self.is_os() {
-            return Ok(None);
-        }
-        builder::build(state, cmd_args)
+        Ok(Box::new(IfOsBuilder {
+            os: self.os,
+            cmd: builder::parse(cmd_args)?,
+        }))
     }
 }
 
