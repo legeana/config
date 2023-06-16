@@ -23,9 +23,15 @@ impl XdgPrefix for XdgCachePrefix {
     fn var(&self) -> &str {
         "XDG_CACHE_HOME"
     }
+    #[cfg(unix)]
     fn xdg_prefix(&self, path: &str) -> Result<PathBuf> {
         let base = xdg::BaseDirectories::new().context("failed to parse XDG_CACHE_HOME")?;
         Ok(base.get_cache_home().join(path))
+    }
+    #[cfg(windows)]
+    fn xdg_prefix(&self, _path: &str) -> Result<PathBuf> {
+        use anyhow::anyhow;
+        Err(anyhow!("{} is not supported on Windows", self.name()))
     }
 }
 
@@ -38,9 +44,15 @@ impl XdgPrefix for XdgConfigPrefix {
     fn var(&self) -> &str {
         "XDG_CONFIG_HOME"
     }
+    #[cfg(unix)]
     fn xdg_prefix(&self, path: &str) -> Result<PathBuf> {
         let base = xdg::BaseDirectories::new().context("failed to parse XDG_CONFIG_HOME")?;
         Ok(base.get_config_home().join(path))
+    }
+    #[cfg(windows)]
+    fn xdg_prefix(&self, _path: &str) -> Result<PathBuf> {
+        use anyhow::anyhow;
+        Err(anyhow!("{} is not supported on Windows", self.name()))
     }
 }
 
@@ -53,9 +65,15 @@ impl XdgPrefix for XdgDataPrefix {
     fn var(&self) -> &str {
         "XDG_DATA_HOME"
     }
+    #[cfg(unix)]
     fn xdg_prefix(&self, path: &str) -> Result<PathBuf> {
         let base = xdg::BaseDirectories::new().context("failed to parse XDG_DATA_HOME")?;
         Ok(base.get_data_home().join(path))
+    }
+    #[cfg(windows)]
+    fn xdg_prefix(&self, _path: &str) -> Result<PathBuf> {
+        use anyhow::anyhow;
+        Err(anyhow!("{} is not supported on Windows", self.name()))
     }
 }
 
@@ -68,9 +86,15 @@ impl XdgPrefix for XdgStatePrefix {
     fn var(&self) -> &str {
         "XDG_STATE_HOME"
     }
+    #[cfg(unix)]
     fn xdg_prefix(&self, path: &str) -> Result<PathBuf> {
         let base = xdg::BaseDirectories::new().context("failed to parse XDG_STATE_HOME")?;
         Ok(base.get_state_home().join(path))
+    }
+    #[cfg(windows)]
+    fn xdg_prefix(&self, _path: &str) -> Result<PathBuf> {
+        use anyhow::anyhow;
+        Err(anyhow!("{} is not supported on Windows", self.name()))
     }
 }
 
