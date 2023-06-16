@@ -85,7 +85,10 @@ pub trait Parser: BoxParserClone {
         }))
     }
     // Compatibility functions.
-    fn build(&self, state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>>;
+    fn build(&self, state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+        let builder = self.parse(args)?;
+        builder.build(state)
+    }
 }
 
 /// Builder is creates a Module or modifies State.
