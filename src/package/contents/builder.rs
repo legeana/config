@@ -66,20 +66,32 @@ pub trait Builder {
     fn build(&self, state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>>;
 }
 
+pub trait BoxParserClone {
+    fn parser_clone(&self) -> Box<dyn Parser>;
+}
+
+impl<T> BoxParserClone for T
+where
+    T: Parser + Clone + 'static,
+{
+    fn parser_clone(&self) -> Box<dyn Parser> {
+        Box::new(self.clone())
+    }
+}
+
 /// Parser transforms a statement into a Builder.
 /// This should be purely syntactical.
-pub trait Parser {
+pub trait Parser: BoxParserClone {
     fn name(&self) -> String;
     fn help(&self) -> String;
     fn parse(&self, args: &[&str]) -> Result<Box<dyn Builder2>> {
         let args: Vec<String> = args.iter().map(|s| String::from(*s)).collect();
         Ok(Box::new(CompatBuilder2 {
             args,
-            parser: self.box_clone(),
+            parser: self.parser_clone(),
         }))
     }
     // Compatibility functions.
-    fn box_clone(&self) -> Box<dyn Parser>;
     fn build(&self, state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>>;
 }
 
@@ -92,9 +104,6 @@ where
     }
     fn help(&self) -> String {
         self.help()
-    }
-    fn box_clone(&self) -> Box<dyn Parser> {
-        Box::new(self.clone())
     }
     fn build(&self, state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         self.build(state, args)
