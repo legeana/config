@@ -100,6 +100,27 @@ impl Module for Importer {
     }
 }
 
+#[derive(Debug)]
+struct ImporterBuilder {
+    filename: String,
+}
+
+impl builder::Builder for ImporterBuilder {
+    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+        let dst = state.prefix.dst_path(&self.filename);
+        let prefix = dst
+            .parent()
+            .ok_or_else(|| anyhow!("failed to get parent of {dst:?}"))?;
+        let output = local_state::FileState::new(dst.clone())
+            .with_context(|| format!("failed to create FileState for {dst:?}"))?;
+        Ok(Some(Box::new(Importer {
+            prefix: prefix.to_owned(),
+            src: state.prefix.src_path(&self.filename),
+            output,
+        })))
+    }
+}
+
 #[derive(Clone)]
 struct ImporterParser;
 
@@ -113,19 +134,9 @@ impl builder::Parser for ImporterParser {
                 create a symlink for filename in prefix to a local persistent state
         ", command=self.name()}
     }
-    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        let filename = util::single_arg(&self.name(), args)?;
-        let dst = state.prefix.dst_path(filename);
-        let prefix = dst
-            .parent()
-            .ok_or_else(|| anyhow!("failed to get parent of {dst:?}"))?;
-        let output = local_state::FileState::new(dst.clone())
-            .with_context(|| format!("failed to create FileState for {dst:?}"))?;
-        Ok(Some(Box::new(Importer {
-            prefix: prefix.to_owned(),
-            src: state.prefix.src_path(filename),
-            output,
-        })))
+    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+        let filename = util::single_arg(&self.name(), args)?.to_owned();
+        Ok(Box::new(ImporterBuilder { filename }))
     }
 }
 
