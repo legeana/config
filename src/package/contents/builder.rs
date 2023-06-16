@@ -59,22 +59,9 @@ impl State {
     }
 }
 
-pub trait BoxParserClone {
-    fn parser_clone(&self) -> Box<dyn Parser>;
-}
-
-impl<T> BoxParserClone for T
-where
-    T: Parser + Clone + 'static,
-{
-    fn parser_clone(&self) -> Box<dyn Parser> {
-        Box::new(self.clone())
-    }
-}
-
 /// Parser transforms a statement into a Builder.
 /// This should be purely syntactical.
-pub trait Parser: BoxParserClone {
+pub trait Parser {
     fn name(&self) -> String;
     fn help(&self) -> String;
     fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn Builder>>;
