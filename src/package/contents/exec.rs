@@ -10,9 +10,6 @@ use super::util;
 use anyhow::Result;
 use indoc::formatdoc;
 
-struct PostInstallExecBuilder;
-struct PostInstallUpdateBuilder;
-
 #[derive(PartialEq)]
 enum ExecCondition {
     Always,
@@ -64,6 +61,8 @@ fn build(
     })))
 }
 
+struct PostInstallExecBuilder;
+
 impl builder::Builder for PostInstallExecBuilder {
     fn name(&self) -> String {
         "post_install_exec".to_owned()
@@ -78,6 +77,8 @@ impl builder::Builder for PostInstallExecBuilder {
         build(ExecCondition::Always, &self.name(), state, args)
     }
 }
+
+struct PostInstallUpdateBuilder;
 
 impl builder::Builder for PostInstallUpdateBuilder {
     fn name(&self) -> String {

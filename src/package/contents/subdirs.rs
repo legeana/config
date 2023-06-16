@@ -6,7 +6,7 @@ use crate::module::Module;
 use super::builder;
 use super::util;
 
-pub struct SubdirsBuilder;
+struct SubdirsBuilder;
 
 impl builder::Builder for SubdirsBuilder {
     fn name(&self) -> String {
@@ -48,4 +48,8 @@ impl builder::Builder for SubdirsBuilder {
         }
         Ok(Some(Box::new(modules)))
     }
+}
+
+pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+    vec![Box::new(SubdirsBuilder {})]
 }

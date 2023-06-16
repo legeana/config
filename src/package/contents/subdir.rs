@@ -6,7 +6,7 @@ use crate::module::Module;
 use super::builder;
 use super::util;
 
-pub struct SubdirBuilder;
+struct SubdirBuilder;
 
 impl builder::Builder for SubdirBuilder {
     fn name(&self) -> String {
@@ -28,4 +28,8 @@ impl builder::Builder for SubdirBuilder {
         let subconf = super::Configuration::new_sub(&mut substate, subroot)?;
         Ok(Some(Box::new(subconf)))
     }
+}
+
+pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+    vec![Box::new(SubdirBuilder {})]
 }

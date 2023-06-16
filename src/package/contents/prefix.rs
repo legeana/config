@@ -6,7 +6,7 @@ use crate::module::Module;
 use super::builder;
 use super::util;
 
-pub struct PrefixBuilder;
+struct PrefixBuilder;
 
 impl builder::Builder for PrefixBuilder {
     fn name(&self) -> String {
@@ -23,4 +23,8 @@ impl builder::Builder for PrefixBuilder {
         state.prefix.set(shellexpand::tilde(prefix).as_ref().into());
         Ok(None)
     }
+}
+
+pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+    vec![Box::new(PrefixBuilder {})]
 }

@@ -11,8 +11,6 @@ use anyhow::{anyhow, Context, Result};
 use glob::glob as glob_iter;
 use indoc::formatdoc;
 
-pub struct CatGlobIntoBuilder;
-
 struct CatGlobInto {
     globs: Vec<String>,
     output: local_state::FileState,
@@ -43,6 +41,8 @@ impl Module for CatGlobInto {
         Ok(())
     }
 }
+
+struct CatGlobIntoBuilder;
 
 impl builder::Builder for CatGlobIntoBuilder {
     fn name(&self) -> String {
@@ -75,4 +75,8 @@ impl builder::Builder for CatGlobIntoBuilder {
             output,
         })))
     }
+}
+
+pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+    vec![Box::new(CatGlobIntoBuilder {})]
 }

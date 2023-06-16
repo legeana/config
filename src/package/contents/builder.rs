@@ -68,37 +68,30 @@ pub trait Builder {
 fn builders() -> Vec<Box<dyn Builder>> {
     let result: Vec<Vec<Box<dyn Builder>>> = vec![
         // MANIFEST.
-        vec![
-            Box::new(super::subdir::SubdirBuilder {}),
-            Box::new(super::subdirs::SubdirsBuilder {}),
-            Box::new(super::prefix::PrefixBuilder {}),
-        ],
+        super::subdir::commands(),
+        super::subdirs::commands(),
+        super::prefix::commands(),
         super::xdg_prefix::commands(),
         super::tags::commands(),
         // Files.
         super::symlink::commands(),
-        vec![
-            Box::new(super::symlink_tree::SymlinkTreeBuilder {}),
-            Box::new(super::mkdir::MkDirBuilder {}),
-            Box::new(super::copy::CopyBuilder {}),
-            Box::new(super::output_file::OutputFileBuilder {}),
-            Box::new(super::cat_glob::CatGlobIntoBuilder {}),
-            Box::new(super::set_contents::SetContentsBuilder {}),
-            Box::new(super::importer::ImporterBuilder {}),
-        ],
+        super::symlink_tree::commands(),
+        super::mkdir::commands(),
+        super::copy::commands(),
+        super::output_file::commands(),
+        super::cat_glob::commands(),
+        super::set_contents::commands(),
+        super::importer::commands(),
         // Downloads.
-        vec![
-            Box::new(super::fetch::FetchIntoBuilder {}),
-            Box::new(super::fetch::FetchExeIntoBuilder {}),
-            Box::new(super::git_clone::GitCloneBuilder {}),
-        ],
+        super::fetch::commands(),
+        super::git_clone::commands(),
         // Exec.
         super::exec::commands(),
         // Control.
-        vec![Box::new(super::if_missing::IfMissingBuilder {})],
+        super::if_missing::commands(),
         super::if_os::commands(),
         // Deprecation.
-        vec![Box::new(super::deprecated::DeprecatedBuilder {})],
+        super::deprecated::commands(),
     ];
     result.into_iter().flatten().collect()
 }

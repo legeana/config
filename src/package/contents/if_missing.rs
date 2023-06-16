@@ -8,8 +8,6 @@ use super::util;
 use anyhow::{Context, Result};
 use indoc::formatdoc;
 
-pub struct IfMissingBuilder;
-
 struct IfMissing {
     path: PathBuf,
     cmd: Box<dyn Module>,
@@ -51,6 +49,8 @@ impl Module for IfMissing {
     }
 }
 
+struct IfMissingBuilder;
+
 impl builder::Builder for IfMissingBuilder {
     fn name(&self) -> String {
         "if_missing".to_owned()
@@ -70,4 +70,8 @@ impl builder::Builder for IfMissingBuilder {
             None => Ok(None),
         }
     }
+}
+
+pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+    vec![Box::new(IfMissingBuilder {})]
 }

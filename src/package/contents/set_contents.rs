@@ -8,8 +8,6 @@ use super::builder;
 use super::local_state;
 use super::util;
 
-pub struct SetContentsBuilder;
-
 struct SetContents {
     output: local_state::FileState,
     contents: String,
@@ -32,6 +30,8 @@ impl Module for SetContents {
     }
 }
 
+struct SetContentsBuilder;
+
 impl builder::Builder for SetContentsBuilder {
     fn name(&self) -> String {
         "set_contents".to_owned()
@@ -52,4 +52,8 @@ impl builder::Builder for SetContentsBuilder {
             contents: contents.to_owned(),
         })))
     }
+}
+
+pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+    vec![Box::new(SetContentsBuilder {})]
 }

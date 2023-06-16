@@ -13,8 +13,6 @@ use anyhow::{anyhow, Context, Result};
 use indoc::formatdoc;
 use walkdir::WalkDir;
 
-pub struct ImporterBuilder;
-
 struct Importer {
     prefix: PathBuf,
     src: PathBuf,
@@ -102,6 +100,8 @@ impl Module for Importer {
     }
 }
 
+struct ImporterBuilder;
+
 impl builder::Builder for ImporterBuilder {
     fn name(&self) -> String {
         "import_from".to_owned()
@@ -126,4 +126,8 @@ impl builder::Builder for ImporterBuilder {
             output,
         })))
     }
+}
+
+pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+    vec![Box::new(ImporterBuilder {})]
 }

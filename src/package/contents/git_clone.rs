@@ -9,8 +9,6 @@ use super::builder;
 use super::local_state;
 use super::util;
 
-pub struct GitCloneBuilder;
-
 struct GitClone {
     remote: git_utils::Remote,
     output: local_state::DirectoryState,
@@ -58,6 +56,8 @@ impl Module for GitClone {
     }
 }
 
+struct GitCloneBuilder;
+
 impl builder::Builder for GitCloneBuilder {
     fn name(&self) -> String {
         "git_clone".to_owned()
@@ -79,4 +79,8 @@ impl builder::Builder for GitCloneBuilder {
             output,
         })))
     }
+}
+
+pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+    vec![Box::new(GitCloneBuilder {})]
 }

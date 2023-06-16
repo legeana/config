@@ -8,8 +8,6 @@ use crate::registry::Registry;
 use super::builder;
 use super::local_state;
 
-pub struct OutputFileBuilder {}
-
 struct OutputFile {
     output: local_state::FileState,
 }
@@ -19,6 +17,8 @@ impl Module for OutputFile {
         self.output.install(rules, registry)
     }
 }
+
+struct OutputFileBuilder;
 
 impl builder::Builder for OutputFileBuilder {
     fn name(&self) -> String {
@@ -37,4 +37,8 @@ impl builder::Builder for OutputFileBuilder {
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
         Ok(Some(Box::new(OutputFile { output })))
     }
+}
+
+pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+    vec![Box::new(OutputFileBuilder {})]
 }

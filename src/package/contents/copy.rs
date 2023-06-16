@@ -10,8 +10,6 @@ use super::util;
 use anyhow::{Context, Result};
 use indoc::formatdoc;
 
-pub struct CopyBuilder;
-
 struct Copy {
     src: PathBuf,
     output: local_state::FileState,
@@ -34,6 +32,8 @@ impl Module for Copy {
     }
 }
 
+struct CopyBuilder;
+
 impl builder::Builder for CopyBuilder {
     fn name(&self) -> String {
         "copy".to_owned()
@@ -54,4 +54,8 @@ impl builder::Builder for CopyBuilder {
             output,
         })))
     }
+}
+
+pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+    vec![Box::new(CopyBuilder {})]
 }

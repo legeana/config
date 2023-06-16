@@ -11,8 +11,6 @@ use anyhow::{Context, Result};
 use indoc::formatdoc;
 use walkdir::WalkDir;
 
-pub struct SymlinkTreeBuilder;
-
 struct SymlinkTree {
     src: PathBuf,
     dst: PathBuf,
@@ -37,6 +35,8 @@ impl Module for SymlinkTree {
     }
 }
 
+struct SymlinkTreeBuilder;
+
 impl builder::Builder for SymlinkTreeBuilder {
     fn name(&self) -> String {
         "symlink_tree".to_owned()
@@ -54,4 +54,8 @@ impl builder::Builder for SymlinkTreeBuilder {
             dst: state.prefix.dst_path(filename),
         })))
     }
+}
+
+pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+    vec![Box::new(SymlinkTreeBuilder {})]
 }

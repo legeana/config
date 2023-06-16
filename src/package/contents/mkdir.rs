@@ -9,8 +9,6 @@ use super::util;
 use anyhow::{Context, Result};
 use indoc::formatdoc;
 
-pub struct MkDirBuilder;
-
 struct MkDir {
     dst: PathBuf,
 }
@@ -25,6 +23,8 @@ impl Module for MkDir {
         Ok(())
     }
 }
+
+struct MkDirBuilder;
 
 impl builder::Builder for MkDirBuilder {
     fn name(&self) -> String {
@@ -42,4 +42,8 @@ impl builder::Builder for MkDirBuilder {
             dst: state.prefix.dst_path(filename),
         })))
     }
+}
+
+pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+    vec![Box::new(MkDirBuilder {})]
 }

@@ -5,7 +5,7 @@ use crate::module::Module;
 use super::builder;
 use super::util::check_command;
 
-pub struct DeprecatedBuilder;
+struct DeprecatedBuilder;
 
 impl builder::Builder for DeprecatedBuilder {
     fn name(&self) -> String {
@@ -25,4 +25,8 @@ impl builder::Builder for DeprecatedBuilder {
         check_command(&self.name(), args).map(|_| ())?;
         Ok(None)
     }
+}
+
+pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+    vec![Box::new(DeprecatedBuilder {})]
 }

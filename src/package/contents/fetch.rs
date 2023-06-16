@@ -8,9 +8,6 @@ use super::builder;
 use super::local_state;
 use super::util;
 
-pub struct FetchIntoBuilder;
-pub struct FetchExeIntoBuilder;
-
 struct FetchInto {
     executable: bool,
     url: String,
@@ -80,6 +77,8 @@ fn build(
     })))
 }
 
+struct FetchIntoBuilder;
+
 impl builder::Builder for FetchIntoBuilder {
     fn name(&self) -> String {
         "fetch_into".to_owned()
@@ -96,6 +95,8 @@ impl builder::Builder for FetchIntoBuilder {
     }
 }
 
+struct FetchExeIntoBuilder;
+
 impl builder::Builder for FetchExeIntoBuilder {
     fn name(&self) -> String {
         "fetch_exe_into".to_owned()
@@ -110,4 +111,11 @@ impl builder::Builder for FetchExeIntoBuilder {
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         build(&self.name(), state, args, true)
     }
+}
+
+pub fn commands() -> Vec<Box<dyn builder::Builder>> {
+    vec![
+        Box::new(FetchIntoBuilder {}),
+        Box::new(FetchExeIntoBuilder {}),
+    ]
 }

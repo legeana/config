@@ -8,7 +8,6 @@ use super::builder;
 use super::util;
 
 struct RequiresBuilder;
-struct ConflictsBuilder;
 
 impl builder::Builder for RequiresBuilder {
     fn name(&self) -> String {
@@ -32,6 +31,8 @@ impl builder::Builder for RequiresBuilder {
         Ok(None)
     }
 }
+
+struct ConflictsBuilder;
 
 impl builder::Builder for ConflictsBuilder {
     fn name(&self) -> String {

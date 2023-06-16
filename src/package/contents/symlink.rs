@@ -10,9 +10,6 @@ use super::builder;
 use super::file_util;
 use super::util;
 
-struct SymlinkBuilder;
-struct SymlinkToBuilder;
-
 struct Symlink {
     src: PathBuf,
     dst: PathBuf,
@@ -23,6 +20,8 @@ impl Module for Symlink {
         file_util::make_symlink(registry, &self.src, &self.dst)
     }
 }
+
+struct SymlinkBuilder;
 
 impl builder::Builder for SymlinkBuilder {
     fn name(&self) -> String {
@@ -42,6 +41,8 @@ impl builder::Builder for SymlinkBuilder {
         })))
     }
 }
+
+struct SymlinkToBuilder;
 
 impl builder::Builder for SymlinkToBuilder {
     fn name(&self) -> String {
