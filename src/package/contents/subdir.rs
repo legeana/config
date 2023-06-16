@@ -1,10 +1,22 @@
-use anyhow::{anyhow, Context, Result};
+use std::path::Path;
+
+use anyhow::{Context, Result};
 use indoc::formatdoc;
 
 use crate::module::Module;
 
 use super::builder;
 use super::util;
+
+fn make_subdir(state: &mut builder::State, subdir: &Path) -> Result<Box<dyn Module>> {
+    let mut substate = builder::State {
+        enabled: true,
+        prefix: state.prefix.join(subdir),
+    };
+    let subroot = substate.prefix.src_dir.clone();
+    let subconf = super::Configuration::new_sub(&mut substate, subroot)?;
+    Ok(Box::new(subconf))
+}
 
 struct SubdirBuilder;
 
@@ -20,13 +32,7 @@ impl builder::Builder for SubdirBuilder {
     }
     fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let subdir = util::single_arg(&self.name(), args)?;
-        let mut substate = builder::State {
-            enabled: true,
-            prefix: state.prefix.join(subdir),
-        };
-        let subroot = substate.prefix.src_dir.clone();
-        let subconf = super::Configuration::new_sub(&mut substate, subroot)?;
-        Ok(Some(Box::new(subconf)))
+        Ok(Some(make_subdir(state, Path::new(subdir))?))
     }
 }
 
@@ -59,16 +65,7 @@ impl builder::Builder for SubdirsBuilder {
                 continue;
             }
             let fname = entry.file_name();
-            let subdir = fname
-                .to_str()
-                .ok_or_else(|| anyhow!("failed to parse {:?}", fname))?;
-            let subroot = entry.path();
-            let mut substate = builder::State {
-                enabled: true,
-                prefix: state.prefix.join(subdir),
-            };
-            let subconf = super::Configuration::new_sub(&mut substate, subroot)?;
-            modules.push(Box::new(subconf));
+            modules.push(make_subdir(state, Path::new(&fname))?);
         }
         Ok(Some(Box::new(modules)))
     }
