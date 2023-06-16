@@ -5,6 +5,15 @@ use crate::module::Module;
 use super::builder;
 use super::util::check_command;
 
+#[derive(Debug)]
+struct NoOpBuilder;
+
+impl builder::Builder for NoOpBuilder {
+    fn build(&self, _state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+        Ok(None)
+    }
+}
+
 #[derive(Clone)]
 struct DeprecatedParser;
 
@@ -15,7 +24,7 @@ impl builder::Parser for DeprecatedParser {
     fn help(&self) -> String {
         "DEPRECATED: N/A".to_owned()
     }
-    fn build(&self, _state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
+    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         /*if check_command("<deprecated>", args).is_ok() {
             log::warn!(
                 "{:?}: <deprecated> is unsupported",
@@ -24,7 +33,7 @@ impl builder::Parser for DeprecatedParser {
             return Ok(());
         }*/
         check_command(&self.name(), args).map(|_| ())?;
-        Ok(None)
+        Ok(Box::new(NoOpBuilder {}))
     }
 }
 
