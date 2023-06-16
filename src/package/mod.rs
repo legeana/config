@@ -91,7 +91,7 @@ impl Package {
                 conflicts: pkgconfig.conflicts,
             },
             modules: vec![
-                Box::new(configuration),
+                configuration,
                 Box::new(ansible_playbooks),
                 Box::new(system_dependency),
                 Box::new(user_dependency),

@@ -25,8 +25,9 @@ mod xdg_prefix;
 use core::fmt;
 use std::path::PathBuf;
 
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Context, Result};
 
+use crate::package::contents::builder::Builder;
 use crate::package::{Module, Rules};
 use crate::registry::Registry;
 
@@ -40,30 +41,21 @@ pub struct Configuration {
 }
 
 impl Configuration {
-    pub fn new_empty(root: PathBuf) -> Self {
-        Self {
+    pub fn new_empty(root: PathBuf) -> Box<dyn Module> {
+        Box::new(Self {
             root,
             modules: Vec::default(),
-        }
+        })
     }
-    pub fn new(root: PathBuf) -> Result<Self> {
+    #[allow(clippy::new_ret_no_self)]
+    pub fn new(root: PathBuf) -> Result<Box<dyn Module>> {
         let mut state = builder::State::new(root.clone());
         Self::new_sub(&mut state, root)
     }
-    pub fn new_sub(state: &mut builder::State, root: PathBuf) -> Result<Self> {
-        let manifest = root.join(MANIFEST);
-        let builders =
-            parser::parse(&manifest).with_context(|| format!("failed to load {manifest:?}"))?;
-        let mut modules: Vec<_> = Vec::new();
-        for builder in builders.iter() {
-            if !state.enabled {
-                break;
-            }
-            if let Some(module) = builder.build(state)? {
-                modules.push(module);
-            }
-        }
-        Ok(Self { root, modules })
+    pub fn new_sub(state: &mut builder::State, root: PathBuf) -> Result<Box<dyn Module>> {
+        ConfigurationBuilder::parse(root)?
+            .build(state)?
+            .ok_or_else(|| anyhow!("failed to unwrap Configuration"))
     }
 }
 
@@ -88,5 +80,40 @@ impl Module for Configuration {
 impl fmt::Display for Configuration {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.root.display())
+    }
+}
+
+#[derive(Debug)]
+struct ConfigurationBuilder {
+    root: PathBuf,
+    builders: Vec<Box<dyn builder::Builder>>,
+}
+
+impl Builder for ConfigurationBuilder {
+    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+        let mut modules: Vec<_> = Vec::new();
+        for builder in self.builders.iter() {
+            if !state.enabled {
+                break;
+            }
+            if let Some(module) = builder.build(state)? {
+                modules.push(module);
+            }
+        }
+        Ok(Some(Box::new(Configuration {
+            root: self.root.clone(),
+            modules,
+        })))
+    }
+}
+
+// Analogous to builder::Parser, but can only be called from code.
+impl ConfigurationBuilder {
+    // TODO: this is different from Parser::parse() that doesn't carry path.
+    pub fn parse(root: PathBuf) -> Result<Box<dyn Builder>> {
+        let manifest = root.join(MANIFEST);
+        let builders =
+            parser::parse(&manifest).with_context(|| format!("failed to load {manifest:?}"))?;
+        Ok(Box::new(ConfigurationBuilder { root, builders }))
     }
 }
