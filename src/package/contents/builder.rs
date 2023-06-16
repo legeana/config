@@ -77,13 +77,7 @@ where
 pub trait Parser: BoxParserClone {
     fn name(&self) -> String;
     fn help(&self) -> String;
-    fn parse(&self, args: &[&str]) -> Result<Box<dyn Builder>> {
-        let args: Vec<String> = args.iter().map(|s| String::from(*s)).collect();
-        Ok(Box::new(CompatBuilder {
-            args,
-            parser: self.parser_clone(),
-        }))
-    }
+    fn parse(&self, args: &[&str]) -> Result<Box<dyn Builder>>;
     // Compatibility functions.
     fn build(&self, state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
         let builder = self.parse(args)?;
@@ -94,18 +88,6 @@ pub trait Parser: BoxParserClone {
 /// Builder is creates a Module or modifies State.
 pub trait Builder {
     fn build(&self, state: &mut State) -> Result<Option<Box<dyn Module>>>;
-}
-
-struct CompatBuilder {
-    args: Vec<String>,
-    parser: Box<dyn Parser>,
-}
-
-impl Builder for CompatBuilder {
-    fn build(&self, state: &mut State) -> Result<Option<Box<dyn Module>>> {
-        let args: Vec<_> = self.args.iter().map(String::as_str).collect();
-        self.parser.build(state, &args)
-    }
 }
 
 fn parsers() -> Vec<Box<dyn Parser>> {
