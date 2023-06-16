@@ -10,7 +10,7 @@ use super::util;
 use anyhow::Result;
 use indoc::formatdoc;
 
-#[derive(PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 enum ExecCondition {
     Always,
     UpdateOnly,
@@ -40,25 +40,28 @@ impl Module for PostInstallExec {
     }
 }
 
-fn build(
+#[derive(Debug)]
+struct PostInstallBuilder {
     exec_condition: ExecCondition,
-    command_name: &str,
-    state: &mut builder::State,
-    args: &[&str],
-) -> Result<Option<Box<dyn Module>>> {
-    let (command, args) = util::multiple_args(command_name, args, 1)?;
-    assert!(command.len() == 1);
-    let args: Vec<String> = args
-        .iter()
-        .map(shellexpand::tilde)
-        .map(String::from)
-        .collect();
-    Ok(Some(Box::new(PostInstallExec {
-        exec_condition,
-        current_dir: state.prefix.dst_dir.clone(),
-        cmd: command[0].to_owned(),
-        args,
-    })))
+    cmd: String,
+    args: Vec<String>,
+}
+
+impl builder::Builder for PostInstallBuilder {
+    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+        let args: Vec<String> = self
+            .args
+            .iter()
+            .map(shellexpand::tilde)
+            .map(String::from)
+            .collect();
+        Ok(Some(Box::new(PostInstallExec {
+            exec_condition: self.exec_condition.clone(),
+            current_dir: state.prefix.dst_dir.clone(),
+            cmd: self.cmd.clone(),
+            args,
+        })))
+    }
 }
 
 #[derive(Clone)]
@@ -74,8 +77,14 @@ impl builder::Parser for PostInstallExecParser {
                 execute a command in a post-install phase
         ", command=self.name()}
     }
-    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        build(ExecCondition::Always, &self.name(), state, args)
+    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+        let (command, args) = util::multiple_args(&self.name(), args, 1)?;
+        assert!(command.len() == 1);
+        Ok(Box::new(PostInstallBuilder {
+            exec_condition: ExecCondition::Always,
+            cmd: command[0].to_owned(),
+            args: args.iter().map(|&s| s.to_owned()).collect(),
+        }))
     }
 }
 
@@ -93,8 +102,14 @@ impl builder::Parser for PostInstallUpdateParser {
                 only if executed via 'setup update' command
         ", command=self.name()}
     }
-    fn build(&self, state: &mut builder::State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        build(ExecCondition::UpdateOnly, &self.name(), state, args)
+    fn parse(&self, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+        let (command, args) = util::multiple_args(&self.name(), args, 1)?;
+        assert!(command.len() == 1);
+        Ok(Box::new(PostInstallBuilder {
+            exec_condition: ExecCondition::UpdateOnly,
+            cmd: command[0].to_owned(),
+            args: args.iter().map(|&s| s.to_owned()).collect(),
+        }))
     }
 }
 
