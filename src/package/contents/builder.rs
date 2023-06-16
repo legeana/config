@@ -78,11 +78,6 @@ pub trait Parser: BoxParserClone {
     fn name(&self) -> String;
     fn help(&self) -> String;
     fn parse(&self, args: &[&str]) -> Result<Box<dyn Builder>>;
-    // Compatibility functions.
-    fn build(&self, state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-        let builder = self.parse(args)?;
-        builder.build(state)
-    }
 }
 
 /// Builder is creates a Module or modifies State.
@@ -150,14 +145,6 @@ pub fn parse(args: &[&str]) -> Result<Box<dyn Builder>> {
             matched.iter().map(|(parser, _)| parser).collect::<Vec<_>>(),
         )),
     }
-}
-
-// TODO: remove
-pub fn build(state: &mut State, args: &[&str]) -> Result<Option<Box<dyn Module>>> {
-    if !state.enabled {
-        return Ok(None);
-    }
-    parse(args)?.build(state)
 }
 
 pub fn help() -> String {

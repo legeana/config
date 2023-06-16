@@ -53,8 +53,17 @@ impl Configuration {
     }
     pub fn new_sub(state: &mut builder::State, root: PathBuf) -> Result<Self> {
         let manifest = root.join(MANIFEST);
-        let modules = parser::parse(state, &manifest)
-            .with_context(|| format!("failed to load {manifest:?}"))?;
+        let builders =
+            parser::parse(&manifest).with_context(|| format!("failed to load {manifest:?}"))?;
+        let mut modules: Vec<_> = Vec::new();
+        for builder in builders.iter() {
+            if !state.enabled {
+                break;
+            }
+            if let Some(module) = builder.build(state)? {
+                modules.push(module);
+            }
+        }
         Ok(Self { root, modules })
     }
 }
