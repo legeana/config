@@ -15,9 +15,7 @@ struct PrefixBuilder {
 
 impl builder::Builder for PrefixBuilder {
     fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
-        state
-            .prefix
-            .set(shellexpand::tilde(&self.prefix).as_ref().into());
+        state.prefix = shellexpand::tilde(&self.prefix).as_ref().into();
         Ok(None)
     }
 }

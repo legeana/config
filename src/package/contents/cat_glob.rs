@@ -51,16 +51,16 @@ struct CatGlobIntoBuilder {
 
 impl builder::Builder for CatGlobIntoBuilder {
     fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
-        let current_prefix = state.prefix.dst_dir.to_str().ok_or_else(|| {
+        let current_prefix = state.prefix.to_str().ok_or_else(|| {
             anyhow!(
                 "failed to represent current prefix {:?} as a string",
-                &state.prefix.dst_dir
+                &state.prefix
             )
         })?;
         let glob_prefix = current_prefix.to_owned() + std::path::MAIN_SEPARATOR_STR;
         let concatenated_globs: Vec<String> =
             self.globs.iter().map(|g| glob_prefix.clone() + g).collect();
-        let dst = state.prefix.dst_path(&self.filename);
+        let dst = state.dst_path(&self.filename);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
         Ok(Some(Box::new(CatGlobInto {

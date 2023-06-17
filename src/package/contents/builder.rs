@@ -11,45 +11,20 @@ pub enum Error {
     UnsupportedCommand { builder: String, command: String },
 }
 
-struct PrefixNewGuard;
-
-pub struct Prefix {
-    _private_constructor_helper: PrefixNewGuard,
-    pub dst_dir: PathBuf,
-}
-
-impl Prefix {
-    fn new() -> Self {
-        Self {
-            _private_constructor_helper: PrefixNewGuard,
-            dst_dir: dirs::home_dir().expect("failed to determine home dir"),
-        }
-    }
-    pub fn set(&mut self, dst_dir: PathBuf) {
-        self.dst_dir = dst_dir;
-    }
-    pub fn join<P: AsRef<Path>>(&self, subdir: P) -> Self {
-        Self {
-            _private_constructor_helper: PrefixNewGuard,
-            dst_dir: self.dst_path(subdir.as_ref()),
-        }
-    }
-    pub fn dst_path<P: AsRef<Path>>(&self, path: P) -> PathBuf {
-        self.dst_dir.join(path)
-    }
-}
-
 pub struct State {
     pub enabled: bool,
-    pub prefix: Prefix,
+    pub prefix: PathBuf,
 }
 
 impl State {
     pub fn new() -> Self {
         Self {
             enabled: true,
-            prefix: Prefix::new(),
+            prefix: dirs::home_dir().expect("failed to determine home dir"),
         }
+    }
+    pub fn dst_path<P: AsRef<Path>>(&self, path: P) -> PathBuf {
+        self.prefix.join(path)
     }
 }
 

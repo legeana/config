@@ -108,7 +108,7 @@ struct ImporterBuilder {
 
 impl builder::Builder for ImporterBuilder {
     fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
-        let dst = state.prefix.dst_path(&self.filename);
+        let dst = state.dst_path(&self.filename);
         let prefix = dst
             .parent()
             .ok_or_else(|| anyhow!("failed to get parent of {dst:?}"))?;

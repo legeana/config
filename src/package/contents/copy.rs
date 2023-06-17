@@ -40,7 +40,7 @@ struct CopyBuilder {
 
 impl builder::Builder for CopyBuilder {
     fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
-        let dst = state.prefix.dst_path(&self.filename);
+        let dst = state.dst_path(&self.filename);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
         Ok(Some(Box::new(Copy {

@@ -45,7 +45,7 @@ impl builder::Builder for SymlinkTreeBuilder {
     fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         Ok(Some(Box::new(SymlinkTree {
             src: self.workdir.join(&self.directory),
-            dst: state.prefix.dst_path(&self.directory),
+            dst: state.dst_path(&self.directory),
         })))
     }
 }

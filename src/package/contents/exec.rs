@@ -57,7 +57,7 @@ impl builder::Builder for PostInstallBuilder {
             .collect();
         Ok(Some(Box::new(PostInstallExec {
             exec_condition: self.exec_condition.clone(),
-            current_dir: state.prefix.dst_dir.clone(),
+            current_dir: state.prefix.clone(),
             cmd: self.cmd.clone(),
             args,
         })))

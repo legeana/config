@@ -32,7 +32,7 @@ impl builder::Builder for SymlinkBuilder {
     fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         Ok(Some(Box::new(Symlink {
             src: self.workdir.join(&self.src),
-            dst: state.prefix.dst_path(&self.dst),
+            dst: state.dst_path(&self.dst),
         })))
     }
 }

@@ -40,7 +40,7 @@ struct SetContentsBuilder {
 
 impl builder::Builder for SetContentsBuilder {
     fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
-        let dst = state.prefix.dst_path(&self.filename);
+        let dst = state.dst_path(&self.filename);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
         Ok(Some(Box::new(SetContents {

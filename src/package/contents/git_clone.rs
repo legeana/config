@@ -66,7 +66,7 @@ struct GitCloneBuilder {
 
 impl builder::Builder for GitCloneBuilder {
     fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
-        let dst = state.prefix.dst_path(&self.dst);
+        let dst = state.dst_path(&self.dst);
         let output = local_state::DirectoryState::new(dst.clone())
             .with_context(|| format!("failed to create DirectoryState from {dst:?}"))?;
         Ok(Some(Box::new(GitClone {

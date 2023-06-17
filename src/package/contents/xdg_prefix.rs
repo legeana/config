@@ -115,7 +115,7 @@ where
     T: XdgPrefix + Clone + 'static,
 {
     fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
-        state.prefix.set(self.prefix.xdg_prefix(&self.path)?);
+        state.prefix = self.prefix.xdg_prefix(&self.path)?;
         Ok(None)
     }
 }

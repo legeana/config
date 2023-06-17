@@ -22,7 +22,7 @@ impl builder::Builder for DirsPrefixBuilder {
             .base_dir
             .as_ref()
             .ok_or_else(|| anyhow!("{} is not supported", self.command))?;
-        state.prefix.set(base_dir.join(&self.subdir));
+        state.prefix = base_dir.join(&self.subdir);
         Ok(None)
     }
 }

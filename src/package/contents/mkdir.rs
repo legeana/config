@@ -32,7 +32,7 @@ struct MkDirBuilder {
 impl builder::Builder for MkDirBuilder {
     fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         Ok(Some(Box::new(MkDir {
-            dst: state.prefix.dst_path(&self.dir),
+            dst: state.dst_path(&self.dir),
         })))
     }
 }
