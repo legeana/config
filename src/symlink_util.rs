@@ -1,6 +1,8 @@
 use std::fs;
-use std::io::Result;
+use std::io;
 use std::path::Path;
+
+use anyhow::{anyhow, Context, Result};
 
 pub struct Metadata {
     metadata: fs::Metadata,
@@ -43,8 +45,22 @@ impl From<fs::Metadata> for Metadata {
     }
 }
 
-#[allow(dead_code)]  // This is a good usage example.
-pub fn metadata(path: &Path) -> Result<Metadata> {
+pub fn metadata(path: &Path) -> io::Result<Metadata> {
     let metadata = path.symlink_metadata()?;
     Ok(metadata.into())
+}
+
+/// Remove path if it is a symlink.
+pub fn remove(path: &Path) -> Result<()> {
+    let md: Metadata =
+        metadata(path).with_context(|| format!("failed to get {path:?} metadata"))?;
+    if md.is_symlink_file() {
+        fs::remove_file(path)?;
+        Ok(())
+    } else if md.is_symlink_dir() {
+        fs::remove_dir(path)?;
+        Ok(())
+    } else {
+        Err(anyhow!("{path:?} is not a symlink"))
+    }
 }

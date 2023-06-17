@@ -13,7 +13,7 @@ impl IsNotFound for io::Error {
 impl IsNotFound for anyhow::Error {
     fn is_not_found(&self) -> bool {
         match self.downcast_ref::<io::Error>() {
-            Some(err) =>  err.is_not_found(),
+            Some(err) => err.is_not_found(),
             None => false,
         }
     }

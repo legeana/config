@@ -25,28 +25,9 @@ fn symlink(src: &Path, dst: &Path) -> Result<()> {
     Ok(())
 }
 
-fn remove_symlink(path: &Path, md: symlink_util::Metadata) -> Result<()> {
-    if md.is_symlink_file() {
-        fs::remove_file(path)?;
-        Ok(())
-    } else if md.is_symlink_dir() {
-        fs::remove_dir(path)?;
-        Ok(())
-    } else {
-        Err(anyhow!("{path:?} is not a symlink"))
-    }
-}
-
 pub fn make_symlink(registry: &mut dyn Registry, src: &Path, dst: &Path) -> Result<()> {
-    let md = file_util::skip_not_found(dst.symlink_metadata())
-        .with_context(|| format!("failed to read {dst:?} metadata"))?;
-    if let Some(md) = md {
-        if !md.is_symlink() {
-            return Err(anyhow!(
-                "unable to overwrite {dst:?} by {src:?}: destination is not a symlink"
-            ));
-        }
-        remove_symlink(dst, md.into()).with_context(|| format!("failed to remove {dst:?}"))?;
+    if let Err(err) = file_util::skip_not_found(symlink_util::remove(dst)) {
+        return Err(err.context(format!("unable to overwrite {dst:?} by {src:?}")));
     }
     let parent = dst
         .parent()

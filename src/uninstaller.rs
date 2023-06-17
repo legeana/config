@@ -2,7 +2,9 @@ use std::path::Path;
 
 use anyhow::{anyhow, Context, Result};
 
+use crate::file_util;
 use crate::registry::Registry;
+use crate::symlink_util;
 
 pub trait Uninstaller {
     fn uninstall(&mut self) -> Result<()>;
@@ -24,12 +26,15 @@ where
 }
 
 fn remove_symlink(path: &Path) -> Result<()> {
-    if let Err(err) = std::fs::remove_file(path) {
-        if err.kind() == std::io::ErrorKind::NotFound {
+    match file_util::skip_not_found(symlink_util::remove(path)) {
+        Ok(Some(_)) => {}
+        Ok(None) => {
             log::debug!("Nothing to remove: {path:?}");
             return Ok(());
         }
-        return Err(err).with_context(|| format!("failed to remove {path:?}"));
+        Err(err) => {
+            return Err(err).with_context(|| format!("failed to remove {path:?}"));
+        }
     }
     log::info!("Removed symlink {path:?}");
     match path.parent() {
