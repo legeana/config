@@ -12,4 +12,5 @@ xdg_or_win_config_local_prefix vim-spell/committed
 symlink en.utf-8.add
 output_file en.utf-8.add.spl
 
-post_install_exec vim -c RegenSpellFiles -c qall
+if_executable vim \
+    post_install_exec vim -c RegenSpellFiles -c qall
