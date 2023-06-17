@@ -27,7 +27,7 @@ mod platform {
     }
 }
 
-#[cfg(win32)]
+#[cfg(windows)]
 mod platform {
     use std::path::PathBuf;
 
