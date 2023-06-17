@@ -1,3 +1,5 @@
+requires = ["os=linux"]
+
 [[dependencies]]
 names = ["wofi"]
 
