@@ -1,5 +1,9 @@
-let s:xdg_cache_home = empty($XDG_CACHE_HOME) ? $HOME . '/.cache' : $XDG_CACHE_HOME
-let s:plug_dir = s:xdg_cache_home . '/vim-plug'
+if has('win32')
+    let s:cache_home = '~/AppData/Local'
+else
+    let s:cache_home = empty($XDG_CACHE_HOME) ? $HOME . '/.cache' : $XDG_CACHE_HOME
+endif
+let s:plug_dir = s:cache_home . '/vim-plug'
 execute 'set runtimepath+=' . fnameescape(s:plug_dir)
 
 call plug#begin(s:plug_dir . '/plugins')
