@@ -4,6 +4,7 @@ use anyhow::{anyhow, Result};
 use indoc::formatdoc;
 
 use crate::module::Module;
+use crate::xdg_or_win;
 
 use super::builder;
 use super::util;
@@ -133,6 +134,27 @@ pub fn commands() -> Vec<Box<dyn builder::Parser>> {
         Box::new(DirsPrefixParser {
             command: "video_prefix",
             base_dir: dirs::video_dir(),
+        }),
+        // XDG (for UNIX) or Windows.
+        Box::new(DirsPrefixParser {
+            command: "xdg_or_win_cache_prefix",
+            base_dir: xdg_or_win::cache_dir(),
+        }),
+        Box::new(DirsPrefixParser {
+            command: "xdg_or_win_config_prefix",
+            base_dir: xdg_or_win::config_dir(),
+        }),
+        Box::new(DirsPrefixParser {
+            command: "xdg_or_win_config_local_prefix",
+            base_dir: xdg_or_win::config_local_dir(),
+        }),
+        Box::new(DirsPrefixParser {
+            command: "xdg_or_win_data_prefix",
+            base_dir: xdg_or_win::data_dir(),
+        }),
+        Box::new(DirsPrefixParser {
+            command: "xdg_or_win_data_local_prefix",
+            base_dir: xdg_or_win::data_local_dir(),
         }),
     ]
 }

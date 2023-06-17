@@ -11,6 +11,7 @@ mod repository;
 mod tag_criteria;
 mod tag_util;
 mod uninstaller;
+mod xdg_or_win;
 
 use module::{Module, Rules};
 use uninstaller::Uninstaller;
