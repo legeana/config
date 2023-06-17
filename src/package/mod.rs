@@ -47,6 +47,10 @@ impl Package {
     pub fn new(root: PathBuf) -> Result<Self> {
         let pkgconfig = config::load_package(&root)
             .with_context(|| format!("failed to load {root:?} package"))?;
+        let criteria = tag_criteria::Criteria {
+            requires: pkgconfig.requires,
+            conflicts: pkgconfig.conflicts,
+        };
         let backup_name = name_from_path(&root)?;
         let dependencies: Vec<String> = match pkgconfig.dependencies {
             Some(deps) => filter_dependencies(&deps)
@@ -68,7 +72,12 @@ impl Package {
             .collect::<Result<_>>()
             .context("failed to parse user_dependencies")?;
         let configuration = if pkgconfig.has_contents {
-            contents::Configuration::new(root.clone())?
+            if criteria.is_satisfied()? {
+                contents::Configuration::new(root.clone())?
+            } else {
+                contents::Configuration::verify(&root)?;
+                contents::Configuration::new_empty(root.clone())
+            }
         } else {
             contents::Configuration::new_empty(root.clone())
         };
@@ -86,10 +95,7 @@ impl Package {
             .collect();
         Ok(Package {
             name: pkgconfig.name.unwrap_or(backup_name),
-            criteria: tag_criteria::Criteria {
-                requires: pkgconfig.requires,
-                conflicts: pkgconfig.conflicts,
-            },
+            criteria,
             modules: vec![
                 configuration,
                 Box::new(ansible_playbooks),

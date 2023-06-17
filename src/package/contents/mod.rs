@@ -22,8 +22,8 @@ mod tags;
 mod util;
 mod xdg_prefix;
 
-use core::fmt;
-use std::path::PathBuf;
+use std::fmt;
+use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Context, Result};
 
@@ -53,6 +53,9 @@ impl Configuration {
         ConfigurationBuilder::parse(root)?
             .build(&mut state)?
             .ok_or_else(|| anyhow!("failed to unwrap Configuration"))
+    }
+    pub fn verify(root: &Path) -> Result<()> {
+        ConfigurationBuilder::verify(root)
     }
 }
 
@@ -111,5 +114,11 @@ impl ConfigurationBuilder {
         let builders = parser::parse(&root, &manifest)
             .with_context(|| format!("failed to load {manifest:?}"))?;
         Ok(Box::new(ConfigurationBuilder { root, builders }))
+    }
+    pub fn verify(root: &Path) -> Result<()> {
+        let manifest = root.join(MANIFEST);
+        let _builders = parser::parse(root, &manifest)
+            .with_context(|| format!("failed to load {manifest:?}"))?;
+        Ok(())
     }
 }
