@@ -1,5 +1,4 @@
-if_unix xdg_config_prefix nvim
-if_windows prefix ~/AppData/Local/nvim
+xdg_or_win_config_local_prefix nvim
 
 symlink init.vim
 symlink opt_plugin
