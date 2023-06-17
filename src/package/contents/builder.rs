@@ -89,6 +89,7 @@ fn parsers() -> Vec<Box<dyn Parser>> {
         // Exec.
         super::exec::commands(),
         // Control.
+        super::if_executable::commands(),
         super::if_missing::commands(),
         super::if_os::commands(),
         // Deprecation.
