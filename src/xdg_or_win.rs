@@ -7,23 +7,23 @@ mod platform {
     }
 
     pub fn cache_dir() -> Option<PathBuf> {
-        base().and_then(|base| Some(base.get_cache_home()))
+        base().map(|base| base.get_cache_home())
     }
 
     pub fn config_dir() -> Option<PathBuf> {
-        base().and_then(|base| Some(base.get_config_home()))
+        base().map(|base| base.get_config_home())
     }
 
     pub fn config_local_dir() -> Option<PathBuf> {
-        base().and_then(|base| Some(base.get_config_home()))
+        base().map(|base| base.get_config_home())
     }
 
     pub fn data_dir() -> Option<PathBuf> {
-        base().and_then(|base| Some(base.get_data_home()))
+        base().map(|base| base.get_data_home())
     }
 
     pub fn data_local_dir() -> Option<PathBuf> {
-        base().and_then(|base| Some(base.get_data_home()))
+        base().map(|base| base.get_data_home())
     }
 }
 

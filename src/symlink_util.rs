@@ -33,9 +33,9 @@ impl Metadata {
     }
 }
 
-impl Into<fs::Metadata> for Metadata {
-    fn into(self) -> fs::Metadata {
-        self.metadata
+impl From<Metadata> for fs::Metadata {
+    fn from(symlink_metadata: Metadata) -> Self {
+        symlink_metadata.metadata
     }
 }
 
