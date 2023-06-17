@@ -2,6 +2,7 @@ mod builder;
 mod cat_glob;
 mod copy;
 mod deprecated;
+mod dirs_prefix;
 mod exec;
 mod fetch;
 mod file_util;

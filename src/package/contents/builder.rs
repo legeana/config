@@ -71,6 +71,7 @@ fn parsers() -> Vec<Box<dyn Parser>> {
         // MANIFEST.
         super::subdir::commands(),
         super::prefix::commands(),
+        super::dirs_prefix::commands(),
         super::xdg_prefix::commands(),
         super::tags::commands(),
         // Files.
