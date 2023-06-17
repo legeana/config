@@ -8,6 +8,7 @@ mod package;
 mod process_utils;
 mod registry;
 mod repository;
+mod symlink_util;
 mod tag_criteria;
 mod tag_util;
 mod uninstaller;

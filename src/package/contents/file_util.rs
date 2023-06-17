@@ -3,7 +3,9 @@ use std::path::Path;
 
 use anyhow::{anyhow, Context, Result};
 
+use crate::file_util;
 use crate::registry::Registry;
+use crate::symlink_util;
 
 #[cfg(unix)]
 fn symlink(src: &Path, dst: &Path) -> Result<()> {
@@ -23,14 +25,28 @@ fn symlink(src: &Path, dst: &Path) -> Result<()> {
     Ok(())
 }
 
+fn remove_symlink(path: &Path, md: symlink_util::Metadata) -> Result<()> {
+    if md.is_symlink_file() {
+        fs::remove_file(path)?;
+        Ok(())
+    } else if md.is_symlink_dir() {
+        fs::remove_dir(path)?;
+        Ok(())
+    } else {
+        Err(anyhow!("{path:?} is not a symlink"))
+    }
+}
+
 pub fn make_symlink(registry: &mut dyn Registry, src: &Path, dst: &Path) -> Result<()> {
-    if dst.exists() {
-        if !dst.is_symlink() {
+    let md = file_util::skip_not_found(dst.symlink_metadata())
+        .with_context(|| format!("failed to read {dst:?} metadata"))?;
+    if let Some(md) = md {
+        if !md.is_symlink() {
             return Err(anyhow!(
                 "unable to overwrite {dst:?} by {src:?}: destination is not a symlink"
             ));
         }
-        fs::remove_file(dst).with_context(|| format!("failed to remove {dst:?}"))?;
+        remove_symlink(dst, md.into()).with_context(|| format!("failed to remove {dst:?}"))?;
     }
     let parent = dst
         .parent()
