@@ -58,6 +58,7 @@ fn parsers() -> Vec<Box<dyn Parser>> {
         super::cat_glob::commands(),
         super::set_contents::commands(),
         super::importer::commands(),
+        super::render::commands(),
         // Downloads.
         super::fetch::commands(),
         super::git_clone::commands(),

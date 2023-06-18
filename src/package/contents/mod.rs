@@ -16,6 +16,7 @@ mod mkdir;
 mod output_file;
 mod parser;
 mod prefix;
+mod render;
 mod set_contents;
 mod subdir;
 mod symlink;
