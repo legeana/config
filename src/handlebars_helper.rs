@@ -27,9 +27,10 @@ where
         _: &mut RenderContext<'reg, 'rc>,
     ) -> Result<ScopedJson<'reg, 'rc>, RenderError> {
         let params: Vec<&Json> = h.params().iter().map(|j| j.value()).collect();
-        let result = self.0.call_inner(&params).map_err(|err| {
-            RenderError::from_error("", AsStdError(err))
-        })?;
+        let result = self
+            .0
+            .call_inner(&params)
+            .map_err(|err| RenderError::from_error("", AsStdError(err)))?;
         Ok(ScopedJson::Derived(result))
     }
 }

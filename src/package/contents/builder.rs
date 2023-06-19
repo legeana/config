@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::{anyhow, Result, Context};
+use anyhow::{anyhow, Context, Result};
 use handlebars::Handlebars;
 use thiserror::Error;
 
@@ -114,7 +114,8 @@ pub fn parse(workdir: &Path, args: &[&str]) -> Result<Box<dyn Builder>> {
 
 pub fn register_render_helpers(hb: &mut Handlebars) -> Result<()> {
     for parser in parsers() {
-        parser.register_render_helper(hb)
+        parser
+            .register_render_helper(hb)
             .with_context(|| format!("failed to register {} helper", parser.name()))?;
     }
     Ok(())
