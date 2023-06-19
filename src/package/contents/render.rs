@@ -14,6 +14,8 @@ const TEMPLATE_NAME: &'static str = "template";
 
 #[derive(Serialize)]
 struct RenderData {
+    source_file: PathBuf,
+    destination_file: PathBuf,
     workdir: PathBuf,
     prefix: PathBuf,
 }
@@ -57,6 +59,8 @@ impl builder::Builder for RenderBuilder {
             hb,
             output,
             data: RenderData {
+                source_file: src.clone(),
+                destination_file: dst.clone(),
                 workdir: self.workdir.clone(),
                 prefix: state.prefix.clone(),
             },
