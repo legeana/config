@@ -10,7 +10,7 @@ use super::builder;
 use super::local_state;
 use super::util;
 
-const TEMPLATE_NAME: &'static str = "template";
+const TEMPLATE_NAME: &str = "template";
 
 #[derive(Serialize)]
 struct RenderData {
@@ -60,8 +60,8 @@ impl builder::Builder for RenderBuilder {
             hb,
             output,
             data: RenderData {
-                source_file: src.clone(),
-                destination_file: dst.clone(),
+                source_file: src,
+                destination_file: dst,
                 workdir: self.workdir.clone(),
                 prefix: state.prefix.clone(),
             },
