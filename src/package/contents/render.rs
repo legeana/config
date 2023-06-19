@@ -49,6 +49,7 @@ impl builder::Builder for RenderBuilder {
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
         let mut hb = handlebars::Handlebars::new();
+        builder::register_render_helpers(&mut hb)?;
         hb.register_escape_fn(handlebars::no_escape);
         hb.register_template_file(TEMPLATE_NAME, &src)
             .with_context(|| format!("failed to load template from {src:?}"))?;

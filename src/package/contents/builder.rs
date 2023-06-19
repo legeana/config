@@ -1,6 +1,7 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, Result, Context};
+use handlebars::Handlebars;
 use thiserror::Error;
 
 use crate::module::Module;
@@ -34,6 +35,11 @@ pub trait Parser {
     fn name(&self) -> String;
     fn help(&self) -> String;
     fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn Builder>>;
+    /// [Optional] Register Handlebars helper.
+    #[allow(unused_variables)]
+    fn register_render_helper(&self, hb: &mut Handlebars) -> Result<()> {
+        Ok(())
+    }
 }
 
 /// Builder is creates a Module or modifies State.
@@ -104,6 +110,14 @@ pub fn parse(workdir: &Path, args: &[&str]) -> Result<Box<dyn Builder>> {
             matched.iter().map(|(parser, _)| parser).collect::<Vec<_>>(),
         )),
     }
+}
+
+pub fn register_render_helpers(hb: &mut Handlebars) -> Result<()> {
+    for parser in parsers() {
+        parser.register_render_helper(hb)
+            .with_context(|| format!("failed to register {} helper", parser.name()))?;
+    }
+    Ok(())
 }
 
 pub fn help() -> String {
