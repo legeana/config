@@ -9,7 +9,6 @@ use crate::tera_helper;
 use crate::xdg_or_win;
 
 use super::builder;
-use super::builder::Parser;
 use super::util;
 
 #[derive(Debug)]
@@ -28,6 +27,12 @@ impl builder::Builder for DirsPrefixBuilder {
         state.prefix = base_dir.join(&self.subdir);
         Ok(None)
     }
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct DirsPrefixParams {
+    path: Option<PathBuf>,
 }
 
 #[derive(Clone)]
@@ -59,30 +64,19 @@ impl builder::Parser for DirsPrefixParser {
         }))
     }
     fn register_render_helper(&self, tera: &mut tera::Tera) -> Result<()> {
-        if self.base_dir.is_none() {
+        let Some(base_dir) = self.base_dir.clone() else {
             return Ok(());
-        }
-        tera.register_function(&self.name(), tera_helper::wrap_function(self.clone()));
+        };
+        tera.register_function(
+            &self.name(),
+            tera_helper::wrap_function(move |args: &DirsPrefixParams| {
+                Ok(match args.path {
+                    Some(ref path) => base_dir.join(path),
+                    None => base_dir.clone(),
+                })
+            }),
+        );
         Ok(())
-    }
-}
-
-#[derive(Deserialize)]
-#[serde(deny_unknown_fields)]
-struct DirsPrefixParams {
-    path: Option<PathBuf>,
-}
-
-impl tera_helper::SimpleFunction<DirsPrefixParams, PathBuf> for DirsPrefixParser {
-    fn call(&self, args: &DirsPrefixParams) -> Result<PathBuf> {
-        let base_dir = self
-            .base_dir
-            .as_ref()
-            .ok_or_else(|| anyhow!("{} is not supported", self.name()))?;
-        Ok(match args.path {
-            Some(ref path) => base_dir.join(path),
-            None => base_dir.clone(),
-        })
     }
 }
 
