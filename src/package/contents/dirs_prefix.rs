@@ -2,9 +2,10 @@ use std::path::PathBuf;
 
 use anyhow::{anyhow, Result};
 use indoc::formatdoc;
+use serde::Deserialize;
 
-use crate::handlebars_helper;
 use crate::module::Module;
+use crate::tera_helper;
 use crate::xdg_or_win;
 
 use super::builder;
@@ -57,55 +58,37 @@ impl builder::Parser for DirsPrefixParser {
             subdir,
         }))
     }
-    fn register_render_helper(&self, hb: &mut handlebars::Handlebars) -> Result<()> {
+    fn register_render_helper(&self, tera: &mut tera::Tera) -> Result<()> {
         if self.base_dir.is_none() {
             return Ok(());
         }
-        hb.register_helper(&self.name(), handlebars_helper::wrap(self.clone()));
+        tera.register_function(&self.name(), tera_helper::wrap_function(self.clone()));
         Ok(())
     }
 }
 
-impl handlebars_helper::SimpleHelper for DirsPrefixParser {
-    fn call_inner(&self, params: &[&serde_json::Value]) -> Result<serde_json::Value> {
-        if params.len() != 1 {
-            return Err(anyhow!(
-                "{} requires a single argument, got {}",
-                self.name(),
-                params.len()
-            ));
-        }
-        let path = params[0].as_str().ok_or_else(|| {
-            anyhow!(
-                "{} argument must be a string, got {:?}",
-                self.name(),
-                params[0]
-            )
-        })?;
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct DirsPrefixParams {
+    path: Option<PathBuf>,
+}
+
+impl tera_helper::SimpleFunction<DirsPrefixParams> for DirsPrefixParser {
+    fn call(&self, args: &DirsPrefixParams) -> Result<serde_json::Value> {
         let base_dir = self
             .base_dir
             .as_ref()
             .ok_or_else(|| anyhow!("{} is not supported", self.name()))?;
-        let result = base_dir.join(path);
+        let result = match args.path {
+            Some(ref path) => base_dir.join(path),
+            None => base_dir.clone(),
+        };
         let result = result
             .to_str()
             .ok_or_else(|| anyhow!("{}: unable to convert {result:?} to string", self.name()))?;
         Ok(result.into())
     }
 }
-
-/*impl handlebars::HelperDef for DirsPrefixParser {
-    fn call_inner<'reg: 'rc, 'rc>(
-            &self,
-            _: &handlebars::Helper<'reg, 'rc>,
-            _: &'reg handlebars::Handlebars<'reg>,
-            _: &'rc handlebars::Context,
-            _: &mut handlebars::RenderContext<'reg, 'rc>,
-        ) -> std::result::Result<handlebars::ScopedJson<'reg, 'rc>, handlebars::RenderError> {
-        let
-        Ok(handlebars::ScopedJson::Derived(handlebars::JsonValue::Null))
-    }
-}*/
 
 pub fn commands() -> Vec<Box<dyn builder::Parser>> {
     vec![

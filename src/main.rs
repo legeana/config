@@ -1,7 +1,6 @@
 mod file_registry;
 mod file_util;
 mod git_utils;
-mod handlebars_helper;
 mod iter_util;
 mod layout;
 mod module;
@@ -12,6 +11,7 @@ mod repository;
 mod symlink_util;
 mod tag_criteria;
 mod tag_util;
+mod tera_helper;
 mod uninstaller;
 mod xdg_or_win;
 

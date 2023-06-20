@@ -2,7 +2,6 @@ use std::path::PathBuf;
 
 use anyhow::{Context, Result};
 use indoc::formatdoc;
-use serde::Serialize;
 
 use crate::module::{Module, Rules};
 
@@ -12,18 +11,10 @@ use super::util;
 
 const TEMPLATE_NAME: &str = "template";
 
-#[derive(Serialize)]
-struct RenderData {
-    source_file: PathBuf,
-    destination_file: PathBuf,
-    workdir: PathBuf,
-    prefix: PathBuf,
-}
-
 struct Render {
-    hb: handlebars::Handlebars<'static>,
+    tera: tera::Tera,
+    context: tera::Context,
     output: local_state::FileState,
-    data: RenderData,
 }
 
 impl Module for Render {
@@ -31,8 +22,8 @@ impl Module for Render {
         self.output.install(rules, registry)?;
         let mut file = std::fs::File::create(self.output.path())
             .with_context(|| format!("failed to create a file {:?}", self.output.path()))?;
-        self.hb
-            .render_to_write(TEMPLATE_NAME, &self.data, &mut file)
+        self.tera
+            .render_to(TEMPLATE_NAME, &self.context, &mut file)
             .with_context(|| format!("failed to render to file {:?}", self.output.path()))?;
         Ok(())
     }
@@ -50,21 +41,19 @@ impl builder::Builder for RenderBuilder {
         let dst = state.dst_path(&self.filename);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
-        let mut hb = handlebars::Handlebars::new();
-        hb.set_strict_mode(true);
-        builder::register_render_helpers(&mut hb)?;
-        hb.register_escape_fn(handlebars::no_escape);
-        hb.register_template_file(TEMPLATE_NAME, &src)
+        let mut tera = tera::Tera::default();
+        tera.add_template_file(&src, Some(TEMPLATE_NAME))
             .with_context(|| format!("failed to load template from {src:?}"))?;
+        builder::register_render_helpers(&mut tera)?;
+        let mut context = tera::Context::new();
+        context.insert("source_file", &src);
+        context.insert("destination_file", &dst);
+        context.insert("workdir", &self.workdir);
+        context.insert("prefix", &state.prefix);
         Ok(Some(Box::new(Render {
-            hb,
+            tera,
+            context,
             output,
-            data: RenderData {
-                source_file: src,
-                destination_file: dst,
-                workdir: self.workdir.clone(),
-                prefix: state.prefix.clone(),
-            },
         })))
     }
 }

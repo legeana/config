@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Context, Result};
-use handlebars::Handlebars;
+use tera::Tera;
 use thiserror::Error;
 
 use crate::module::Module;
@@ -37,7 +37,7 @@ pub trait Parser {
     fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn Builder>>;
     /// [Optional] Register Handlebars helper.
     #[allow(unused_variables)]
-    fn register_render_helper(&self, hb: &mut Handlebars) -> Result<()> {
+    fn register_render_helper(&self, tera: &mut Tera) -> Result<()> {
         Ok(())
     }
 }
@@ -112,10 +112,10 @@ pub fn parse(workdir: &Path, args: &[&str]) -> Result<Box<dyn Builder>> {
     }
 }
 
-pub fn register_render_helpers(hb: &mut Handlebars) -> Result<()> {
+pub fn register_render_helpers(tera: &mut Tera) -> Result<()> {
     for parser in parsers() {
         parser
-            .register_render_helper(hb)
+            .register_render_helper(tera)
             .with_context(|| format!("failed to register {} helper", parser.name()))?;
     }
     Ok(())
