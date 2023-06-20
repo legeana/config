@@ -1,9 +1,9 @@
 use std::{collections::HashMap, marker::PhantomData};
 
 use anyhow::{Context, Result};
-use serde::Serialize;
-use serde::de::DeserializeOwned;
 use serde::de::value::MapDeserializer;
+use serde::de::DeserializeOwned;
+use serde::Serialize;
 use tera::{Filter, Function, Value};
 
 fn deserialize_args<T>(args: &HashMap<String, Value>) -> Result<T>
@@ -21,6 +21,9 @@ where
     R: Serialize + Send + Sync,
 {
     fn call(&self, args: &Params) -> Result<R>;
+    fn is_safe(&self) -> bool {
+        false
+    }
 }
 
 pub struct WrappedFunction<T, Params, R>
@@ -44,13 +47,15 @@ where
         let wrap_result = || {
             let args: Params = deserialize_args(args)?;
             let result = self.wrapped.call(&args)?;
-            serde_json::to_value(result)
-                .context("failed to serialize result to json")
+            serde_json::to_value(result).context("failed to serialize result to json")
         };
         match wrap_result() {
             Ok(result) => Ok(result),
             Err(err) => Err(tera::Error::msg(err.to_string())),
         }
+    }
+    fn is_safe(&self) -> bool {
+        self.wrapped.is_safe()
     }
 }
 
@@ -73,7 +78,10 @@ where
     V: DeserializeOwned + Send + Sync,
     R: Serialize + Send + Sync,
 {
-    fn call(&self, value: &V, args: &Params) -> Result<R>;
+    fn filter(&self, value: &V, args: &Params) -> Result<R>;
+    fn is_safe(&self) -> bool {
+        false
+    }
 }
 
 pub struct WrappedFilter<T, V, Params, R>
@@ -100,13 +108,15 @@ where
         let wrap_result = || {
             let value = serde_json::from_value(value.to_owned())?;
             let args: Params = deserialize_args(args)?;
-            let result = self.wrapped.call(&value, &args)?;
-            serde_json::to_value(result)
-                .context("failed to serialize result to json")
+            let result = self.wrapped.filter(&value, &args)?;
+            serde_json::to_value(result).context("failed to serialize result to json")
         };
         match wrap_result() {
             Ok(result) => Ok(result),
             Err(err) => Err(tera::Error::msg(err.to_string())),
         }
+    }
+    fn is_safe(&self) -> bool {
+        self.wrapped.is_safe()
     }
 }
