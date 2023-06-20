@@ -6,6 +6,7 @@ mod layout;
 mod module;
 mod package;
 mod process_utils;
+mod quote;
 mod registry;
 mod repository;
 mod symlink_util;
