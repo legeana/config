@@ -73,20 +73,16 @@ struct DirsPrefixParams {
     path: Option<PathBuf>,
 }
 
-impl tera_helper::SimpleFunction<DirsPrefixParams> for DirsPrefixParser {
-    fn call(&self, args: &DirsPrefixParams) -> Result<serde_json::Value> {
+impl tera_helper::SimpleFunction<DirsPrefixParams, PathBuf> for DirsPrefixParser {
+    fn call(&self, args: &DirsPrefixParams) -> Result<PathBuf> {
         let base_dir = self
             .base_dir
             .as_ref()
             .ok_or_else(|| anyhow!("{} is not supported", self.name()))?;
-        let result = match args.path {
+        Ok(match args.path {
             Some(ref path) => base_dir.join(path),
             None => base_dir.clone(),
-        };
-        let result = result
-            .to_str()
-            .ok_or_else(|| anyhow!("{}: unable to convert {result:?} to string", self.name()))?;
-        Ok(result.into())
+        })
     }
 }
 
