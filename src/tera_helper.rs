@@ -26,6 +26,17 @@ where
     }
 }
 
+impl<F, Params, R> SimpleFunction<Params, R> for F
+where
+    F: Fn(&Params) -> Result<R>,
+    Params: DeserializeOwned + Send + Sync,
+    R: Serialize + Send + Sync,
+{
+    fn call(&self, args: &Params) -> Result<R> {
+        self(args)
+    }
+}
+
 pub struct WrappedFunction<T, Params, R>
 where
     T: SimpleFunction<Params, R> + Send + Sync,
@@ -74,13 +85,25 @@ where
 
 pub trait SimpleFilter<V, Params, R>
 where
-    Params: DeserializeOwned + Send + Sync,
     V: DeserializeOwned + Send + Sync,
+    Params: DeserializeOwned + Send + Sync,
     R: Serialize + Send + Sync,
 {
     fn filter(&self, value: &V, args: &Params) -> Result<R>;
     fn is_safe(&self) -> bool {
         false
+    }
+}
+
+impl<F, V, Params, R> SimpleFilter<V, Params, R> for F
+where
+    F: Fn(&V, &Params) -> Result<R>,
+    V: DeserializeOwned + Send + Sync,
+    Params: DeserializeOwned + Send + Sync,
+    R: Serialize + Send + Sync,
+{
+    fn filter(&self, value: &V, args: &Params) -> Result<R> {
+        self(value, args)
     }
 }
 
