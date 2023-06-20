@@ -143,3 +143,19 @@ where
         self.wrapped.is_safe()
     }
 }
+
+#[allow(dead_code)]
+pub fn wrap_filter<T, V, Params, R>(func: T) -> WrappedFilter<T, V, Params, R>
+where
+    T: SimpleFilter<V, Params, R> + Send + Sync,
+    V: DeserializeOwned + Send + Sync,
+    Params: DeserializeOwned + Send + Sync,
+    R: Serialize + Send + Sync,
+{
+    WrappedFilter {
+        wrapped: func,
+        value: PhantomData,
+        params: PhantomData,
+        result: PhantomData,
+    }
+}
