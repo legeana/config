@@ -69,7 +69,7 @@ impl builder::Parser for DirsPrefixParser {
         };
         tera.register_function(
             &self.name(),
-            tera_helper::wrap_function(move |args: &DirsPrefixParams| {
+            tera_helper::wrap_fn(move |args: &DirsPrefixParams| {
                 Ok(match args.path {
                     Some(ref path) => base_dir.join(path),
                     None => base_dir.clone(),
