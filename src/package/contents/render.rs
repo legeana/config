@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use indoc::formatdoc;
@@ -33,13 +33,14 @@ impl Module for Render {
 #[derive(Debug)]
 struct RenderBuilder {
     workdir: PathBuf,
-    filename: String,
+    src: String,
+    dst: String,
 }
 
 impl builder::Builder for RenderBuilder {
     fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
-        let src = self.workdir.join(&self.filename);
-        let dst = state.dst_path(&self.filename);
+        let src = self.workdir.join(&self.src);
+        let dst = state.dst_path(&self.dst);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
         let mut tera = tera::Tera::default();
@@ -73,19 +74,39 @@ impl builder::Parser for RenderParser {
                 render template
         ", command=self.name()}
     }
-    fn parse(
-        &self,
-        workdir: &std::path::Path,
-        args: &[&str],
-    ) -> anyhow::Result<Box<dyn builder::Builder>> {
-        let filename = util::single_arg(&self.name(), args)?.to_owned();
+    fn parse(&self, workdir: &Path, args: &[&str]) -> anyhow::Result<Box<dyn builder::Builder>> {
+        let filename = util::single_arg(&self.name(), args)?;
         Ok(Box::new(RenderBuilder {
             workdir: workdir.to_owned(),
-            filename,
+            src: filename.to_owned(),
+            dst: filename.to_owned(),
+        }))
+    }
+}
+
+#[derive(Clone)]
+struct RenderToParser;
+
+impl builder::Parser for RenderToParser {
+    fn name(&self) -> String {
+        "render_to".to_owned()
+    }
+    fn help(&self) -> String {
+        formatdoc! {"
+            {command} <destination> <filename>
+                render template <filename> into <destination>
+        ", command=self.name()}
+    }
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+        let (dst, src) = util::double_arg(&self.name(), args)?;
+        Ok(Box::new(RenderBuilder {
+            workdir: workdir.to_owned(),
+            src: src.to_owned(),
+            dst: dst.to_owned(),
         }))
     }
 }
 
 pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(RenderParser {})]
+    vec![Box::new(RenderParser {}), Box::new(RenderToParser {})]
 }
