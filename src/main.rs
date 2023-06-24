@@ -1,3 +1,4 @@
+mod empty_struct;
 mod file_registry;
 mod file_util;
 mod git_utils;
@@ -13,6 +14,7 @@ mod symlink_util;
 mod tag_criteria;
 mod tag_util;
 mod tera_helper;
+mod tera_helpers;
 mod uninstaller;
 mod xdg_or_win;
 

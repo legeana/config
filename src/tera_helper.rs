@@ -6,6 +6,8 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 use tera::{Filter as TeraFilter, Function as TeraFunction, Value};
 
+use crate::empty_struct;
+
 fn deserialize_args<T>(args: &HashMap<String, Value>) -> Result<T>
 where
     T: DeserializeOwned + Send + Sync,
@@ -150,4 +152,29 @@ where
     F: Fn(&V, &Params) -> Result<R>,
 {
     WrappedFnFilter { f, _t: PhantomData }.into()
+}
+
+pub struct WrappedNilFilter<F, V, R> {
+    f: F,
+    _t: PhantomData<(V, R)>,
+}
+
+impl<F, V, R> Filter for WrappedNilFilter<F, V, R>
+where
+    F: Fn(&V) -> Result<R>,
+{
+    type Value = V;
+    type Params = empty_struct::EmptyStruct;
+    type Result = R;
+
+    fn filter(&self, value: &Self::Value, _args: &Self::Params) -> Result<Self::Result> {
+        (self.f)(value)
+    }
+}
+
+pub fn wrap_nil_filter<F, V, R>(f: F) -> WrappedFilter<WrappedNilFilter<F, V, R>>
+where
+    F: Fn(&V) -> Result<R>,
+{
+    WrappedNilFilter { f, _t: PhantomData }.into()
 }

@@ -4,6 +4,7 @@ use anyhow::{Context, Result};
 use indoc::formatdoc;
 
 use crate::module::{Module, Rules};
+use crate::tera_helpers;
 
 use super::builder;
 use super::local_state;
@@ -45,6 +46,7 @@ impl builder::Builder for RenderBuilder {
         tera.add_template_file(&src, Some(TEMPLATE_NAME))
             .with_context(|| format!("failed to load template from {src:?}"))?;
         builder::register_render_helpers(&mut tera)?;
+        tera_helpers::register(&mut tera)?;
         let mut context = tera::Context::new();
         context.insert("source_file", &src);
         context.insert("destination_file", &dst);

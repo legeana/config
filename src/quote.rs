@@ -33,7 +33,6 @@ pub fn enquote_with(quote: char, text: &str) -> String {
     esc.enquote(quote, text.chars()).collect()
 }
 
-#[allow(dead_code)]
 pub fn enquote(text: &str) -> String {
     enquote_with('"', text)
 }
