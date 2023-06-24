@@ -1,5 +1,5 @@
 if_unix xdg_config_prefix wezterm
-if_unix symlink wezterm.lua
+if_unix render wezterm.lua
 
 if_windows prefix ~
-if_windows symlink_to .wezterm.lua wezterm.lua
+if_windows render_to .wezterm.lua wezterm.lua
