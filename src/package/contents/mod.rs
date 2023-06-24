@@ -23,7 +23,6 @@ mod symlink;
 mod symlink_tree;
 mod tags;
 mod util;
-mod xdg_prefix;
 
 use std::fmt;
 use std::path::{Path, PathBuf};

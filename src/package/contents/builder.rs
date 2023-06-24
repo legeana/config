@@ -53,7 +53,6 @@ fn parsers() -> Vec<Box<dyn Parser>> {
         super::subdir::commands(),
         super::prefix::commands(),
         super::dirs_prefix::commands(),
-        super::xdg_prefix::commands(),
         super::tags::commands(),
         // Files.
         super::symlink::commands(),

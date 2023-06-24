@@ -6,6 +6,7 @@ use serde::Deserialize;
 
 use crate::module::Module;
 use crate::tera_helper;
+use crate::xdg;
 use crate::xdg_or_win;
 
 use super::builder;
@@ -157,6 +158,23 @@ pub fn commands() -> Vec<Box<dyn builder::Parser>> {
         Box::new(DirsPrefixParser {
             command: "video_prefix",
             base_dir: dirs::video_dir(),
+        }),
+        // XDG
+        Box::new(DirsPrefixParser {
+            command: "xdg_cache_prefix",
+            base_dir: xdg::cache_dir(),
+        }),
+        Box::new(DirsPrefixParser {
+            command: "xdg_config_prefix",
+            base_dir: xdg::config_dir(),
+        }),
+        Box::new(DirsPrefixParser {
+            command: "xdg_data_prefix",
+            base_dir: xdg::data_dir(),
+        }),
+        Box::new(DirsPrefixParser {
+            command: "xdg_state_prefix",
+            base_dir: xdg::state_dir(),
         }),
         // XDG (for UNIX) or Windows.
         Box::new(DirsPrefixParser {

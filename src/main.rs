@@ -16,6 +16,7 @@ mod tag_util;
 mod tera_helper;
 mod tera_helpers;
 mod uninstaller;
+mod xdg;
 mod xdg_or_win;
 
 use module::{Module, Rules};

@@ -2,28 +2,26 @@
 mod platform {
     use std::path::PathBuf;
 
-    fn base() -> Option<xdg::BaseDirectories> {
-        xdg::BaseDirectories::new().ok()
-    }
+    use crate::xdg;
 
     pub fn cache_dir() -> Option<PathBuf> {
-        base().map(|base| base.get_cache_home())
+        xdg::cache_dir()
     }
 
     pub fn config_dir() -> Option<PathBuf> {
-        base().map(|base| base.get_config_home())
+        xdg::config_dir()
     }
 
     pub fn config_local_dir() -> Option<PathBuf> {
-        base().map(|base| base.get_config_home())
+        xdg::config_dir()
     }
 
     pub fn data_dir() -> Option<PathBuf> {
-        base().map(|base| base.get_data_home())
+        xdg::data_dir()
     }
 
     pub fn data_local_dir() -> Option<PathBuf> {
-        base().map(|base| base.get_data_home())
+        xdg::data_dir()
     }
 }
 
