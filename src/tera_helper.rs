@@ -83,6 +83,31 @@ where
     }
 }
 
+pub struct WrappedNilFunction<F, R> {
+    f: F,
+    _t: PhantomData<R>,
+}
+
+#[allow(dead_code)]
+pub fn wrap_nil<F, R>(f: F) -> WrappedFunction<WrappedNilFunction<F, R>>
+where
+    F: Fn() -> Result<R>,
+{
+    WrappedNilFunction { f, _t: PhantomData }.into()
+}
+
+impl<F, R> Function for WrappedNilFunction<F, R>
+where
+    F: Fn() -> Result<R>,
+{
+    type Params = empty_struct::EmptyStruct;
+    type Result = R;
+
+    fn call(&self, _args: &Self::Params) -> Result<Self::Result> {
+        (self.f)()
+    }
+}
+
 pub trait Filter {
     type Value;
     type Params;
@@ -172,6 +197,7 @@ where
     }
 }
 
+#[allow(dead_code)]
 pub fn wrap_nil_filter<F, V, R>(f: F) -> WrappedFilter<WrappedNilFilter<F, V, R>>
 where
     F: Fn(&V) -> Result<R>,
