@@ -36,8 +36,8 @@ pub trait Parser {
     fn help(&self) -> String;
     fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn Builder>>;
     /// [Optional] Register Handlebars helper.
-    #[allow(unused_variables)]
     fn register_render_helper(&self, tera: &mut Tera) -> Result<()> {
+        let _ = tera;
         Ok(())
     }
 }

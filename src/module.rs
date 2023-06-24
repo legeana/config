@@ -9,20 +9,23 @@ pub struct Rules {
 }
 
 pub trait Module {
-    #[allow(unused_variables)]
     fn pre_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+        let _ = rules;
+        let _ = registry;
         Ok(())
     }
-    #[allow(unused_variables)]
     fn install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+        let _ = rules;
+        let _ = registry;
         Ok(())
     }
-    #[allow(unused_variables)]
     fn post_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+        let _ = rules;
+        let _ = registry;
         Ok(())
     }
-    #[allow(unused_variables)]
     fn system_install(&self, rules: &Rules) -> Result<()> {
+        let _ = rules;
         Ok(())
     }
 }
