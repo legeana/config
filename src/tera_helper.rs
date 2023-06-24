@@ -36,15 +36,12 @@ where
     T::Result: Serialize + Send + Sync,
 {
     fn call(&self, args: &HashMap<String, Value>) -> tera::Result<Value> {
-        let wrap_result = || {
+        (|| {
             let args: T::Params = deserialize_args(args)?;
             let result = self.wrapped.call(&args)?;
             serde_json::to_value(result).context("failed to serialize result to json")
-        };
-        match wrap_result() {
-            Ok(result) => Ok(result),
-            Err(err) => Err(tera::Error::msg(err.to_string())),
-        }
+        })()
+        .map_err(|err| tera::Error::chain("failed to execute tera function", err))
     }
     fn is_safe(&self) -> bool {
         self.wrapped.is_safe()
@@ -107,16 +104,13 @@ where
     T::Result: Serialize + Send + Sync,
 {
     fn filter(&self, value: &Value, args: &HashMap<String, Value>) -> tera::Result<Value> {
-        let wrap_result = || {
+        (|| {
             let value = serde_json::from_value(value.to_owned())?;
             let args: T::Params = deserialize_args(args)?;
             let result = self.wrapped.filter(&value, &args)?;
             serde_json::to_value(result).context("failed to serialize result to json")
-        };
-        match wrap_result() {
-            Ok(result) => Ok(result),
-            Err(err) => Err(tera::Error::msg(err.to_string())),
-        }
+        })()
+        .map_err(|err| tera::Error::chain("failed to execute tera filter", err))
     }
     fn is_safe(&self) -> bool {
         self.wrapped.is_safe()
