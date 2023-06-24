@@ -1,12 +1,19 @@
 use std::path::Path;
 
 use crate::module::Module;
+use crate::tera_helper;
 
 use super::builder;
 use super::util;
 
 use anyhow::Result;
 use indoc::formatdoc;
+
+fn is_os(os: &str) -> bool {
+    // We don't have to check this in runtime as this never changes.
+    // In fact, it's even beneficial to check this during build to support *Prefix.
+    os == std::env::consts::FAMILY || os == std::env::consts::OS
+}
 
 #[derive(Debug)]
 struct IfOsBuilder {
@@ -16,9 +23,7 @@ struct IfOsBuilder {
 
 impl IfOsBuilder {
     fn is_os(&self) -> bool {
-        // We don't have to check this in runtime as this never changes.
-        // In fact, it's even beneficial to check this during build to support *Prefix.
-        self.os == std::env::consts::FAMILY || self.os == std::env::consts::OS
+        is_os(self.os)
     }
 }
 
@@ -59,6 +64,12 @@ impl builder::Parser for IfOsParser {
             os: self.os,
             cmd: builder::parse(workdir, cmd_args)?,
         }))
+    }
+    fn register_render_helper(&self, tera: &mut tera::Tera) -> Result<()> {
+        let name = format!("is_{}", self.os);
+        let os = self.os.to_owned();
+        tera.register_function(&name, tera_helper::wrap_nil(move || Ok(is_os(&os))));
+        Ok(())
     }
 }
 
