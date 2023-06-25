@@ -1,3 +1,4 @@
+mod command;
 mod empty_struct;
 mod file_registry;
 mod file_util;

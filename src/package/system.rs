@@ -1,7 +1,6 @@
-use std::ffi::OsStr;
-
 use anyhow::{Context, Result};
 
+use crate::command::is_command;
 use crate::module::{Module, Rules};
 use crate::process_utils;
 use crate::tag_criteria::TagCriteria;
@@ -51,7 +50,7 @@ impl Apt {
 
 impl Installer for Apt {
     fn install(&self) -> Result<()> {
-        if !is_available("apt")? {
+        if !is_command("apt")? {
             return Ok(());
         }
         process_utils::run_verbose(
@@ -77,7 +76,7 @@ impl Pacman {
 
 impl Installer for Pacman {
     fn install(&self) -> Result<()> {
-        if !is_available("pacman")? {
+        if !is_command("pacman")? {
             return Ok(());
         }
         process_utils::run_verbose(
@@ -108,18 +107,5 @@ impl Installer for Bash {
                 .arg("-c")
                 .arg(&self.script),
         )
-    }
-}
-
-fn is_available<T: AsRef<OsStr> + std::fmt::Debug>(cmd: T) -> Result<bool> {
-    match which::which(&cmd) {
-        Ok(_) => Ok(true),
-        Err(err) => {
-            match err {
-                which::Error::CannotFindBinaryPath => Ok(false),
-                _ => Err(anyhow::Error::new(err)
-                    .context(format!("failed to check if {cmd:?} is installed"))),
-            }
-        }
     }
 }

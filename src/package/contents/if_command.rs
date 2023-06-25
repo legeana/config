@@ -1,18 +1,11 @@
-use anyhow::{Context, Result};
+use anyhow::Result;
 use indoc::formatdoc;
 
+use crate::command::is_command;
 use crate::module::{Module, Rules};
 
 use super::builder;
 use super::util;
-
-fn is_command(exe: &str) -> Result<bool> {
-    match which::which(exe) {
-        Ok(_) => Ok(true),
-        Err(which::Error::CannotFindBinaryPath) => Ok(false),
-        Err(err) => Err(err).context(format!("failed to check if {exe:?} is available in PATH")),
-    }
-}
 
 struct IfCommand {
     executable: String,
