@@ -6,34 +6,32 @@ use crate::module::{Module, Rules};
 use super::builder;
 use super::util;
 
-struct IfExecutable {
+fn is_command(exe: &str) -> Result<bool> {
+    match which::which(exe) {
+        Ok(_) => Ok(true),
+        Err(which::Error::CannotFindBinaryPath) => Ok(false),
+        Err(err) => Err(err).context(format!("failed to check if {exe:?} is available in PATH")),
+    }
+}
+
+struct IfCommand {
     executable: String,
     cmd: Box<dyn Module>,
 }
 
-impl IfExecutable {
-    fn is_available(&self) -> Result<bool> {
-        match which::which(&self.executable) {
-            Ok(_) => Ok(true),
-            Err(which::Error::CannotFindBinaryPath) => Ok(false),
-            Err(err) => Err(err).context(format!(
-                "failed to check if {:?} is available in PATH",
-                self.executable
-            )),
-        }
-    }
+impl IfCommand {
     fn run<F>(&self, f: F) -> Result<()>
     where
         F: FnOnce() -> Result<()>,
     {
-        if !self.is_available()? {
+        if !is_command(&self.executable)? {
             return Ok(());
         }
         f()
     }
 }
 
-impl Module for IfExecutable {
+impl Module for IfCommand {
     fn pre_install(
         &self,
         rules: &Rules,
@@ -54,15 +52,15 @@ impl Module for IfExecutable {
 }
 
 #[derive(Debug)]
-struct IfExecutableBuilder {
+struct IfCommandBuilder {
     executable: String,
     cmd: Box<dyn builder::Builder>,
 }
 
-impl builder::Builder for IfExecutableBuilder {
+impl builder::Builder for IfCommandBuilder {
     fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         match self.cmd.build(state)? {
-            Some(cmd) => Ok(Some(Box::new(IfExecutable {
+            Some(cmd) => Ok(Some(Box::new(IfCommand {
                 executable: self.executable.clone(),
                 cmd,
             }))),
@@ -72,11 +70,11 @@ impl builder::Builder for IfExecutableBuilder {
 }
 
 #[derive(Clone)]
-struct IfExecutableParser;
+struct IfCommandParser;
 
-impl builder::Parser for IfExecutableParser {
+impl builder::Parser for IfCommandParser {
     fn name(&self) -> String {
-        "if_executable".to_owned()
+        "if_command".to_owned()
     }
     fn help(&self) -> String {
         formatdoc! {"
@@ -88,7 +86,7 @@ impl builder::Parser for IfExecutableParser {
     fn parse(&self, workdir: &std::path::Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
         let (exe, cmd_args) = util::multiple_args(&self.name(), args, 1)?;
         assert_eq!(exe.len(), 1);
-        Ok(Box::new(IfExecutableBuilder {
+        Ok(Box::new(IfCommandBuilder {
             executable: exe[0].to_owned(),
             cmd: builder::parse(workdir, cmd_args)?,
         }))
@@ -96,5 +94,5 @@ impl builder::Parser for IfExecutableParser {
 }
 
 pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(IfExecutableParser {})]
+    vec![Box::new(IfCommandParser {})]
 }

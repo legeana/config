@@ -7,7 +7,7 @@ mod exec;
 mod fetch;
 mod file_util;
 mod git_clone;
-mod if_executable;
+mod if_command;
 mod if_missing;
 mod if_os;
 mod importer;
