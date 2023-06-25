@@ -2,6 +2,7 @@ use std::path::Path;
 use std::path::PathBuf;
 
 use crate::module::{Module, Rules};
+use crate::registry::Registry;
 
 use super::builder;
 use super::util;
@@ -31,21 +32,13 @@ impl IfMissing {
 }
 
 impl Module for IfMissing {
-    fn pre_install(
-        &self,
-        rules: &Rules,
-        registry: &mut dyn crate::registry::Registry,
-    ) -> Result<()> {
+    fn pre_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         self.run(|| self.cmd.pre_install(rules, registry))
     }
-    fn install(&self, rules: &Rules, registry: &mut dyn crate::registry::Registry) -> Result<()> {
+    fn install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         self.run(|| self.cmd.install(rules, registry))
     }
-    fn post_install(
-        &self,
-        rules: &Rules,
-        registry: &mut dyn crate::registry::Registry,
-    ) -> Result<()> {
+    fn post_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         self.run(|| self.cmd.post_install(rules, registry))
     }
 }

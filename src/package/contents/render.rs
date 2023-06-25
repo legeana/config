@@ -4,6 +4,7 @@ use anyhow::{Context, Result};
 use indoc::formatdoc;
 
 use crate::module::{Module, Rules};
+use crate::registry::Registry;
 use crate::tera_helpers;
 
 use super::builder;
@@ -19,7 +20,7 @@ struct Render {
 }
 
 impl Module for Render {
-    fn install(&self, rules: &Rules, registry: &mut dyn crate::registry::Registry) -> Result<()> {
+    fn install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         self.output.install(rules, registry)?;
         let mut file = std::fs::File::create(self.output.path())
             .with_context(|| format!("failed to create a file {:?}", self.output.path()))?;

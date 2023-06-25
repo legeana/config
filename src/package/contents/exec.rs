@@ -3,6 +3,7 @@ use std::process;
 
 use crate::module::{Module, Rules};
 use crate::process_utils;
+use crate::registry::Registry;
 
 use super::builder;
 use super::util;
@@ -24,11 +25,7 @@ struct PostInstallExec {
 }
 
 impl Module for PostInstallExec {
-    fn post_install(
-        &self,
-        rules: &Rules,
-        _registry: &mut dyn crate::registry::Registry,
-    ) -> Result<()> {
+    fn post_install(&self, rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
         if self.exec_condition == ExecCondition::UpdateOnly && !rules.force_download {
             return Ok(());
         }
