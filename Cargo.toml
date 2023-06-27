@@ -22,7 +22,7 @@ shellexpand = "3.1"
 shlex = "1.1.0"
 stderrlog = "0.5.4"
 sysinfo = { version = "0.28.4", default-features = false }
-tera = "1.19.0"
+tera = { version = "1.19.0", default-features = false }
 thiserror = "1.0"
 toml = "0.7.3"
 ureq = "2.6.2"
