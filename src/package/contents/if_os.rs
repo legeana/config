@@ -16,23 +16,23 @@ fn is_os(os: &str) -> bool {
 }
 
 #[derive(Debug)]
-struct IfOsBuilder {
+struct IfOsStatement {
     os: &'static str,
-    cmd: Box<dyn builder::Builder>,
+    cmd: Box<dyn builder::Statement>,
 }
 
-impl IfOsBuilder {
+impl IfOsStatement {
     fn is_os(&self) -> bool {
         is_os(self.os)
     }
 }
 
-impl builder::Builder for IfOsBuilder {
-    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+impl builder::Statement for IfOsStatement {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         if !self.is_os() {
             return Ok(None);
         }
-        self.cmd.build(state)
+        self.cmd.eval(state)
     }
 }
 
@@ -57,10 +57,10 @@ impl builder::Parser for IfOsParser {
                 execute a MANIFEST <command> only if os (or family) is {os}
         ", os=self.os, command=self.command()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
         let (empty, cmd_args) = util::multiple_args(&self.command(), args, 0)?;
         assert!(empty.is_empty());
-        Ok(Box::new(IfOsBuilder {
+        Ok(Box::new(IfOsStatement {
             os: self.os,
             cmd: builder::parse(workdir, cmd_args)?,
         }))

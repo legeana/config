@@ -32,14 +32,14 @@ impl Module for Render {
 }
 
 #[derive(Debug)]
-struct RenderBuilder {
+struct RenderStatement {
     workdir: PathBuf,
     src: String,
     dst: String,
 }
 
-impl builder::Builder for RenderBuilder {
-    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+impl builder::Statement for RenderStatement {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         let src = self.workdir.join(&self.src);
         let dst = state.dst_path(&self.dst);
         let output = local_state::FileState::new(dst.clone())
@@ -75,9 +75,9 @@ impl builder::Parser for RenderParser {
                 render template
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> anyhow::Result<Box<dyn builder::Builder>> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> anyhow::Result<Box<dyn builder::Statement>> {
         let filename = util::single_arg(&self.name(), args)?;
-        Ok(Box::new(RenderBuilder {
+        Ok(Box::new(RenderStatement {
             workdir: workdir.to_owned(),
             src: filename.to_owned(),
             dst: filename.to_owned(),
@@ -98,9 +98,9 @@ impl builder::Parser for RenderToParser {
                 render template <filename> into <destination>
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
         let (dst, src) = util::double_arg(&self.name(), args)?;
-        Ok(Box::new(RenderBuilder {
+        Ok(Box::new(RenderStatement {
             workdir: workdir.to_owned(),
             src: src.to_owned(),
             dst: dst.to_owned(),

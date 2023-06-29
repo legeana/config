@@ -25,12 +25,12 @@ impl Module for MkDir {
 }
 
 #[derive(Debug)]
-struct MkDirBuilder {
+struct MkDirStatement {
     dir: String,
 }
 
-impl builder::Builder for MkDirBuilder {
-    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+impl builder::Statement for MkDirStatement {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         Ok(Some(Box::new(MkDir {
             dst: state.dst_path(&self.dir),
         })))
@@ -50,9 +50,9 @@ impl builder::Parser for MkDirParser {
                 create a directory in prefix
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
         let dir = util::single_arg(&self.name(), args)?.to_owned();
-        Ok(Box::new(MkDirBuilder { dir }))
+        Ok(Box::new(MkDirStatement { dir }))
     }
 }
 

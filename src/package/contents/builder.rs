@@ -29,12 +29,12 @@ impl State {
     }
 }
 
-/// Parser transforms a statement into a Builder.
+/// Parses a Statement.
 /// This should be purely syntactical.
 pub trait Parser {
     fn name(&self) -> String;
     fn help(&self) -> String;
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn Builder>>;
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn Statement>>;
     /// [Optional] Register Handlebars helper.
     fn register_render_helper(&self, tera: &mut Tera) -> Result<()> {
         let _ = tera;
@@ -42,9 +42,9 @@ pub trait Parser {
     }
 }
 
-/// Builder is creates a Module or modifies State.
-pub trait Builder: std::fmt::Debug {
-    fn build(&self, state: &mut State) -> Result<Option<Box<dyn Module>>>;
+/// Command creates a Module or modifies State.
+pub trait Statement: std::fmt::Debug {
+    fn eval(&self, state: &mut State) -> Result<Option<Box<dyn Module>>>;
 }
 
 fn parsers() -> Vec<Box<dyn Parser>> {
@@ -79,8 +79,8 @@ fn parsers() -> Vec<Box<dyn Parser>> {
     result.into_iter().flatten().collect()
 }
 
-pub fn parse(workdir: &Path, args: &[&str]) -> Result<Box<dyn Builder>> {
-    let mut matched: Vec<(String, Box<dyn Builder>)> = Vec::new();
+pub fn parse(workdir: &Path, args: &[&str]) -> Result<Box<dyn Statement>> {
+    let mut matched: Vec<(String, Box<dyn Statement>)> = Vec::new();
     for parser in parsers() {
         match parser.parse(workdir, args) {
             Ok(builder) => matched.push((parser.name(), builder)),

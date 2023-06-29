@@ -29,7 +29,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Context, Result};
 
-use crate::package::contents::builder::Builder;
+use crate::package::contents::builder::Statement;
 use crate::package::{Module, Rules};
 use crate::registry::Registry;
 
@@ -52,12 +52,12 @@ impl Configuration {
     #[allow(clippy::new_ret_no_self)]
     pub fn new(root: PathBuf) -> Result<Box<dyn Module>> {
         let mut state = builder::State::new();
-        ConfigurationBuilder::parse(root)?
-            .build(&mut state)?
+        ConfigurationStatement::parse(root)?
+            .eval(&mut state)?
             .ok_or_else(|| anyhow!("failed to unwrap Configuration"))
     }
     pub fn verify(root: &Path) -> Result<()> {
-        ConfigurationBuilder::verify(root)
+        ConfigurationStatement::verify(root)
     }
 }
 
@@ -86,19 +86,19 @@ impl fmt::Display for Configuration {
 }
 
 #[derive(Debug)]
-struct ConfigurationBuilder {
+struct ConfigurationStatement {
     root: PathBuf,
-    builders: Vec<Box<dyn builder::Builder>>,
+    statements: Vec<Box<dyn builder::Statement>>,
 }
 
-impl Builder for ConfigurationBuilder {
-    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+impl Statement for ConfigurationStatement {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         let mut modules: Vec<_> = Vec::new();
-        for builder in self.builders.iter() {
+        for statement in self.statements.iter() {
             if !state.enabled {
                 break;
             }
-            if let Some(module) = builder.build(state)? {
+            if let Some(module) = statement.eval(state)? {
                 modules.push(module);
             }
         }
@@ -110,16 +110,16 @@ impl Builder for ConfigurationBuilder {
 }
 
 // Analogous to builder::Parser, but can only be called from code.
-impl ConfigurationBuilder {
-    pub fn parse(root: PathBuf) -> Result<Box<dyn Builder>> {
+impl ConfigurationStatement {
+    pub fn parse(root: PathBuf) -> Result<Box<dyn Statement>> {
         let manifest = root.join(MANIFEST);
-        let builders = parser::parse(&root, &manifest)
+        let statements = parser::parse(&root, &manifest)
             .with_context(|| format!("failed to load {manifest:?}"))?;
-        Ok(Box::new(ConfigurationBuilder { root, builders }))
+        Ok(Box::new(ConfigurationStatement { root, statements }))
     }
     pub fn verify(root: &Path) -> Result<()> {
         let manifest = root.join(MANIFEST);
-        let _builders = parser::parse(root, &manifest)
+        let _statements = parser::parse(root, &manifest)
             .with_context(|| format!("failed to load {manifest:?}"))?;
         Ok(())
     }

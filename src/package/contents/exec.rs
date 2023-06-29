@@ -38,14 +38,14 @@ impl Module for PostInstallExec {
 }
 
 #[derive(Debug)]
-struct PostInstallBuilder {
+struct PostInstallStatement {
     exec_condition: ExecCondition,
     cmd: String,
     args: Vec<String>,
 }
 
-impl builder::Builder for PostInstallBuilder {
-    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+impl builder::Statement for PostInstallStatement {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         let args: Vec<String> = self
             .args
             .iter()
@@ -74,10 +74,10 @@ impl builder::Parser for PostInstallExecParser {
                 execute a command in a post-install phase
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
         let (command, args) = util::multiple_args(&self.name(), args, 1)?;
         assert!(command.len() == 1);
-        Ok(Box::new(PostInstallBuilder {
+        Ok(Box::new(PostInstallStatement {
             exec_condition: ExecCondition::Always,
             cmd: command[0].to_owned(),
             args: args.iter().map(|&s| s.to_owned()).collect(),
@@ -99,10 +99,10 @@ impl builder::Parser for PostInstallUpdateParser {
                 only if executed via 'setup update' command
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
         let (command, args) = util::multiple_args(&self.name(), args, 1)?;
         assert!(command.len() == 1);
-        Ok(Box::new(PostInstallBuilder {
+        Ok(Box::new(PostInstallStatement {
             exec_condition: ExecCondition::UpdateOnly,
             cmd: command[0].to_owned(),
             args: args.iter().map(|&s| s.to_owned()).collect(),

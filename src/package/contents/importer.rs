@@ -101,13 +101,13 @@ impl Module for Importer {
 }
 
 #[derive(Debug)]
-struct ImporterBuilder {
+struct ImporterStatement {
     workdir: PathBuf,
     filename: String,
 }
 
-impl builder::Builder for ImporterBuilder {
-    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+impl builder::Statement for ImporterStatement {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         let dst = state.dst_path(&self.filename);
         let prefix = dst
             .parent()
@@ -135,9 +135,9 @@ impl builder::Parser for ImporterParser {
                 create a symlink for filename in prefix to a local persistent state
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
         let filename = util::single_arg(&self.name(), args)?.to_owned();
-        Ok(Box::new(ImporterBuilder {
+        Ok(Box::new(ImporterStatement {
             workdir: workdir.to_owned(),
             filename,
         }))

@@ -69,7 +69,7 @@ impl<B: BufRead> Iterator for LineIterator<B> {
     }
 }
 
-fn parse_line(workdir: &Path, line: &str) -> Result<Option<Box<dyn builder::Builder>>> {
+fn parse_line(workdir: &Path, line: &str) -> Result<Option<Box<dyn builder::Statement>>> {
     if line.is_empty() || line.starts_with('#') {
         return Ok(None);
     }
@@ -79,16 +79,16 @@ fn parse_line(workdir: &Path, line: &str) -> Result<Option<Box<dyn builder::Buil
 }
 
 #[derive(Debug)]
-struct ParsedBuilder {
+struct ParsedStatement {
     line_num: usize,
     line: String,
     manifest_path: PathBuf,
-    builder: Box<dyn builder::Builder>,
+    statement: Box<dyn builder::Statement>,
 }
 
-impl builder::Builder for ParsedBuilder {
-    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
-        self.builder.build(state).with_context(|| {
+impl builder::Statement for ParsedStatement {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+        self.statement.eval(state).with_context(|| {
             format!(
                 "failed to build line {line_num} {line:?} from {manifest_path:?}",
                 line_num = self.line_num,
@@ -99,23 +99,23 @@ impl builder::Builder for ParsedBuilder {
     }
 }
 
-pub fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<Box<dyn builder::Builder>>> {
+pub fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<Box<dyn builder::Statement>>> {
     let manifest =
         File::open(manifest_path).with_context(|| format!("failed to open {manifest_path:?}"))?;
     let reader = BufReader::new(manifest);
-    let mut builders: Vec<Box<dyn builder::Builder>> = Vec::new();
+    let mut builders: Vec<Box<dyn builder::Statement>> = Vec::new();
     for (line_idx, line_or) in LineIterator::new(reader.lines()) {
         let line_num = line_idx + 1;
         let line = line_or
             .with_context(|| format!("failed to read line {line_num} from {manifest_path:?}"))?;
-        if let Some(builder) = parse_line(workdir, &line).with_context(|| {
+        if let Some(statement) = parse_line(workdir, &line).with_context(|| {
             format!("failed to parse line {line_num} {line:?} from {manifest_path:?}")
         })? {
-            builders.push(Box::new(ParsedBuilder {
+            builders.push(Box::new(ParsedStatement {
                 line_num,
                 line,
                 manifest_path: manifest_path.to_owned(),
-                builder,
+                statement,
             }));
         }
     }

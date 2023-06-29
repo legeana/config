@@ -22,14 +22,14 @@ impl Module for Symlink {
 }
 
 #[derive(Debug)]
-struct SymlinkBuilder {
+struct SymlinkStatement {
     workdir: PathBuf,
     src: String,
     dst: String,
 }
 
-impl builder::Builder for SymlinkBuilder {
-    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+impl builder::Statement for SymlinkStatement {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         Ok(Some(Box::new(Symlink {
             src: self.workdir.join(&self.src),
             dst: state.dst_path(&self.dst),
@@ -50,9 +50,9 @@ impl builder::Parser for SymlinkParser {
                 create a symlink for filename in prefix
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
         let filename = util::single_arg(&self.name(), args)?;
-        Ok(Box::new(SymlinkBuilder {
+        Ok(Box::new(SymlinkStatement {
             workdir: workdir.to_owned(),
             src: filename.to_owned(),
             dst: filename.to_owned(),
@@ -73,9 +73,9 @@ impl builder::Parser for SymlinkToParser {
                 create a symlink for filename in prefix
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
         let (dst, src) = util::double_arg(&self.name(), args)?;
-        Ok(Box::new(SymlinkBuilder {
+        Ok(Box::new(SymlinkStatement {
             workdir: workdir.to_owned(),
             src: src.to_owned(),
             dst: dst.to_owned(),

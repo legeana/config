@@ -21,12 +21,12 @@ impl Module for OutputFile {
 }
 
 #[derive(Debug)]
-struct OutputFileBuilder {
+struct OutputFileStatement {
     filename: String,
 }
 
-impl builder::Builder for OutputFileBuilder {
-    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+impl builder::Statement for OutputFileStatement {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         let dst = state.dst_path(&self.filename);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
@@ -47,9 +47,9 @@ impl builder::Parser for OutputFileParser {
                 create a symlink for filename in prefix to a local persistent state
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
         let filename = util::single_arg(&self.name(), args)?.to_owned();
-        Ok(Box::new(OutputFileBuilder { filename }))
+        Ok(Box::new(OutputFileStatement { filename }))
     }
 }
 

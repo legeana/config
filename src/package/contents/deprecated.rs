@@ -8,10 +8,10 @@ use super::builder;
 use super::util::check_command;
 
 #[derive(Debug)]
-struct NoOpBuilder;
+struct NoOpStatement;
 
-impl builder::Builder for NoOpBuilder {
-    fn build(&self, _state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+impl builder::Statement for NoOpStatement {
+    fn eval(&self, _state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         Ok(None)
     }
 }
@@ -26,7 +26,7 @@ impl builder::Parser for DeprecatedParser {
     fn help(&self) -> String {
         "DEPRECATED: N/A".to_owned()
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
         /*if check_command("<deprecated>", args).is_ok() {
             log::warn!(
                 "{:?}: <deprecated> is unsupported",
@@ -35,7 +35,7 @@ impl builder::Parser for DeprecatedParser {
             return Ok(());
         }*/
         check_command(&self.name(), args).map(|_| ())?;
-        Ok(Box::new(NoOpBuilder {}))
+        Ok(Box::new(NoOpStatement {}))
     }
 }
 

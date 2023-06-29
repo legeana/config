@@ -59,13 +59,13 @@ impl Module for GitClone {
 }
 
 #[derive(Debug)]
-struct GitCloneBuilder {
+struct GitCloneStatement {
     url: String,
     dst: String,
 }
 
-impl builder::Builder for GitCloneBuilder {
-    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+impl builder::Statement for GitCloneStatement {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         let dst = state.dst_path(&self.dst);
         let output = local_state::DirectoryState::new(dst.clone())
             .with_context(|| format!("failed to create DirectoryState from {dst:?}"))?;
@@ -90,9 +90,9 @@ impl builder::Parser for GitCloneParser {
                 if <branch> is specified clone <branch> instead of default HEAD
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
         let (url, dst) = util::double_arg(&self.name(), args)?;
-        Ok(Box::new(GitCloneBuilder {
+        Ok(Box::new(GitCloneStatement {
             url: url.to_owned(),
             dst: dst.to_owned(),
         }))

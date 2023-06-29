@@ -33,13 +33,13 @@ impl Module for Copy {
 }
 
 #[derive(Debug)]
-struct CopyBuilder {
+struct CopyStatement {
     workdir: PathBuf,
     filename: String,
 }
 
-impl builder::Builder for CopyBuilder {
-    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+impl builder::Statement for CopyStatement {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         let dst = state.dst_path(&self.filename);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
@@ -63,9 +63,9 @@ impl builder::Parser for CopyParser {
                 create a copy of a filename in local storage and install a symlink to it
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
         let filename = util::single_arg(&self.name(), args)?.to_owned();
-        Ok(Box::new(CopyBuilder {
+        Ok(Box::new(CopyStatement {
             workdir: workdir.to_owned(),
             filename,
         }))

@@ -13,14 +13,14 @@ use super::builder;
 use super::util;
 
 #[derive(Debug)]
-struct DirsPrefixBuilder {
+struct DirsPrefixStatement {
     command: &'static str,
     base_dir: Option<PathBuf>,
     subdir: String,
 }
 
-impl builder::Builder for DirsPrefixBuilder {
-    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+impl builder::Statement for DirsPrefixStatement {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         let base_dir = self
             .base_dir
             .as_ref()
@@ -56,9 +56,9 @@ impl builder::Parser for DirsPrefixParser {
         &self,
         _workdir: &std::path::Path,
         args: &[&str],
-    ) -> Result<Box<dyn builder::Builder>> {
+    ) -> Result<Box<dyn builder::Statement>> {
         let subdir = util::single_arg(&self.name(), args)?.to_owned();
-        Ok(Box::new(DirsPrefixBuilder {
+        Ok(Box::new(DirsPrefixStatement {
             command: self.command,
             base_dir: self.base_dir.clone(),
             subdir,

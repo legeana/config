@@ -33,13 +33,13 @@ impl Module for SetContents {
 }
 
 #[derive(Debug)]
-struct SetContentsBuilder {
+struct SetContentsStatement {
     filename: String,
     contents: String,
 }
 
-impl builder::Builder for SetContentsBuilder {
-    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+impl builder::Statement for SetContentsStatement {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         let dst = state.dst_path(&self.filename);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
@@ -63,9 +63,9 @@ impl builder::Parser for SetContentsParser {
                 overwrites <filename> with <contents>
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
         let (filename, contents) = util::double_arg(&self.name(), args)?;
-        Ok(Box::new(SetContentsBuilder {
+        Ok(Box::new(SetContentsStatement {
             filename: filename.to_owned(),
             contents: contents.to_owned(),
         }))

@@ -9,12 +9,12 @@ use super::builder;
 use super::util;
 
 #[derive(Debug)]
-struct PrefixBuilder {
+struct PrefixStatement {
     prefix: String,
 }
 
-impl builder::Builder for PrefixBuilder {
-    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+impl builder::Statement for PrefixStatement {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         state.prefix = shellexpand::tilde(&self.prefix).as_ref().into();
         Ok(None)
     }
@@ -33,9 +33,9 @@ impl builder::Parser for PrefixParser {
                 set current installation prefix to <directory>
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
         let prefix = util::single_arg(&self.name(), args)?.to_owned();
-        Ok(Box::new(PrefixBuilder { prefix }))
+        Ok(Box::new(PrefixStatement { prefix }))
     }
 }
 

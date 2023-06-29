@@ -63,14 +63,14 @@ impl Module for FetchInto {
 }
 
 #[derive(Debug)]
-struct FetchIntoBuilder {
+struct FetchIntoStatement {
     filename: String,
     url: String,
     executable: bool,
 }
 
-impl builder::Builder for FetchIntoBuilder {
-    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+impl builder::Statement for FetchIntoStatement {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         let dst = state.dst_path(&self.filename);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
@@ -96,9 +96,9 @@ impl builder::Parser for FetchIntoParser {
                 and installs a symlink to it
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
         let (filename, url) = util::double_arg(&self.name(), args)?;
-        Ok(Box::new(FetchIntoBuilder {
+        Ok(Box::new(FetchIntoStatement {
             filename: filename.to_owned(),
             url: url.to_owned(),
             executable: false,
@@ -120,9 +120,9 @@ impl builder::Parser for FetchExeIntoParser {
                 and installs a symlink to it
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
         let (filename, url) = util::double_arg(&self.name(), args)?;
-        Ok(Box::new(FetchIntoBuilder {
+        Ok(Box::new(FetchIntoStatement {
             filename: filename.to_owned(),
             url: url.to_owned(),
             executable: true,

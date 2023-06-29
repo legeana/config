@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use anyhow::Result;
 use indoc::formatdoc;
 
@@ -38,14 +40,14 @@ impl Module for IfCommand {
 }
 
 #[derive(Debug)]
-struct IfCommandBuilder {
+struct IfCommandStatement {
     executable: String,
-    cmd: Box<dyn builder::Builder>,
+    cmd: Box<dyn builder::Statement>,
 }
 
-impl builder::Builder for IfCommandBuilder {
-    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
-        match self.cmd.build(state)? {
+impl builder::Statement for IfCommandStatement {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+        match self.cmd.eval(state)? {
             Some(cmd) => Ok(Some(Box::new(IfCommand {
                 executable: self.executable.clone(),
                 cmd,
@@ -69,10 +71,10 @@ impl builder::Parser for IfCommandParser {
                 in PATH
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &std::path::Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
         let (exe, cmd_args) = util::multiple_args(&self.name(), args, 1)?;
         assert_eq!(exe.len(), 1);
-        Ok(Box::new(IfCommandBuilder {
+        Ok(Box::new(IfCommandStatement {
             executable: exe[0].to_owned(),
             cmd: builder::parse(workdir, cmd_args)?,
         }))

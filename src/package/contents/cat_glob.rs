@@ -44,13 +44,13 @@ impl Module for CatGlobInto {
 }
 
 #[derive(Debug)]
-struct CatGlobIntoBuilder {
+struct CatGlobIntoStatement {
     filename: String,
     globs: Vec<String>,
 }
 
-impl builder::Builder for CatGlobIntoBuilder {
-    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+impl builder::Statement for CatGlobIntoStatement {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         let current_prefix = state.prefix.to_str().ok_or_else(|| {
             anyhow!(
                 "failed to represent current prefix {:?} as a string",
@@ -83,7 +83,7 @@ impl builder::Parser for CatGlobIntoParser {
                 create filename in local storage by concatenating globs
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
         let (fname, globs) = util::multiple_args(&self.name(), args, 1)?;
         assert!(fname.len() == 1);
         let filename = fname[0].to_owned();
@@ -92,7 +92,7 @@ impl builder::Parser for CatGlobIntoParser {
             .map(|&s| s.to_owned())
             //.map(String::from)
             .collect();
-        Ok(Box::new(CatGlobIntoBuilder { filename, globs }))
+        Ok(Box::new(CatGlobIntoStatement { filename, globs }))
     }
 }
 

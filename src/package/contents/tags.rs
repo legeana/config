@@ -10,12 +10,12 @@ use super::builder;
 use super::util;
 
 #[derive(Debug)]
-struct RequiresBuilder {
+struct RequiresStatement {
     tags: Vec<String>,
 }
 
-impl builder::Builder for RequiresBuilder {
-    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+impl builder::Statement for RequiresStatement {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         for tag in self.tags.iter() {
             let has_tag =
                 tag_util::has_tag(tag).with_context(|| format!("failed to check tag {tag}"))?;
@@ -40,21 +40,21 @@ impl builder::Parser for RequiresParser {
                 do not process current directory if any of the tags is not present
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
         let (_, tags) = util::multiple_args(&self.name(), args, 0)?;
-        Ok(Box::new(RequiresBuilder {
+        Ok(Box::new(RequiresStatement {
             tags: tags.iter().map(|&s| s.to_owned()).collect(),
         }))
     }
 }
 
 #[derive(Debug)]
-struct ConflictsBuilder {
+struct ConflictsStatement {
     tags: Vec<String>,
 }
 
-impl builder::Builder for ConflictsBuilder {
-    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+impl builder::Statement for ConflictsStatement {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         for tag in self.tags.iter() {
             let has_tag =
                 tag_util::has_tag(tag).with_context(|| format!("failed to check tag {tag}"))?;
@@ -79,9 +79,9 @@ impl builder::Parser for ConflictsParser {
                 do not process current directory if any of the tags is present
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
         let (_, tags) = util::multiple_args(&self.name(), args, 0)?;
-        Ok(Box::new(ConflictsBuilder {
+        Ok(Box::new(ConflictsStatement {
             tags: tags.iter().map(|&s| s.to_owned()).collect(),
         }))
     }

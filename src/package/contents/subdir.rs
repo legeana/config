@@ -10,18 +10,18 @@ use super::builder;
 use super::util;
 
 #[derive(Debug)]
-struct SubdirBuilder {
+struct SubdirStatement {
     subdir: PathBuf,
-    config: Box<dyn builder::Builder>,
+    config: Box<dyn builder::Statement>,
 }
 
-impl builder::Builder for SubdirBuilder {
-    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+impl builder::Statement for SubdirStatement {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         let mut substate = builder::State {
             enabled: true,
             prefix: state.prefix.join(&self.subdir),
         };
-        self.config.build(&mut substate)
+        self.config.eval(&mut substate)
     }
 }
 
@@ -38,26 +38,26 @@ impl builder::Parser for SubdirParser {
                 load subdirectory configuration recursively
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
         let subdir = util::single_arg(&self.name(), args)?;
         let subroot = workdir.join(subdir);
-        Ok(Box::new(SubdirBuilder {
+        Ok(Box::new(SubdirStatement {
             subdir: subdir.into(),
-            config: super::ConfigurationBuilder::parse(subroot)?,
+            config: super::ConfigurationStatement::parse(subroot)?,
         }))
     }
 }
 
 #[derive(Debug)]
-struct SubdirsBuilder {
-    subdirs: Vec<SubdirBuilder>,
+struct SubdirsStatement {
+    subdirs: Vec<SubdirStatement>,
 }
 
-impl builder::Builder for SubdirsBuilder {
-    fn build(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+impl builder::Statement for SubdirsStatement {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
         let mut modules: Vec<Box<dyn Module>> = Vec::new();
         for subdir in self.subdirs.iter() {
-            if let Some(m) = subdir.build(state)? {
+            if let Some(m) = subdir.eval(state)? {
                 modules.push(m);
             }
         }
@@ -78,9 +78,9 @@ impl builder::Parser for SubdirsParser {
                 load all subdirectories recursively
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Builder>> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
         util::no_args(&self.name(), args)?;
-        let mut subdirs: Vec<SubdirBuilder> = Vec::new();
+        let mut subdirs: Vec<SubdirStatement> = Vec::new();
         for entry in workdir
             .read_dir()
             .with_context(|| format!("failed to read {:?}", workdir))?
@@ -92,12 +92,12 @@ impl builder::Parser for SubdirsParser {
                 continue;
             }
             let fname = entry.file_name();
-            subdirs.push(SubdirBuilder {
+            subdirs.push(SubdirStatement {
                 subdir: fname.into(),
-                config: super::ConfigurationBuilder::parse(entry.path())?,
+                config: super::ConfigurationStatement::parse(entry.path())?,
             });
         }
-        Ok(Box::new(SubdirsBuilder { subdirs }))
+        Ok(Box::new(SubdirsStatement { subdirs }))
     }
 }
 
