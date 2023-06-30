@@ -42,35 +42,12 @@ pub trait Statement: std::fmt::Debug {
 }
 
 pub fn parse(workdir: &Path, args: &[&str]) -> Result<Box<dyn Statement>> {
-    let mut matched: Vec<(String, Box<dyn Statement>)> = Vec::new();
-    for parser in super::inventory::parsers() {
-        match parser.parse(workdir, args) {
-            Ok(builder) => matched.push((parser.name(), builder)),
-            Err(err) => {
-                match err.downcast_ref::<Error>() {
-                    Some(Error::UnsupportedCommand {
-                        builder: _,
-                        command: _,
-                    }) => {
-                        // Try another builder.
-                        continue;
-                    }
-                    _ => {
-                        return Err(err);
-                    }
-                }
-            }
-        }
+    if args.is_empty() {
+        return Err(anyhow!("command with no args[0] should not exist"));
     }
-    match matched.len() {
-        0 => Err(anyhow!("unsupported command {:?}", args)),
-        1 => Ok(matched.pop().unwrap().1),
-        _ => Err(anyhow!(
-            "{:?} matched multiple parsers: {:?}",
-            args,
-            matched.iter().map(|(parser, _)| parser).collect::<Vec<_>>(),
-        )),
-    }
+    let command = args[0];
+    let parser = super::inventory::parser(command)?;
+    parser.parse(workdir, args)
 }
 
 pub fn help() -> String {

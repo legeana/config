@@ -1,3 +1,6 @@
+use std::collections::HashMap;
+
+use anyhow::{anyhow, Result};
 use once_cell::sync::OnceCell;
 use tera::Tera;
 
@@ -14,13 +17,19 @@ pub trait RenderHelper: Sync + Send {
 
 #[derive(Default)]
 struct RegistryImpl {
-    commands: Vec<Box<dyn builder::Parser>>,
+    parsers: HashMap<String, Box<dyn builder::Parser>>,
+    parsers_order: Vec<String>,
     render_helpers: Vec<Box<dyn RenderHelper>>,
 }
 
 impl Registry for RegistryImpl {
     fn register_parser(&mut self, parser: Box<dyn builder::Parser>) {
-        self.commands.push(parser);
+        let name = parser.name();
+        let former = self.parsers.insert(parser.name(), parser);
+        if let Some(former) = former {
+            panic!("parser name conflict: {:?}", former.name());
+        }
+        self.parsers_order.push(name);
     }
     fn register_render_helper(&mut self, render_helper: Box<dyn RenderHelper>) {
         self.render_helpers.push(render_helper);
@@ -66,11 +75,35 @@ fn registry() -> &'static RegistryImpl {
 }
 
 pub fn parsers() -> impl Iterator<Item = &'static Box<dyn builder::Parser>> {
-    registry().commands.iter()
+    registry().parsers_order.iter().map(|name| {
+        registry()
+            .parsers
+            .get(name)
+            .expect("parsers_order must match parsers")
+    })
+}
+
+pub fn parser(name: &str) -> Result<&dyn builder::Parser> {
+    registry()
+        .parsers
+        .get(name)
+        .ok_or_else(|| anyhow!("unknown command {name}"))
+        .map(|p| p.as_ref())
 }
 
 pub fn register_render_helpers(tera: &mut Tera) {
     for rh in &registry().render_helpers {
         rh.register_render_helper(tera);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parsers_index() {
+        assert_eq!(registry().parsers.len(), registry().parsers_order.len());
+        assert_eq!(parsers().count(), registry().parsers.len());
     }
 }
