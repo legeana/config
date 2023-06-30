@@ -1,23 +1,33 @@
+use anyhow::Result;
 use once_cell::sync::OnceCell;
+use tera::Tera;
 
 use super::builder;
 
 pub trait Registry {
     fn register_parser(&mut self, parser: Box<dyn builder::Parser>);
-    fn register_render_helper(&mut self, render_helper: Box<dyn builder::RenderHelper>);
+    fn register_render_helper(&mut self, render_helper: Box<dyn RenderHelper>);
+}
+
+pub trait RenderHelper: Sync + Send {
+    /// [Optional] Register Tera helper.
+    fn register_render_helper(&self, tera: &mut Tera) -> Result<()> {
+        let _ = tera;
+        Ok(())
+    }
 }
 
 #[derive(Default)]
 struct RegistryImpl {
     commands: Vec<Box<dyn builder::Parser>>,
-    render_helpers: Vec<Box<dyn builder::RenderHelper>>,
+    render_helpers: Vec<Box<dyn RenderHelper>>,
 }
 
 impl Registry for RegistryImpl {
     fn register_parser(&mut self, parser: Box<dyn builder::Parser>) {
         self.commands.push(parser);
     }
-    fn register_render_helper(&mut self, render_helper: Box<dyn builder::RenderHelper>) {
+    fn register_render_helper(&mut self, render_helper: Box<dyn RenderHelper>) {
         self.render_helpers.push(render_helper);
     }
 }
@@ -64,6 +74,9 @@ pub fn parsers() -> impl Iterator<Item = &'static Box<dyn builder::Parser>> {
     registry().commands.iter()
 }
 
-pub fn render_helpers() -> impl Iterator<Item = &'static Box<dyn builder::RenderHelper>> {
-    registry().render_helpers.iter()
+pub fn register_render_helpers(tera: &mut Tera) -> Result<()> {
+    for rh in &registry().render_helpers {
+        rh.register_render_helper(tera)?;
+    }
+    Ok(())
 }

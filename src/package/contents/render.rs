@@ -48,7 +48,7 @@ impl builder::Statement for RenderStatement {
         let mut tera = tera::Tera::default();
         tera.add_template_file(&src, Some(TEMPLATE_NAME))
             .with_context(|| format!("failed to load template from {src:?}"))?;
-        builder::register_render_helpers(&mut tera)?;
+        inventory::register_render_helpers(&mut tera)?;
         tera_helpers::register(&mut tera)?;
         let mut context = tera::Context::new();
         context.insert("source_file", &src);

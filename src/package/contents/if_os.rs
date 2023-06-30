@@ -68,7 +68,7 @@ impl builder::Parser for IfOsParser {
     }
 }
 
-impl builder::RenderHelper for IfOsParser {
+impl inventory::RenderHelper for IfOsParser {
     fn register_render_helper(&self, tera: &mut tera::Tera) -> Result<()> {
         let name = format!("is_{}", self.os);
         let os = self.os.to_owned();

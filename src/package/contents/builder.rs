@@ -1,7 +1,6 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Result};
-use tera::Tera;
 use thiserror::Error;
 
 use crate::module::Module;
@@ -26,14 +25,6 @@ impl State {
     }
     pub fn dst_path<P: AsRef<Path>>(&self, path: P) -> PathBuf {
         self.prefix.join(path)
-    }
-}
-
-pub trait RenderHelper: Sync + Send {
-    /// [Optional] Register Tera helper.
-    fn register_render_helper(&self, tera: &mut Tera) -> Result<()> {
-        let _ = tera;
-        Ok(())
     }
 }
 
@@ -80,13 +71,6 @@ pub fn parse(workdir: &Path, args: &[&str]) -> Result<Box<dyn Statement>> {
             matched.iter().map(|(parser, _)| parser).collect::<Vec<_>>(),
         )),
     }
-}
-
-pub fn register_render_helpers(tera: &mut Tera) -> Result<()> {
-    for rh in super::inventory::render_helpers() {
-        rh.register_render_helper(tera)?;
-    }
-    Ok(())
 }
 
 pub fn help() -> String {
