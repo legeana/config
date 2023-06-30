@@ -4,6 +4,7 @@ use crate::module::Module;
 use crate::tera_helper;
 
 use super::builder;
+use super::inventory;
 use super::util;
 
 use anyhow::Result;
@@ -65,6 +66,9 @@ impl builder::Parser for IfOsParser {
             cmd: builder::parse(workdir, cmd_args)?,
         }))
     }
+}
+
+impl builder::RenderHelper for IfOsParser {
     fn register_render_helper(&self, tera: &mut tera::Tera) -> Result<()> {
         let name = format!("is_{}", self.os);
         let os = self.os.to_owned();
@@ -73,11 +77,15 @@ impl builder::Parser for IfOsParser {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![
-        Box::new(IfOsParser { os: "macos" }),
-        Box::new(IfOsParser { os: "linux" }),
-        Box::new(IfOsParser { os: "unix" }),
-        Box::new(IfOsParser { os: "windows" }),
-    ]
+pub fn register(registry: &mut dyn inventory::Registry) {
+    let parsers = [
+        IfOsParser { os: "macos" },
+        IfOsParser { os: "linux" },
+        IfOsParser { os: "unix" },
+        IfOsParser { os: "windows" },
+    ];
+    for parser in parsers {
+        registry.register_parser(Box::new(parser.clone()));
+        registry.register_render_helper(Box::new(parser));
+    }
 }

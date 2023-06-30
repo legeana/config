@@ -4,11 +4,12 @@ use anyhow::{Context, Result};
 use indoc::formatdoc;
 
 use crate::module::{Module, Rules};
-use crate::package::contents::util;
 use crate::registry::Registry;
 
 use super::builder;
+use super::inventory;
 use super::local_state;
+use super::util;
 
 struct OutputFile {
     output: local_state::FileState,
@@ -53,6 +54,6 @@ impl builder::Parser for OutputFileParser {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(OutputFileParser {})]
+pub fn register(registry: &mut dyn inventory::Registry) {
+    registry.register_parser(Box::new(OutputFileParser {}));
 }

@@ -8,6 +8,7 @@ use crate::registry::Registry;
 use crate::tera_helpers;
 
 use super::builder;
+use super::inventory;
 use super::local_state;
 use super::util;
 
@@ -108,6 +109,7 @@ impl builder::Parser for RenderToParser {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(RenderParser {}), Box::new(RenderToParser {})]
+pub fn register(registry: &mut dyn inventory::Registry) {
+    registry.register_parser(Box::new(RenderParser {}));
+    registry.register_parser(Box::new(RenderToParser {}));
 }

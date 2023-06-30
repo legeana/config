@@ -5,6 +5,7 @@ use crate::registry::Registry;
 
 use super::builder;
 use super::file_util;
+use super::inventory;
 use super::util;
 
 use anyhow::{Context, Result};
@@ -72,6 +73,6 @@ impl builder::Parser for SymlinkTreeParser {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(SymlinkTreeParser {})]
+pub fn register(registry: &mut dyn inventory::Registry) {
+    registry.register_parser(Box::new(SymlinkTreeParser {}));
 }

@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{anyhow, Result};
 use tera::Tera;
 use thiserror::Error;
 
@@ -29,17 +29,20 @@ impl State {
     }
 }
 
-/// Parses a Statement.
-/// This should be purely syntactical.
-pub trait Parser {
-    fn name(&self) -> String;
-    fn help(&self) -> String;
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn Statement>>;
-    /// [Optional] Register Handlebars helper.
+pub trait RenderHelper: Sync + Send {
+    /// [Optional] Register Tera helper.
     fn register_render_helper(&self, tera: &mut Tera) -> Result<()> {
         let _ = tera;
         Ok(())
     }
+}
+
+/// Parses a Statement.
+/// This should be purely syntactical.
+pub trait Parser: Sync + Send {
+    fn name(&self) -> String;
+    fn help(&self) -> String;
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn Statement>>;
 }
 
 /// Command creates a Module or modifies State.
@@ -47,41 +50,9 @@ pub trait Statement: std::fmt::Debug {
     fn eval(&self, state: &mut State) -> Result<Option<Box<dyn Module>>>;
 }
 
-fn parsers() -> Vec<Box<dyn Parser>> {
-    let result: Vec<Vec<Box<dyn Parser>>> = vec![
-        // MANIFEST.
-        super::subdir::commands(),
-        super::prefix::commands(),
-        super::dirs_prefix::commands(),
-        super::tags::commands(),
-        // Files.
-        super::symlink::commands(),
-        super::symlink_tree::commands(),
-        super::mkdir::commands(),
-        super::copy::commands(),
-        super::output_file::commands(),
-        super::cat_glob::commands(),
-        super::set_contents::commands(),
-        super::importer::commands(),
-        super::render::commands(),
-        // Downloads.
-        super::fetch::commands(),
-        super::git_clone::commands(),
-        // Exec.
-        super::exec::commands(),
-        // Control.
-        super::if_command::commands(),
-        super::if_missing::commands(),
-        super::if_os::commands(),
-        // Deprecation.
-        super::deprecated::commands(),
-    ];
-    result.into_iter().flatten().collect()
-}
-
 pub fn parse(workdir: &Path, args: &[&str]) -> Result<Box<dyn Statement>> {
     let mut matched: Vec<(String, Box<dyn Statement>)> = Vec::new();
-    for parser in parsers() {
+    for parser in super::inventory::parsers() {
         match parser.parse(workdir, args) {
             Ok(builder) => matched.push((parser.name(), builder)),
             Err(err) => {
@@ -112,17 +83,15 @@ pub fn parse(workdir: &Path, args: &[&str]) -> Result<Box<dyn Statement>> {
 }
 
 pub fn register_render_helpers(tera: &mut Tera) -> Result<()> {
-    for parser in parsers() {
-        parser
-            .register_render_helper(tera)
-            .with_context(|| format!("failed to register {} helper", parser.name()))?;
+    for rh in super::inventory::render_helpers() {
+        rh.register_render_helper(tera)?;
     }
     Ok(())
 }
 
 pub fn help() -> String {
     let mut help = String::new();
-    for parser in parsers() {
+    for parser in super::inventory::parsers() {
         help.push_str(parser.help().trim_end());
         help.push('\n');
     }

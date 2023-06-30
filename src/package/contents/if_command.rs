@@ -8,6 +8,7 @@ use crate::module::{Module, Rules};
 use crate::registry::Registry;
 
 use super::builder;
+use super::inventory;
 use super::util;
 
 struct IfCommand {
@@ -81,6 +82,6 @@ impl builder::Parser for IfCommandParser {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(IfCommandParser {})]
+pub fn register(registry: &mut dyn inventory::Registry) {
+    registry.register_parser(Box::new(IfCommandParser {}));
 }

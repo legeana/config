@@ -5,6 +5,7 @@ use crate::module::{Module, Rules};
 use crate::registry::Registry;
 
 use super::builder;
+use super::inventory;
 use super::local_state;
 use super::util;
 
@@ -96,6 +97,6 @@ impl builder::Parser for CatGlobIntoParser {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(CatGlobIntoParser {})]
+pub fn register(registry: &mut dyn inventory::Registry) {
+    registry.register_parser(Box::new(CatGlobIntoParser {}));
 }

@@ -5,6 +5,7 @@ use anyhow::Result;
 use crate::module::Module;
 
 use super::builder;
+use super::inventory;
 use super::util::check_command;
 
 #[derive(Debug)]
@@ -39,6 +40,6 @@ impl builder::Parser for DeprecatedParser {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(DeprecatedParser {})]
+pub fn register(registry: &mut dyn inventory::Registry) {
+    registry.register_parser(Box::new(DeprecatedParser {}));
 }

@@ -7,6 +7,7 @@ use indoc::formatdoc;
 use crate::module::Module;
 
 use super::builder;
+use super::inventory;
 use super::util;
 
 #[derive(Debug)]
@@ -101,6 +102,7 @@ impl builder::Parser for SubdirsParser {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(SubdirParser {}), Box::new(SubdirsParser {})]
+pub fn register(registry: &mut dyn inventory::Registry) {
+    registry.register_parser(Box::new(SubdirParser {}));
+    registry.register_parser(Box::new(SubdirsParser {}));
 }

@@ -8,6 +8,7 @@ use crate::registry::Registry;
 
 use super::builder;
 use super::file_util;
+use super::inventory;
 use super::util;
 
 struct Symlink {
@@ -83,6 +84,7 @@ impl builder::Parser for SymlinkToParser {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(SymlinkParser {}), Box::new(SymlinkToParser {})]
+pub fn register(registry: &mut dyn inventory::Registry) {
+    registry.register_parser(Box::new(SymlinkParser {}));
+    registry.register_parser(Box::new(SymlinkToParser {}));
 }

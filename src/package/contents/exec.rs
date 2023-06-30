@@ -6,6 +6,7 @@ use crate::process_utils;
 use crate::registry::Registry;
 
 use super::builder;
+use super::inventory;
 use super::util;
 
 use anyhow::Result;
@@ -110,9 +111,7 @@ impl builder::Parser for PostInstallUpdateParser {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![
-        Box::new(PostInstallExecParser {}),
-        Box::new(PostInstallUpdateParser {}),
-    ]
+pub fn register(registry: &mut dyn inventory::Registry) {
+    registry.register_parser(Box::new(PostInstallExecParser {}));
+    registry.register_parser(Box::new(PostInstallUpdateParser {}));
 }

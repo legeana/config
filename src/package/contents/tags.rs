@@ -7,6 +7,7 @@ use crate::module::Module;
 use crate::tag_util;
 
 use super::builder;
+use super::inventory;
 use super::util;
 
 #[derive(Debug)]
@@ -87,6 +88,7 @@ impl builder::Parser for ConflictsParser {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![Box::new(RequiresParser {}), Box::new(ConflictsParser {})]
+pub fn register(registry: &mut dyn inventory::Registry) {
+    registry.register_parser(Box::new(RequiresParser {}));
+    registry.register_parser(Box::new(ConflictsParser {}));
 }

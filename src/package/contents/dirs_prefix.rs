@@ -10,6 +10,7 @@ use crate::xdg;
 use crate::xdg_or_win;
 
 use super::builder;
+use super::inventory;
 use super::util;
 
 #[derive(Debug)]
@@ -64,12 +65,15 @@ impl builder::Parser for DirsPrefixParser {
             subdir,
         }))
     }
+}
+
+impl builder::RenderHelper for DirsPrefixParser {
     fn register_render_helper(&self, tera: &mut tera::Tera) -> Result<()> {
         let Some(base_dir) = self.base_dir.clone() else {
             return Ok(());
         };
         tera.register_function(
-            &self.name(),
+            &builder::Parser::name(self),
             tera_helper::wrap_fn(move |args: &DirsPrefixParams| {
                 Ok(match args.path {
                     Some(ref path) => base_dir.join(path),
@@ -81,121 +85,125 @@ impl builder::Parser for DirsPrefixParser {
     }
 }
 
-pub fn commands() -> Vec<Box<dyn builder::Parser>> {
-    vec![
-        Box::new(DirsPrefixParser {
+pub fn register(registry: &mut dyn inventory::Registry) {
+    let parsers = [
+        DirsPrefixParser {
             command: "audio_prefix",
             base_dir: dirs::audio_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "cache_prefix",
             base_dir: dirs::cache_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "config_prefix",
             base_dir: dirs::config_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "config_local_prefix",
             base_dir: dirs::config_local_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "data_prefix",
             base_dir: dirs::data_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "data_local_prefix",
             base_dir: dirs::data_local_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "desktop_prefix",
             base_dir: dirs::desktop_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "document_prefix",
             base_dir: dirs::document_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "download_prefix",
             base_dir: dirs::download_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "executable_prefix",
             base_dir: dirs::executable_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "font_prefix",
             base_dir: dirs::font_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "home_prefix",
             base_dir: dirs::home_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "picture_prefix",
             base_dir: dirs::picture_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "preference_prefix",
             base_dir: dirs::preference_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "public_prefix",
             base_dir: dirs::public_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "runtime_prefix",
             base_dir: dirs::runtime_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "state_prefix",
             base_dir: dirs::state_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "template_prefix",
             base_dir: dirs::template_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "video_prefix",
             base_dir: dirs::video_dir(),
-        }),
+        },
         // XDG
-        Box::new(DirsPrefixParser {
+        DirsPrefixParser {
             command: "xdg_cache_prefix",
             base_dir: xdg::cache_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "xdg_config_prefix",
             base_dir: xdg::config_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "xdg_data_prefix",
             base_dir: xdg::data_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "xdg_state_prefix",
             base_dir: xdg::state_dir(),
-        }),
+        },
         // XDG (for UNIX) or Windows.
-        Box::new(DirsPrefixParser {
+        DirsPrefixParser {
             command: "xdg_or_win_cache_prefix",
             base_dir: xdg_or_win::cache_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "xdg_or_win_config_prefix",
             base_dir: xdg_or_win::config_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "xdg_or_win_config_local_prefix",
             base_dir: xdg_or_win::config_local_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "xdg_or_win_data_prefix",
             base_dir: xdg_or_win::data_dir(),
-        }),
-        Box::new(DirsPrefixParser {
+        },
+        DirsPrefixParser {
             command: "xdg_or_win_data_local_prefix",
             base_dir: xdg_or_win::data_local_dir(),
-        }),
-    ]
+        },
+    ];
+    for dir in parsers {
+        registry.register_parser(Box::new(dir.clone()));
+        registry.register_render_helper(Box::new(dir));
+    }
 }
