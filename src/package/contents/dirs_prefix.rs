@@ -68,9 +68,9 @@ impl builder::Parser for DirsPrefixParser {
 }
 
 impl inventory::RenderHelper for DirsPrefixParser {
-    fn register_render_helper(&self, tera: &mut tera::Tera) -> Result<()> {
+    fn register_render_helper(&self, tera: &mut tera::Tera) {
         let Some(base_dir) = self.base_dir.clone() else {
-            return Ok(());
+            return;
         };
         tera.register_function(
             &builder::Parser::name(self),
@@ -81,7 +81,6 @@ impl inventory::RenderHelper for DirsPrefixParser {
                 })
             }),
         );
-        Ok(())
     }
 }
 

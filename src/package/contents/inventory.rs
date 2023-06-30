@@ -1,4 +1,3 @@
-use anyhow::Result;
 use once_cell::sync::OnceCell;
 use tera::Tera;
 
@@ -10,11 +9,7 @@ pub trait Registry {
 }
 
 pub trait RenderHelper: Sync + Send {
-    /// [Optional] Register Tera helper.
-    fn register_render_helper(&self, tera: &mut Tera) -> Result<()> {
-        let _ = tera;
-        Ok(())
-    }
+    fn register_render_helper(&self, tera: &mut Tera);
 }
 
 #[derive(Default)]
@@ -74,9 +69,8 @@ pub fn parsers() -> impl Iterator<Item = &'static Box<dyn builder::Parser>> {
     registry().commands.iter()
 }
 
-pub fn register_render_helpers(tera: &mut Tera) -> Result<()> {
+pub fn register_render_helpers(tera: &mut Tera) {
     for rh in &registry().render_helpers {
-        rh.register_render_helper(tera)?;
+        rh.register_render_helper(tera);
     }
-    Ok(())
 }
