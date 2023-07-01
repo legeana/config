@@ -4,6 +4,7 @@ use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
 use super::ast;
+use super::engine;
 use super::file_util;
 use super::inventory;
 use super::util;
@@ -43,7 +44,7 @@ struct SymlinkTreeStatement {
 }
 
 impl ast::Statement for SymlinkTreeStatement {
-    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
         Ok(Some(Box::new(SymlinkTree {
             src: self.workdir.join(&self.directory),
             dst: state.dst_path(&self.directory),

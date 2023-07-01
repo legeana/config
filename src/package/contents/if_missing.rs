@@ -5,6 +5,7 @@ use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
 use super::ast;
+use super::engine;
 use super::inventory;
 use super::util;
 
@@ -51,7 +52,7 @@ struct IfMissingStatement {
 }
 
 impl ast::Statement for IfMissingStatement {
-    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
         let path: PathBuf = shellexpand::tilde(&self.path).as_ref().into();
         match self.cmd.eval(state)? {
             Some(cmd) => Ok(Some(Box::new(IfMissing { path, cmd }))),

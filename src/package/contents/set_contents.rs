@@ -7,6 +7,7 @@ use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
 use super::ast;
+use super::engine;
 use super::inventory;
 use super::local_state;
 use super::util;
@@ -40,7 +41,7 @@ struct SetContentsStatement {
 }
 
 impl ast::Statement for SetContentsStatement {
-    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
         let dst = state.dst_path(&self.filename);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;

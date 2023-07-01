@@ -7,6 +7,7 @@ use crate::module::ModuleBox;
 use crate::tag_util;
 
 use super::ast;
+use super::engine;
 use super::inventory;
 use super::util;
 
@@ -16,7 +17,7 @@ struct RequiresStatement {
 }
 
 impl ast::Statement for RequiresStatement {
-    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
         for tag in self.tags.iter() {
             let has_tag =
                 tag_util::has_tag(tag).with_context(|| format!("failed to check tag {tag}"))?;
@@ -55,7 +56,7 @@ struct ConflictsStatement {
 }
 
 impl ast::Statement for ConflictsStatement {
-    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
         for tag in self.tags.iter() {
             let has_tag =
                 tag_util::has_tag(tag).with_context(|| format!("failed to check tag {tag}"))?;

@@ -10,6 +10,7 @@ use crate::xdg;
 use crate::xdg_or_win;
 
 use super::ast;
+use super::engine;
 use super::inventory;
 use super::util;
 
@@ -21,7 +22,7 @@ struct DirsPrefixStatement {
 }
 
 impl ast::Statement for DirsPrefixStatement {
-    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
         let base_dir = self
             .base_dir
             .as_ref()

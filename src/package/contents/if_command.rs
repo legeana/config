@@ -8,6 +8,7 @@ use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
 use super::ast;
+use super::engine;
 use super::inventory;
 use super::util;
 
@@ -47,7 +48,7 @@ struct IfCommandStatement {
 }
 
 impl ast::Statement for IfCommandStatement {
-    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
         match self.cmd.eval(state)? {
             Some(cmd) => Ok(Some(Box::new(IfCommand {
                 executable: self.executable.clone(),

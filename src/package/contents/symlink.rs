@@ -7,6 +7,7 @@ use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
 use super::ast;
+use super::engine;
 use super::file_util;
 use super::inventory;
 use super::util;
@@ -30,7 +31,7 @@ struct SymlinkStatement {
 }
 
 impl ast::Statement for SymlinkStatement {
-    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
         Ok(Some(Box::new(Symlink {
             src: self.workdir.join(&self.src),
             dst: state.dst_path(&self.dst),

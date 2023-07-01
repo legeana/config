@@ -8,6 +8,7 @@ use anyhow::{anyhow, Context, Result};
 use crate::module::ModuleBox;
 
 use super::ast;
+use super::engine;
 
 const LINE_CONT: char = '\\';
 
@@ -87,7 +88,7 @@ struct ParsedStatement {
 }
 
 impl ast::Statement for ParsedStatement {
-    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
         self.statement.eval(state).with_context(|| {
             format!(
                 "failed to build line {line_num} {line:?} from {manifest_path:?}",

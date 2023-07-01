@@ -4,6 +4,7 @@ use crate::module::ModuleBox;
 use crate::tera_helper;
 
 use super::ast;
+use super::engine;
 use super::inventory;
 use super::util;
 
@@ -29,7 +30,7 @@ impl IfOsStatement {
 }
 
 impl ast::Statement for IfOsStatement {
-    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
         if !self.is_os() {
             return Ok(None);
         }

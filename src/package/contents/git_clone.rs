@@ -8,6 +8,7 @@ use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
 use super::ast;
+use super::engine;
 use super::inventory;
 use super::local_state;
 use super::util;
@@ -66,7 +67,7 @@ struct GitCloneStatement {
 }
 
 impl ast::Statement for GitCloneStatement {
-    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
         let dst = state.dst_path(&self.dst);
         let output = local_state::DirectoryState::new(dst.clone())
             .with_context(|| format!("failed to create DirectoryState from {dst:?}"))?;

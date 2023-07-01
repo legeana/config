@@ -6,6 +6,7 @@ use indoc::formatdoc;
 use crate::module::ModuleBox;
 
 use super::ast;
+use super::engine;
 use super::inventory;
 use super::util;
 
@@ -15,7 +16,7 @@ struct PrefixStatement {
 }
 
 impl ast::Statement for PrefixStatement {
-    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
         state.prefix = shellexpand::tilde(&self.prefix).as_ref().into();
         Ok(None)
     }

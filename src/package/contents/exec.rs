@@ -6,6 +6,7 @@ use crate::process_utils;
 use crate::registry::Registry;
 
 use super::ast;
+use super::engine;
 use super::inventory;
 use super::util;
 
@@ -46,7 +47,7 @@ struct PostInstallStatement {
 }
 
 impl ast::Statement for PostInstallStatement {
-    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
         let args: Vec<String> = self
             .args
             .iter()

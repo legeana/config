@@ -4,6 +4,7 @@ use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
 use super::ast;
+use super::engine;
 use super::inventory;
 use super::util;
 
@@ -31,7 +32,7 @@ struct MkDirStatement {
 }
 
 impl ast::Statement for MkDirStatement {
-    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
         Ok(Some(Box::new(MkDir {
             dst: state.dst_path(&self.dir),
         })))

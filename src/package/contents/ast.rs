@@ -1,25 +1,10 @@
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use anyhow::{anyhow, Result};
 
 use crate::module::ModuleBox;
 
-pub struct State {
-    pub enabled: bool,
-    pub prefix: PathBuf,
-}
-
-impl State {
-    pub fn new() -> Self {
-        Self {
-            enabled: true,
-            prefix: dirs::home_dir().expect("failed to determine home dir"),
-        }
-    }
-    pub fn dst_path<P: AsRef<Path>>(&self, path: P) -> PathBuf {
-        self.prefix.join(path)
-    }
-}
+use super::engine;
 
 /// Parses a Statement.
 /// This should be purely syntactical.
@@ -33,7 +18,7 @@ pub type ParserBox = Box<dyn Parser>;
 
 /// Command creates a Module or modifies State.
 pub trait Statement: std::fmt::Debug {
-    fn eval(&self, state: &mut State) -> Result<Option<ModuleBox>>;
+    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>>;
 }
 
 pub type StatementBox = Box<dyn Statement>;

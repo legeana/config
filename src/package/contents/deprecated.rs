@@ -5,6 +5,7 @@ use anyhow::Result;
 use crate::module::ModuleBox;
 
 use super::ast;
+use super::engine;
 use super::inventory;
 use super::util::check_command;
 
@@ -12,7 +13,7 @@ use super::util::check_command;
 struct NoOpStatement;
 
 impl ast::Statement for NoOpStatement {
-    fn eval(&self, _state: &mut ast::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, _state: &mut engine::State) -> Result<Option<ModuleBox>> {
         Ok(None)
     }
 }

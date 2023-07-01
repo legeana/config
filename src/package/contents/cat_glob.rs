@@ -5,6 +5,7 @@ use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
 use super::ast;
+use super::engine;
 use super::inventory;
 use super::local_state;
 use super::util;
@@ -51,7 +52,7 @@ struct CatGlobIntoStatement {
 }
 
 impl ast::Statement for CatGlobIntoStatement {
-    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
         let current_prefix = state.prefix.to_str().ok_or_else(|| {
             anyhow!(
                 "failed to represent current prefix {:?} as a string",

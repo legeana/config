@@ -8,6 +8,7 @@ use crate::registry::Registry;
 use crate::tera_helpers;
 
 use super::ast;
+use super::engine;
 use super::inventory;
 use super::local_state;
 use super::util;
@@ -40,7 +41,7 @@ struct RenderStatement {
 }
 
 impl ast::Statement for RenderStatement {
-    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
         let src = self.workdir.join(&self.src);
         let dst = state.dst_path(&self.dst);
         let output = local_state::FileState::new(dst.clone())
