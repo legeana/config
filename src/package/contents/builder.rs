@@ -1,15 +1,8 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Result};
-use thiserror::Error;
 
 use crate::module::Module;
-
-#[derive(Error, Debug)]
-pub enum Error {
-    #[error("builder {builder}: unsupported command {command}")]
-    UnsupportedCommand { builder: String, command: String },
-}
 
 pub struct State {
     pub enabled: bool,

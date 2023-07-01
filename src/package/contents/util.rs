@@ -1,5 +1,3 @@
-use super::builder;
-
 use anyhow::{anyhow, Result};
 
 /// Checks that the first argument is command and returns a slice of command arguments.
@@ -10,11 +8,7 @@ pub fn check_command<'a, 'b>(command: &str, args: &'a [&'b str]) -> Result<&'a [
     let cmd = args[0];
     let cmd_args = &args[1..];
     if command != cmd {
-        return Err(builder::Error::UnsupportedCommand {
-            builder: command.to_owned(),
-            command: cmd.to_owned(),
-        }
-        .into());
+        return Err(anyhow!("incorrect command: expected {command:?}, got {cmd:?}"));
     }
     Ok(cmd_args)
 }
