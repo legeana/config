@@ -30,8 +30,8 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Context, Result};
 
+use crate::module::{Module, Rules};
 use crate::package::contents::builder::Statement;
-use crate::package::{Module, Rules};
 use crate::registry::Registry;
 
 const MANIFEST: &str = "MANIFEST";

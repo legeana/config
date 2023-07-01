@@ -1,11 +1,11 @@
 use anyhow::{anyhow, Context, Result};
 
+use crate::module::{Module, Rules};
 use crate::registry::Registry;
 use crate::tag_criteria::TagCriteria;
 
 use super::config;
 use super::Installer;
-use super::{Module, Rules};
 
 #[derive(Default)]
 pub struct UserDependency {

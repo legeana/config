@@ -2,10 +2,9 @@ use std::path::PathBuf;
 
 use anyhow::Result;
 
+use crate::module::{Module, Rules};
 use crate::process_utils;
 use crate::registry::Registry;
-
-use super::{Module, Rules};
 
 pub struct AnsiblePlaybook {
     root: PathBuf,

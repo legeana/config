@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Context, Result};
 
-use crate::package::Module;
+use crate::module::Module;
 
 use super::builder;
 
