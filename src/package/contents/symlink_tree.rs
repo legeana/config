@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::builder;
+use super::ast;
 use super::file_util;
 use super::inventory;
 use super::util;
@@ -42,8 +42,8 @@ struct SymlinkTreeStatement {
     directory: String,
 }
 
-impl builder::Statement for SymlinkTreeStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
+impl ast::Statement for SymlinkTreeStatement {
+    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
         Ok(Some(Box::new(SymlinkTree {
             src: self.workdir.join(&self.directory),
             dst: state.dst_path(&self.directory),
@@ -54,7 +54,7 @@ impl builder::Statement for SymlinkTreeStatement {
 #[derive(Clone)]
 struct SymlinkTreeParser;
 
-impl builder::Parser for SymlinkTreeParser {
+impl ast::Parser for SymlinkTreeParser {
     fn name(&self) -> String {
         "symlink_tree".to_owned()
     }
@@ -64,7 +64,7 @@ impl builder::Parser for SymlinkTreeParser {
                 create a symlink for every file in a directory recursively
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
         let directory = util::single_arg(&self.name(), args)?.to_owned();
         Ok(Box::new(SymlinkTreeStatement {
             workdir: workdir.to_owned(),

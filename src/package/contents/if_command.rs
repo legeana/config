@@ -7,7 +7,7 @@ use crate::command::is_command;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::builder;
+use super::ast;
 use super::inventory;
 use super::util;
 
@@ -43,11 +43,11 @@ impl Module for IfCommand {
 #[derive(Debug)]
 struct IfCommandStatement {
     executable: String,
-    cmd: builder::StatementBox,
+    cmd: ast::StatementBox,
 }
 
-impl builder::Statement for IfCommandStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
+impl ast::Statement for IfCommandStatement {
+    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
         match self.cmd.eval(state)? {
             Some(cmd) => Ok(Some(Box::new(IfCommand {
                 executable: self.executable.clone(),
@@ -61,7 +61,7 @@ impl builder::Statement for IfCommandStatement {
 #[derive(Clone)]
 struct IfCommandParser;
 
-impl builder::Parser for IfCommandParser {
+impl ast::Parser for IfCommandParser {
     fn name(&self) -> String {
         "if_command".to_owned()
     }
@@ -72,12 +72,12 @@ impl builder::Parser for IfCommandParser {
                 in PATH
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
         let (exe, cmd_args) = util::multiple_args(&self.name(), args, 1)?;
         assert_eq!(exe.len(), 1);
         Ok(Box::new(IfCommandStatement {
             executable: exe[0].to_owned(),
-            cmd: builder::parse(workdir, cmd_args)?,
+            cmd: ast::parse(workdir, cmd_args)?,
         }))
     }
 }

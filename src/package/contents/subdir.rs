@@ -6,19 +6,19 @@ use indoc::formatdoc;
 
 use crate::module::ModuleBox;
 
-use super::builder;
+use super::ast;
 use super::inventory;
 use super::util;
 
 #[derive(Debug)]
 struct SubdirStatement {
     subdir: PathBuf,
-    config: builder::StatementBox,
+    config: ast::StatementBox,
 }
 
-impl builder::Statement for SubdirStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
-        let mut substate = builder::State {
+impl ast::Statement for SubdirStatement {
+    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
+        let mut substate = ast::State {
             enabled: true,
             prefix: state.prefix.join(&self.subdir),
         };
@@ -29,7 +29,7 @@ impl builder::Statement for SubdirStatement {
 #[derive(Clone)]
 struct SubdirParser;
 
-impl builder::Parser for SubdirParser {
+impl ast::Parser for SubdirParser {
     fn name(&self) -> String {
         "subdir".to_owned()
     }
@@ -39,7 +39,7 @@ impl builder::Parser for SubdirParser {
                 load subdirectory configuration recursively
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
         let subdir = util::single_arg(&self.name(), args)?;
         let subroot = workdir.join(subdir);
         Ok(Box::new(SubdirStatement {
@@ -54,8 +54,8 @@ struct SubdirsStatement {
     subdirs: Vec<SubdirStatement>,
 }
 
-impl builder::Statement for SubdirsStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
+impl ast::Statement for SubdirsStatement {
+    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
         let mut modules: Vec<ModuleBox> = Vec::new();
         for subdir in self.subdirs.iter() {
             if let Some(m) = subdir.eval(state)? {
@@ -69,7 +69,7 @@ impl builder::Statement for SubdirsStatement {
 #[derive(Clone)]
 struct SubdirsParser;
 
-impl builder::Parser for SubdirsParser {
+impl ast::Parser for SubdirsParser {
     fn name(&self) -> String {
         "subdirs".to_owned()
     }
@@ -79,7 +79,7 @@ impl builder::Parser for SubdirsParser {
                 load all subdirectories recursively
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
         util::no_args(&self.name(), args)?;
         let mut subdirs: Vec<SubdirStatement> = Vec::new();
         for entry in workdir

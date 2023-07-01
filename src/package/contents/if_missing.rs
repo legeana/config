@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::builder;
+use super::ast;
 use super::inventory;
 use super::util;
 
@@ -47,11 +47,11 @@ impl Module for IfMissing {
 #[derive(Debug)]
 struct IfMissingStatement {
     path: String,
-    cmd: builder::StatementBox,
+    cmd: ast::StatementBox,
 }
 
-impl builder::Statement for IfMissingStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
+impl ast::Statement for IfMissingStatement {
+    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
         let path: PathBuf = shellexpand::tilde(&self.path).as_ref().into();
         match self.cmd.eval(state)? {
             Some(cmd) => Ok(Some(Box::new(IfMissing { path, cmd }))),
@@ -63,7 +63,7 @@ impl builder::Statement for IfMissingStatement {
 #[derive(Clone)]
 struct IfMissingParser;
 
-impl builder::Parser for IfMissingParser {
+impl ast::Parser for IfMissingParser {
     fn name(&self) -> String {
         "if_missing".to_owned()
     }
@@ -73,12 +73,12 @@ impl builder::Parser for IfMissingParser {
                 execute a MANIFEST <command> only if <path> is missing
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
         let (path, cmd_args) = util::multiple_args(&self.name(), args, 1)?;
         assert_eq!(path.len(), 1);
         Ok(Box::new(IfMissingStatement {
             path: path[0].to_owned(),
-            cmd: builder::parse(workdir, cmd_args)?,
+            cmd: ast::parse(workdir, cmd_args)?,
         }))
     }
 }

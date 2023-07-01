@@ -5,7 +5,7 @@ use crate::module::{Module, ModuleBox, Rules};
 use crate::process_utils;
 use crate::registry::Registry;
 
-use super::builder;
+use super::ast;
 use super::inventory;
 use super::util;
 
@@ -45,8 +45,8 @@ struct PostInstallStatement {
     args: Vec<String>,
 }
 
-impl builder::Statement for PostInstallStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
+impl ast::Statement for PostInstallStatement {
+    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
         let args: Vec<String> = self
             .args
             .iter()
@@ -65,7 +65,7 @@ impl builder::Statement for PostInstallStatement {
 #[derive(Clone)]
 struct PostInstallExecParser;
 
-impl builder::Parser for PostInstallExecParser {
+impl ast::Parser for PostInstallExecParser {
     fn name(&self) -> String {
         "post_install_exec".to_owned()
     }
@@ -75,7 +75,7 @@ impl builder::Parser for PostInstallExecParser {
                 execute a command in a post-install phase
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
         let (command, args) = util::multiple_args(&self.name(), args, 1)?;
         assert!(command.len() == 1);
         Ok(Box::new(PostInstallStatement {
@@ -89,7 +89,7 @@ impl builder::Parser for PostInstallExecParser {
 #[derive(Clone)]
 struct PostInstallUpdateParser;
 
-impl builder::Parser for PostInstallUpdateParser {
+impl ast::Parser for PostInstallUpdateParser {
     fn name(&self) -> String {
         "post_install_update".to_owned()
     }
@@ -100,7 +100,7 @@ impl builder::Parser for PostInstallUpdateParser {
                 only if executed via 'setup update' command
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
         let (command, args) = util::multiple_args(&self.name(), args, 1)?;
         assert!(command.len() == 1);
         Ok(Box::new(PostInstallStatement {

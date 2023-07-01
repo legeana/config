@@ -4,7 +4,7 @@ use std::path::Path;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::builder;
+use super::ast;
 use super::inventory;
 use super::local_state;
 use super::util;
@@ -50,8 +50,8 @@ struct CatGlobIntoStatement {
     globs: Vec<String>,
 }
 
-impl builder::Statement for CatGlobIntoStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
+impl ast::Statement for CatGlobIntoStatement {
+    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
         let current_prefix = state.prefix.to_str().ok_or_else(|| {
             anyhow!(
                 "failed to represent current prefix {:?} as a string",
@@ -74,7 +74,7 @@ impl builder::Statement for CatGlobIntoStatement {
 #[derive(Clone)]
 struct CatGlobIntoParser;
 
-impl builder::Parser for CatGlobIntoParser {
+impl ast::Parser for CatGlobIntoParser {
     fn name(&self) -> String {
         "cat_glob_into".to_owned()
     }
@@ -84,7 +84,7 @@ impl builder::Parser for CatGlobIntoParser {
                 create filename in local storage by concatenating globs
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
         let (fname, globs) = util::multiple_args(&self.name(), args, 1)?;
         assert!(fname.len() == 1);
         let filename = fname[0].to_owned();

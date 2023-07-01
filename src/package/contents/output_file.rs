@@ -6,7 +6,7 @@ use indoc::formatdoc;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::builder;
+use super::ast;
 use super::inventory;
 use super::local_state;
 use super::util;
@@ -26,8 +26,8 @@ struct OutputFileStatement {
     filename: String,
 }
 
-impl builder::Statement for OutputFileStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
+impl ast::Statement for OutputFileStatement {
+    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
         let dst = state.dst_path(&self.filename);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
@@ -38,7 +38,7 @@ impl builder::Statement for OutputFileStatement {
 #[derive(Clone)]
 struct OutputFileParser;
 
-impl builder::Parser for OutputFileParser {
+impl ast::Parser for OutputFileParser {
     fn name(&self) -> String {
         "output_file".to_owned()
     }
@@ -48,7 +48,7 @@ impl builder::Parser for OutputFileParser {
                 create a symlink for filename in prefix to a local persistent state
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
         let filename = util::single_arg(&self.name(), args)?.to_owned();
         Ok(Box::new(OutputFileStatement { filename }))
     }

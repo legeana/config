@@ -6,7 +6,7 @@ use indoc::formatdoc;
 use crate::module::ModuleBox;
 use crate::tag_util;
 
-use super::builder;
+use super::ast;
 use super::inventory;
 use super::util;
 
@@ -15,8 +15,8 @@ struct RequiresStatement {
     tags: Vec<String>,
 }
 
-impl builder::Statement for RequiresStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
+impl ast::Statement for RequiresStatement {
+    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
         for tag in self.tags.iter() {
             let has_tag =
                 tag_util::has_tag(tag).with_context(|| format!("failed to check tag {tag}"))?;
@@ -31,7 +31,7 @@ impl builder::Statement for RequiresStatement {
 #[derive(Clone)]
 struct RequiresParser;
 
-impl builder::Parser for RequiresParser {
+impl ast::Parser for RequiresParser {
     fn name(&self) -> String {
         "requires".to_owned()
     }
@@ -41,7 +41,7 @@ impl builder::Parser for RequiresParser {
                 do not process current directory if any of the tags is not present
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
         let (_, tags) = util::multiple_args(&self.name(), args, 0)?;
         Ok(Box::new(RequiresStatement {
             tags: tags.iter().map(|&s| s.to_owned()).collect(),
@@ -54,8 +54,8 @@ struct ConflictsStatement {
     tags: Vec<String>,
 }
 
-impl builder::Statement for ConflictsStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
+impl ast::Statement for ConflictsStatement {
+    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
         for tag in self.tags.iter() {
             let has_tag =
                 tag_util::has_tag(tag).with_context(|| format!("failed to check tag {tag}"))?;
@@ -70,7 +70,7 @@ impl builder::Statement for ConflictsStatement {
 #[derive(Clone)]
 struct ConflictsParser;
 
-impl builder::Parser for ConflictsParser {
+impl ast::Parser for ConflictsParser {
     fn name(&self) -> String {
         "conflicts".to_owned()
     }
@@ -80,7 +80,7 @@ impl builder::Parser for ConflictsParser {
                 do not process current directory if any of the tags is present
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
         let (_, tags) = util::multiple_args(&self.name(), args, 0)?;
         Ok(Box::new(ConflictsStatement {
             tags: tags.iter().map(|&s| s.to_owned()).collect(),

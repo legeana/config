@@ -7,7 +7,7 @@ use anyhow::{anyhow, Context, Result};
 
 use crate::module::ModuleBox;
 
-use super::builder;
+use super::ast;
 
 const LINE_CONT: char = '\\';
 
@@ -69,13 +69,13 @@ impl<B: BufRead> Iterator for LineIterator<B> {
     }
 }
 
-fn parse_line(workdir: &Path, line: &str) -> Result<Option<builder::StatementBox>> {
+fn parse_line(workdir: &Path, line: &str) -> Result<Option<ast::StatementBox>> {
     if line.is_empty() || line.starts_with('#') {
         return Ok(None);
     }
     let args = shlex::split(line).ok_or_else(|| anyhow!("failed to split line {:?}", line))?;
     let arg_refs: Vec<&str> = args.iter().map(String::as_str).collect();
-    Ok(Some(builder::parse(workdir, &arg_refs)?))
+    Ok(Some(ast::parse(workdir, &arg_refs)?))
 }
 
 #[derive(Debug)]
@@ -83,11 +83,11 @@ struct ParsedStatement {
     line_num: usize,
     line: String,
     manifest_path: PathBuf,
-    statement: builder::StatementBox,
+    statement: ast::StatementBox,
 }
 
-impl builder::Statement for ParsedStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
+impl ast::Statement for ParsedStatement {
+    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
         self.statement.eval(state).with_context(|| {
             format!(
                 "failed to build line {line_num} {line:?} from {manifest_path:?}",
@@ -99,11 +99,11 @@ impl builder::Statement for ParsedStatement {
     }
 }
 
-pub fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<builder::StatementBox>> {
+pub fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<ast::StatementBox>> {
     let manifest =
         File::open(manifest_path).with_context(|| format!("failed to open {manifest_path:?}"))?;
     let reader = BufReader::new(manifest);
-    let mut builders: Vec<builder::StatementBox> = Vec::new();
+    let mut builders: Vec<ast::StatementBox> = Vec::new();
     for (line_idx, line_or) in LineIterator::new(reader.lines()) {
         let line_num = line_idx + 1;
         let line = line_or

@@ -1,4 +1,4 @@
-mod builder;
+mod ast;
 mod cat_glob;
 mod copy;
 mod deprecated;
@@ -31,12 +31,12 @@ use std::path::{Path, PathBuf};
 use anyhow::{anyhow, Context, Result};
 
 use crate::module::{Module, ModuleBox, Rules};
-use crate::package::contents::builder::{Statement, StatementBox};
+use crate::package::contents::ast::{Statement, StatementBox};
 use crate::registry::Registry;
 
 const MANIFEST: &str = "MANIFEST";
 
-pub use builder::help;
+pub use ast::help;
 
 pub struct Configuration {
     root: PathBuf,
@@ -52,7 +52,7 @@ impl Configuration {
     }
     #[allow(clippy::new_ret_no_self)]
     pub fn new(root: PathBuf) -> Result<ModuleBox> {
-        let mut state = builder::State::new();
+        let mut state = ast::State::new();
         ConfigurationStatement::parse(root)?
             .eval(&mut state)?
             .ok_or_else(|| anyhow!("failed to unwrap Configuration"))
@@ -93,7 +93,7 @@ struct ConfigurationStatement {
 }
 
 impl Statement for ConfigurationStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
         let mut modules: Vec<_> = Vec::new();
         for statement in self.statements.iter() {
             if !state.enabled {
@@ -110,7 +110,7 @@ impl Statement for ConfigurationStatement {
     }
 }
 
-// Analogous to builder::Parser, but can only be called from code.
+// Analogous to ast::Parser, but can only be called from code.
 impl ConfigurationStatement {
     pub fn parse(root: PathBuf) -> Result<StatementBox> {
         let manifest = root.join(MANIFEST);

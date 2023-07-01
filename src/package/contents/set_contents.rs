@@ -6,7 +6,7 @@ use indoc::formatdoc;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::builder;
+use super::ast;
 use super::inventory;
 use super::local_state;
 use super::util;
@@ -39,8 +39,8 @@ struct SetContentsStatement {
     contents: String,
 }
 
-impl builder::Statement for SetContentsStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
+impl ast::Statement for SetContentsStatement {
+    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
         let dst = state.dst_path(&self.filename);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
@@ -54,7 +54,7 @@ impl builder::Statement for SetContentsStatement {
 #[derive(Clone)]
 struct SetContentsParser;
 
-impl builder::Parser for SetContentsParser {
+impl ast::Parser for SetContentsParser {
     fn name(&self) -> String {
         "set_contents".to_owned()
     }
@@ -64,7 +64,7 @@ impl builder::Parser for SetContentsParser {
                 overwrites <filename> with <contents>
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
         let (filename, contents) = util::double_arg(&self.name(), args)?;
         Ok(Box::new(SetContentsStatement {
             filename: filename.to_owned(),

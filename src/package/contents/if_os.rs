@@ -3,7 +3,7 @@ use std::path::Path;
 use crate::module::ModuleBox;
 use crate::tera_helper;
 
-use super::builder;
+use super::ast;
 use super::inventory;
 use super::util;
 
@@ -19,7 +19,7 @@ fn is_os(os: &str) -> bool {
 #[derive(Debug)]
 struct IfOsStatement {
     os: &'static str,
-    cmd: builder::StatementBox,
+    cmd: ast::StatementBox,
 }
 
 impl IfOsStatement {
@@ -28,8 +28,8 @@ impl IfOsStatement {
     }
 }
 
-impl builder::Statement for IfOsStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
+impl ast::Statement for IfOsStatement {
+    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
         if !self.is_os() {
             return Ok(None);
         }
@@ -48,7 +48,7 @@ impl IfOsParser {
     }
 }
 
-impl builder::Parser for IfOsParser {
+impl ast::Parser for IfOsParser {
     fn name(&self) -> String {
         self.command()
     }
@@ -58,12 +58,12 @@ impl builder::Parser for IfOsParser {
                 execute a MANIFEST <command> only if os (or family) is {os}
         ", os=self.os, command=self.command()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
         let (empty, cmd_args) = util::multiple_args(&self.command(), args, 0)?;
         assert!(empty.is_empty());
         Ok(Box::new(IfOsStatement {
             os: self.os,
-            cmd: builder::parse(workdir, cmd_args)?,
+            cmd: ast::parse(workdir, cmd_args)?,
         }))
     }
 }

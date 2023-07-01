@@ -7,7 +7,7 @@ use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 use crate::tera_helpers;
 
-use super::builder;
+use super::ast;
 use super::inventory;
 use super::local_state;
 use super::util;
@@ -39,8 +39,8 @@ struct RenderStatement {
     dst: String,
 }
 
-impl builder::Statement for RenderStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
+impl ast::Statement for RenderStatement {
+    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
         let src = self.workdir.join(&self.src);
         let dst = state.dst_path(&self.dst);
         let output = local_state::FileState::new(dst.clone())
@@ -66,7 +66,7 @@ impl builder::Statement for RenderStatement {
 #[derive(Clone)]
 struct RenderParser;
 
-impl builder::Parser for RenderParser {
+impl ast::Parser for RenderParser {
     fn name(&self) -> String {
         "render".to_owned()
     }
@@ -76,7 +76,7 @@ impl builder::Parser for RenderParser {
                 render template
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> anyhow::Result<builder::StatementBox> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> anyhow::Result<ast::StatementBox> {
         let filename = util::single_arg(&self.name(), args)?;
         Ok(Box::new(RenderStatement {
             workdir: workdir.to_owned(),
@@ -89,7 +89,7 @@ impl builder::Parser for RenderParser {
 #[derive(Clone)]
 struct RenderToParser;
 
-impl builder::Parser for RenderToParser {
+impl ast::Parser for RenderToParser {
     fn name(&self) -> String {
         "render_to".to_owned()
     }
@@ -99,7 +99,7 @@ impl builder::Parser for RenderToParser {
                 render template <filename> into <destination>
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
         let (dst, src) = util::double_arg(&self.name(), args)?;
         Ok(Box::new(RenderStatement {
             workdir: workdir.to_owned(),

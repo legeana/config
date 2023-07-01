@@ -6,7 +6,7 @@ use indoc::formatdoc;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::builder;
+use super::ast;
 use super::inventory;
 use super::local_state;
 use super::util;
@@ -70,8 +70,8 @@ struct FetchIntoStatement {
     executable: bool,
 }
 
-impl builder::Statement for FetchIntoStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
+impl ast::Statement for FetchIntoStatement {
+    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
         let dst = state.dst_path(&self.filename);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
@@ -86,7 +86,7 @@ impl builder::Statement for FetchIntoStatement {
 #[derive(Clone)]
 struct FetchIntoParser;
 
-impl builder::Parser for FetchIntoParser {
+impl ast::Parser for FetchIntoParser {
     fn name(&self) -> String {
         "fetch_into".to_owned()
     }
@@ -97,7 +97,7 @@ impl builder::Parser for FetchIntoParser {
                 and installs a symlink to it
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
         let (filename, url) = util::double_arg(&self.name(), args)?;
         Ok(Box::new(FetchIntoStatement {
             filename: filename.to_owned(),
@@ -110,7 +110,7 @@ impl builder::Parser for FetchIntoParser {
 #[derive(Clone)]
 struct FetchExeIntoParser;
 
-impl builder::Parser for FetchExeIntoParser {
+impl ast::Parser for FetchExeIntoParser {
     fn name(&self) -> String {
         "fetch_exe_into".to_owned()
     }
@@ -121,7 +121,7 @@ impl builder::Parser for FetchExeIntoParser {
                 and installs a symlink to it
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
         let (filename, url) = util::double_arg(&self.name(), args)?;
         Ok(Box::new(FetchIntoStatement {
             filename: filename.to_owned(),

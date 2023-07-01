@@ -5,7 +5,7 @@ use indoc::formatdoc;
 
 use crate::module::ModuleBox;
 
-use super::builder;
+use super::ast;
 use super::inventory;
 use super::util;
 
@@ -14,8 +14,8 @@ struct PrefixStatement {
     prefix: String,
 }
 
-impl builder::Statement for PrefixStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
+impl ast::Statement for PrefixStatement {
+    fn eval(&self, state: &mut ast::State) -> Result<Option<ModuleBox>> {
         state.prefix = shellexpand::tilde(&self.prefix).as_ref().into();
         Ok(None)
     }
@@ -24,7 +24,7 @@ impl builder::Statement for PrefixStatement {
 #[derive(Clone)]
 struct PrefixParser;
 
-impl builder::Parser for PrefixParser {
+impl ast::Parser for PrefixParser {
     fn name(&self) -> String {
         "prefix".to_owned()
     }
@@ -34,7 +34,7 @@ impl builder::Parser for PrefixParser {
                 set current installation prefix to <directory>
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
         let prefix = util::single_arg(&self.name(), args)?.to_owned();
         Ok(Box::new(PrefixStatement { prefix }))
     }
