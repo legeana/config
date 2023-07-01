@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use crate::module::{Module, Rules};
+use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
 use super::builder;
@@ -43,7 +43,7 @@ struct SymlinkTreeStatement {
 }
 
 impl builder::Statement for SymlinkTreeStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
         Ok(Some(Box::new(SymlinkTree {
             src: self.workdir.join(&self.directory),
             dst: state.dst_path(&self.directory),
@@ -64,7 +64,7 @@ impl builder::Parser for SymlinkTreeParser {
                 create a symlink for every file in a directory recursively
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
         let directory = util::single_arg(&self.name(), args)?.to_owned();
         Ok(Box::new(SymlinkTreeStatement {
             workdir: workdir.to_owned(),

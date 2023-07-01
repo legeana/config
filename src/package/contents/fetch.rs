@@ -3,7 +3,7 @@ use std::path::Path;
 use anyhow::{Context, Result};
 use indoc::formatdoc;
 
-use crate::module::{Module, Rules};
+use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
 use super::builder;
@@ -71,7 +71,7 @@ struct FetchIntoStatement {
 }
 
 impl builder::Statement for FetchIntoStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
         let dst = state.dst_path(&self.filename);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
@@ -97,7 +97,7 @@ impl builder::Parser for FetchIntoParser {
                 and installs a symlink to it
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
         let (filename, url) = util::double_arg(&self.name(), args)?;
         Ok(Box::new(FetchIntoStatement {
             filename: filename.to_owned(),
@@ -121,7 +121,7 @@ impl builder::Parser for FetchExeIntoParser {
                 and installs a symlink to it
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
         let (filename, url) = util::double_arg(&self.name(), args)?;
         Ok(Box::new(FetchIntoStatement {
             filename: filename.to_owned(),

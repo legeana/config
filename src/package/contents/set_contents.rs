@@ -3,7 +3,7 @@ use std::path::Path;
 use anyhow::{Context, Result};
 use indoc::formatdoc;
 
-use crate::module::{Module, Rules};
+use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
 use super::builder;
@@ -40,7 +40,7 @@ struct SetContentsStatement {
 }
 
 impl builder::Statement for SetContentsStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
         let dst = state.dst_path(&self.filename);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
@@ -64,7 +64,7 @@ impl builder::Parser for SetContentsParser {
                 overwrites <filename> with <contents>
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
         let (filename, contents) = util::double_arg(&self.name(), args)?;
         Ok(Box::new(SetContentsStatement {
             filename: filename.to_owned(),

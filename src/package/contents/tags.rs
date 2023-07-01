@@ -3,7 +3,7 @@ use std::path::Path;
 use anyhow::{Context, Result};
 use indoc::formatdoc;
 
-use crate::module::Module;
+use crate::module::ModuleBox;
 use crate::tag_util;
 
 use super::builder;
@@ -16,7 +16,7 @@ struct RequiresStatement {
 }
 
 impl builder::Statement for RequiresStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
         for tag in self.tags.iter() {
             let has_tag =
                 tag_util::has_tag(tag).with_context(|| format!("failed to check tag {tag}"))?;
@@ -41,7 +41,7 @@ impl builder::Parser for RequiresParser {
                 do not process current directory if any of the tags is not present
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
         let (_, tags) = util::multiple_args(&self.name(), args, 0)?;
         Ok(Box::new(RequiresStatement {
             tags: tags.iter().map(|&s| s.to_owned()).collect(),
@@ -55,7 +55,7 @@ struct ConflictsStatement {
 }
 
 impl builder::Statement for ConflictsStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
         for tag in self.tags.iter() {
             let has_tag =
                 tag_util::has_tag(tag).with_context(|| format!("failed to check tag {tag}"))?;
@@ -80,7 +80,7 @@ impl builder::Parser for ConflictsParser {
                 do not process current directory if any of the tags is present
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
         let (_, tags) = util::multiple_args(&self.name(), args, 0)?;
         Ok(Box::new(ConflictsStatement {
             tags: tags.iter().map(|&s| s.to_owned()).collect(),

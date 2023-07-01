@@ -4,7 +4,7 @@ use anyhow::Result;
 use indoc::formatdoc;
 
 use crate::command::is_command;
-use crate::module::{Module, Rules};
+use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
 use super::builder;
@@ -13,7 +13,7 @@ use super::util;
 
 struct IfCommand {
     executable: String,
-    cmd: Box<dyn Module>,
+    cmd: ModuleBox,
 }
 
 impl IfCommand {
@@ -43,11 +43,11 @@ impl Module for IfCommand {
 #[derive(Debug)]
 struct IfCommandStatement {
     executable: String,
-    cmd: Box<dyn builder::Statement>,
+    cmd: builder::StatementBox,
 }
 
 impl builder::Statement for IfCommandStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
         match self.cmd.eval(state)? {
             Some(cmd) => Ok(Some(Box::new(IfCommand {
                 executable: self.executable.clone(),
@@ -72,7 +72,7 @@ impl builder::Parser for IfCommandParser {
                 in PATH
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
         let (exe, cmd_args) = util::multiple_args(&self.name(), args, 1)?;
         assert_eq!(exe.len(), 1);
         Ok(Box::new(IfCommandStatement {

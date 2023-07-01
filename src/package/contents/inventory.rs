@@ -7,7 +7,7 @@ use tera::Tera;
 use super::builder;
 
 pub trait Registry {
-    fn register_parser(&mut self, parser: Box<dyn builder::Parser>);
+    fn register_parser(&mut self, parser: builder::ParserBox);
     fn register_render_helper(&mut self, render_helper: Box<dyn RenderHelper>);
 }
 
@@ -17,13 +17,13 @@ pub trait RenderHelper: Sync + Send {
 
 #[derive(Default)]
 struct RegistryImpl {
-    parsers: HashMap<String, Box<dyn builder::Parser>>,
+    parsers: HashMap<String, builder::ParserBox>,
     parsers_order: Vec<String>,
     render_helpers: Vec<Box<dyn RenderHelper>>,
 }
 
 impl Registry for RegistryImpl {
-    fn register_parser(&mut self, parser: Box<dyn builder::Parser>) {
+    fn register_parser(&mut self, parser: builder::ParserBox) {
         let name = parser.name();
         let former = self.parsers.insert(parser.name(), parser);
         if let Some(former) = former {
@@ -74,7 +74,7 @@ fn registry() -> &'static RegistryImpl {
     })
 }
 
-pub fn parsers() -> impl Iterator<Item = &'static Box<dyn builder::Parser>> {
+pub fn parsers() -> impl Iterator<Item = &'static builder::ParserBox> {
     registry().parsers_order.iter().map(|name| {
         registry()
             .parsers

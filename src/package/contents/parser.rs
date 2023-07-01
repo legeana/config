@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Context, Result};
 
-use crate::module::Module;
+use crate::module::ModuleBox;
 
 use super::builder;
 
@@ -69,7 +69,7 @@ impl<B: BufRead> Iterator for LineIterator<B> {
     }
 }
 
-fn parse_line(workdir: &Path, line: &str) -> Result<Option<Box<dyn builder::Statement>>> {
+fn parse_line(workdir: &Path, line: &str) -> Result<Option<builder::StatementBox>> {
     if line.is_empty() || line.starts_with('#') {
         return Ok(None);
     }
@@ -83,11 +83,11 @@ struct ParsedStatement {
     line_num: usize,
     line: String,
     manifest_path: PathBuf,
-    statement: Box<dyn builder::Statement>,
+    statement: builder::StatementBox,
 }
 
 impl builder::Statement for ParsedStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
         self.statement.eval(state).with_context(|| {
             format!(
                 "failed to build line {line_num} {line:?} from {manifest_path:?}",
@@ -99,11 +99,11 @@ impl builder::Statement for ParsedStatement {
     }
 }
 
-pub fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<Box<dyn builder::Statement>>> {
+pub fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<builder::StatementBox>> {
     let manifest =
         File::open(manifest_path).with_context(|| format!("failed to open {manifest_path:?}"))?;
     let reader = BufReader::new(manifest);
-    let mut builders: Vec<Box<dyn builder::Statement>> = Vec::new();
+    let mut builders: Vec<builder::StatementBox> = Vec::new();
     for (line_idx, line_or) in LineIterator::new(reader.lines()) {
         let line_num = line_idx + 1;
         let line = line_or

@@ -9,7 +9,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Context, Result};
 
-use crate::module::{Module, Rules};
+use crate::module::{Module, ModuleBox, Rules};
 use crate::package::installer::Installer;
 use crate::registry::Registry;
 use crate::tag_criteria::{self, TagCriteria};
@@ -19,7 +19,7 @@ pub use contents::help as manifest_help;
 pub struct Package {
     name: String,
     criteria: tag_criteria::Criteria,
-    modules: Vec<Box<dyn Module>>,
+    modules: Vec<ModuleBox>,
     #[allow(dead_code)]
     dependencies: Vec<String>,
 }

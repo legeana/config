@@ -2,7 +2,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Result};
 
-use crate::module::Module;
+use crate::module::ModuleBox;
 
 pub struct State {
     pub enabled: bool,
@@ -26,15 +26,19 @@ impl State {
 pub trait Parser: Sync + Send {
     fn name(&self) -> String;
     fn help(&self) -> String;
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn Statement>>;
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<StatementBox>;
 }
+
+pub type ParserBox = Box<dyn Parser>;
 
 /// Command creates a Module or modifies State.
 pub trait Statement: std::fmt::Debug {
-    fn eval(&self, state: &mut State) -> Result<Option<Box<dyn Module>>>;
+    fn eval(&self, state: &mut State) -> Result<Option<ModuleBox>>;
 }
 
-pub fn parse(workdir: &Path, args: &[&str]) -> Result<Box<dyn Statement>> {
+pub type StatementBox = Box<dyn Statement>;
+
+pub fn parse(workdir: &Path, args: &[&str]) -> Result<StatementBox> {
     if args.is_empty() {
         return Err(anyhow!("command with no args[0] should not exist"));
     }

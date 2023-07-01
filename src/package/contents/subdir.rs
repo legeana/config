@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use anyhow::{Context, Result};
 use indoc::formatdoc;
 
-use crate::module::Module;
+use crate::module::ModuleBox;
 
 use super::builder;
 use super::inventory;
@@ -13,11 +13,11 @@ use super::util;
 #[derive(Debug)]
 struct SubdirStatement {
     subdir: PathBuf,
-    config: Box<dyn builder::Statement>,
+    config: builder::StatementBox,
 }
 
 impl builder::Statement for SubdirStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
         let mut substate = builder::State {
             enabled: true,
             prefix: state.prefix.join(&self.subdir),
@@ -39,7 +39,7 @@ impl builder::Parser for SubdirParser {
                 load subdirectory configuration recursively
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
         let subdir = util::single_arg(&self.name(), args)?;
         let subroot = workdir.join(subdir);
         Ok(Box::new(SubdirStatement {
@@ -55,8 +55,8 @@ struct SubdirsStatement {
 }
 
 impl builder::Statement for SubdirsStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
-        let mut modules: Vec<Box<dyn Module>> = Vec::new();
+    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
+        let mut modules: Vec<ModuleBox> = Vec::new();
         for subdir in self.subdirs.iter() {
             if let Some(m) = subdir.eval(state)? {
                 modules.push(m);
@@ -79,7 +79,7 @@ impl builder::Parser for SubdirsParser {
                 load all subdirectories recursively
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
         util::no_args(&self.name(), args)?;
         let mut subdirs: Vec<SubdirStatement> = Vec::new();
         for entry in workdir

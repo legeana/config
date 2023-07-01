@@ -30,6 +30,8 @@ pub trait Module {
     }
 }
 
+pub type ModuleBox = Box<dyn Module>;
+
 impl<T: Module> Module for Vec<T> {
     fn pre_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         for module in self {
@@ -57,7 +59,7 @@ impl<T: Module> Module for Vec<T> {
     }
 }
 
-impl Module for Box<dyn Module> {
+impl Module for ModuleBox {
     fn pre_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         self.as_ref().pre_install(rules, registry)
     }

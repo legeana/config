@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use crate::module::{Module, Rules};
+use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
 use super::builder;
@@ -40,7 +40,7 @@ struct CopyStatement {
 }
 
 impl builder::Statement for CopyStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
         let dst = state.dst_path(&self.filename);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
@@ -64,7 +64,7 @@ impl builder::Parser for CopyParser {
                 create a copy of a filename in local storage and install a symlink to it
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
         let filename = util::single_arg(&self.name(), args)?.to_owned();
         Ok(Box::new(CopyStatement {
             workdir: workdir.to_owned(),

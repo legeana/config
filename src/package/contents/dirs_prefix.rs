@@ -4,7 +4,7 @@ use anyhow::{anyhow, Result};
 use indoc::formatdoc;
 use serde::Deserialize;
 
-use crate::module::Module;
+use crate::module::ModuleBox;
 use crate::tera_helper;
 use crate::xdg;
 use crate::xdg_or_win;
@@ -21,7 +21,7 @@ struct DirsPrefixStatement {
 }
 
 impl builder::Statement for DirsPrefixStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
         let base_dir = self
             .base_dir
             .as_ref()
@@ -53,11 +53,7 @@ impl builder::Parser for DirsPrefixParser {
                 set current installation prefix to {base_dir:?}/<directory>
         ", command=self.name(), base_dir=self.base_dir}
     }
-    fn parse(
-        &self,
-        _workdir: &std::path::Path,
-        args: &[&str],
-    ) -> Result<Box<dyn builder::Statement>> {
+    fn parse(&self, _workdir: &std::path::Path, args: &[&str]) -> Result<builder::StatementBox> {
         let subdir = util::single_arg(&self.name(), args)?.to_owned();
         Ok(Box::new(DirsPrefixStatement {
             command: self.command,

@@ -2,7 +2,7 @@ use std::path::Path;
 
 use anyhow::Result;
 
-use crate::module::Module;
+use crate::module::ModuleBox;
 
 use super::builder;
 use super::inventory;
@@ -12,7 +12,7 @@ use super::util::check_command;
 struct NoOpStatement;
 
 impl builder::Statement for NoOpStatement {
-    fn eval(&self, _state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+    fn eval(&self, _state: &mut builder::State) -> Result<Option<ModuleBox>> {
         Ok(None)
     }
 }
@@ -27,7 +27,7 @@ impl builder::Parser for DeprecatedParser {
     fn help(&self) -> String {
         "DEPRECATED: N/A".to_owned()
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
         /*if check_command("<deprecated>", args).is_ok() {
             log::warn!(
                 "{:?}: <deprecated> is unsupported",

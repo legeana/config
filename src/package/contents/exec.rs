@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 use std::process;
 
-use crate::module::{Module, Rules};
+use crate::module::{Module, ModuleBox, Rules};
 use crate::process_utils;
 use crate::registry::Registry;
 
@@ -46,7 +46,7 @@ struct PostInstallStatement {
 }
 
 impl builder::Statement for PostInstallStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
         let args: Vec<String> = self
             .args
             .iter()
@@ -75,7 +75,7 @@ impl builder::Parser for PostInstallExecParser {
                 execute a command in a post-install phase
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
         let (command, args) = util::multiple_args(&self.name(), args, 1)?;
         assert!(command.len() == 1);
         Ok(Box::new(PostInstallStatement {
@@ -100,7 +100,7 @@ impl builder::Parser for PostInstallUpdateParser {
                 only if executed via 'setup update' command
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
         let (command, args) = util::multiple_args(&self.name(), args, 1)?;
         assert!(command.len() == 1);
         Ok(Box::new(PostInstallStatement {

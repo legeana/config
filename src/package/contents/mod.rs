@@ -30,8 +30,8 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Context, Result};
 
-use crate::module::{Module, Rules};
-use crate::package::contents::builder::Statement;
+use crate::module::{Module, ModuleBox, Rules};
+use crate::package::contents::builder::{Statement, StatementBox};
 use crate::registry::Registry;
 
 const MANIFEST: &str = "MANIFEST";
@@ -40,18 +40,18 @@ pub use builder::help;
 
 pub struct Configuration {
     root: PathBuf,
-    modules: Vec<Box<dyn Module>>,
+    modules: Vec<ModuleBox>,
 }
 
 impl Configuration {
-    pub fn new_empty(root: PathBuf) -> Box<dyn Module> {
+    pub fn new_empty(root: PathBuf) -> ModuleBox {
         Box::new(Self {
             root,
             modules: Vec::default(),
         })
     }
     #[allow(clippy::new_ret_no_self)]
-    pub fn new(root: PathBuf) -> Result<Box<dyn Module>> {
+    pub fn new(root: PathBuf) -> Result<ModuleBox> {
         let mut state = builder::State::new();
         ConfigurationStatement::parse(root)?
             .eval(&mut state)?
@@ -89,11 +89,11 @@ impl fmt::Display for Configuration {
 #[derive(Debug)]
 struct ConfigurationStatement {
     root: PathBuf,
-    statements: Vec<Box<dyn builder::Statement>>,
+    statements: Vec<StatementBox>,
 }
 
 impl Statement for ConfigurationStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
         let mut modules: Vec<_> = Vec::new();
         for statement in self.statements.iter() {
             if !state.enabled {
@@ -112,7 +112,7 @@ impl Statement for ConfigurationStatement {
 
 // Analogous to builder::Parser, but can only be called from code.
 impl ConfigurationStatement {
-    pub fn parse(root: PathBuf) -> Result<Box<dyn Statement>> {
+    pub fn parse(root: PathBuf) -> Result<StatementBox> {
         let manifest = root.join(MANIFEST);
         let statements = parser::parse(&root, &manifest)
             .with_context(|| format!("failed to load {manifest:?}"))?;

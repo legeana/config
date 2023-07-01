@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use anyhow::Result;
 use indoc::formatdoc;
 
-use crate::module::{Module, Rules};
+use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
 use super::builder;
@@ -30,7 +30,7 @@ struct SymlinkStatement {
 }
 
 impl builder::Statement for SymlinkStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
         Ok(Some(Box::new(Symlink {
             src: self.workdir.join(&self.src),
             dst: state.dst_path(&self.dst),
@@ -51,7 +51,7 @@ impl builder::Parser for SymlinkParser {
                 create a symlink for filename in prefix
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
         let filename = util::single_arg(&self.name(), args)?;
         Ok(Box::new(SymlinkStatement {
             workdir: workdir.to_owned(),
@@ -74,7 +74,7 @@ impl builder::Parser for SymlinkToParser {
                 create a symlink for filename in prefix
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
         let (dst, src) = util::double_arg(&self.name(), args)?;
         Ok(Box::new(SymlinkStatement {
             workdir: workdir.to_owned(),

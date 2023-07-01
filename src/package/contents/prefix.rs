@@ -3,7 +3,7 @@ use std::path::Path;
 use anyhow::Result;
 use indoc::formatdoc;
 
-use crate::module::Module;
+use crate::module::ModuleBox;
 
 use super::builder;
 use super::inventory;
@@ -15,7 +15,7 @@ struct PrefixStatement {
 }
 
 impl builder::Statement for PrefixStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
         state.prefix = shellexpand::tilde(&self.prefix).as_ref().into();
         Ok(None)
     }
@@ -34,7 +34,7 @@ impl builder::Parser for PrefixParser {
                 set current installation prefix to <directory>
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
         let prefix = util::single_arg(&self.name(), args)?.to_owned();
         Ok(Box::new(PrefixStatement { prefix }))
     }

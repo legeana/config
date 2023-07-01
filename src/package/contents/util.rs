@@ -8,7 +8,9 @@ pub fn check_command<'a, 'b>(command: &str, args: &'a [&'b str]) -> Result<&'a [
     let cmd = args[0];
     let cmd_args = &args[1..];
     if command != cmd {
-        return Err(anyhow!("incorrect command: expected {command:?}, got {cmd:?}"));
+        return Err(anyhow!(
+            "incorrect command: expected {command:?}, got {cmd:?}"
+        ));
     }
     Ok(cmd_args)
 }

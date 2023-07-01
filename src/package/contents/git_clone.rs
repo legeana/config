@@ -4,7 +4,7 @@ use anyhow::{Context, Result};
 use indoc::formatdoc;
 
 use crate::git_utils;
-use crate::module::{Module, Rules};
+use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
 use super::builder;
@@ -66,7 +66,7 @@ struct GitCloneStatement {
 }
 
 impl builder::Statement for GitCloneStatement {
-    fn eval(&self, state: &mut builder::State) -> Result<Option<Box<dyn Module>>> {
+    fn eval(&self, state: &mut builder::State) -> Result<Option<ModuleBox>> {
         let dst = state.dst_path(&self.dst);
         let output = local_state::DirectoryState::new(dst.clone())
             .with_context(|| format!("failed to create DirectoryState from {dst:?}"))?;
@@ -91,7 +91,7 @@ impl builder::Parser for GitCloneParser {
                 if <branch> is specified clone <branch> instead of default HEAD
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<Box<dyn builder::Statement>> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<builder::StatementBox> {
         let (url, dst) = util::double_arg(&self.name(), args)?;
         Ok(Box::new(GitCloneStatement {
             url: url.to_owned(),
