@@ -26,30 +26,27 @@ mod symlink_tree;
 mod tags;
 mod util;
 
-use std::fmt;
 use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Context, Result};
 
-use crate::module::{Module, ModuleBox, Rules};
+use crate::module::{self, ModuleBox, Rules};
 use crate::package::contents::ast::{Statement, StatementBox};
-use crate::registry::Registry;
 
 const MANIFEST: &str = "MANIFEST";
 
 pub use ast::help;
 
-pub struct Configuration {
-    root: PathBuf,
-    modules: Vec<ModuleBox>,
+pub struct Configuration;
+
+fn error_context(root: &Path) -> String {
+    format!("{root:?}")
 }
 
 impl Configuration {
     pub fn new_empty(root: PathBuf) -> ModuleBox {
-        Box::new(Self {
-            root,
-            modules: Vec::default(),
-        })
+        let modules: Vec<ModuleBox> = Vec::default();
+        module::wrap(modules, error_context(&root))
     }
     #[allow(clippy::new_ret_no_self)]
     pub fn new(root: PathBuf) -> Result<ModuleBox> {
@@ -60,30 +57,6 @@ impl Configuration {
     }
     pub fn verify(root: &Path) -> Result<()> {
         ConfigurationStatement::verify(root)
-    }
-}
-
-impl Module for Configuration {
-    fn pre_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-        self.modules
-            .pre_install(rules, registry)
-            .with_context(|| format!("failed pre_install in {:?}", self.root))
-    }
-    fn install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-        self.modules
-            .install(rules, registry)
-            .with_context(|| format!("failed install in {:?}", self.root))
-    }
-    fn post_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-        self.modules
-            .post_install(rules, registry)
-            .with_context(|| format!("failed post_install in {:?}", self.root))
-    }
-}
-
-impl fmt::Display for Configuration {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.root.display())
     }
 }
 
@@ -104,10 +77,7 @@ impl Statement for ConfigurationStatement {
                 modules.push(module);
             }
         }
-        Ok(Some(Box::new(Configuration {
-            root: self.root.clone(),
-            modules,
-        })))
+        Ok(Some(module::wrap(modules, error_context(&self.root))))
     }
 }
 
