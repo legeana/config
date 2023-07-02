@@ -91,10 +91,10 @@ impl ast::Statement for ParsedStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         self.statement.eval(ctx).with_context(|| {
             format!(
-                "failed to build line {line_num} {line:?} from {manifest_path:?}",
+                "failed to evaluate {manifest_path:?} line {line_num}: {line:?}",
+                manifest_path = self.manifest_path,
                 line_num = self.line_num,
                 line = self.line,
-                manifest_path = self.manifest_path,
             )
         })
     }
