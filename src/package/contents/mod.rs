@@ -28,7 +28,7 @@ mod util;
 
 use std::path::{Path, PathBuf};
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result};
 
 use crate::module::{self, ModuleBox, Rules};
 use crate::package::contents::ast::{Statement, StatementBox};
@@ -43,9 +43,9 @@ fn error_context(root: &Path) -> String {
 
 pub fn new(root: PathBuf) -> Result<ModuleBox> {
     let mut ctx = engine::Context::new();
-    ConfigurationStatement::parse(root)?
+    Ok(ConfigurationStatement::parse(root)?
         .eval(&mut ctx)?
-        .ok_or_else(|| anyhow!("failed to unwrap Configuration"))
+        .unwrap_or_else(module::dummy_box))
 }
 
 pub fn verify(root: &Path) -> Result<()> {
@@ -68,6 +68,9 @@ impl Statement for ConfigurationStatement {
             if let Some(module) = statement.eval(ctx)? {
                 modules.push(module);
             }
+        }
+        if modules.is_empty() {
+            return Ok(None);
         }
         Ok(Some(module::wrap(modules, error_context(&self.root))))
     }
