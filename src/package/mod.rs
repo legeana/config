@@ -73,9 +73,9 @@ impl Package {
             .context("failed to parse user_dependencies")?;
         let configuration: ModuleBox = if pkgconfig.has_contents {
             if criteria.is_satisfied()? {
-                contents::Configuration::new(root.clone())?
+                contents::new(root.clone())?
             } else {
-                contents::Configuration::verify(&root)?;
+                contents::verify(&root)?;
                 module::dummy_box()
             }
         } else {

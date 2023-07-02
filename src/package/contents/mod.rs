@@ -37,23 +37,19 @@ const MANIFEST: &str = "MANIFEST";
 
 pub use ast::help;
 
-pub struct Configuration;
-
 fn error_context(root: &Path) -> String {
     format!("{root:?}")
 }
 
-impl Configuration {
-    #[allow(clippy::new_ret_no_self)]
-    pub fn new(root: PathBuf) -> Result<ModuleBox> {
-        let mut state = engine::Context::new();
-        ConfigurationStatement::parse(root)?
-            .eval(&mut state)?
-            .ok_or_else(|| anyhow!("failed to unwrap Configuration"))
-    }
-    pub fn verify(root: &Path) -> Result<()> {
-        ConfigurationStatement::verify(root)
-    }
+pub fn new(root: PathBuf) -> Result<ModuleBox> {
+    let mut state = engine::Context::new();
+    ConfigurationStatement::parse(root)?
+        .eval(&mut state)?
+        .ok_or_else(|| anyhow!("failed to unwrap Configuration"))
+}
+
+pub fn verify(root: &Path) -> Result<()> {
+    ConfigurationStatement::verify(root)
 }
 
 #[derive(Debug)]
