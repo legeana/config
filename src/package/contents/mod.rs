@@ -44,10 +44,6 @@ fn error_context(root: &Path) -> String {
 }
 
 impl Configuration {
-    pub fn new_empty(root: PathBuf) -> ModuleBox {
-        let modules: Vec<ModuleBox> = Vec::default();
-        module::wrap(modules, error_context(&root))
-    }
     #[allow(clippy::new_ret_no_self)]
     pub fn new(root: PathBuf) -> Result<ModuleBox> {
         let mut state = engine::Context::new();

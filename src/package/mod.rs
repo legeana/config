@@ -9,7 +9,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Context, Result};
 
-use crate::module::{Module, ModuleBox, Rules};
+use crate::module::{self, Module, ModuleBox, Rules};
 use crate::package::installer::Installer;
 use crate::registry::Registry;
 use crate::tag_criteria::{self, TagCriteria};
@@ -71,15 +71,15 @@ impl Package {
             .map(user::UserDependency::new)
             .collect::<Result<_>>()
             .context("failed to parse user_dependencies")?;
-        let configuration = if pkgconfig.has_contents {
+        let configuration: ModuleBox = if pkgconfig.has_contents {
             if criteria.is_satisfied()? {
                 contents::Configuration::new(root.clone())?
             } else {
                 contents::Configuration::verify(&root)?;
-                contents::Configuration::new_empty(root.clone())
+                module::dummy_box()
             }
         } else {
-            contents::Configuration::new_empty(root.clone())
+            module::dummy_box()
         };
         let ansible_playbooks: Vec<ansible::AnsiblePlaybook> = pkgconfig
             .ansible_playbooks
