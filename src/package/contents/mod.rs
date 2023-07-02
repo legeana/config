@@ -42,9 +42,9 @@ fn error_context(root: &Path) -> String {
 }
 
 pub fn new(root: PathBuf) -> Result<ModuleBox> {
-    let mut state = engine::Context::new();
+    let mut ctx = engine::Context::new();
     ConfigurationStatement::parse(root)?
-        .eval(&mut state)?
+        .eval(&mut ctx)?
         .ok_or_else(|| anyhow!("failed to unwrap Configuration"))
 }
 
