@@ -18,10 +18,10 @@ struct SubdirStatement {
 }
 
 impl ast::Statement for SubdirStatement {
-    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
-        let mut substate = engine::State {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+        let mut substate = engine::Context {
             enabled: true,
-            prefix: state.prefix.join(&self.subdir),
+            prefix: ctx.prefix.join(&self.subdir),
         };
         self.config.eval(&mut substate)
     }
@@ -56,10 +56,10 @@ struct SubdirsStatement {
 }
 
 impl ast::Statement for SubdirsStatement {
-    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         let mut modules: Vec<ModuleBox> = Vec::new();
         for subdir in self.subdirs.iter() {
-            if let Some(m) = subdir.eval(state)? {
+            if let Some(m) = subdir.eval(ctx)? {
                 modules.push(m);
             }
         }

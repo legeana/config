@@ -32,9 +32,9 @@ struct MkDirStatement {
 }
 
 impl ast::Statement for MkDirStatement {
-    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         Ok(Some(Box::new(MkDir {
-            dst: state.dst_path(&self.dir),
+            dst: ctx.dst_path(&self.dir),
         })))
     }
 }

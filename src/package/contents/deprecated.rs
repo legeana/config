@@ -13,7 +13,7 @@ use super::util::check_command;
 struct NoOpStatement;
 
 impl ast::Statement for NoOpStatement {
-    fn eval(&self, _state: &mut engine::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, _ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         Ok(None)
     }
 }

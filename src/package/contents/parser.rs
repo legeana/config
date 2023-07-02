@@ -88,8 +88,8 @@ struct ParsedStatement {
 }
 
 impl ast::Statement for ParsedStatement {
-    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
-        self.statement.eval(state).with_context(|| {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+        self.statement.eval(ctx).with_context(|| {
             format!(
                 "failed to build line {line_num} {line:?} from {manifest_path:?}",
                 line_num = self.line_num,

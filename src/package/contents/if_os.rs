@@ -30,11 +30,11 @@ impl IfOsStatement {
 }
 
 impl ast::Statement for IfOsStatement {
-    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         if !self.is_os() {
             return Ok(None);
         }
-        self.cmd.eval(state)
+        self.cmd.eval(ctx)
     }
 }
 

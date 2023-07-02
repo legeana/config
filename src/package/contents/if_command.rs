@@ -48,8 +48,8 @@ struct IfCommandStatement {
 }
 
 impl ast::Statement for IfCommandStatement {
-    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
-        match self.cmd.eval(state)? {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+        match self.cmd.eval(ctx)? {
             Some(cmd) => Ok(Some(Box::new(IfCommand {
                 executable: self.executable.clone(),
                 cmd,

@@ -44,10 +44,10 @@ struct SymlinkTreeStatement {
 }
 
 impl ast::Statement for SymlinkTreeStatement {
-    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         Ok(Some(Box::new(SymlinkTree {
             src: self.workdir.join(&self.directory),
-            dst: state.dst_path(&self.directory),
+            dst: ctx.dst_path(&self.directory),
         })))
     }
 }

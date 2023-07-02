@@ -53,7 +53,7 @@ impl Configuration {
     }
     #[allow(clippy::new_ret_no_self)]
     pub fn new(root: PathBuf) -> Result<ModuleBox> {
-        let mut state = engine::State::new();
+        let mut state = engine::Context::new();
         ConfigurationStatement::parse(root)?
             .eval(&mut state)?
             .ok_or_else(|| anyhow!("failed to unwrap Configuration"))
@@ -94,13 +94,13 @@ struct ConfigurationStatement {
 }
 
 impl Statement for ConfigurationStatement {
-    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         let mut modules: Vec<_> = Vec::new();
         for statement in self.statements.iter() {
-            if !state.enabled {
+            if !ctx.enabled {
                 break;
             }
-            if let Some(module) = statement.eval(state)? {
+            if let Some(module) = statement.eval(ctx)? {
                 modules.push(module);
             }
         }

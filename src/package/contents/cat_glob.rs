@@ -52,17 +52,17 @@ struct CatGlobIntoStatement {
 }
 
 impl ast::Statement for CatGlobIntoStatement {
-    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
-        let current_prefix = state.prefix.to_str().ok_or_else(|| {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+        let current_prefix = ctx.prefix.to_str().ok_or_else(|| {
             anyhow!(
                 "failed to represent current prefix {:?} as a string",
-                &state.prefix
+                &ctx.prefix
             )
         })?;
         let glob_prefix = current_prefix.to_owned() + std::path::MAIN_SEPARATOR_STR;
         let concatenated_globs: Vec<String> =
             self.globs.iter().map(|g| glob_prefix.clone() + g).collect();
-        let dst = state.dst_path(&self.filename);
+        let dst = ctx.dst_path(&self.filename);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
         Ok(Some(Box::new(CatGlobInto {

@@ -16,8 +16,8 @@ struct PrefixStatement {
 }
 
 impl ast::Statement for PrefixStatement {
-    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
-        state.prefix = shellexpand::tilde(&self.prefix).as_ref().into();
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+        ctx.prefix = shellexpand::tilde(&self.prefix).as_ref().into();
         Ok(None)
     }
 }

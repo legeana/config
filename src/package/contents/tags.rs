@@ -17,12 +17,12 @@ struct RequiresStatement {
 }
 
 impl ast::Statement for RequiresStatement {
-    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         for tag in self.tags.iter() {
             let has_tag =
                 tag_util::has_tag(tag).with_context(|| format!("failed to check tag {tag}"))?;
             if !has_tag {
-                state.enabled = false;
+                ctx.enabled = false;
             }
         }
         Ok(None)
@@ -56,12 +56,12 @@ struct ConflictsStatement {
 }
 
 impl ast::Statement for ConflictsStatement {
-    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         for tag in self.tags.iter() {
             let has_tag =
                 tag_util::has_tag(tag).with_context(|| format!("failed to check tag {tag}"))?;
             if has_tag {
-                state.enabled = false;
+                ctx.enabled = false;
             }
         }
         Ok(None)

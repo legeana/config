@@ -18,7 +18,7 @@ pub type ParserBox = Box<dyn Parser>;
 
 /// Command creates a Module or modifies State.
 pub trait Statement: std::fmt::Debug {
-    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>>;
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>>;
 }
 
 pub type StatementBox = Box<dyn Statement>;

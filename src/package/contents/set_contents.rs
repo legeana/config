@@ -41,8 +41,8 @@ struct SetContentsStatement {
 }
 
 impl ast::Statement for SetContentsStatement {
-    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
-        let dst = state.dst_path(&self.filename);
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+        let dst = ctx.dst_path(&self.filename);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
         Ok(Some(Box::new(SetContents {

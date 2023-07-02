@@ -52,9 +52,9 @@ struct IfMissingStatement {
 }
 
 impl ast::Statement for IfMissingStatement {
-    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         let path: PathBuf = shellexpand::tilde(&self.path).as_ref().into();
-        match self.cmd.eval(state)? {
+        match self.cmd.eval(ctx)? {
             Some(cmd) => Ok(Some(Box::new(IfMissing { path, cmd }))),
             None => Ok(None),
         }

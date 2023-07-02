@@ -41,9 +41,9 @@ struct RenderStatement {
 }
 
 impl ast::Statement for RenderStatement {
-    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         let src = self.workdir.join(&self.src);
-        let dst = state.dst_path(&self.dst);
+        let dst = ctx.dst_path(&self.dst);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
         let mut tera = tera::Tera::default();
@@ -55,7 +55,7 @@ impl ast::Statement for RenderStatement {
         context.insert("source_file", &src);
         context.insert("destination_file", &dst);
         context.insert("workdir", &self.workdir);
-        context.insert("prefix", &state.prefix);
+        context.insert("prefix", &ctx.prefix);
         Ok(Some(Box::new(Render {
             tera,
             context,

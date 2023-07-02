@@ -31,10 +31,10 @@ struct SymlinkStatement {
 }
 
 impl ast::Statement for SymlinkStatement {
-    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         Ok(Some(Box::new(Symlink {
             src: self.workdir.join(&self.src),
-            dst: state.dst_path(&self.dst),
+            dst: ctx.dst_path(&self.dst),
         })))
     }
 }

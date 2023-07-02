@@ -1,11 +1,11 @@
 use std::path::{Path, PathBuf};
 
-pub struct State {
+pub struct Context {
     pub enabled: bool,
     pub prefix: PathBuf,
 }
 
-impl State {
+impl Context {
     pub fn new() -> Self {
         Self {
             enabled: true,

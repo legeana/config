@@ -22,12 +22,12 @@ struct DirsPrefixStatement {
 }
 
 impl ast::Statement for DirsPrefixStatement {
-    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         let base_dir = self
             .base_dir
             .as_ref()
             .ok_or_else(|| anyhow!("{} is not supported", self.command))?;
-        state.prefix = base_dir.join(&self.subdir);
+        ctx.prefix = base_dir.join(&self.subdir);
         Ok(None)
     }
 }

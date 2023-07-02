@@ -47,7 +47,7 @@ struct PostInstallStatement {
 }
 
 impl ast::Statement for PostInstallStatement {
-    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         let args: Vec<String> = self
             .args
             .iter()
@@ -56,7 +56,7 @@ impl ast::Statement for PostInstallStatement {
             .collect();
         Ok(Some(Box::new(PostInstallExec {
             exec_condition: self.exec_condition.clone(),
-            current_dir: state.prefix.clone(),
+            current_dir: ctx.prefix.clone(),
             cmd: self.cmd.clone(),
             args,
         })))

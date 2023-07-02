@@ -109,8 +109,8 @@ struct ImporterStatement {
 }
 
 impl ast::Statement for ImporterStatement {
-    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
-        let dst = state.dst_path(&self.filename);
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+        let dst = ctx.dst_path(&self.filename);
         let prefix = dst
             .parent()
             .ok_or_else(|| anyhow!("failed to get parent of {dst:?}"))?;

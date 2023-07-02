@@ -67,8 +67,8 @@ struct GitCloneStatement {
 }
 
 impl ast::Statement for GitCloneStatement {
-    fn eval(&self, state: &mut engine::State) -> Result<Option<ModuleBox>> {
-        let dst = state.dst_path(&self.dst);
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+        let dst = ctx.dst_path(&self.dst);
         let output = local_state::DirectoryState::new(dst.clone())
             .with_context(|| format!("failed to create DirectoryState from {dst:?}"))?;
         Ok(Some(Box::new(GitClone {
