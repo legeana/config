@@ -27,9 +27,7 @@ pub trait Function {
     }
 }
 
-pub struct WrappedFunction<T> {
-    wrapped: T,
-}
+pub struct WrappedFunction<T>(T);
 
 impl<T> TeraFunction for WrappedFunction<T>
 where
@@ -40,13 +38,13 @@ where
     fn call(&self, args: &HashMap<String, Value>) -> tera::Result<Value> {
         (|| {
             let args: T::Params = deserialize_args(args)?;
-            let result = self.wrapped.call(&args)?;
+            let result = self.0.call(&args)?;
             serde_json::to_value(result).context("failed to serialize result to json")
         })()
         .map_err(|err| tera::Error::chain("failed to execute tera function", err))
     }
     fn is_safe(&self) -> bool {
-        self.wrapped.is_safe()
+        self.0.is_safe()
     }
 }
 
@@ -55,7 +53,7 @@ where
     T: Function,
 {
     fn from(wrapped: T) -> Self {
-        Self { wrapped }
+        Self(wrapped)
     }
 }
 
@@ -119,9 +117,7 @@ pub trait Filter {
     }
 }
 
-pub struct WrappedFilter<T> {
-    wrapped: T,
-}
+pub struct WrappedFilter<T>(T);
 
 impl<T> TeraFilter for WrappedFilter<T>
 where
@@ -134,13 +130,13 @@ where
         (|| {
             let value = serde_json::from_value(value.to_owned())?;
             let args: T::Params = deserialize_args(args)?;
-            let result = self.wrapped.filter(&value, &args)?;
+            let result = self.0.filter(&value, &args)?;
             serde_json::to_value(result).context("failed to serialize result to json")
         })()
         .map_err(|err| tera::Error::chain("failed to execute tera filter", err))
     }
     fn is_safe(&self) -> bool {
-        self.wrapped.is_safe()
+        self.0.is_safe()
     }
 }
 
@@ -149,7 +145,7 @@ where
     T: Filter,
 {
     fn from(wrapped: T) -> Self {
-        Self { wrapped }
+        Self(wrapped)
     }
 }
 
