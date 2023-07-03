@@ -6,7 +6,6 @@ use indoc::formatdoc;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::ast;
 use super::engine;
 use super::inventory;
 use super::local_state;
@@ -40,7 +39,7 @@ struct SetContentsStatement {
     contents: String,
 }
 
-impl ast::Statement for SetContentsStatement {
+impl engine::Statement for SetContentsStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         let dst = ctx.dst_path(&self.filename);
         let output = local_state::FileState::new(dst.clone())
@@ -55,7 +54,7 @@ impl ast::Statement for SetContentsStatement {
 #[derive(Clone)]
 struct SetContentsParser;
 
-impl ast::Parser for SetContentsParser {
+impl engine::Parser for SetContentsParser {
     fn name(&self) -> String {
         "set_contents".to_owned()
     }
@@ -65,7 +64,7 @@ impl ast::Parser for SetContentsParser {
                 overwrites <filename> with <contents>
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
         let (filename, contents) = util::double_arg(&self.name(), args)?;
         Ok(Box::new(SetContentsStatement {
             filename: filename.to_owned(),

@@ -7,7 +7,6 @@ use crate::command::is_command;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::ast;
 use super::engine;
 use super::inventory;
 use super::util;
@@ -44,10 +43,10 @@ impl Module for IfCommand {
 #[derive(Debug)]
 struct IfCommandStatement {
     executable: String,
-    cmd: ast::StatementBox,
+    cmd: engine::StatementBox,
 }
 
-impl ast::Statement for IfCommandStatement {
+impl engine::Statement for IfCommandStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         match self.cmd.eval(ctx)? {
             Some(cmd) => Ok(Some(Box::new(IfCommand {
@@ -62,7 +61,7 @@ impl ast::Statement for IfCommandStatement {
 #[derive(Clone)]
 struct IfCommandParser;
 
-impl ast::Parser for IfCommandParser {
+impl engine::Parser for IfCommandParser {
     fn name(&self) -> String {
         "if_command".to_owned()
     }
@@ -73,12 +72,12 @@ impl ast::Parser for IfCommandParser {
                 in PATH
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
         let (exe, cmd_args) = util::multiple_args(&self.name(), args, 1)?;
         assert_eq!(exe.len(), 1);
         Ok(Box::new(IfCommandStatement {
             executable: exe[0].to_owned(),
-            cmd: ast::parse(workdir, cmd_args)?,
+            cmd: engine::parse(workdir, cmd_args)?,
         }))
     }
 }

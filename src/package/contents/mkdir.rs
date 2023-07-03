@@ -3,7 +3,6 @@ use std::path::{Path, PathBuf};
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::ast;
 use super::engine;
 use super::inventory;
 use super::util;
@@ -31,7 +30,7 @@ struct MkDirStatement {
     dir: String,
 }
 
-impl ast::Statement for MkDirStatement {
+impl engine::Statement for MkDirStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         Ok(Some(Box::new(MkDir {
             dst: ctx.dst_path(&self.dir),
@@ -42,7 +41,7 @@ impl ast::Statement for MkDirStatement {
 #[derive(Clone)]
 struct MkDirParser;
 
-impl ast::Parser for MkDirParser {
+impl engine::Parser for MkDirParser {
     fn name(&self) -> String {
         "mkdir".to_owned()
     }
@@ -52,7 +51,7 @@ impl ast::Parser for MkDirParser {
                 create a directory in prefix
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
         let dir = util::single_arg(&self.name(), args)?.to_owned();
         Ok(Box::new(MkDirStatement { dir }))
     }

@@ -7,7 +7,6 @@ use crate::git_utils;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::ast;
 use super::engine;
 use super::inventory;
 use super::local_state;
@@ -66,7 +65,7 @@ struct GitCloneStatement {
     dst: String,
 }
 
-impl ast::Statement for GitCloneStatement {
+impl engine::Statement for GitCloneStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         let dst = ctx.dst_path(&self.dst);
         let output = local_state::DirectoryState::new(dst.clone())
@@ -81,7 +80,7 @@ impl ast::Statement for GitCloneStatement {
 #[derive(Clone)]
 struct GitCloneParser;
 
-impl ast::Parser for GitCloneParser {
+impl engine::Parser for GitCloneParser {
     fn name(&self) -> String {
         "git_clone".to_owned()
     }
@@ -92,7 +91,7 @@ impl ast::Parser for GitCloneParser {
                 if <branch> is specified clone <branch> instead of default HEAD
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
         let (url, dst) = util::double_arg(&self.name(), args)?;
         Ok(Box::new(GitCloneStatement {
             url: url.to_owned(),

@@ -3,7 +3,6 @@ use std::path::Path;
 use crate::module::ModuleBox;
 use crate::tera_helper;
 
-use super::ast;
 use super::engine;
 use super::inventory;
 use super::util;
@@ -20,7 +19,7 @@ fn is_os(os: &str) -> bool {
 #[derive(Debug)]
 struct IfOsStatement {
     os: &'static str,
-    cmd: ast::StatementBox,
+    cmd: engine::StatementBox,
 }
 
 impl IfOsStatement {
@@ -29,7 +28,7 @@ impl IfOsStatement {
     }
 }
 
-impl ast::Statement for IfOsStatement {
+impl engine::Statement for IfOsStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         if !self.is_os() {
             return Ok(None);
@@ -49,7 +48,7 @@ impl IfOsParser {
     }
 }
 
-impl ast::Parser for IfOsParser {
+impl engine::Parser for IfOsParser {
     fn name(&self) -> String {
         self.command()
     }
@@ -59,12 +58,12 @@ impl ast::Parser for IfOsParser {
                 execute a MANIFEST <command> only if os (or family) is {os}
         ", os=self.os, command=self.command()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
         let (empty, cmd_args) = util::multiple_args(&self.command(), args, 0)?;
         assert!(empty.is_empty());
         Ok(Box::new(IfOsStatement {
             os: self.os,
-            cmd: ast::parse(workdir, cmd_args)?,
+            cmd: engine::parse(workdir, cmd_args)?,
         }))
     }
 }

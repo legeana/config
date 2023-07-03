@@ -4,7 +4,6 @@ use anyhow::Result;
 
 use crate::module::ModuleBox;
 
-use super::ast;
 use super::engine;
 use super::inventory;
 use super::util::check_command;
@@ -12,7 +11,7 @@ use super::util::check_command;
 #[derive(Debug)]
 struct NoOpStatement;
 
-impl ast::Statement for NoOpStatement {
+impl engine::Statement for NoOpStatement {
     fn eval(&self, _ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         Ok(None)
     }
@@ -21,14 +20,14 @@ impl ast::Statement for NoOpStatement {
 #[derive(Clone)]
 struct DeprecatedParser;
 
-impl ast::Parser for DeprecatedParser {
+impl engine::Parser for DeprecatedParser {
     fn name(&self) -> String {
         "deprecated commands, do not use".to_owned()
     }
     fn help(&self) -> String {
         "DEPRECATED: N/A".to_owned()
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
         /*if check_command("<deprecated>", args).is_ok() {
             log::warn!(
                 "{:?}: <deprecated> is unsupported",

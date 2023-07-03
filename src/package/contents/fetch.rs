@@ -6,7 +6,6 @@ use indoc::formatdoc;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::ast;
 use super::engine;
 use super::inventory;
 use super::local_state;
@@ -71,7 +70,7 @@ struct FetchIntoStatement {
     executable: bool,
 }
 
-impl ast::Statement for FetchIntoStatement {
+impl engine::Statement for FetchIntoStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         let dst = ctx.dst_path(&self.filename);
         let output = local_state::FileState::new(dst.clone())
@@ -87,7 +86,7 @@ impl ast::Statement for FetchIntoStatement {
 #[derive(Clone)]
 struct FetchIntoParser;
 
-impl ast::Parser for FetchIntoParser {
+impl engine::Parser for FetchIntoParser {
     fn name(&self) -> String {
         "fetch_into".to_owned()
     }
@@ -98,7 +97,7 @@ impl ast::Parser for FetchIntoParser {
                 and installs a symlink to it
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
         let (filename, url) = util::double_arg(&self.name(), args)?;
         Ok(Box::new(FetchIntoStatement {
             filename: filename.to_owned(),
@@ -111,7 +110,7 @@ impl ast::Parser for FetchIntoParser {
 #[derive(Clone)]
 struct FetchExeIntoParser;
 
-impl ast::Parser for FetchExeIntoParser {
+impl engine::Parser for FetchExeIntoParser {
     fn name(&self) -> String {
         "fetch_exe_into".to_owned()
     }
@@ -122,7 +121,7 @@ impl ast::Parser for FetchExeIntoParser {
                 and installs a symlink to it
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
         let (filename, url) = util::double_arg(&self.name(), args)?;
         Ok(Box::new(FetchIntoStatement {
             filename: filename.to_owned(),

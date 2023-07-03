@@ -6,7 +6,6 @@ use indoc::formatdoc;
 use crate::module::ModuleBox;
 use crate::tag_util;
 
-use super::ast;
 use super::engine;
 use super::inventory;
 use super::util;
@@ -16,7 +15,7 @@ struct RequiresStatement {
     tags: Vec<String>,
 }
 
-impl ast::Statement for RequiresStatement {
+impl engine::Statement for RequiresStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         for tag in self.tags.iter() {
             let has_tag =
@@ -32,7 +31,7 @@ impl ast::Statement for RequiresStatement {
 #[derive(Clone)]
 struct RequiresParser;
 
-impl ast::Parser for RequiresParser {
+impl engine::Parser for RequiresParser {
     fn name(&self) -> String {
         "requires".to_owned()
     }
@@ -42,7 +41,7 @@ impl ast::Parser for RequiresParser {
                 do not process current directory if any of the tags is not present
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
         let (_, tags) = util::multiple_args(&self.name(), args, 0)?;
         Ok(Box::new(RequiresStatement {
             tags: tags.iter().map(|&s| s.to_owned()).collect(),
@@ -55,7 +54,7 @@ struct ConflictsStatement {
     tags: Vec<String>,
 }
 
-impl ast::Statement for ConflictsStatement {
+impl engine::Statement for ConflictsStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         for tag in self.tags.iter() {
             let has_tag =
@@ -71,7 +70,7 @@ impl ast::Statement for ConflictsStatement {
 #[derive(Clone)]
 struct ConflictsParser;
 
-impl ast::Parser for ConflictsParser {
+impl engine::Parser for ConflictsParser {
     fn name(&self) -> String {
         "conflicts".to_owned()
     }
@@ -81,7 +80,7 @@ impl ast::Parser for ConflictsParser {
                 do not process current directory if any of the tags is present
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
         let (_, tags) = util::multiple_args(&self.name(), args, 0)?;
         Ok(Box::new(ConflictsStatement {
             tags: tags.iter().map(|&s| s.to_owned()).collect(),

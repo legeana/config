@@ -4,7 +4,6 @@ use std::path::Path;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::ast;
 use super::engine;
 use super::inventory;
 use super::local_state;
@@ -51,7 +50,7 @@ struct CatGlobIntoStatement {
     globs: Vec<String>,
 }
 
-impl ast::Statement for CatGlobIntoStatement {
+impl engine::Statement for CatGlobIntoStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         let current_prefix = ctx.prefix.to_str().ok_or_else(|| {
             anyhow!(
@@ -75,7 +74,7 @@ impl ast::Statement for CatGlobIntoStatement {
 #[derive(Clone)]
 struct CatGlobIntoParser;
 
-impl ast::Parser for CatGlobIntoParser {
+impl engine::Parser for CatGlobIntoParser {
     fn name(&self) -> String {
         "cat_glob_into".to_owned()
     }
@@ -85,7 +84,7 @@ impl ast::Parser for CatGlobIntoParser {
                 create filename in local storage by concatenating globs
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
         let (fname, globs) = util::multiple_args(&self.name(), args, 1)?;
         assert!(fname.len() == 1);
         let filename = fname[0].to_owned();

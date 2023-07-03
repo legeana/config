@@ -5,7 +5,6 @@ use std::{fs::File, io::Write};
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::ast;
 use super::engine;
 use super::inventory;
 use super::local_state;
@@ -108,7 +107,7 @@ struct ImporterStatement {
     filename: String,
 }
 
-impl ast::Statement for ImporterStatement {
+impl engine::Statement for ImporterStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         let dst = ctx.dst_path(&self.filename);
         let prefix = dst
@@ -127,7 +126,7 @@ impl ast::Statement for ImporterStatement {
 #[derive(Clone)]
 struct ImporterParser;
 
-impl ast::Parser for ImporterParser {
+impl engine::Parser for ImporterParser {
     fn name(&self) -> String {
         "import_from".to_owned()
     }
@@ -137,7 +136,7 @@ impl ast::Parser for ImporterParser {
                 create a symlink for filename in prefix to a local persistent state
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
         let filename = util::single_arg(&self.name(), args)?.to_owned();
         Ok(Box::new(ImporterStatement {
             workdir: workdir.to_owned(),

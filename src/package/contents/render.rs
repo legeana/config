@@ -7,7 +7,6 @@ use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 use crate::tera_helpers;
 
-use super::ast;
 use super::engine;
 use super::inventory;
 use super::local_state;
@@ -40,7 +39,7 @@ struct RenderStatement {
     dst: String,
 }
 
-impl ast::Statement for RenderStatement {
+impl engine::Statement for RenderStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         let src = self.workdir.join(&self.src);
         let dst = ctx.dst_path(&self.dst);
@@ -67,7 +66,7 @@ impl ast::Statement for RenderStatement {
 #[derive(Clone)]
 struct RenderParser;
 
-impl ast::Parser for RenderParser {
+impl engine::Parser for RenderParser {
     fn name(&self) -> String {
         "render".to_owned()
     }
@@ -77,7 +76,7 @@ impl ast::Parser for RenderParser {
                 render template
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> anyhow::Result<ast::StatementBox> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> anyhow::Result<engine::StatementBox> {
         let filename = util::single_arg(&self.name(), args)?;
         Ok(Box::new(RenderStatement {
             workdir: workdir.to_owned(),
@@ -90,7 +89,7 @@ impl ast::Parser for RenderParser {
 #[derive(Clone)]
 struct RenderToParser;
 
-impl ast::Parser for RenderToParser {
+impl engine::Parser for RenderToParser {
     fn name(&self) -> String {
         "render_to".to_owned()
     }
@@ -100,7 +99,7 @@ impl ast::Parser for RenderToParser {
                 render template <filename> into <destination>
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
         let (dst, src) = util::double_arg(&self.name(), args)?;
         Ok(Box::new(RenderStatement {
             workdir: workdir.to_owned(),

@@ -9,7 +9,6 @@ use crate::tera_helper;
 use crate::xdg;
 use crate::xdg_or_win;
 
-use super::ast;
 use super::engine;
 use super::inventory;
 use super::util;
@@ -21,7 +20,7 @@ struct DirsPrefixStatement {
     subdir: String,
 }
 
-impl ast::Statement for DirsPrefixStatement {
+impl engine::Statement for DirsPrefixStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         let base_dir = self
             .base_dir
@@ -44,7 +43,7 @@ struct DirsPrefixParser {
     base_dir: Option<PathBuf>,
 }
 
-impl ast::Parser for DirsPrefixParser {
+impl engine::Parser for DirsPrefixParser {
     fn name(&self) -> String {
         self.command.to_owned()
     }
@@ -54,7 +53,7 @@ impl ast::Parser for DirsPrefixParser {
                 set current installation prefix to {base_dir:?}/<directory>
         ", command=self.name(), base_dir=self.base_dir}
     }
-    fn parse(&self, _workdir: &std::path::Path, args: &[&str]) -> Result<ast::StatementBox> {
+    fn parse(&self, _workdir: &std::path::Path, args: &[&str]) -> Result<engine::StatementBox> {
         let subdir = util::single_arg(&self.name(), args)?.to_owned();
         Ok(Box::new(DirsPrefixStatement {
             command: self.command,
@@ -70,7 +69,7 @@ impl inventory::RenderHelper for DirsPrefixParser {
             return;
         };
         tera.register_function(
-            &ast::Parser::name(self),
+            &engine::Parser::name(self),
             tera_helper::wrap_fn(move |args: &DirsPrefixParams| {
                 Ok(match args.path {
                     Some(ref path) => base_dir.join(path),

@@ -6,7 +6,6 @@ use indoc::formatdoc;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::ast;
 use super::engine;
 use super::inventory;
 use super::local_state;
@@ -27,7 +26,7 @@ struct OutputFileStatement {
     filename: String,
 }
 
-impl ast::Statement for OutputFileStatement {
+impl engine::Statement for OutputFileStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         let dst = ctx.dst_path(&self.filename);
         let output = local_state::FileState::new(dst.clone())
@@ -39,7 +38,7 @@ impl ast::Statement for OutputFileStatement {
 #[derive(Clone)]
 struct OutputFileParser;
 
-impl ast::Parser for OutputFileParser {
+impl engine::Parser for OutputFileParser {
     fn name(&self) -> String {
         "output_file".to_owned()
     }
@@ -49,7 +48,7 @@ impl ast::Parser for OutputFileParser {
                 create a symlink for filename in prefix to a local persistent state
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
+    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
         let filename = util::single_arg(&self.name(), args)?.to_owned();
         Ok(Box::new(OutputFileStatement { filename }))
     }

@@ -3,7 +3,6 @@ use std::path::{Path, PathBuf};
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::ast;
 use super::engine;
 use super::inventory;
 use super::local_state;
@@ -40,7 +39,7 @@ struct CopyStatement {
     filename: String,
 }
 
-impl ast::Statement for CopyStatement {
+impl engine::Statement for CopyStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         let dst = ctx.dst_path(&self.filename);
         let output = local_state::FileState::new(dst.clone())
@@ -55,7 +54,7 @@ impl ast::Statement for CopyStatement {
 #[derive(Clone)]
 struct CopyParser;
 
-impl ast::Parser for CopyParser {
+impl engine::Parser for CopyParser {
     fn name(&self) -> String {
         "copy".to_owned()
     }
@@ -65,7 +64,7 @@ impl ast::Parser for CopyParser {
                 create a copy of a filename in local storage and install a symlink to it
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
         let filename = util::single_arg(&self.name(), args)?.to_owned();
         Ok(Box::new(CopyStatement {
             workdir: workdir.to_owned(),

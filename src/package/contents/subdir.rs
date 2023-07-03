@@ -6,7 +6,6 @@ use indoc::formatdoc;
 
 use crate::module::ModuleBox;
 
-use super::ast;
 use super::engine;
 use super::inventory;
 use super::util;
@@ -14,10 +13,10 @@ use super::util;
 #[derive(Debug)]
 struct SubdirStatement {
     subdir: PathBuf,
-    config: ast::StatementBox,
+    config: engine::StatementBox,
 }
 
-impl ast::Statement for SubdirStatement {
+impl engine::Statement for SubdirStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         let mut substate = engine::Context {
             enabled: true,
@@ -30,7 +29,7 @@ impl ast::Statement for SubdirStatement {
 #[derive(Clone)]
 struct SubdirParser;
 
-impl ast::Parser for SubdirParser {
+impl engine::Parser for SubdirParser {
     fn name(&self) -> String {
         "subdir".to_owned()
     }
@@ -40,7 +39,7 @@ impl ast::Parser for SubdirParser {
                 load subdirectory configuration recursively
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
         let subdir = util::single_arg(&self.name(), args)?;
         let subroot = workdir.join(subdir);
         Ok(Box::new(SubdirStatement {
@@ -55,7 +54,7 @@ struct SubdirsStatement {
     subdirs: Vec<SubdirStatement>,
 }
 
-impl ast::Statement for SubdirsStatement {
+impl engine::Statement for SubdirsStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         let mut modules: Vec<ModuleBox> = Vec::new();
         for subdir in self.subdirs.iter() {
@@ -70,7 +69,7 @@ impl ast::Statement for SubdirsStatement {
 #[derive(Clone)]
 struct SubdirsParser;
 
-impl ast::Parser for SubdirsParser {
+impl engine::Parser for SubdirsParser {
     fn name(&self) -> String {
         "subdirs".to_owned()
     }
@@ -80,7 +79,7 @@ impl ast::Parser for SubdirsParser {
                 load all subdirectories recursively
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
         util::no_args(&self.name(), args)?;
         let mut subdirs: Vec<SubdirStatement> = Vec::new();
         for entry in workdir

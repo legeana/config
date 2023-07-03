@@ -1,4 +1,3 @@
-mod ast;
 mod cat_glob;
 mod copy;
 mod deprecated;
@@ -31,11 +30,11 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result};
 
 use crate::module::{self, ModuleBox, Rules};
-use crate::package::contents::ast::{Statement, StatementBox};
+use crate::package::contents::engine::{Statement, StatementBox};
 
 const MANIFEST: &str = "MANIFEST";
 
-pub use ast::help;
+pub use engine::help;
 
 fn error_context(root: &Path) -> String {
     format!("{root:?}")
@@ -76,7 +75,7 @@ impl Statement for ConfigurationStatement {
     }
 }
 
-// Analogous to ast::Parser, but can only be called from code.
+// Analogous to engine::Parser, but can only be called from code.
 impl ConfigurationStatement {
     pub fn parse(root: PathBuf) -> Result<StatementBox> {
         let manifest = root.join(MANIFEST);

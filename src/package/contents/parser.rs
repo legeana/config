@@ -7,7 +7,6 @@ use anyhow::{anyhow, Context, Result};
 
 use crate::module::ModuleBox;
 
-use super::ast;
 use super::engine;
 
 const LINE_CONT: char = '\\';
@@ -70,13 +69,13 @@ impl<B: BufRead> Iterator for LineIterator<B> {
     }
 }
 
-fn parse_line(workdir: &Path, line: &str) -> Result<Option<ast::StatementBox>> {
+fn parse_line(workdir: &Path, line: &str) -> Result<Option<engine::StatementBox>> {
     if line.is_empty() || line.starts_with('#') {
         return Ok(None);
     }
     let args = shlex::split(line).ok_or_else(|| anyhow!("failed to split line {:?}", line))?;
     let arg_refs: Vec<&str> = args.iter().map(String::as_str).collect();
-    Ok(Some(ast::parse(workdir, &arg_refs)?))
+    Ok(Some(engine::parse(workdir, &arg_refs)?))
 }
 
 #[derive(Debug)]
@@ -84,10 +83,10 @@ struct ParsedStatement {
     line_num: usize,
     line: String,
     manifest_path: PathBuf,
-    statement: ast::StatementBox,
+    statement: engine::StatementBox,
 }
 
-impl ast::Statement for ParsedStatement {
+impl engine::Statement for ParsedStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         self.statement.eval(ctx).with_context(|| {
             format!(
@@ -100,11 +99,11 @@ impl ast::Statement for ParsedStatement {
     }
 }
 
-pub fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<ast::StatementBox>> {
+pub fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<engine::StatementBox>> {
     let manifest =
         File::open(manifest_path).with_context(|| format!("failed to open {manifest_path:?}"))?;
     let reader = BufReader::new(manifest);
-    let mut builders: Vec<ast::StatementBox> = Vec::new();
+    let mut builders: Vec<engine::StatementBox> = Vec::new();
     for (line_idx, line_or) in LineIterator::new(reader.lines()) {
         let line_num = line_idx + 1;
         let line = line_or

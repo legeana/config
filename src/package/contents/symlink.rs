@@ -6,7 +6,6 @@ use indoc::formatdoc;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::ast;
 use super::engine;
 use super::file_util;
 use super::inventory;
@@ -30,7 +29,7 @@ struct SymlinkStatement {
     dst: String,
 }
 
-impl ast::Statement for SymlinkStatement {
+impl engine::Statement for SymlinkStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         Ok(Some(Box::new(Symlink {
             src: self.workdir.join(&self.src),
@@ -42,7 +41,7 @@ impl ast::Statement for SymlinkStatement {
 #[derive(Clone)]
 struct SymlinkParser;
 
-impl ast::Parser for SymlinkParser {
+impl engine::Parser for SymlinkParser {
     fn name(&self) -> String {
         "symlink".to_owned()
     }
@@ -52,7 +51,7 @@ impl ast::Parser for SymlinkParser {
                 create a symlink for filename in prefix
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
         let filename = util::single_arg(&self.name(), args)?;
         Ok(Box::new(SymlinkStatement {
             workdir: workdir.to_owned(),
@@ -65,7 +64,7 @@ impl ast::Parser for SymlinkParser {
 #[derive(Clone)]
 struct SymlinkToParser;
 
-impl ast::Parser for SymlinkToParser {
+impl engine::Parser for SymlinkToParser {
     fn name(&self) -> String {
         "symlink_to".to_owned()
     }
@@ -75,7 +74,7 @@ impl ast::Parser for SymlinkToParser {
                 create a symlink for filename in prefix
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
         let (dst, src) = util::double_arg(&self.name(), args)?;
         Ok(Box::new(SymlinkStatement {
             workdir: workdir.to_owned(),

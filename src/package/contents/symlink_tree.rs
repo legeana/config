@@ -3,7 +3,6 @@ use std::path::{Path, PathBuf};
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::ast;
 use super::engine;
 use super::file_util;
 use super::inventory;
@@ -43,7 +42,7 @@ struct SymlinkTreeStatement {
     directory: String,
 }
 
-impl ast::Statement for SymlinkTreeStatement {
+impl engine::Statement for SymlinkTreeStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         Ok(Some(Box::new(SymlinkTree {
             src: self.workdir.join(&self.directory),
@@ -55,7 +54,7 @@ impl ast::Statement for SymlinkTreeStatement {
 #[derive(Clone)]
 struct SymlinkTreeParser;
 
-impl ast::Parser for SymlinkTreeParser {
+impl engine::Parser for SymlinkTreeParser {
     fn name(&self) -> String {
         "symlink_tree".to_owned()
     }
@@ -65,7 +64,7 @@ impl ast::Parser for SymlinkTreeParser {
                 create a symlink for every file in a directory recursively
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<ast::StatementBox> {
+    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
         let directory = util::single_arg(&self.name(), args)?.to_owned();
         Ok(Box::new(SymlinkTreeStatement {
             workdir: workdir.to_owned(),
