@@ -1,0 +1,31 @@
+use std::path::Path;
+
+use crate::quote;
+
+use super::ast;
+
+grammar(location: &Path);
+
+pub Manifest: ast::Manifest = {
+    <Statement*> => ast::Manifest {
+        location: location.to_owned(),
+        statements: <>,
+    },
+};
+
+Statement: ast::Statement = {
+    <Command> => ast::Statement::Command(<>),
+};
+
+Command: ast::Command = {
+    <name:Literal> <args:Literal*> Newline => ast::Command { name, args }
+};
+
+// TODO: use "\n" instead.
+Newline = ";";
+
+Literal: String = {
+    <r#""([^"\\]|\\.)*""#> => quote::unquote(<>).unwrap(),
+    <r#"'([^"\\]|\\.)*'"#> => quote::unquote(<>).unwrap(),
+    <r#"\w+"#> => <>.to_owned(),
+};

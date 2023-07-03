@@ -1,3 +1,4 @@
+mod ast;
 mod cat_glob;
 mod copy;
 mod deprecated;
@@ -28,9 +29,12 @@ mod util;
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
+use lalrpop_util::lalrpop_mod;
 
 use crate::module::{self, ModuleBox, Rules};
 use crate::package::contents::engine::{Statement, StatementBox};
+
+lalrpop_mod!(ast_parser, "/package/contents/ast_parser.rs");
 
 const MANIFEST: &str = "MANIFEST";
 
