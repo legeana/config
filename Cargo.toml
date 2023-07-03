@@ -2,6 +2,7 @@
 name = "pikaconfig"
 version = "0.1.0"
 edition = "2021"
+build = "build.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -28,3 +29,14 @@ toml = "0.7.3"
 ureq = "2.6.2"
 walkdir = "2"
 which = "4.4.0"
+
+# https://lalrpop.github.io/lalrpop/quick_start_guide.html
+# See also build.rs.
+[dependencies.lalrpop-util]
+version = "0.20.0"
+default-features = false
+features = ["lexer", "unicode"]
+[build-dependencies.lalrpop]
+version = "0.20.0"
+default-features = false
+features = ["lexer", "unicode"]
