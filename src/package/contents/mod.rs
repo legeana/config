@@ -13,6 +13,7 @@ mod if_missing;
 mod if_os;
 mod importer;
 mod inventory;
+mod lexer;
 mod local_state;
 mod mkdir;
 mod output_file;
