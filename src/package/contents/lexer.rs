@@ -13,7 +13,6 @@ pub enum LexerError {
 }
 
 impl LexerError {
-    #[allow(dead_code)]
     pub fn with_location(self, lex: &logos::Lexer<Token>) -> LocationError {
         LocationError {
             source: self,
@@ -80,6 +79,39 @@ impl std::fmt::Display for Location {
             self.line_number + 1,
             self.column + 1
         )
+    }
+}
+
+pub type Spanned<Tok, Loc, Error> = Result<(Loc, Tok, Loc), Error>;
+
+pub struct LalrpopLexer<'input> {
+    lexer: logos::Lexer<'input, Token>,
+}
+
+impl<'input> LalrpopLexer<'input> {
+    #[allow(dead_code)]
+    pub fn new(source: &'input str) -> Self {
+        Self {
+            lexer: Token::lexer(source),
+        }
+    }
+}
+
+impl<'input> Iterator for LalrpopLexer<'input> {
+    type Item = Spanned<Token, usize, LocationError>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.lexer.next() {
+            Some(Ok(tok)) => {
+                let logos::Span { start, end } = self.lexer.span();
+                Some(Ok((start, tok, end)))
+            }
+            Some(Err(err)) => {
+                let err = err.with_location(&self.lexer);
+                Some(Err(err))
+            }
+            None => None,
+        }
     }
 }
 
