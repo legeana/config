@@ -40,8 +40,8 @@ pub fn enquote(text: &str) -> String {
     enquote_with('"', text)
 }
 
-#[derive(Error, Debug, PartialEq)]
-enum UnquoteError {
+#[derive(Error, Clone, Debug, PartialEq)]
+pub enum UnquoteError {
     #[error("unexpected symbol {c:?} at position {pos}: {text:?}")]
     BeforeInit { pos: usize, c: char, text: String },
     #[error("unexpected symbol {c:?} past end quote {q:?} at position {pos}: {text:?}")]
@@ -117,11 +117,11 @@ fn unquote_impl(text: &str) -> UnquoteState {
 }
 
 #[allow(dead_code)]
-pub fn unquote<S: AsRef<str>>(text: S) -> Result<String> {
+pub fn unquote<S: AsRef<str>>(text: S) -> Result<String, UnquoteError> {
     type S = UnquoteState;
     let text = text.as_ref();
     match unquote_impl(text) {
-        S::Error(e) => Err(e.into()),
+        S::Error(e) => Err(e),
         S::Success(result) => Ok(result),
         state => panic!("unexpected state {state:?}: {text:?}"),
     }
