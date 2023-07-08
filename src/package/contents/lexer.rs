@@ -40,7 +40,7 @@ pub enum Token {
     Newline,
     #[regex(r#"'([^'\\]|\\.)*'"#, |lex| quote::unquote(lex.slice()))]
     #[regex(r#""([^"\\]|\\.)*""#, |lex| quote::unquote(lex.slice()))]
-    #[regex(r#"\S+"#, |lex| lex.slice().to_owned())]
+    #[regex(r#"[^\s'"]+"#, |lex| lex.slice().to_owned())]
     Literal(String),
 }
 
@@ -269,6 +269,22 @@ mod tests {
             lex.next(),
             Some(Ok(Token::Literal(r#"mixed "quoted""#.into())))
         );
+        assert_eq!(lex.next(), Some(Ok(Token::Newline)));
+        assert_eq!(lex.next(), Some(Ok(Token::Space)));
+        assert_eq!(lex.next(), None);
+    }
+
+    #[test]
+    fn test_no_space_between_literals() {
+        let mut lex = Token::lexer(
+            r#"
+            "hello""world"
+        "#,
+        );
+        assert_eq!(lex.next(), Some(Ok(Token::Newline)));
+        assert_eq!(lex.next(), Some(Ok(Token::Space)));
+        assert_eq!(lex.next(), Some(Ok(Token::Literal("hello".into()))));
+        assert_eq!(lex.next(), Some(Ok(Token::Literal("world".into()))));
         assert_eq!(lex.next(), Some(Ok(Token::Newline)));
         assert_eq!(lex.next(), Some(Ok(Token::Space)));
         assert_eq!(lex.next(), None);
