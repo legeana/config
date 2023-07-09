@@ -32,6 +32,7 @@ pub struct LocationError {
 #[derive(Clone, Debug, Logos, PartialEq)]
 #[logos(error = LexerError)]
 #[logos(extras = LineTracker)]
+#[logos(skip r"#.*")] // comments
 pub enum Token {
     #[token("\\\n", |lex| lex.extras.update_line(&lex.span()))]
     #[regex(r#"[ \t]+"#)]
@@ -301,6 +302,36 @@ mod tests {
         assert_eq!(lex.next(), Some(Ok(Token::Space)));
         let err = lex.next().expect("error").expect_err("");
         assert_eq!(err, LexerError::InvalidLiteral);
+    }
+
+    #[test]
+    fn test_comments() {
+        let mut lex = Token::lexer(r#"
+            # comment 1
+            command one
+            # comment 2
+            command two
+        "#,
+        );
+        assert_eq!(lex.next(), Some(Ok(Token::Newline)));
+        assert_eq!(lex.next(), Some(Ok(Token::Space)));
+        // Skipped comment 1.
+        assert_eq!(lex.next(), Some(Ok(Token::Newline)));
+        assert_eq!(lex.next(), Some(Ok(Token::Space)));
+        assert_eq!(lex.next(), Some(Ok(Token::Literal("command".into()))));
+        assert_eq!(lex.next(), Some(Ok(Token::Space)));
+        assert_eq!(lex.next(), Some(Ok(Token::Literal("one".into()))));
+        assert_eq!(lex.next(), Some(Ok(Token::Newline)));
+        assert_eq!(lex.next(), Some(Ok(Token::Space)));
+        // Skipped comment 2.
+        assert_eq!(lex.next(), Some(Ok(Token::Newline)));
+        assert_eq!(lex.next(), Some(Ok(Token::Space)));
+        assert_eq!(lex.next(), Some(Ok(Token::Literal("command".into()))));
+        assert_eq!(lex.next(), Some(Ok(Token::Space)));
+        assert_eq!(lex.next(), Some(Ok(Token::Literal("two".into()))));
+        assert_eq!(lex.next(), Some(Ok(Token::Newline)));
+        assert_eq!(lex.next(), Some(Ok(Token::Space)));
+        assert_eq!(lex.next(), None);
     }
 
     #[test]
