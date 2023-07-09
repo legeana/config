@@ -14,8 +14,8 @@ pub struct Manifest {
 }
 
 impl Manifest {
-    pub fn parse<P: AsRef<Path>>(location: P, input: &str) -> Result<Manifest> {
-        let lex = lexer::LalrpopLexer::new(input);
+    pub fn parse(location: impl AsRef<Path>, input: impl AsRef<str>) -> Result<Manifest> {
+        let lex = lexer::LalrpopLexer::new(input.as_ref());
         let parser = super::ast_parser::ManifestParser::new();
         match parser.parse(location.as_ref(), lex) {
             Ok(manifest) => Ok(manifest),
