@@ -5,6 +5,8 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Result};
 
+use super::lexer;
+
 #[derive(Debug, PartialEq)]
 pub struct Manifest {
     pub location: PathBuf,
@@ -13,8 +15,9 @@ pub struct Manifest {
 
 impl Manifest {
     pub fn parse<P: AsRef<Path>>(location: P, input: &str) -> Result<Manifest> {
+        let lex = lexer::LalrpopLexer::new(input);
         let parser = super::ast_parser::ManifestParser::new();
-        match parser.parse(location.as_ref(), input) {
+        match parser.parse(location.as_ref(), lex) {
             Ok(manifest) => Ok(manifest),
             Err(err) => Err(anyhow!("failed to parse Manifest: {err:?}")),
         }
@@ -37,14 +40,18 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_manifest_parse() {
+    fn test_empty_manifest() {
         assert_eq!(
-            Manifest::parse("", "").ok(),
-            Some(Manifest {
+            Manifest::parse("", "").unwrap(),
+            Manifest {
                 location: "".into(),
                 statements: Vec::new(),
-            })
+            }
         );
+    }
+
+    #[test]
+    fn test_manifest_location() {
         assert_eq!(
             Manifest::parse("some-path", "").unwrap(),
             Manifest {
@@ -52,9 +59,51 @@ mod tests {
                 statements: Vec::new(),
             }
         );
+    }
+
+    #[test]
+    fn test_manifest_empty_line() {
         assert_eq!(
-            // TODO: use \n instead of ;
-            Manifest::parse("", "prefix path;").unwrap(),
+            Manifest::parse("", "\n").unwrap(),
+            Manifest {
+                location: "".into(),
+                statements: Vec::new(),
+            }
+        );
+    }
+
+    #[test]
+    fn test_manifest_without_trailing_newline() {
+        assert_eq!(
+            Manifest::parse("", "prefix path").unwrap(),
+            Manifest {
+                location: "".into(),
+                statements: vec![Statement::Command(Command {
+                    name: "prefix".to_owned(),
+                    args: vec!["path".to_owned()],
+                }),],
+            }
+        );
+    }
+
+    #[test]
+    fn test_manifest_single_line() {
+        assert_eq!(
+            Manifest::parse("", "prefix path\n").unwrap(),
+            Manifest {
+                location: "".into(),
+                statements: vec![Statement::Command(Command {
+                    name: "prefix".to_owned(),
+                    args: vec!["path".to_owned()],
+                }),],
+            }
+        );
+    }
+
+    #[test]
+    fn test_manifest_multiple_lines() {
+        assert_eq!(
+            Manifest::parse("", "prefix path\nanother line\n").unwrap(),
             Manifest {
                 location: "".into(),
                 statements: vec![
@@ -62,15 +111,54 @@ mod tests {
                         name: "prefix".to_owned(),
                         args: vec!["path".to_owned()],
                     }),
+                    Statement::Command(Command {
+                        name: "another".to_owned(),
+                        args: vec!["line".to_owned()],
+                    }),
                 ],
             }
         );
+    }
+
+    #[test]
+    fn test_manifest_empty_lines_between() {
         assert_eq!(
-            // TODO: use \n instead of ;
-            Manifest::parse("", r#"
-                symlink "some/path" and 'another';
-                another_command;
-            "#).unwrap(),
+            Manifest::parse(
+                "",
+                r#"
+                command one
+
+                command two
+            "#
+            )
+            .unwrap(),
+            Manifest {
+                location: "".into(),
+                statements: vec![
+                    Statement::Command(Command {
+                        name: "command".into(),
+                        args: vec!["one".into()]
+                    }),
+                    Statement::Command(Command {
+                        name: "command".into(),
+                        args: vec!["two".into()]
+                    }),
+                ],
+            }
+        );
+    }
+
+    #[test]
+    fn test_multiple_quoted_statements() {
+        assert_eq!(
+            Manifest::parse(
+                "",
+                r#"
+                symlink "some/path" and 'another'
+                another_command
+            "#
+            )
+            .unwrap(),
             Manifest {
                 location: "".into(),
                 statements: vec![

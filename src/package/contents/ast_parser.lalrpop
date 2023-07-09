@@ -1,16 +1,30 @@
 use std::path::Path;
 
-use crate::quote;
+use crate::package::contents::lexer;
 
 use super::ast;
 
 grammar(location: &Path);
 
 pub Manifest: ast::Manifest = {
-    <Statement*> => ast::Manifest {
+    <StatementList> => ast::Manifest {
         location: location.to_owned(),
         statements: <>,
     },
+};
+
+StatementList: Vec<ast::Statement> = {
+    <mut list:StatementList> Newline <st:Statement> => {
+        list.push(st);
+        list
+    },
+    <StatementList> Newline EmptyLine,
+    <Statement> => vec![<>],
+    EmptyLine => Vec::new(),
+};
+
+EmptyLine = {
+    Space*,
 };
 
 Statement: ast::Statement = {
@@ -18,14 +32,16 @@ Statement: ast::Statement = {
 };
 
 Command: ast::Command = {
-    <name:Literal> <args:Literal*> Newline => ast::Command { name, args }
+    Space* <name:Literal> <args:(Space+ <Literal>)*> Space* => ast::Command { name, args },
 };
 
-// TODO: use "\n" instead.
-Newline = ";";
+extern {
+    type Location = usize;
+    type Error = lexer::LocationError;
 
-Literal: String = {
-    <r#""([^"\\]|\\.)*""#> => quote::unquote(<>).unwrap(),
-    <r#"'([^"\\]|\\.)*'"#> => quote::unquote(<>).unwrap(),
-    <r#"\w+"#> => <>.to_owned(),
-};
+    enum lexer::Token {
+        Space => lexer::Token::Space,
+        Newline => lexer::Token::Newline,
+        Literal => lexer::Token::Literal(<String>),
+    }
+}
