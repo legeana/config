@@ -1,6 +1,3 @@
-// TODO: remove when ast is used
-#![allow(dead_code)]
-
 use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Result};

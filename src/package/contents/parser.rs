@@ -1,82 +1,11 @@
-use std::fs::File;
-use std::io::{BufRead, BufReader, Lines};
-use std::iter::Enumerate;
 use std::path::{Path, PathBuf};
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result};
 
 use crate::module::ModuleBox;
 
+use super::ast;
 use super::engine;
-
-const LINE_CONT: char = '\\';
-
-struct LineIterator<B: BufRead> {
-    lines: Enumerate<Lines<B>>,
-    end: bool,
-}
-
-impl<B: BufRead> LineIterator<B> {
-    fn new(lines: Lines<B>) -> Self {
-        Self {
-            lines: lines.enumerate(),
-            end: false,
-        }
-    }
-}
-
-fn is_cont(line: &str) -> bool {
-    // TODO: support "line\\"
-    line.ends_with(LINE_CONT)
-}
-
-impl<B: BufRead> Iterator for LineIterator<B> {
-    type Item = (usize, Result<String>);
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.end {
-            return None;
-        }
-        let mut buffer: Vec<String> = Vec::new();
-        let mut buf_line_num = 0;
-        loop {
-            match self.lines.next() {
-                Some((line_idx, Ok(line))) => {
-                    if buffer.is_empty() {
-                        buf_line_num = line_idx;
-                    }
-                    if is_cont(&line) {
-                        buffer.push(line[..line.len() - 1].into());
-                    } else {
-                        buffer.push(line);
-                        break;
-                    }
-                }
-                Some((line_idx, Err(err))) => {
-                    self.end = true;
-                    return Some((line_idx, Err(err.into())));
-                }
-                None => {
-                    self.end = true;
-                    break;
-                }
-            }
-        }
-        if buffer.is_empty() {
-            return None;
-        }
-        Some((buf_line_num, Ok(buffer.join(""))))
-    }
-}
-
-fn parse_line(workdir: &Path, line: &str) -> Result<Option<engine::StatementBox>> {
-    if line.is_empty() || line.starts_with('#') {
-        return Ok(None);
-    }
-    let args = shlex::split(line).ok_or_else(|| anyhow!("failed to split line {:?}", line))?;
-    let arg_refs: Vec<&str> = args.iter().map(String::as_str).collect();
-    Ok(Some(engine::parse(workdir, &arg_refs)?))
-}
 
 #[derive(Debug)]
 struct ParsedStatement {
@@ -100,24 +29,39 @@ impl engine::Statement for ParsedStatement {
 }
 
 pub fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<engine::StatementBox>> {
-    let manifest =
-        File::open(manifest_path).with_context(|| format!("failed to open {manifest_path:?}"))?;
-    let reader = BufReader::new(manifest);
+    let manifest = std::fs::read_to_string(manifest_path)
+        .with_context(|| format!("failed to read {manifest_path:?}"))?;
     let mut builders: Vec<engine::StatementBox> = Vec::new();
-    for (line_idx, line_or) in LineIterator::new(reader.lines()) {
-        let line_num = line_idx + 1;
-        let line = line_or
-            .with_context(|| format!("failed to read line {line_num} from {manifest_path:?}"))?;
-        if let Some(statement) = parse_line(workdir, &line).with_context(|| {
-            format!("failed to parse line {line_num} {line:?} from {manifest_path:?}")
-        })? {
-            builders.push(Box::new(ParsedStatement {
-                line_num,
-                line,
-                manifest_path: manifest_path.to_owned(),
-                statement,
-            }));
+    let manifest_ast = ast::Manifest::parse(manifest_path, manifest)
+        .with_context(|| format!("failed to parse {manifest_path:?}"))?;
+    for statement in manifest_ast.statements {
+        match statement {
+            ast::Statement::Command(cmd) => {
+                // pass name/args separately
+                let mut args: Vec<&str> = Vec::with_capacity(cmd.args.len() + 1);
+                args.push(&cmd.name);
+                args.extend(cmd.args.iter().map(String::as_str));
+                builders.push(parse_statement(workdir, manifest_path, &args)?);
+            }
         }
     }
     Ok(builders)
+}
+
+pub fn parse_statement(
+    workdir: &Path,
+    manifest_path: &Path,
+    args: &[&str],
+) -> Result<engine::StatementBox> {
+    let line = shlex::join(args.into_iter().cloned()); // TODO: use the actual source
+    let line_num = 0; // TODO
+    let statement = engine::parse(workdir, args).with_context(|| {
+        format!("failed to parse line {line_num} {line:?} from {manifest_path:?}")
+    })?;
+    Ok(Box::new(ParsedStatement {
+        line,
+        line_num,
+        manifest_path: manifest_path.to_owned(),
+        statement,
+    }))
 }
