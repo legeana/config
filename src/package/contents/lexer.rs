@@ -291,6 +291,19 @@ mod tests {
     }
 
     #[test]
+    fn test_no_newline_in_literal() {
+        let mut lex = Token::lexer(
+            r#"
+            "hello
+            world"#,
+        );
+        assert_eq!(lex.next(), Some(Ok(Token::Newline)));
+        assert_eq!(lex.next(), Some(Ok(Token::Space)));
+        let err = lex.next().expect("error").expect_err("");
+        assert_eq!(err, LexerError::InvalidLiteral);
+    }
+
+    #[test]
     fn test_error() {
         let mut lex = Token::lexer(
             r#"
