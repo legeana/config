@@ -52,7 +52,7 @@ pub struct LineTracker {
 }
 
 impl LineTracker {
-    pub fn location(&self, span: &logos::Span) -> Location {
+    fn location(&self, span: &logos::Span) -> Location {
         Location {
             index: span.start,
             line_number: self.line_number,
