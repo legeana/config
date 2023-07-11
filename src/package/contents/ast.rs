@@ -28,6 +28,7 @@ pub enum Statement {
 
 #[derive(Debug, PartialEq)]
 pub struct Command {
+    pub location: lexer::Location,
     pub name: String,
     pub args: Vec<String>,
 }
@@ -76,6 +77,7 @@ mod tests {
             Manifest {
                 location: "".into(),
                 statements: vec![Statement::Command(Command {
+                    location: lexer::Location::new_p_l_c(0, 1, 1),
                     name: "prefix".to_owned(),
                     args: vec!["path".to_owned()],
                 }),],
@@ -90,6 +92,7 @@ mod tests {
             Manifest {
                 location: "".into(),
                 statements: vec![Statement::Command(Command {
+                    location: lexer::Location::new_p_l_c(0, 1, 1),
                     name: "prefix".to_owned(),
                     args: vec!["path".to_owned()],
                 }),],
@@ -105,10 +108,12 @@ mod tests {
                 location: "".into(),
                 statements: vec![
                     Statement::Command(Command {
+                        location: lexer::Location::new_p_l_c(0, 1, 1),
                         name: "prefix".to_owned(),
                         args: vec!["path".to_owned()],
                     }),
                     Statement::Command(Command {
+                        location: lexer::Location::new_p_l_c(12, 2, 1),
                         name: "another".to_owned(),
                         args: vec!["line".to_owned()],
                     }),
@@ -133,10 +138,12 @@ mod tests {
                 location: "".into(),
                 statements: vec![
                     Statement::Command(Command {
+                        location: lexer::Location::new_p_l_c(17, 2, 17),
                         name: "command".into(),
                         args: vec!["one".into()]
                     }),
                     Statement::Command(Command {
+                        location: lexer::Location::new_p_l_c(46, 4, 17),
                         name: "command".into(),
                         args: vec!["two".into()]
                     }),
@@ -160,6 +167,7 @@ mod tests {
                 location: "".into(),
                 statements: vec![
                     Statement::Command(Command {
+                        location: lexer::Location::new_p_l_c(17, 2, 17),
                         name: "symlink".to_owned(),
                         args: vec![
                             "some/path".to_owned(),
@@ -168,6 +176,7 @@ mod tests {
                         ],
                     }),
                     Statement::Command(Command {
+                        location: lexer::Location::new_p_l_c(67, 3, 17),
                         name: "another_command".to_owned(),
                         args: Vec::new(),
                     }),

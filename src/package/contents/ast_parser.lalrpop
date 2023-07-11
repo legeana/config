@@ -32,7 +32,15 @@ Statement: ast::Statement = {
 };
 
 Command: ast::Command = {
-    Space* <name:Literal> <args:(Space+ <Literal>)*> Space* => ast::Command { name, args },
+    Space*
+    <start:@L>
+    <name:Literal>
+    <args:(Space+ <Literal>)*>
+    Space* => ast::Command {
+        location: start,
+        name,
+        args,
+    },
 };
 
 extern {

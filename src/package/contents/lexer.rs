@@ -109,9 +109,21 @@ impl Default for LineTracker {
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Location {
-    index: usize,
-    line_number: usize,
-    column: usize,
+    pub index: usize,
+    pub line_number: usize,
+    pub column: usize,
+}
+
+impl Location {
+    // Used only in tests.
+    #[allow(dead_code)]
+    pub fn new_p_l_c(index: usize, line_number: usize, column: usize) -> Self {
+        Self {
+            index,
+            line_number,
+            column,
+        }
+    }
 }
 
 impl std::fmt::Display for Location {
@@ -121,7 +133,7 @@ impl std::fmt::Display for Location {
 }
 
 #[derive(Clone, Debug, Default, PartialEq)]
-pub struct LocationRange {
+struct LocationRange {
     start: Location,
     end: Option<Location>,
 }

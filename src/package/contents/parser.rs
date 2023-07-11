@@ -41,7 +41,12 @@ pub fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<engine::Stateme
                 let mut args: Vec<&str> = Vec::with_capacity(cmd.args.len() + 1);
                 args.push(&cmd.name);
                 args.extend(cmd.args.iter().map(String::as_str));
-                builders.push(parse_statement(workdir, manifest_path, &args)?);
+                builders.push(parse_statement(
+                    cmd.location.line_number,
+                    workdir,
+                    manifest_path,
+                    &args,
+                )?);
             }
         }
     }
@@ -49,12 +54,12 @@ pub fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<engine::Stateme
 }
 
 pub fn parse_statement(
+    line_num: usize,
     workdir: &Path,
     manifest_path: &Path,
     args: &[&str],
 ) -> Result<engine::StatementBox> {
     let line = shlex::join(args.into_iter().cloned()); // TODO: use the actual source
-    let line_num = 0; // TODO
     let statement = engine::parse(workdir, args).with_context(|| {
         format!("failed to parse line {line_num} {line:?} from {manifest_path:?}")
     })?;
