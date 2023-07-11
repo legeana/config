@@ -16,7 +16,7 @@ impl Manifest {
         let parser = super::ast_parser::ManifestParser::new();
         match parser.parse(location.as_ref(), lex) {
             Ok(manifest) => Ok(manifest),
-            Err(err) => Err(anyhow!("failed to parse Manifest: {err:?}")),
+            Err(err) => Err(anyhow!("failed to parse Manifest: {err}")),
         }
     }
 }

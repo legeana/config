@@ -36,7 +36,7 @@ Command: ast::Command = {
 };
 
 extern {
-    type Location = usize;
+    type Location = lexer::Location;
     type Error = lexer::LocationError;
 
     enum lexer::Token {

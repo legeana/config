@@ -9,14 +9,21 @@ pub enum LexerError {
     UnquoteError(#[from] quote::UnquoteError),
     #[default]
     #[error("invalid token")]
-    InvalidLiteral,
+    InvalidToken,
 }
 
 impl LexerError {
     pub fn with_location(self, lex: &logos::Lexer<Token>) -> LocationError {
-        LocationError {
-            source: self,
-            location: lex.extras.location(&lex.span()),
+        let (start, end) = lex.extras.span_location(&lex.span());
+        match self {
+            Self::InvalidToken => LocationError {
+                source: self,
+                location: LocationRange::new_single(start),
+            },
+            _ => LocationError {
+                source: self,
+                location: LocationRange::new_pair(start, end),
+            },
         }
     }
 }
@@ -26,7 +33,7 @@ impl LexerError {
 pub struct LocationError {
     #[source]
     source: LexerError,
-    location: Location,
+    location: LocationRange,
 }
 
 #[derive(Clone, Debug, Logos, PartialEq)]
@@ -34,10 +41,10 @@ pub struct LocationError {
 #[logos(extras = LineTracker)]
 #[logos(skip r"#.*")] // comments
 pub enum Token {
-    #[token("\\\n", |lex| lex.extras.update_line(&lex.span()))]
+    #[token("\\\n", |lex| lex.extras.record_line(lex.span().end))]
     #[regex(r#"[ \t]+"#)]
     Space,
-    #[token("\n", |lex| lex.extras.update_line(&lex.span()))]
+    #[token("\n", |lex| lex.extras.record_line(lex.span().end))]
     Newline,
     #[regex(r#"'([^'\\]|\\.)*'"#, |lex| quote::unquote(lex.slice()))]
     #[regex(r#""([^"\\]|\\.)*""#, |lex| quote::unquote(lex.slice()))]
@@ -45,27 +52,62 @@ pub enum Token {
     Literal(String),
 }
 
-#[derive(Default)]
+impl std::fmt::Display for Token {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Token::Space => write!(f, "Token::Space"),
+            Token::Newline => write!(f, "Token::Newline"),
+            Token::Literal(s) => write!(f, "Token::Literal({s:?})"),
+        }
+    }
+}
+
 pub struct LineTracker {
-    line_start: usize,  // starts at 0
-    line_number: usize, // starts at 0
+    line_starts: Vec<usize>, // byte index
 }
 
 impl LineTracker {
-    fn location(&self, span: &logos::Span) -> Location {
+    fn line_index(&self, pos: usize) -> usize {
+        assert!(!self.line_starts.is_empty());
+        // Binary search?
+        for (line_index, start) in self.line_starts.iter().enumerate().rev() {
+            if pos >= *start {
+                return line_index;
+            }
+        }
+        assert!(pos >= *self.line_starts.last().expect("must not be empty"));
+        self.line_starts.len() - 1
+    }
+    fn char_location(&self, pos: usize) -> Location {
+        let line_index = self.line_index(pos);
+        assert!(line_index < self.line_starts.len());
+        let line_start = self.line_starts[line_index];
+        assert!(line_start <= pos);
+        let column = pos - line_start + 1;
         Location {
-            index: span.start,
-            line_number: self.line_number,
-            column: span.start - self.line_start,
+            index: pos,
+            line_number: line_index + 1,
+            column,
         }
     }
-    fn update_line(&mut self, span: &logos::Span) {
-        self.line_number += 1;
-        self.line_start = span.end;
+    fn span_location(&self, span: &logos::Span) -> (Location, Location) {
+        (self.char_location(span.start), self.char_location(span.end))
+    }
+    fn record_line(&mut self, line_start: usize) {
+        self.line_starts.push(line_start);
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+impl Default for LineTracker {
+    fn default() -> Self {
+        Self {
+            // First line always starts at 0.
+            line_starts: vec![0],
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Location {
     index: usize,
     line_number: usize,
@@ -74,12 +116,35 @@ pub struct Location {
 
 impl std::fmt::Display for Location {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "line {} column {}",
-            self.line_number + 1,
-            self.column + 1
-        )
+        write!(f, "line {} column {}", self.line_number, self.column)
+    }
+}
+
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct LocationRange {
+    start: Location,
+    end: Option<Location>,
+}
+
+impl LocationRange {
+    fn new_pair(start: Location, end: Location) -> Self {
+        LocationRange {
+            start,
+            end: Some(end),
+        }
+    }
+    fn new_single(start: Location) -> Self {
+        LocationRange { start, end: None }
+    }
+}
+
+impl std::fmt::Display for LocationRange {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.start)?;
+        match self.end {
+            Some(end) => write!(f, " .. {end}"),
+            None => Ok(()),
+        }
     }
 }
 
@@ -99,12 +164,13 @@ impl<'input> LalrpopLexer<'input> {
 }
 
 impl<'input> Iterator for LalrpopLexer<'input> {
-    type Item = Spanned<Token, usize, LocationError>;
+    type Item = Spanned<Token, Location, LocationError>;
 
     fn next(&mut self) -> Option<Self::Item> {
         match self.lexer.next() {
             Some(Ok(tok)) => {
-                let logos::Span { start, end } = self.lexer.span();
+                let span = self.lexer.span();
+                let (start, end) = self.lexer.extras.span_location(&span);
                 Some(Ok((start, tok, end)))
             }
             Some(Err(err)) => {
@@ -301,12 +367,13 @@ mod tests {
         assert_eq!(lex.next(), Some(Ok(Token::Newline)));
         assert_eq!(lex.next(), Some(Ok(Token::Space)));
         let err = lex.next().expect("error").expect_err("");
-        assert_eq!(err, LexerError::InvalidLiteral);
+        assert_eq!(err, LexerError::InvalidToken);
     }
 
     #[test]
     fn test_comments() {
-        let mut lex = Token::lexer(r#"
+        let mut lex = Token::lexer(
+            r#"
             # comment 1
             command one
             # comment 2
@@ -343,15 +410,18 @@ mod tests {
         );
         assert_eq!(lex.next(), Some(Ok(Token::Newline)));
         assert_eq!(lex.next(), Some(Ok(Token::Space)));
-        let err = lex.next().expect("error").expect_err("InvalidLiteral");
-        assert_eq!(err, LexerError::InvalidLiteral);
+        let err = lex.next().expect("error").expect_err("InvalidToken");
+        assert_eq!(err, LexerError::InvalidToken);
         let loc_err = err.with_location(&lex);
         assert_eq!(
             loc_err.location,
-            Location {
-                index: 13,
-                line_number: 1,
-                column: 12
+            LocationRange {
+                start: Location {
+                    index: 13,
+                    line_number: 2,
+                    column: 13,
+                },
+                end: None,
             }
         );
         assert_eq!(loc_err.to_string(), "invalid token at line 2 column 13");
