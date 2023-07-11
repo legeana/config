@@ -155,7 +155,6 @@ pub struct LalrpopLexer<'input> {
 }
 
 impl<'input> LalrpopLexer<'input> {
-    #[allow(dead_code)]
     pub fn new(source: &'input str) -> Self {
         Self {
             lexer: Token::lexer(source),
