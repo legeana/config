@@ -1,0 +1,8 @@
+[editor]
+line-number = "absolute"
+
+[keys.normal]
+"j" = "move_char_left"
+"k" = "move_visual_line_down"
+"l" = "move_visual_line_up"
+";" = "move_char_right"
