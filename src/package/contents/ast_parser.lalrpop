@@ -1,0 +1,55 @@
+use std::path::Path;
+
+use crate::package::contents::lexer;
+
+use super::ast;
+
+grammar(location: &Path);
+
+pub Manifest: ast::Manifest = {
+    <StatementList> => ast::Manifest {
+        location: location.to_owned(),
+        statements: <>,
+    },
+};
+
+StatementList: Vec<ast::Statement> = {
+    <mut list:StatementList> Newline <st:Statement> => {
+        list.push(st);
+        list
+    },
+    <StatementList> Newline EmptyLine,
+    <Statement> => vec![<>],
+    EmptyLine => Vec::new(),
+};
+
+EmptyLine = {
+    Space*,
+};
+
+Statement: ast::Statement = {
+    <Command> => ast::Statement::Command(<>),
+};
+
+Command: ast::Command = {
+    Space*
+    <start:@L>
+    <name:Literal>
+    <args:(Space+ <Literal>)*>
+    Space* => ast::Command {
+        location: start,
+        name,
+        args,
+    },
+};
+
+extern {
+    type Location = lexer::Location;
+    type Error = lexer::LocationError;
+
+    enum lexer::Token {
+        Space => lexer::Token::Space,
+        Newline => lexer::Token::Newline,
+        Literal => lexer::Token::Literal(<String>),
+    }
+}
