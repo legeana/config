@@ -432,14 +432,7 @@ mod tests {
         let loc_err = err.with_location(&lex);
         assert_eq!(
             loc_err.location,
-            LocationRange {
-                start: Location {
-                    index: 13,
-                    line_number: 2,
-                    column: 13,
-                },
-                end: None,
-            }
+            LocationRange::new_single(Location::new_p_l_c(13, 2, 13))
         );
         assert_eq!(loc_err.to_string(), "invalid token at line 2 column 13");
     }
