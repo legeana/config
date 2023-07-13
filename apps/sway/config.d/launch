@@ -2,4 +2,4 @@
 bindsym --to-code $mod+Shift+q kill
 
 # Start your launcher
-bindsym --to-code $mod+d exec $menu
+bindsym --to-code $mod+d exec $launch $menu
