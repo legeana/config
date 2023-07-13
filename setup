@@ -14,7 +14,7 @@ src_root() {
     pwd
 }
 
-SRC="$(src_root)"
+SRC="$(src_root)/pikaconfig"
 
 log() {
     echo "$@" >&2
