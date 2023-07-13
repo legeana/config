@@ -1,5 +1,6 @@
 prefix ~/.local/bin
 
+symlink debug-env
 symlink discord-emojification
 symlink git-new
 symlink gpg-batch
