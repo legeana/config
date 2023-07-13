@@ -68,10 +68,33 @@ load_go_path() {
     fi
 }
 
+try_ssh_agent() {
+    local sock
+    for sock in "$@"; do
+        if [ -S "$sock" ]; then
+            export SSH_AUTH_SOCK="$sock"
+            return
+        fi
+    done
+}
+
+add_ssh_agent() {
+    if [ -z "$SSH_AUTH_SOCK" -a \
+         -z "$SSH_TTY" -a \
+         -z "$SSH_CONNECTION" -a \
+         -z "$SSH_CLIENT" -a \
+         -z "$TMUX" ]; then
+        try_ssh_agent \
+            "$HOME/.1password/agent.sock" \
+            "$XDG_RUNTIME_DIR/ssh-agent.socket"
+    fi
+}
+
 load_env
 add_to_path "$HOME/.local/bin"
 load_opt_path
 load_cargo_path
 load_go_path
+add_ssh_agent
 
 exec "$@"
