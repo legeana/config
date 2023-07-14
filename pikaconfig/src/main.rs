@@ -32,18 +32,19 @@ use std::path::{Path, PathBuf};
 
 const NO_UPDATE_ENV: &str = "PIKACONFIG_NO_UPDATE";
 const INSTALL_REGISTRY: &str = ".install";
+const SETUP: &str = "setup";
 
-fn config_root() -> Result<PathBuf> {
+fn config_root(file_in_root: &str) -> Result<PathBuf> {
     let exe_path = env::current_exe()?;
     let mut parent = exe_path.parent();
     while let Some(dir) = parent {
-        let setup = dir.join("setup");
-        if setup.exists() {
+        let file = dir.join(file_in_root);
+        if file.exists() {
             return Ok(dir.to_path_buf());
         }
         parent = dir.parent();
     }
-    Err(anyhow!("unable to find setup in project root"))
+    Err(anyhow!("unable to find {file_in_root:?} in project root"))
 }
 
 #[derive(Debug, Parser)]
@@ -70,12 +71,12 @@ enum Commands {
     List {},
 }
 
-fn reload() -> Result<()> {
-    let setup = config_root()?.join("setup");
+fn reload(setup: impl AsRef<Path>) -> Result<()> {
+    let setup = setup.as_ref();
     let args: Vec<OsString> = env::args_os().skip(1).collect();
     log::info!("Restarting: $ {setup:?} {args:?}");
     process_utils::run(
-        std::process::Command::new(&setup)
+        std::process::Command::new(setup)
             .args(args)
             .env(NO_UPDATE_ENV, "yes"),
     )
@@ -133,7 +134,8 @@ fn main() -> Result<()> {
         .init()
         .context("failed to initialize stderrlog")?;
     // Main code.
-    let root = config_root()?;
+    let root = config_root(SETUP)?;
+    let setup = root.join(SETUP);
     log::info!("Found user configuration: {root:?}");
     let check_update = || -> Result<bool> {
         let no_update = args.no_update || env::var(NO_UPDATE_ENV).is_ok();
@@ -142,7 +144,7 @@ fn main() -> Result<()> {
             if need_restart {
                 // This process is considered replaced.
                 // Don't do anything here.
-                reload()?;
+                reload(setup)?;
                 return Ok(true);
             }
         }
