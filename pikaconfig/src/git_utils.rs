@@ -41,7 +41,22 @@ pub fn git_pull(root: &Path) -> Result<bool> {
     Ok(old_head != new_head)
 }
 
-pub fn git_force_shallow_pull(root: &Path) -> Result<()> {
+pub fn git_force_shallow_pull(root: &Path, remote: &Remote) -> Result<()> {
+    process_utils::run(
+        Command::new("git")
+            .arg("remote")
+            .arg("rm")
+            .arg(ORIGIN)
+            .current_dir(root),
+    )?;
+    process_utils::run(
+        Command::new("git")
+            .arg("remote")
+            .arg("add")
+            .arg(ORIGIN)
+            .arg(&remote.url)
+            .current_dir(root),
+    )?;
     process_utils::run(
         Command::new("git")
             .arg("fetch")
@@ -51,30 +66,27 @@ pub fn git_force_shallow_pull(root: &Path) -> Result<()> {
     )?;
     process_utils::run(
         Command::new("git")
-            .args(["reset", "--hard"])
-            .arg(format!("{ORIGIN}/{HEAD}"))
-            .current_dir(root),
-    )
-}
-
-pub fn git_force_remote(root: &Path, remote: &Remote) -> Result<()> {
-    process_utils::run(
-        Command::new("git")
             .arg("remote")
-            .arg("set-url")
+            .arg("set-head")
+            .arg("--auto")
             .arg(ORIGIN)
-            .arg(&remote.url)
             .current_dir(root),
     )?;
     let branch = match &remote.branch {
         Some(branch) => branch.clone(),
-        None => get_remote_head(root)?,
+        None => get_remote_head_ref(root)?,
     };
     process_utils::run(
         Command::new("git")
             .arg("checkout")
             .arg("--force")
-            .arg(branch)
+            .arg(&branch)
+            .current_dir(root),
+    )?;
+    process_utils::run(
+        Command::new("git")
+            .args(["reset", "--hard"])
+            .arg(format!("{ORIGIN}/{branch}"))
             .current_dir(root),
     )?;
     Ok(())
@@ -100,19 +112,44 @@ fn get_head(root: &Path) -> Result<String> {
     Ok(rev_parse.trim().to_string())
 }
 
-fn get_remote_head(root: &Path) -> Result<String> {
-    let symbolic_ref = process_utils::output(
-        Command::new("git")
-            .arg("symbolic-ref")
-            .arg(format!("refs/remotes/{ORIGIN}/{HEAD}"))
-            .current_dir(root),
-    )?;
+pub fn get_head_ref(root: &Path) -> Result<String> {
+    let symbolic_ref = get_symbolic_ref(root, "HEAD")?;
     Ok(symbolic_ref
         .rsplit_once('/')
         .ok_or_else(|| anyhow!("failed to parse {symbolic_ref}"))?
         .1
-        .trim()
         .to_string())
+}
+
+pub fn get_remote_head_ref(root: &Path) -> Result<String> {
+    let symbolic_ref = get_symbolic_ref(root, format!("refs/remotes/{ORIGIN}/{HEAD}"))?;
+    Ok(symbolic_ref
+        .rsplit_once('/')
+        .ok_or_else(|| anyhow!("failed to parse {symbolic_ref}"))?
+        .1
+        .to_string())
+}
+
+fn get_symbolic_ref(root: &Path, name: impl AsRef<str>) -> Result<String> {
+    let output = process_utils::output(
+        Command::new("git")
+            .arg("symbolic-ref")
+            .arg("--")
+            .arg(name.as_ref())
+            .current_dir(root),
+    )?;
+    Ok(output.trim().to_owned())
+}
+
+pub fn get_remote_url(root: &Path) -> Result<String> {
+    let url_raw = process_utils::output(
+        Command::new("git")
+            .arg("remote")
+            .arg("get-url")
+            .arg(ORIGIN)
+            .current_dir(root),
+    )?;
+    Ok(url_raw.trim().to_owned())
 }
 
 #[cfg(test)]

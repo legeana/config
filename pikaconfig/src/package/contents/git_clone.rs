@@ -18,9 +18,21 @@ struct GitClone {
 }
 
 impl GitClone {
+    fn need_update(&self) -> Result<bool> {
+        let root = self.output.path();
+        let remote_url = git_utils::get_remote_url(root)?;
+        if remote_url != self.remote.url {
+            return Ok(true);
+        }
+        let remote_branch = git_utils::get_remote_head_ref(root)?;
+        let current_branch = git_utils::get_head_ref(root)?;
+        Ok(match self.remote.branch {
+            Some(ref branch) => &remote_branch != branch,
+            None => remote_branch != current_branch,
+        })
+    }
     fn force_pull(&self) -> Result<()> {
-        git_utils::git_force_remote(self.output.path(), &self.remote)?;
-        git_utils::git_force_shallow_pull(self.output.path())
+        git_utils::git_force_shallow_pull(self.output.path(), &self.remote)
     }
     fn clone(&self) -> Result<()> {
         git_utils::git_shallow_clone(&self.remote, self.output.path())
@@ -45,7 +57,7 @@ impl Module for GitClone {
                 )
             })
         } else {
-            if !rules.force_download {
+            if !self.need_update()? && !rules.force_download {
                 return Ok(());
             }
             self.force_pull().with_context(|| {
