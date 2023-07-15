@@ -59,7 +59,7 @@ pub fn parse_statement(
     manifest_path: &Path,
     args: &[&str],
 ) -> Result<engine::StatementBox> {
-    let line = shlex::join(args.into_iter().cloned()); // TODO: use the actual source
+    let line = shlex::join(args.iter().cloned()); // TODO: use the actual source
     let statement = engine::parse(workdir, args).with_context(|| {
         format!("failed to parse line {line_num} {line:?} from {manifest_path:?}")
     })?;
