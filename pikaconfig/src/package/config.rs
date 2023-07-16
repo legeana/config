@@ -23,7 +23,6 @@ pub struct Package {
     pub conflicts: Option<Vec<String>>,
     #[serde(default = "default_has_contents")]
     pub has_contents: bool,
-    pub ansible_playbooks: Option<Vec<AnsiblePlaybook>>,
     pub dependencies: Option<Vec<Dependency>>,
     pub system_dependencies: Option<Vec<SystemDependency>>,
     pub user_dependencies: Option<Vec<UserDependency>>,
@@ -98,8 +97,6 @@ pub struct UserDependency {
     pub brew: Option<Vec<String>>,
     pub npm: Option<Vec<String>>,
     pub pip_user: Option<Vec<String>>,
-    pub ansible_galaxy_role: Option<Vec<String>>,
-    pub ansible_galaxy_collection: Option<Vec<String>>,
 }
 
 impl tag_criteria::TagCriteria for UserDependency {
@@ -109,18 +106,6 @@ impl tag_criteria::TagCriteria for UserDependency {
     fn conflicts(&self) -> Option<&[String]> {
         self.conflicts.as_deref()
     }
-}
-
-fn default_ask_become_pass() -> bool {
-    false
-}
-
-#[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
-#[serde(deny_unknown_fields)]
-pub struct AnsiblePlaybook {
-    pub playbooks: Vec<String>,
-    #[serde(default = "default_ask_become_pass")]
-    pub ask_become_pass: bool,
 }
 
 fn load_toml_string(data: &str) -> Result<Package> {
@@ -180,13 +165,6 @@ mod tests {
             conflicts = ['c1', 'c2']
             has_contents = false
 
-            [[ansible_playbooks]]
-            playbooks = ['playbook1.yml']
-
-            [[ansible_playbooks]]
-            playbooks = ['playbook2.yml']
-            ask_become_pass = true
-
             [[dependencies]]
             names = ['pkg1', 'pkg2']
 
@@ -211,19 +189,6 @@ mod tests {
         assert_eq!(pkg.requires, Some(vec!["r1".to_owned(), "r2".to_owned()]));
         assert_eq!(pkg.conflicts, Some(vec!["c1".to_owned(), "c2".to_owned()]));
         assert_eq!(pkg.has_contents, false);
-        assert_eq!(
-            pkg.ansible_playbooks,
-            Some(vec![
-                AnsiblePlaybook {
-                    playbooks: vec!["playbook1.yml".to_owned()],
-                    ..AnsiblePlaybook::default()
-                },
-                AnsiblePlaybook {
-                    playbooks: vec!["playbook2.yml".to_owned()],
-                    ask_become_pass: true,
-                },
-            ])
-        );
         assert_eq!(
             pkg.dependencies,
             Some(vec![

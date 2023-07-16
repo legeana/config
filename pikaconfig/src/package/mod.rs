@@ -1,4 +1,3 @@
-mod ansible;
 mod config;
 mod contents;
 mod installer;
@@ -73,7 +72,7 @@ impl Package {
             .context("failed to parse user_dependencies")?;
         let configuration: ModuleBox = if pkgconfig.has_contents {
             if criteria.is_satisfied()? {
-                contents::new(root.clone())?
+                contents::new(root)?
             } else {
                 contents::verify(&root)?;
                 module::dummy_box()
@@ -81,24 +80,11 @@ impl Package {
         } else {
             module::dummy_box()
         };
-        let ansible_playbooks: Vec<ansible::AnsiblePlaybook> = pkgconfig
-            .ansible_playbooks
-            .unwrap_or_default()
-            .iter()
-            .map(|pb| {
-                ansible::AnsiblePlaybook::new(
-                    root.clone(),
-                    pb.playbooks.clone(),
-                    pb.ask_become_pass,
-                )
-            })
-            .collect();
         Ok(Package {
             name: pkgconfig.name.unwrap_or(backup_name),
             criteria,
             modules: vec![
                 configuration,
-                Box::new(ansible_playbooks),
                 Box::new(system_dependency),
                 Box::new(user_dependency),
             ],
