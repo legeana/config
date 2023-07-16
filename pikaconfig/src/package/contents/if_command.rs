@@ -77,7 +77,7 @@ impl engine::Parser for IfCommandParser {
         assert_eq!(exe.len(), 1);
         Ok(Box::new(IfCommandStatement {
             executable: exe[0].to_owned(),
-            cmd: engine::parse(workdir, cmd_args)?,
+            cmd: engine::parse_args(workdir, cmd_args)?,
         }))
     }
 }

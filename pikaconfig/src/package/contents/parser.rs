@@ -37,15 +37,12 @@ pub fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<engine::Stateme
     for statement in manifest_ast.statements {
         match statement {
             ast::Statement::Command(cmd) => {
-                // pass name/args separately
-                let mut args: Vec<&str> = Vec::with_capacity(cmd.args.len() + 1);
-                args.push(&cmd.name);
-                args.extend(cmd.args.iter().map(String::as_str));
                 builders.push(parse_statement(
                     cmd.location.line_number,
                     workdir,
                     manifest_path,
-                    &args,
+                    cmd.name,
+                    &cmd.args.iter().map(String::as_str).collect::<Vec<_>>(),
                 )?);
             }
         }
@@ -57,10 +54,12 @@ pub fn parse_statement(
     line_num: usize,
     workdir: &Path,
     manifest_path: &Path,
+    cmd: impl AsRef<str>,
     args: &[&str],
 ) -> Result<engine::StatementBox> {
-    let line = shlex::join(args.iter().cloned()); // TODO: use the actual source
-    let statement = engine::parse(workdir, args).with_context(|| {
+    // TODO: use the actual source
+    let line = shlex::join(std::iter::once(cmd.as_ref()).chain(args.iter().copied()));
+    let statement = engine::parse(workdir, cmd.as_ref(), args).with_context(|| {
         format!("failed to parse line {line_num} {line:?} from {manifest_path:?}")
     })?;
     Ok(Box::new(ParsedStatement {

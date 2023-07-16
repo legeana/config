@@ -78,7 +78,7 @@ impl engine::Parser for IfMissingParser {
         assert_eq!(path.len(), 1);
         Ok(Box::new(IfMissingStatement {
             path: path[0].to_owned(),
-            cmd: engine::parse(workdir, cmd_args)?,
+            cmd: engine::parse_args(workdir, cmd_args)?,
         }))
     }
 }

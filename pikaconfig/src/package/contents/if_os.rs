@@ -63,7 +63,7 @@ impl engine::Parser for IfOsParser {
         assert!(empty.is_empty());
         Ok(Box::new(IfOsStatement {
             os: self.os,
-            cmd: engine::parse(workdir, cmd_args)?,
+            cmd: engine::parse_args(workdir, cmd_args)?,
         }))
     }
 }

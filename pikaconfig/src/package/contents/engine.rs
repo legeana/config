@@ -40,11 +40,14 @@ pub trait Statement: std::fmt::Debug {
 
 pub type StatementBox = Box<dyn Statement>;
 
-pub fn parse(workdir: &Path, args: &[&str]) -> Result<StatementBox> {
+pub fn parse_args(workdir: &Path, args: &[&str]) -> Result<StatementBox> {
     if args.is_empty() {
         return Err(anyhow!("command with no args[0] should not exist"));
     }
-    let command = args[0];
+    parse(workdir, args[0], &args[1..])
+}
+
+pub fn parse(workdir: &Path, command: &str, args: &[&str]) -> Result<StatementBox> {
     let parser = super::inventory::parser(command)?;
     parser.parse(workdir, args)
 }
