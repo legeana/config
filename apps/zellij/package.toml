@@ -1,5 +1,3 @@
-has_contents = false
-
 [[user_dependencies]]
 cargo = ["zellij"]
 wants = { command = "zellij" }
