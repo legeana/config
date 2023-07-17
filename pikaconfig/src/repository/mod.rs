@@ -70,13 +70,13 @@ impl Repository {
 }
 
 impl Module for Repository {
-    fn pre_uninstall(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+    fn pre_uninstall(&self, rules: &Rules) -> Result<()> {
         if !self.enabled()? {
             return Ok(());
         }
         for package in &self.packages {
             package
-                .pre_uninstall(rules, registry)
+                .pre_uninstall(rules)
                 .with_context(|| format!("failed to pre-uninstall {}", package.name()))?;
         }
         Ok(())

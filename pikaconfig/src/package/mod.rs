@@ -115,8 +115,8 @@ impl Package {
 }
 
 impl Module for Package {
-    fn pre_uninstall(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-        self.run_if_enabled(|| self.modules.pre_uninstall(rules, registry))
+    fn pre_uninstall(&self, rules: &Rules) -> Result<()> {
+        self.run_if_enabled(|| self.modules.pre_uninstall(rules))
             .with_context(|| format!("{}: failed pre_uninstall", self.name()))
     }
     fn pre_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {

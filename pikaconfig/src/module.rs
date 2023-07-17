@@ -11,9 +11,8 @@ pub struct Rules {
 pub trait Module {
     /// Used for resource intensive operations to reduce the time without valid
     /// configuration between uninstall and install.
-    fn pre_uninstall(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+    fn pre_uninstall(&self, rules: &Rules) -> Result<()> {
         let _ = rules;
-        let _ = registry;
         Ok(())
     }
     fn pre_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
@@ -40,9 +39,9 @@ pub trait Module {
 pub type ModuleBox = Box<dyn Module>;
 
 impl<T: Module> Module for Vec<T> {
-    fn pre_uninstall(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+    fn pre_uninstall(&self, rules: &Rules) -> Result<()> {
         for module in self {
-            module.pre_uninstall(rules, registry)?;
+            module.pre_uninstall(rules)?;
         }
         Ok(())
     }
@@ -73,8 +72,8 @@ impl<T: Module> Module for Vec<T> {
 }
 
 impl Module for ModuleBox {
-    fn pre_uninstall(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-        self.as_ref().pre_uninstall(rules, registry)
+    fn pre_uninstall(&self, rules: &Rules) -> Result<()> {
+        self.as_ref().pre_uninstall(rules)
     }
     fn pre_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         self.as_ref().pre_install(rules, registry)
@@ -96,9 +95,9 @@ struct WrappedModule<T: Module> {
 }
 
 impl<T: Module> Module for WrappedModule<T> {
-    fn pre_uninstall(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+    fn pre_uninstall(&self, rules: &Rules) -> Result<()> {
         self.module
-            .pre_uninstall(rules, registry)
+            .pre_uninstall(rules)
             .with_context(|| format!("failed pre_uninstall in {:?}", self.error_context))
     }
     fn pre_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
