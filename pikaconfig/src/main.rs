@@ -98,19 +98,23 @@ fn install(rules: &Rules, root: &Path) -> Result<()> {
     // Load repositories before uninstalling to abort early.
     // It's better to keep the old configuration than no configuration.
     let repos = layout::repositories(root)?;
+    for repo in &repos {
+        repo.pre_uninstall(rules)
+            .with_context(|| format!("failed to pre-uninstall {}", repo.name()))?;
+    }
     let mut registry = registry(root);
     registry
         .uninstall()
         .context("failed to uninstall before installing")?;
-    for repo in repos.iter() {
+    for repo in &repos {
         repo.pre_install(rules, &mut registry)
             .with_context(|| format!("failed to pre-install {}", repo.name()))?;
     }
-    for repo in repos.iter() {
+    for repo in &repos {
         repo.install(rules, &mut registry)
             .with_context(|| format!("failed to install {}", repo.name()))?;
     }
-    for repo in repos.iter() {
+    for repo in &repos {
         repo.post_install(rules, &mut registry)
             .with_context(|| format!("failed to post-install {}", repo.name()))?;
     }
