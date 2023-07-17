@@ -86,6 +86,12 @@ impl tag_criteria::TagCriteria for SystemDependency {
     }
 }
 
+#[derive(Deserialize, PartialEq, Eq, Debug, Clone)]
+#[serde(deny_unknown_fields, untagged)]
+pub enum Satisficer {
+    Command { command: String },
+}
+
 #[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct UserDependency {
@@ -93,6 +99,9 @@ pub struct UserDependency {
     pub requires: Option<Vec<String>>,
     /// Conflicting tags.
     pub conflicts: Option<Vec<String>>,
+    /// Satisfaction criteria.
+    /// Rules::force_download will force this dependency to be updated.
+    pub wants: Option<Satisficer>,
     // User-level package managers.
     pub brew: Option<Vec<String>>,
     pub npm: Option<Vec<String>>,
@@ -182,6 +191,10 @@ mod tests {
 
             [[user_dependencies]]
             pip_user = ['pkg1-pip', 'pkg2-pip']
+
+            [[user_dependencies]]
+            pip_user = ['pkg']
+            wants = {command = 'pkg-cmd'}
         ",
         )
         .expect("load_toml_string");
@@ -224,10 +237,19 @@ mod tests {
         );
         assert_eq!(
             pkg.user_dependencies,
-            Some(vec![UserDependency {
-                pip_user: Some(vec!["pkg1-pip".to_owned(), "pkg2-pip".to_owned()]),
-                ..UserDependency::default()
-            },])
+            Some(vec![
+                UserDependency {
+                    pip_user: Some(vec!["pkg1-pip".to_owned(), "pkg2-pip".to_owned()]),
+                    ..UserDependency::default()
+                },
+                UserDependency {
+                    pip_user: Some(vec!["pkg".to_owned()]),
+                    wants: Some(Satisficer::Command {
+                        command: "pkg-cmd".to_owned()
+                    }),
+                    ..UserDependency::default()
+                },
+            ])
         );
     }
 }

@@ -5,19 +5,27 @@ use crate::registry::Registry;
 use crate::tag_criteria::TagCriteria;
 
 use super::config;
+use super::satisficer::{self, Satisficer};
 use super::Installer;
 
 #[derive(Default)]
 pub struct UserDependency {
+    satisficer: Option<Box<dyn Satisficer>>,
     installers: Vec<Box<dyn Installer>>,
 }
 
 impl UserDependency {
     pub fn new(cfg: &config::UserDependency) -> Result<Self> {
-        let installers: Vec<Box<dyn Installer>> = Vec::new();
         if !cfg.is_satisfied().context("failed to check tags")? {
             return Ok(Self::default());
         }
+        let satisficer: Option<Box<dyn Satisficer>> = match &cfg.wants {
+            Some(config::Satisficer::Command { command }) => {
+                Some(Box::new(satisficer::WantsCommand::new(command)))
+            }
+            None => None,
+        };
+        let installers: Vec<Box<dyn Installer>> = Vec::new();
         if cfg.brew.is_some() {
             return Err(anyhow!("brew is not supported yet"));
         }
@@ -27,12 +35,18 @@ impl UserDependency {
         if cfg.npm.is_some() {
             return Err(anyhow!("pip_user is not supported yet"));
         }
-        Ok(Self { installers })
+        Ok(Self {
+            satisficer,
+            installers,
+        })
     }
 }
 
 impl Module for UserDependency {
-    fn pre_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
+    fn pre_install(&self, rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
+        if !rules.force_download && self.satisficer.is_satisfied()? {
+            return Ok(());
+        }
         self.installers.install()
     }
 }

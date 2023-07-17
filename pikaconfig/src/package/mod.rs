@@ -1,6 +1,7 @@
 mod config;
 mod contents;
 mod installer;
+mod satisficer;
 mod system;
 mod user;
 
