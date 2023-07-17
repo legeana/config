@@ -70,11 +70,22 @@ impl Repository {
 }
 
 impl Module for Repository {
+    fn pre_uninstall(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+        if !self.enabled()? {
+            return Ok(());
+        }
+        for package in &self.packages {
+            package
+                .pre_uninstall(rules, registry)
+                .with_context(|| format!("failed to pre-uninstall {}", package.name()))?;
+        }
+        Ok(())
+    }
     fn pre_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         if !self.enabled()? {
             return Ok(());
         }
-        for package in self.packages.iter() {
+        for package in &self.packages {
             package
                 .pre_install(rules, registry)
                 .with_context(|| format!("failed to pre-install {}", package.name()))?;
@@ -85,7 +96,7 @@ impl Module for Repository {
         if !self.enabled()? {
             return Ok(());
         }
-        for package in self.packages.iter() {
+        for package in &self.packages {
             package
                 .install(rules, registry)
                 .with_context(|| format!("failed to install {}", package.name()))?;
@@ -96,7 +107,7 @@ impl Module for Repository {
         if !self.enabled()? {
             return Ok(());
         }
-        for package in self.packages.iter() {
+        for package in &self.packages {
             package
                 .post_install(rules, registry)
                 .with_context(|| format!("failed to post-install {}", package.name()))?;
@@ -107,7 +118,7 @@ impl Module for Repository {
         if !self.enabled()? {
             return Ok(());
         }
-        for package in self.packages.iter() {
+        for package in &self.packages {
             let result = package
                 .system_install(rules)
                 .with_context(|| format!("failed to system install {}", package.name()));
