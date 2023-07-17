@@ -104,6 +104,7 @@ pub struct UserDependency {
     pub wants: Option<Satisficer>,
     // User-level package managers.
     pub brew: Option<Vec<String>>,
+    pub cargo: Option<Vec<String>>,
     pub npm: Option<Vec<String>>,
     pub pip_user: Option<Vec<String>>,
 }

@@ -1,8 +1,12 @@
+use std::process::Command;
+
 use anyhow::{anyhow, Context, Result};
 
 use crate::module::{Module, Rules};
 use crate::registry::Registry;
 use crate::tag_criteria::TagCriteria;
+
+use crate::process_utils;
 
 use super::config;
 use super::satisficer::{self, Satisficer};
@@ -25,9 +29,14 @@ impl UserDependency {
             }
             None => None,
         };
-        let installers: Vec<Box<dyn Installer>> = Vec::new();
+        let mut installers: Vec<Box<dyn Installer>> = Vec::new();
         if cfg.brew.is_some() {
             return Err(anyhow!("brew is not supported yet"));
+        }
+        if let Some(cargo) = &cfg.cargo {
+            installers.push(Box::new(Cargo {
+                packages: cargo.clone(),
+            }));
         }
         if cfg.npm.is_some() {
             return Err(anyhow!("npm is not supported yet"));
@@ -48,5 +57,20 @@ impl Module for UserDependency {
             return Ok(());
         }
         self.installers.install()
+    }
+}
+
+struct Cargo {
+    packages: Vec<String>,
+}
+
+impl Installer for Cargo {
+    fn install(&self) -> Result<()> {
+        process_utils::run_verbose(
+            Command::new("cargo")
+                .arg("install")
+                .arg("--")
+                .args(&self.packages),
+        )
     }
 }
