@@ -9,6 +9,8 @@ pub struct Rules {
 }
 
 pub trait Module {
+    /// Used for resource intensive operations to reduce the time without valid
+    /// configuration between uninstall and install.
     fn pre_uninstall(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         let _ = rules;
         let _ = registry;
