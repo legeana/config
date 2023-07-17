@@ -9,6 +9,11 @@ pub struct Rules {
 }
 
 pub trait Module {
+    fn pre_uninstall(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+        let _ = rules;
+        let _ = registry;
+        Ok(())
+    }
     fn pre_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         let _ = rules;
         let _ = registry;
@@ -33,6 +38,12 @@ pub trait Module {
 pub type ModuleBox = Box<dyn Module>;
 
 impl<T: Module> Module for Vec<T> {
+    fn pre_uninstall(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+        for module in self {
+            module.pre_uninstall(rules, registry)?;
+        }
+        Ok(())
+    }
     fn pre_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         for module in self {
             module.pre_install(rules, registry)?;
@@ -60,6 +71,9 @@ impl<T: Module> Module for Vec<T> {
 }
 
 impl Module for ModuleBox {
+    fn pre_uninstall(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+        self.as_ref().pre_uninstall(rules, registry)
+    }
     fn pre_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         self.as_ref().pre_install(rules, registry)
     }
@@ -80,6 +94,11 @@ struct WrappedModule<T: Module> {
 }
 
 impl<T: Module> Module for WrappedModule<T> {
+    fn pre_uninstall(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+        self.module
+            .pre_uninstall(rules, registry)
+            .with_context(|| format!("failed pre_uninstall in {:?}", self.error_context))
+    }
     fn pre_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         self.module
             .pre_install(rules, registry)
