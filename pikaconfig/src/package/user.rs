@@ -3,7 +3,6 @@ use std::process::Command;
 use anyhow::{anyhow, Context, Result};
 
 use crate::module::{Module, Rules};
-use crate::registry::Registry;
 use crate::tag_criteria::TagCriteria;
 
 use crate::process_utils;
@@ -52,7 +51,7 @@ impl UserDependency {
 }
 
 impl Module for UserDependency {
-    fn pre_install(&self, rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
+    fn pre_uninstall(&self, rules: &Rules) -> Result<()> {
         if !rules.force_download && self.satisficer.is_satisfied()? {
             return Ok(());
         }
