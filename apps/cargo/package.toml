@@ -1,0 +1,3 @@
+[[user_dependencies]]
+cargo = ["cargo-info"]
+wants = { command = "cargo-info" }
