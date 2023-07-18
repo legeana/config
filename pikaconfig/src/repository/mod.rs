@@ -75,9 +75,11 @@ impl Module for Repository {
             return Ok(());
         }
         for package in &self.packages {
-            package
-                .pre_uninstall(rules)
-                .with_context(|| format!("failed to pre-uninstall {}", package.name()))?;
+            rules.wrap_keep_going(|| {
+                package
+                    .pre_uninstall(rules)
+                    .with_context(|| format!("failed to pre-uninstall {}", package.name()))
+            })?;
         }
         Ok(())
     }
@@ -86,9 +88,11 @@ impl Module for Repository {
             return Ok(());
         }
         for package in &self.packages {
-            package
-                .pre_install(rules, registry)
-                .with_context(|| format!("failed to pre-install {}", package.name()))?;
+            rules.wrap_keep_going(|| {
+                package
+                    .pre_install(rules, registry)
+                    .with_context(|| format!("failed to pre-install {}", package.name()))
+            })?;
         }
         Ok(())
     }
@@ -97,9 +101,11 @@ impl Module for Repository {
             return Ok(());
         }
         for package in &self.packages {
-            package
-                .install(rules, registry)
-                .with_context(|| format!("failed to install {}", package.name()))?;
+            rules.wrap_keep_going(|| {
+                package
+                    .install(rules, registry)
+                    .with_context(|| format!("failed to install {}", package.name()))
+            })?;
         }
         Ok(())
     }
@@ -108,9 +114,11 @@ impl Module for Repository {
             return Ok(());
         }
         for package in &self.packages {
-            package
-                .post_install(rules, registry)
-                .with_context(|| format!("failed to post-install {}", package.name()))?;
+            rules.wrap_keep_going(|| {
+                package
+                    .post_install(rules, registry)
+                    .with_context(|| format!("failed to post-install {}", package.name()))
+            })?;
         }
         Ok(())
     }
@@ -119,19 +127,11 @@ impl Module for Repository {
             return Ok(());
         }
         for package in &self.packages {
-            let result = package
-                .system_install(rules)
-                .with_context(|| format!("failed to system install {}", package.name()));
-            match result {
-                Ok(_) => (),
-                Err(err) => {
-                    if rules.allow_package_install_failures {
-                        log::error!("failed to install {}: {err}", package.name());
-                    } else {
-                        return Err(err);
-                    }
-                }
-            };
+            rules.wrap_keep_going(|| {
+                package
+                    .system_install(rules)
+                    .with_context(|| format!("failed to system install {}", package.name()))
+            })?;
         }
         Ok(())
     }

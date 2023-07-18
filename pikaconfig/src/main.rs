@@ -55,16 +55,16 @@ struct Cli {
     no_update: bool,
     #[clap(subcommand)]
     command: Commands,
+    #[clap(short = 'k', long,
+           help = "Don't interrupt installation process if a package fails")]
+    keep_going: bool,
 }
 
 #[derive(Debug, Subcommand)]
 enum Commands {
     Install {},
     Update {},
-    SystemInstall {
-        #[clap(long, default_value_t = true, action = clap::ArgAction::Set)]
-        strict: bool,
-    },
+    SystemInstall {},
     Uninstall {},
     ManifestHelp {},
     Tags {},
@@ -161,7 +161,7 @@ fn main() -> Result<()> {
             }
             let rules = Rules {
                 force_download: false,
-                ..Rules::default()
+                keep_going: args.keep_going,
             };
             install(&rules, &root).context("failed to install")?;
         }
@@ -171,16 +171,16 @@ fn main() -> Result<()> {
             }
             let rules = Rules {
                 force_download: true,
-                ..Rules::default()
+                keep_going: args.keep_going,
             };
             install(&rules, &root).context("failed to install")?;
         }
-        Commands::SystemInstall { strict } => {
+        Commands::SystemInstall {} => {
             if check_update()? {
                 return Ok(());
             }
             let rules = Rules {
-                allow_package_install_failures: !strict,
+                keep_going: args.keep_going,
                 ..Rules::default()
             };
             system_install(&rules, &root).context("failed to system_install")?;

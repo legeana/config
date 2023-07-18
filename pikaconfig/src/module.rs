@@ -4,8 +4,27 @@ use crate::registry::Registry;
 
 #[derive(Default)]
 pub struct Rules {
-    pub allow_package_install_failures: bool,
     pub force_download: bool,
+    pub keep_going: bool,
+}
+
+impl Rules {
+    pub fn wrap_keep_going<F>(&self, f: F) -> Result<()>
+    where
+        F: FnOnce() -> Result<()>,
+    {
+        match f() {
+            Ok(_) => Ok(()),
+            Err(err) => {
+                if self.keep_going {
+                    log::error!("{err:?}");
+                    Ok(())
+                } else {
+                    Err(err)
+                }
+            }
+        }
+    }
 }
 
 pub trait Module {
