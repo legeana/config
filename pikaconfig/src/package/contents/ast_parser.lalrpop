@@ -14,33 +14,36 @@ pub Manifest: ast::Manifest = {
 };
 
 StatementList: Vec<ast::Statement> = {
-    <mut list:StatementList> Newline <st:Statement> => {
+    <mut list:StatementList> <st:Statement> => {
         list.push(st);
         list
     },
-    <StatementList> Newline EmptyLine,
+    <StatementList> EmptyLine,
     <Statement> => vec![<>],
     EmptyLine => Vec::new(),
 };
 
 EmptyLine = {
-    Space*,
+    LineTerminator,
 };
 
 Statement: ast::Statement = {
-    <Command> => ast::Statement::Command(<>),
+    <Command> LineTerminator => ast::Statement::Command(<>),
 };
 
 Command: ast::Command = {
-    Space*
     <start:@L>
     <name:Literal>
-    <args:(Space+ <Literal>)*>
-    Space* => ast::Command {
+    <args:(<Literal>)*> => ast::Command {
         location: start,
         name,
         args,
     },
+};
+
+LineTerminator = {
+    Newline,
+    EndOfInput,
 };
 
 extern {
@@ -48,7 +51,7 @@ extern {
     type Error = lexer::LocationError;
 
     enum lexer::Token {
-        Space => lexer::Token::Space,
+        EndOfInput => lexer::Token::EndOfInput,
         Newline => lexer::Token::Newline,
         Literal => lexer::Token::Literal(<String>),
     }
