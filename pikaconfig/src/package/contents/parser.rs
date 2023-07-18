@@ -45,6 +45,9 @@ pub fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<engine::Stateme
                     &cmd.args.iter().map(String::as_str).collect::<Vec<_>>(),
                 )?);
             }
+            ast::Statement::IfStatement(_if_st) => {
+                todo!();
+            }
         }
     }
     Ok(builders)

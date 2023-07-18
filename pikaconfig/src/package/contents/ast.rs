@@ -25,6 +25,7 @@ impl Manifest {
 #[derive(Debug, PartialEq)]
 pub enum Statement {
     Command(Command),
+    IfStatement(IfStatement),
 }
 
 #[derive(Debug, PartialEq)]
@@ -32,6 +33,13 @@ pub struct Command {
     pub location: lexer::Location,
     pub name: String,
     pub args: Vec<String>,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct IfStatement {
+    pub location: lexer::Location,
+    pub conditional: Command,
+    pub statements: Vec<Statement>,
 }
 
 #[cfg(test)]
@@ -182,6 +190,109 @@ mod tests {
                         args: Vec::new(),
                     }),
                 ],
+            }
+        );
+    }
+
+    #[test]
+    fn test_if_statement_no_args() {
+        assert_eq!(
+            Manifest::parse(
+                "",
+                r#"
+                if cond {
+                    statement
+                }
+            "#
+            )
+            .unwrap(),
+            Manifest {
+                location: "".into(),
+                statements: vec![Statement::IfStatement(IfStatement {
+                    location: lexer::Location::new_p_l_c(17, 2, 17),
+                    conditional: Command {
+                        location: lexer::Location::new_p_l_c(20, 2, 20),
+                        name: "cond".to_owned(),
+                        args: Vec::new(),
+                    },
+                    statements: vec![Statement::Command(Command {
+                        location: lexer::Location::new_p_l_c(47, 3, 21),
+                        name: "statement".to_owned(),
+                        args: Vec::new(),
+                    })],
+                }),],
+            }
+        );
+    }
+
+    #[test]
+    fn test_if_statement_with_args() {
+        assert_eq!(
+            Manifest::parse(
+                "",
+                r#"
+                if cond with args {
+                    statement
+                }
+            "#
+            )
+            .unwrap(),
+            Manifest {
+                location: "".into(),
+                statements: vec![Statement::IfStatement(IfStatement {
+                    location: lexer::Location::new_p_l_c(17, 2, 17),
+                    conditional: Command {
+                        location: lexer::Location::new_p_l_c(20, 2, 20),
+                        name: "cond".to_owned(),
+                        args: vec!["with".to_owned(), "args".to_owned(),],
+                    },
+                    statements: vec![Statement::Command(Command {
+                        location: lexer::Location::new_p_l_c(57, 3, 21),
+                        name: "statement".to_owned(),
+                        args: Vec::new(),
+                    })],
+                }),],
+            }
+        );
+    }
+
+    #[test]
+    fn test_nested_if_statement() {
+        assert_eq!(
+            Manifest::parse(
+                "",
+                r#"
+                if cond one {
+                    if cond two {
+                        statement
+                    }
+                }
+            "#
+            )
+            .unwrap(),
+            Manifest {
+                location: "".into(),
+                statements: vec![Statement::IfStatement(IfStatement {
+                    location: lexer::Location::new_p_l_c(17, 2, 17),
+                    conditional: Command {
+                        location: lexer::Location::new_p_l_c(20, 2, 20),
+                        name: "cond".to_owned(),
+                        args: vec!["one".to_owned(),],
+                    },
+                    statements: vec![Statement::IfStatement(IfStatement {
+                        location: lexer::Location::new_p_l_c(51, 3, 21),
+                        conditional: Command {
+                            location: lexer::Location::new_p_l_c(54, 3, 24),
+                            name: "cond".to_owned(),
+                            args: vec!["two".to_owned(),],
+                        },
+                        statements: vec![Statement::Command(Command {
+                            location: lexer::Location::new_p_l_c(89, 4, 25),
+                            name: "statement".to_owned(),
+                            args: Vec::new(),
+                        }),],
+                    })],
+                }),],
             }
         );
     }

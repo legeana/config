@@ -29,6 +29,7 @@ EmptyLine = {
 
 Statement: ast::Statement = {
     <Command> LineTerminator => ast::Statement::Command(<>),
+    <IfStatement> LineTerminator => ast::Statement::IfStatement(<>),
 };
 
 Command: ast::Command = {
@@ -38,6 +39,19 @@ Command: ast::Command = {
         location: start,
         name,
         args,
+    },
+};
+
+IfStatement: ast::IfStatement = {
+    <start:@L>
+    If
+    <conditional:Command>
+    Begin
+    <statements:StatementList>
+    End => ast::IfStatement {
+        location: start,
+        conditional,
+        statements,
     },
 };
 
@@ -54,5 +68,8 @@ extern {
         EndOfInput => lexer::Token::EndOfInput,
         Newline => lexer::Token::Newline,
         Literal => lexer::Token::Literal(<String>),
+        If => lexer::Token::If,
+        Begin => lexer::Token::Begin,
+        End => lexer::Token::End,
     }
 }
