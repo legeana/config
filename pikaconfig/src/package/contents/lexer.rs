@@ -50,6 +50,12 @@ pub enum Token {
     #[regex(r#""([^"\n\\]|\\[^\n])*""#, |lex| quote::unquote(lex.slice()))]
     #[regex(r#"[^\s'"]+"#, |lex| lex.slice().to_owned())]
     Literal(String),
+    #[token("if")]
+    If,
+    #[token("{")]
+    Begin,
+    #[token("}")]
+    End,
 }
 
 impl std::fmt::Display for Token {
@@ -58,6 +64,9 @@ impl std::fmt::Display for Token {
             Token::Space => write!(f, "Token::Space"),
             Token::Newline => write!(f, "Token::Newline"),
             Token::Literal(s) => write!(f, "Token::Literal({s:?})"),
+            Token::If => write!(f, "Token::If"),
+            Token::Begin => write!(f, "Token::Begin"),
+            Token::End => write!(f, "Token::End"),
         }
     }
 }
@@ -435,5 +444,36 @@ mod tests {
             LocationRange::new_single(Location::new_p_l_c(13, 2, 13))
         );
         assert_eq!(loc_err.to_string(), "invalid token at line 2 column 13");
+    }
+
+    #[test]
+    fn test_if_block() {
+        let mut lex = Token::lexer(
+            r#"
+            if test {
+                command hello world
+            }
+            "#,
+        );
+        assert_eq!(lex.next(), Some(Ok(Token::Newline)));
+        assert_eq!(lex.next(), Some(Ok(Token::Space)));
+        assert_eq!(lex.next(), Some(Ok(Token::If)));
+        assert_eq!(lex.next(), Some(Ok(Token::Space)));
+        assert_eq!(lex.next(), Some(Ok(Token::Literal("test".into()))));
+        assert_eq!(lex.next(), Some(Ok(Token::Space)));
+        assert_eq!(lex.next(), Some(Ok(Token::Begin)));
+        assert_eq!(lex.next(), Some(Ok(Token::Newline)));
+        assert_eq!(lex.next(), Some(Ok(Token::Space)));
+        assert_eq!(lex.next(), Some(Ok(Token::Literal("command".into()))));
+        assert_eq!(lex.next(), Some(Ok(Token::Space)));
+        assert_eq!(lex.next(), Some(Ok(Token::Literal("hello".into()))));
+        assert_eq!(lex.next(), Some(Ok(Token::Space)));
+        assert_eq!(lex.next(), Some(Ok(Token::Literal("world".into()))));
+        assert_eq!(lex.next(), Some(Ok(Token::Newline)));
+        assert_eq!(lex.next(), Some(Ok(Token::Space)));
+        assert_eq!(lex.next(), Some(Ok(Token::End)));
+        assert_eq!(lex.next(), Some(Ok(Token::Newline)));
+        assert_eq!(lex.next(), Some(Ok(Token::Space)));
+        assert_eq!(lex.next(), None);
     }
 }
