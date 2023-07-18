@@ -40,6 +40,7 @@ pub struct IfStatement {
     pub location: lexer::Location,
     pub conditional: Command,
     pub statements: Vec<Statement>,
+    pub else_statements: Vec<Statement>,
 }
 
 #[cfg(test)]
@@ -220,6 +221,7 @@ mod tests {
                         name: "statement".to_owned(),
                         args: Vec::new(),
                     })],
+                    else_statements: Vec::new(),
                 }),],
             }
         );
@@ -250,6 +252,45 @@ mod tests {
                         location: lexer::Location::new_p_l_c(57, 3, 21),
                         name: "statement".to_owned(),
                         args: Vec::new(),
+                    })],
+                    else_statements: Vec::new(),
+                }),],
+            }
+        );
+    }
+
+    #[test]
+    fn test_if_statement_with_else() {
+        assert_eq!(
+            Manifest::parse(
+                "",
+                r#"
+                if cond {
+                    statement
+                } else {
+                    alternative statement
+                }
+            "#
+            )
+            .unwrap(),
+            Manifest {
+                location: "".into(),
+                statements: vec![Statement::IfStatement(IfStatement {
+                    location: lexer::Location::new_p_l_c(17, 2, 17),
+                    conditional: Command {
+                        location: lexer::Location::new_p_l_c(20, 2, 20),
+                        name: "cond".to_owned(),
+                        args: Vec::new(),
+                    },
+                    statements: vec![Statement::Command(Command {
+                        location: lexer::Location::new_p_l_c(47, 3, 21),
+                        name: "statement".to_owned(),
+                        args: Vec::new(),
+                    })],
+                    else_statements: vec![Statement::Command(Command {
+                        location: lexer::Location::new_p_l_c(102, 5, 21),
+                        name: "alternative".to_owned(),
+                        args: vec!["statement".to_owned(),],
                     })],
                 }),],
             }
@@ -291,7 +332,9 @@ mod tests {
                             name: "statement".to_owned(),
                             args: Vec::new(),
                         }),],
+                        else_statements: Vec::new(),
                     })],
+                    else_statements: Vec::new(),
                 }),],
             }
         );

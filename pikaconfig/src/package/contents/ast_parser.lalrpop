@@ -46,13 +46,24 @@ IfStatement: ast::IfStatement = {
     <start:@L>
     If
     <conditional:Command>
-    Begin
-    <statements:StatementList>
-    End => ast::IfStatement {
+    <statements:Block>
+    <else_statements:ElseBlock?>
+    => ast::IfStatement {
         location: start,
         conditional,
         statements,
+        else_statements: else_statements.unwrap_or_default(),
     },
+};
+
+Block = {
+    Begin
+    <StatementList>
+    End
+};
+
+ElseBlock = {
+    Else <Block>
 };
 
 LineTerminator = {
@@ -69,6 +80,7 @@ extern {
         Newline => lexer::Token::Newline,
         Literal => lexer::Token::Literal(<String>),
         If => lexer::Token::If,
+        Else => lexer::Token::Else,
         Begin => lexer::Token::Begin,
         End => lexer::Token::End,
     }

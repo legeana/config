@@ -55,6 +55,8 @@ pub enum Token {
     Literal(String),
     #[token("if")]
     If,
+    #[token("else")]
+    Else,
     #[token("{")]
     Begin,
     #[token("}")]
@@ -69,6 +71,7 @@ impl std::fmt::Display for Token {
             Token::Newline => write!(f, "Token::Newline"),
             Token::Literal(s) => write!(f, "Token::Literal({s:?})"),
             Token::If => write!(f, "Token::If"),
+            Token::Else => write!(f, "Token::Else"),
             Token::Begin => write!(f, "Token::Begin"),
             Token::End => write!(f, "Token::End"),
         }
@@ -484,6 +487,8 @@ mod tests {
             r#"
             if test {
                 command hello world
+            } else {
+                alternative command
             }
             "#,
         );
@@ -495,6 +500,13 @@ mod tests {
         assert_token!(lex.next(), Token::Literal("command".into()));
         assert_token!(lex.next(), Token::Literal("hello".into()));
         assert_token!(lex.next(), Token::Literal("world".into()));
+        assert_token!(lex.next(), Token::Newline);
+        assert_token!(lex.next(), Token::End);
+        assert_token!(lex.next(), Token::Else);
+        assert_token!(lex.next(), Token::Begin);
+        assert_token!(lex.next(), Token::Newline);
+        assert_token!(lex.next(), Token::Literal("alternative".into()));
+        assert_token!(lex.next(), Token::Literal("command".into()));
         assert_token!(lex.next(), Token::Newline);
         assert_token!(lex.next(), Token::End);
         assert_token!(lex.next(), Token::Newline);
