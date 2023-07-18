@@ -148,6 +148,50 @@ pub fn wrap<T: Module + 'static>(module: T, error_context: String) -> ModuleBox 
     })
 }
 
+struct WrappedKeepGoing<T: Module> {
+    modules: Vec<T>,
+}
+
+impl<T: Module> Module for WrappedKeepGoing<T> {
+    fn pre_uninstall(&self, rules: &Rules) -> Result<()> {
+        for m in &self.modules {
+            rules.wrap_keep_going(|| m.pre_uninstall(rules))?;
+        }
+        Ok(())
+    }
+    fn pre_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+        for m in &self.modules {
+            rules.wrap_keep_going(|| m.pre_install(rules, registry))?;
+        }
+        Ok(())
+    }
+    fn install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+        for m in &self.modules {
+            rules.wrap_keep_going(|| m.install(rules, registry))?;
+        }
+        Ok(())
+    }
+    fn post_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+        for m in &self.modules {
+            rules.wrap_keep_going(|| m.post_install(rules, registry))?;
+        }
+        Ok(())
+    }
+    fn system_install(&self, rules: &Rules) -> Result<()> {
+        for m in &self.modules {
+            rules.wrap_keep_going(|| m.system_install(rules))?;
+        }
+        Ok(())
+    }
+}
+
+pub fn wrap_keep_going<T>(modules: Vec<T>) -> ModuleBox
+where
+    T: Module + 'static,
+{
+    Box::new(WrappedKeepGoing { modules })
+}
+
 pub struct Dummy;
 
 impl Module for Dummy {}

@@ -57,14 +57,14 @@ impl Package {
                 .with_context(|| format!("failed to get dependencies of {root:?}"))?,
             None => Vec::new(),
         };
-        let system_dependency: Vec<system::SystemDependency> = pkgconfig
+        let system_dependencies: Vec<system::SystemDependency> = pkgconfig
             .system_dependencies
             .unwrap_or_default()
             .iter()
             .map(system::SystemDependency::new)
             .collect::<Result<_>>()
             .context("failed to parse system_dependencies")?;
-        let user_dependency: Vec<user::UserDependency> = pkgconfig
+        let user_dependencies: Vec<user::UserDependency> = pkgconfig
             .user_dependencies
             .unwrap_or_default()
             .iter()
@@ -86,8 +86,8 @@ impl Package {
             criteria,
             modules: vec![
                 configuration,
-                Box::new(system_dependency),
-                Box::new(user_dependency),
+                module::wrap_keep_going(system_dependencies),
+                module::wrap_keep_going(user_dependencies),
             ],
             dependencies,
         })
