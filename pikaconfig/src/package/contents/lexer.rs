@@ -206,9 +206,32 @@ impl<'input> Iterator for LalrpopLexer<'input> {
 mod tests {
     use super::*;
 
+    struct TestLexer<'input>(LalrpopLexer<'input>);
+
+    impl<'input> TestLexer<'input> {
+        fn new(source: &'input str) -> Self {
+            Self(LalrpopLexer::new(source))
+        }
+        fn slice(&self) -> &'input str {
+            self.0.lexer.slice()
+        }
+    }
+
+    impl<'input> Iterator for TestLexer<'input> {
+        type Item = Result<Token, LocationError>;
+
+        fn next(&mut self) -> Option<Result<Token, LocationError>> {
+            match self.0.next() {
+                Some(Ok((_, tok, _))) => Some(Ok(tok)),
+                Some(Err(err)) => Some(Err(err)),
+                None => None,
+            }
+        }
+    }
+
     #[test]
     fn test_unquoted() {
-        let mut lex = Token::lexer(
+        let mut lex = TestLexer::new(
             r#"
             simple command
             another command
@@ -237,7 +260,7 @@ mod tests {
 
     #[test]
     fn test_escaped_newline() {
-        let mut lex = Token::lexer(
+        let mut lex = TestLexer::new(
             r#"
             simple command \
                 multiple args
@@ -262,7 +285,7 @@ mod tests {
 
     #[test]
     fn test_single_quoted_literals() {
-        let mut lex = Token::lexer(
+        let mut lex = TestLexer::new(
             r#"
             'single-quoted'
             'single quoted'
@@ -279,7 +302,7 @@ mod tests {
 
     #[test]
     fn test_double_quoted_literals() {
-        let mut lex = Token::lexer(
+        let mut lex = TestLexer::new(
             r#"
             "double-quoted"
             "double quoted"
@@ -315,7 +338,7 @@ mod tests {
 
     #[test]
     fn test_quoted_literals() {
-        let mut lex = Token::lexer(
+        let mut lex = TestLexer::new(
             r#"
             unquoted 'single quoted' "double quoted"
             unquoted\escaped 'single \'quoted\'' "double \"quoted\""
@@ -363,7 +386,7 @@ mod tests {
 
     #[test]
     fn test_no_space_between_literals() {
-        let mut lex = Token::lexer(
+        let mut lex = TestLexer::new(
             r#"
             "hello""world"
         "#,
@@ -379,7 +402,7 @@ mod tests {
 
     #[test]
     fn test_no_newline_in_literal() {
-        let mut lex = Token::lexer(
+        let mut lex = TestLexer::new(
             r#"
             "hello
             world"#,
@@ -387,12 +410,12 @@ mod tests {
         assert_eq!(lex.next(), Some(Ok(Token::Newline)));
         assert_eq!(lex.next(), Some(Ok(Token::Space)));
         let err = lex.next().expect("error").expect_err("");
-        assert_eq!(err, LexerError::InvalidToken);
+        assert_eq!(err.source, LexerError::InvalidToken);
     }
 
     #[test]
     fn test_comments() {
-        let mut lex = Token::lexer(
+        let mut lex = TestLexer::new(
             r#"
             # comment 1
             command one
@@ -429,7 +452,7 @@ mod tests {
 
     #[test]
     fn test_error() {
-        let mut lex = Token::lexer(
+        let mut lex = TestLexer::new(
             r#"
             "misquoted
         "#,
@@ -437,18 +460,17 @@ mod tests {
         assert_eq!(lex.next(), Some(Ok(Token::Newline)));
         assert_eq!(lex.next(), Some(Ok(Token::Space)));
         let err = lex.next().expect("error").expect_err("InvalidToken");
-        assert_eq!(err, LexerError::InvalidToken);
-        let loc_err = err.with_location(&lex);
+        assert_eq!(err.source, LexerError::InvalidToken);
         assert_eq!(
-            loc_err.location,
+            err.location,
             LocationRange::new_single(Location::new_p_l_c(13, 2, 13))
         );
-        assert_eq!(loc_err.to_string(), "invalid token at line 2 column 13");
+        assert_eq!(err.to_string(), "invalid token at line 2 column 13");
     }
 
     #[test]
     fn test_if_block() {
-        let mut lex = Token::lexer(
+        let mut lex = TestLexer::new(
             r#"
             if test {
                 command hello world
