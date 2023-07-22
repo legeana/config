@@ -28,14 +28,14 @@ EmptyLine = {
 };
 
 Statement: ast::Statement = {
-    <Command> LineTerminator => ast::Statement::Command(<>),
+    <Invocation> LineTerminator => ast::Statement::Command(<>),
     <IfStatement> LineTerminator => ast::Statement::IfStatement(<>),
 };
 
-Command: ast::Command = {
+Invocation: ast::Invocation = {
     <start:@L>
     <name:Literal>
-    <args:(<Literal>)*> => ast::Command {
+    <args:(<Literal>)*> => ast::Invocation {
         location: start,
         name,
         args,
@@ -45,7 +45,7 @@ Command: ast::Command = {
 IfStatement: ast::IfStatement = {
     <start:@L>
     If
-    <conditional:Command>
+    <conditional:Invocation>
     <statements:Block>
     <else_statements:ElseBlock?>
     => ast::IfStatement {
