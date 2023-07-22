@@ -83,5 +83,5 @@ impl engine::Parser for IfCommandParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_parser(Box::new(IfCommandParser {}));
+    registry.register_command(Box::new(IfCommandParser {}));
 }

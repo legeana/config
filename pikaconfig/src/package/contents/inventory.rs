@@ -7,7 +7,7 @@ use tera::Tera;
 use super::engine;
 
 pub trait Registry {
-    fn register_parser(&mut self, parser: engine::ParserBox);
+    fn register_command(&mut self, parser: engine::ParserBox);
     fn register_render_helper(&mut self, render_helper: Box<dyn RenderHelper>);
 }
 
@@ -17,19 +17,19 @@ pub trait RenderHelper: Sync + Send {
 
 #[derive(Default)]
 struct RegistryImpl {
-    parsers: HashMap<String, engine::ParserBox>,
-    parsers_order: Vec<String>,
+    commands: HashMap<String, engine::ParserBox>,
+    commands_order: Vec<String>,
     render_helpers: Vec<Box<dyn RenderHelper>>,
 }
 
 impl Registry for RegistryImpl {
-    fn register_parser(&mut self, parser: engine::ParserBox) {
+    fn register_command(&mut self, parser: engine::ParserBox) {
         let name = parser.name();
-        let former = self.parsers.insert(parser.name(), parser);
+        let former = self.commands.insert(parser.name(), parser);
         if let Some(former) = former {
             panic!("parser name conflict: {:?}", former.name());
         }
-        self.parsers_order.push(name);
+        self.commands_order.push(name);
     }
     fn register_render_helper(&mut self, render_helper: Box<dyn RenderHelper>) {
         self.render_helpers.push(render_helper);
@@ -75,9 +75,9 @@ fn registry() -> &'static RegistryImpl {
 }
 
 pub fn parsers() -> impl Iterator<Item = &'static engine::ParserBox> {
-    registry().parsers_order.iter().map(|name| {
+    registry().commands_order.iter().map(|name| {
         registry()
-            .parsers
+            .commands
             .get(name)
             .expect("parsers_order must match parsers")
     })
@@ -85,7 +85,7 @@ pub fn parsers() -> impl Iterator<Item = &'static engine::ParserBox> {
 
 pub fn parser(name: &str) -> Result<&dyn engine::Parser> {
     registry()
-        .parsers
+        .commands
         .get(name)
         .ok_or_else(|| anyhow!("unknown command {name}"))
         .map(|p| p.as_ref())
@@ -103,7 +103,7 @@ mod tests {
 
     #[test]
     fn test_parsers_index() {
-        assert_eq!(registry().parsers.len(), registry().parsers_order.len());
-        assert_eq!(parsers().count(), registry().parsers.len());
+        assert_eq!(registry().commands.len(), registry().commands_order.len());
+        assert_eq!(parsers().count(), registry().commands.len());
     }
 }

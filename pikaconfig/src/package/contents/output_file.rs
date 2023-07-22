@@ -55,5 +55,5 @@ impl engine::Parser for OutputFileParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_parser(Box::new(OutputFileParser {}));
+    registry.register_command(Box::new(OutputFileParser {}));
 }

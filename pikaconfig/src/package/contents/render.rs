@@ -110,6 +110,6 @@ impl engine::Parser for RenderToParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_parser(Box::new(RenderParser {}));
-    registry.register_parser(Box::new(RenderToParser {}));
+    registry.register_command(Box::new(RenderParser {}));
+    registry.register_command(Box::new(RenderToParser {}));
 }

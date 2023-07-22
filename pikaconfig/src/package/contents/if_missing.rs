@@ -84,5 +84,5 @@ impl engine::Parser for IfMissingParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_parser(Box::new(IfMissingParser {}));
+    registry.register_command(Box::new(IfMissingParser {}));
 }

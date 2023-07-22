@@ -198,7 +198,7 @@ pub fn register(registry: &mut dyn inventory::Registry) {
         },
     ];
     for dir in parsers {
-        registry.register_parser(Box::new(dir.clone()));
+        registry.register_command(Box::new(dir.clone()));
         registry.register_render_helper(Box::new(dir));
     }
 }

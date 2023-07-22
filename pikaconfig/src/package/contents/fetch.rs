@@ -132,6 +132,6 @@ impl engine::Parser for FetchExeIntoParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_parser(Box::new(FetchIntoParser {}));
-    registry.register_parser(Box::new(FetchExeIntoParser {}));
+    registry.register_command(Box::new(FetchIntoParser {}));
+    registry.register_command(Box::new(FetchExeIntoParser {}));
 }

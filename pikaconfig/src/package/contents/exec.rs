@@ -112,6 +112,6 @@ impl engine::Parser for PostInstallUpdateParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_parser(Box::new(PostInstallExecParser {}));
-    registry.register_parser(Box::new(PostInstallUpdateParser {}));
+    registry.register_command(Box::new(PostInstallExecParser {}));
+    registry.register_command(Box::new(PostInstallUpdateParser {}));
 }

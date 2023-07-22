@@ -85,6 +85,6 @@ impl engine::Parser for SymlinkToParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_parser(Box::new(SymlinkParser {}));
-    registry.register_parser(Box::new(SymlinkToParser {}));
+    registry.register_command(Box::new(SymlinkParser {}));
+    registry.register_command(Box::new(SymlinkToParser {}));
 }

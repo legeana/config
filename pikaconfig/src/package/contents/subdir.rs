@@ -103,6 +103,6 @@ impl engine::Parser for SubdirsParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_parser(Box::new(SubdirParser {}));
-    registry.register_parser(Box::new(SubdirsParser {}));
+    registry.register_command(Box::new(SubdirParser {}));
+    registry.register_command(Box::new(SubdirsParser {}));
 }

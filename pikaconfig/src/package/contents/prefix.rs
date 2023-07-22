@@ -41,5 +41,5 @@ impl engine::Parser for PrefixParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_parser(Box::new(PrefixParser {}));
+    registry.register_command(Box::new(PrefixParser {}));
 }

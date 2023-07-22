@@ -58,5 +58,5 @@ impl engine::Parser for MkDirParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_parser(Box::new(MkDirParser {}));
+    registry.register_command(Box::new(MkDirParser {}));
 }

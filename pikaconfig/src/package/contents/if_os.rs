@@ -84,7 +84,7 @@ pub fn register(registry: &mut dyn inventory::Registry) {
         IfOsParser { os: "windows" },
     ];
     for parser in parsers {
-        registry.register_parser(Box::new(parser.clone()));
+        registry.register_command(Box::new(parser.clone()));
         registry.register_render_helper(Box::new(parser));
     }
 }

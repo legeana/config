@@ -146,5 +146,5 @@ impl engine::Parser for ImporterParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_parser(Box::new(ImporterParser {}));
+    registry.register_command(Box::new(ImporterParser {}));
 }

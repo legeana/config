@@ -74,5 +74,5 @@ impl engine::Parser for CopyParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_parser(Box::new(CopyParser {}));
+    registry.register_command(Box::new(CopyParser {}));
 }

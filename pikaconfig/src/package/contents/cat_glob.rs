@@ -98,5 +98,5 @@ impl engine::Parser for CatGlobIntoParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_parser(Box::new(CatGlobIntoParser {}));
+    registry.register_command(Box::new(CatGlobIntoParser {}));
 }

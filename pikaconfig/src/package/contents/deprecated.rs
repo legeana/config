@@ -36,5 +36,5 @@ impl engine::Parser for DeprecatedParser {
 }
 
 pub fn register(_registry: &mut dyn inventory::Registry) {
-    //registry.register_parser(Box::new(DeprecatedParser("<deprecated>")));
+    //registry.register_command(Box::new(DeprecatedParser("<deprecated>")));
 }
