@@ -2,6 +2,7 @@ use std::path::Path;
 
 use crate::package::contents::lexer;
 
+use super::args::Arguments;
 use super::ast;
 
 grammar(location: &Path);
@@ -38,7 +39,7 @@ Invocation: ast::Invocation = {
     <args:(<Literal>)*> => ast::Invocation {
         location: start,
         name,
-        args,
+        args: Arguments(args),
     },
 };
 

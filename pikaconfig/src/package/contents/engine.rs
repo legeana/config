@@ -4,6 +4,7 @@ use anyhow::{anyhow, Result};
 
 use crate::module::ModuleBox;
 
+use super::args::Arguments;
 use super::engine;
 
 pub struct Context {
@@ -37,7 +38,7 @@ pub type ParserBox = Box<dyn Parser>;
 pub trait ConditionBuilder: Sync + Send {
     fn name(&self) -> String;
     fn help(&self) -> String;
-    fn build(&self, workdir: &Path, args: &[&str]) -> Result<ConditionBox>;
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<ConditionBox>;
 }
 
 pub type ConditionBuilderBox = Box<dyn ConditionBuilder>;
@@ -67,7 +68,7 @@ pub fn parse(workdir: &Path, command: &str, args: &[&str]) -> Result<StatementBo
     parser.parse(workdir, args)
 }
 
-pub fn new_condition(workdir: &Path, name: &str, args: &[&str]) -> Result<ConditionBox> {
+pub fn new_condition(workdir: &Path, name: &str, args: &Arguments) -> Result<ConditionBox> {
     let builder = super::inventory::condition(name)?;
     builder.build(workdir, args)
 }

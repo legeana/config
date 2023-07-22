@@ -2,6 +2,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Result};
 
+use super::args::Arguments;
 use super::lexer;
 
 #[derive(Debug, PartialEq)]
@@ -32,7 +33,7 @@ pub enum Statement {
 pub struct Invocation {
     pub location: lexer::Location,
     pub name: String,
-    pub args: Vec<String>,
+    pub args: Arguments,
 }
 
 #[derive(Debug, PartialEq)]
@@ -46,6 +47,7 @@ pub struct IfStatement {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use super::super::args::args;
 
     #[test]
     fn test_empty_manifest() {
@@ -89,7 +91,7 @@ mod tests {
                 statements: vec![Statement::Command(Invocation {
                     location: lexer::Location::new_p_l_c(0, 1, 1),
                     name: "prefix".to_owned(),
-                    args: vec!["path".to_owned()],
+                    args: args!["path"],
                 }),],
             }
         );
@@ -104,7 +106,7 @@ mod tests {
                 statements: vec![Statement::Command(Invocation {
                     location: lexer::Location::new_p_l_c(0, 1, 1),
                     name: "prefix".to_owned(),
-                    args: vec!["path".to_owned()],
+                    args: args!["path"],
                 }),],
             }
         );
@@ -120,12 +122,12 @@ mod tests {
                     Statement::Command(Invocation {
                         location: lexer::Location::new_p_l_c(0, 1, 1),
                         name: "prefix".to_owned(),
-                        args: vec!["path".to_owned()],
+                        args: args!["path"],
                     }),
                     Statement::Command(Invocation {
                         location: lexer::Location::new_p_l_c(12, 2, 1),
                         name: "another".to_owned(),
-                        args: vec!["line".to_owned()],
+                        args: args!["line"],
                     }),
                 ],
             }
@@ -150,12 +152,12 @@ mod tests {
                     Statement::Command(Invocation {
                         location: lexer::Location::new_p_l_c(17, 2, 17),
                         name: "command".into(),
-                        args: vec!["one".into()]
+                        args: args!["one"],
                     }),
                     Statement::Command(Invocation {
                         location: lexer::Location::new_p_l_c(46, 4, 17),
                         name: "command".into(),
-                        args: vec!["two".into()]
+                        args: args!["two"],
                     }),
                 ],
             }
@@ -179,16 +181,16 @@ mod tests {
                     Statement::Command(Invocation {
                         location: lexer::Location::new_p_l_c(17, 2, 17),
                         name: "symlink".to_owned(),
-                        args: vec![
-                            "some/path".to_owned(),
-                            "and".to_owned(),
-                            "another".to_owned(),
+                        args: args![
+                            "some/path",
+                            "and",
+                            "another",
                         ],
                     }),
                     Statement::Command(Invocation {
                         location: lexer::Location::new_p_l_c(67, 3, 17),
                         name: "another_command".to_owned(),
-                        args: Vec::new(),
+                        args: args![],
                     }),
                 ],
             }
@@ -214,12 +216,12 @@ mod tests {
                     conditional: Invocation {
                         location: lexer::Location::new_p_l_c(20, 2, 20),
                         name: "cond".to_owned(),
-                        args: Vec::new(),
+                        args: args![],
                     },
                     statements: vec![Statement::Command(Invocation {
                         location: lexer::Location::new_p_l_c(47, 3, 21),
                         name: "statement".to_owned(),
-                        args: Vec::new(),
+                        args: args![],
                     })],
                     else_statements: Vec::new(),
                 }),],
@@ -246,12 +248,12 @@ mod tests {
                     conditional: Invocation {
                         location: lexer::Location::new_p_l_c(20, 2, 20),
                         name: "cond".to_owned(),
-                        args: vec!["with".to_owned(), "args".to_owned(),],
+                        args: args!["with", "args"],
                     },
                     statements: vec![Statement::Command(Invocation {
                         location: lexer::Location::new_p_l_c(57, 3, 21),
                         name: "statement".to_owned(),
-                        args: Vec::new(),
+                        args: args![],
                     })],
                     else_statements: Vec::new(),
                 }),],
@@ -280,17 +282,17 @@ mod tests {
                     conditional: Invocation {
                         location: lexer::Location::new_p_l_c(20, 2, 20),
                         name: "cond".to_owned(),
-                        args: Vec::new(),
+                        args: args![],
                     },
                     statements: vec![Statement::Command(Invocation {
                         location: lexer::Location::new_p_l_c(47, 3, 21),
                         name: "statement".to_owned(),
-                        args: Vec::new(),
+                        args: args![],
                     })],
                     else_statements: vec![Statement::Command(Invocation {
                         location: lexer::Location::new_p_l_c(102, 5, 21),
                         name: "alternative".to_owned(),
-                        args: vec!["statement".to_owned(),],
+                        args: args!["statement"],
                     })],
                 }),],
             }
@@ -318,19 +320,19 @@ mod tests {
                     conditional: Invocation {
                         location: lexer::Location::new_p_l_c(20, 2, 20),
                         name: "cond".to_owned(),
-                        args: vec!["one".to_owned(),],
+                        args: args!["one"],
                     },
                     statements: vec![Statement::IfStatement(IfStatement {
                         location: lexer::Location::new_p_l_c(51, 3, 21),
                         conditional: Invocation {
                             location: lexer::Location::new_p_l_c(54, 3, 24),
                             name: "cond".to_owned(),
-                            args: vec!["two".to_owned(),],
+                            args: args!["two"],
                         },
                         statements: vec![Statement::Command(Invocation {
                             location: lexer::Location::new_p_l_c(89, 4, 25),
                             name: "statement".to_owned(),
-                            args: Vec::new(),
+                            args: args![],
                         }),],
                         else_statements: Vec::new(),
                     })],

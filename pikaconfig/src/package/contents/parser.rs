@@ -42,7 +42,7 @@ pub fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<engine::Stateme
                     workdir,
                     manifest_path,
                     cmd.name,
-                    &cmd.args.iter().map(String::as_str).collect::<Vec<_>>(),
+                    &cmd.args.0.iter().map(String::as_str).collect::<Vec<_>>(),
                 )?);
             }
             ast::Statement::IfStatement(_if_st) => {
