@@ -23,6 +23,7 @@ impl Context {
     }
 }
 
+// TODO: rename Parser into something better
 /// Parses a Statement.
 /// This should be purely syntactical.
 pub trait Parser: Sync + Send {
@@ -32,6 +33,20 @@ pub trait Parser: Sync + Send {
 }
 
 pub type ParserBox = Box<dyn Parser>;
+
+pub trait ConditionBuilder: Sync + Send {
+    fn name(&self) -> String;
+    fn help(&self) -> String;
+    fn build(&self, workdir: &Path, args: &[&str]) -> Result<ConditionBox>;
+}
+
+pub type ConditionBuilderBox = Box<dyn ConditionBuilder>;
+
+pub trait Condition: std::fmt::Debug {
+    fn eval(&self, ctx: &engine::Context) -> Result<bool>;
+}
+
+pub type ConditionBox = Box<dyn Condition>;
 
 /// Command creates a Module or modifies State.
 pub trait Statement: std::fmt::Debug {
@@ -52,10 +67,22 @@ pub fn parse(workdir: &Path, command: &str, args: &[&str]) -> Result<StatementBo
     parser.parse(workdir, args)
 }
 
+pub fn new_condition(workdir: &Path, name: &str, args: &[&str]) -> Result<ConditionBox> {
+    let builder = super::inventory::condition(name)?;
+    builder.build(workdir, args)
+}
+
 pub fn help() -> String {
     let mut help = String::new();
+    help.push_str("## Commands\n");
     for parser in super::inventory::parsers() {
         help.push_str(parser.help().trim_end());
+        help.push('\n');
+    }
+    help.push('\n');
+    help.push_str("## Conditions\n");
+    for condition in super::inventory::conditions() {
+        help.push_str(condition.help().trim());
         help.push('\n');
     }
     help

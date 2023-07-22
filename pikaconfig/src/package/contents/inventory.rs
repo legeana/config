@@ -8,6 +8,7 @@ use super::engine;
 
 pub trait Registry {
     fn register_command(&mut self, parser: engine::ParserBox);
+    fn register_condition(&mut self, builder: engine::ConditionBuilderBox);
     fn register_render_helper(&mut self, render_helper: Box<dyn RenderHelper>);
 }
 
@@ -19,6 +20,8 @@ pub trait RenderHelper: Sync + Send {
 struct RegistryImpl {
     commands: HashMap<String, engine::ParserBox>,
     commands_order: Vec<String>,
+    conditions: HashMap<String, engine::ConditionBuilderBox>,
+    conditions_order: Vec<String>,
     render_helpers: Vec<Box<dyn RenderHelper>>,
 }
 
@@ -30,6 +33,14 @@ impl Registry for RegistryImpl {
             panic!("parser name conflict: {:?}", former.name());
         }
         self.commands_order.push(name);
+    }
+    fn register_condition(&mut self, builder: engine::ConditionBuilderBox) {
+        let name = builder.name();
+        let former = self.conditions.insert(builder.name(), builder);
+        if let Some(former) = former {
+            panic!("ConditionBuilder name conflict: {:?}", former.name());
+        }
+        self.conditions_order.push(name);
     }
     fn register_render_helper(&mut self, render_helper: Box<dyn RenderHelper>) {
         self.render_helpers.push(render_helper);
@@ -91,6 +102,24 @@ pub fn parser(name: &str) -> Result<&dyn engine::Parser> {
         .map(|p| p.as_ref())
 }
 
+pub fn conditions() -> impl Iterator<Item = &'static engine::ConditionBuilderBox> {
+    registry()
+        .conditions_order.iter().map(|name| {
+            registry()
+                .conditions
+                .get(name)
+                .expect("conditions_order must match conditions")
+        })
+}
+
+pub fn condition(name: &str) -> Result<&dyn engine::ConditionBuilder> {
+    registry()
+        .conditions
+        .get(name)
+        .ok_or_else(|| anyhow!("unknown condition {name}"))
+        .map(|p| p.as_ref())
+}
+
 pub fn register_render_helpers(tera: &mut Tera) {
     for rh in &registry().render_helpers {
         rh.register_render_helper(tera);
@@ -105,5 +134,11 @@ mod tests {
     fn test_parsers_index() {
         assert_eq!(registry().commands.len(), registry().commands_order.len());
         assert_eq!(parsers().count(), registry().commands.len());
+    }
+
+    #[test]
+    fn test_conditions_index() {
+        assert_eq!(registry().conditions.len(), registry().conditions_order.len());
+        assert_eq!(conditions().count(), registry().conditions.len());
     }
 }
