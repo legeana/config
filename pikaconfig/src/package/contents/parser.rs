@@ -4,6 +4,7 @@ use anyhow::{Context, Result};
 
 use crate::module::ModuleBox;
 
+use super::args::Arguments;
 use super::ast;
 use super::engine;
 
@@ -42,7 +43,7 @@ pub fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<engine::Stateme
                     workdir,
                     manifest_path,
                     cmd.name,
-                    &cmd.args.0.iter().map(String::as_str).collect::<Vec<_>>(),
+                    &cmd.args,
                 )?);
             }
             ast::Statement::IfStatement(_if_st) => {
@@ -58,10 +59,10 @@ pub fn parse_statement(
     workdir: &Path,
     manifest_path: &Path,
     cmd: impl AsRef<str>,
-    args: &[&str],
+    args: &Arguments,
 ) -> Result<engine::StatementBox> {
     // TODO: use the actual source
-    let line = shlex::join(std::iter::once(cmd.as_ref()).chain(args.iter().copied()));
+    let line = shlex::join(std::iter::once(cmd.as_ref()).chain(args.0.iter().map(String::as_str)));
     let statement = engine::parse(workdir, cmd.as_ref(), args).with_context(|| {
         format!("failed to parse line {line_num} {line:?} from {manifest_path:?}")
     })?;

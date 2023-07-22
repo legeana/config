@@ -31,6 +31,9 @@ pub trait Parser: Sync + Send {
     fn name(&self) -> String;
     fn help(&self) -> String;
     fn parse(&self, workdir: &Path, args: &[&str]) -> Result<StatementBox>;
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<StatementBox> {
+        self.parse(workdir, &args.0.iter().map(String::as_str).collect::<Vec<_>>())
+    }
 }
 
 pub type ParserBox = Box<dyn Parser>;
@@ -60,12 +63,14 @@ pub fn parse_args(workdir: &Path, args: &[&str]) -> Result<StatementBox> {
     if args.is_empty() {
         return Err(anyhow!("command with no args[0] should not exist"));
     }
-    parse(workdir, args[0], &args[1..])
+    let name = args[0];
+    let args = Arguments(args[1..].iter().cloned().map(String::from).collect());
+    parse(workdir, name, &args)
 }
 
-pub fn parse(workdir: &Path, command: &str, args: &[&str]) -> Result<StatementBox> {
+pub fn parse(workdir: &Path, command: &str, args: &Arguments) -> Result<StatementBox> {
     let parser = super::inventory::parser(command)?;
-    parser.parse(workdir, args)
+    parser.build(workdir, args)
 }
 
 pub fn new_condition(workdir: &Path, name: &str, args: &Arguments) -> Result<ConditionBox> {
