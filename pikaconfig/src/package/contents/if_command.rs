@@ -11,6 +11,34 @@ use super::args::Arguments;
 use super::engine;
 use super::inventory;
 
+#[derive(Debug)]
+struct IsCommand(String);
+
+impl engine::Condition for IsCommand {
+    fn eval(&self, _ctx: &engine::Context) -> Result<bool> {
+        is_command(&self.0)
+    }
+}
+
+#[derive(Clone, Debug)]
+struct IsCommandBuilder;
+
+impl engine::ConditionBuilder for IsCommandBuilder {
+    fn name(&self) -> String {
+        "is_command".to_owned()
+    }
+    fn help(&self) -> String {
+        formatdoc! {"
+            {command} <executable>
+                true if <executable> is an executable command
+        ", command=self.name()}
+    }
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::ConditionBox> {
+        let exe = args.expect_single_arg(self.name())?.to_owned();
+        Ok(Box::new(IsCommand(exe)))
+    }
+}
+
 struct IfCommand {
     executable: String,
     cmd: ModuleBox,
@@ -84,5 +112,6 @@ impl engine::CommandBuilder for IfCommandBuilder {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(IfCommandBuilder {}));
+    registry.register_command(Box::new(IfCommandBuilder));
+    registry.register_condition(Box::new(IsCommandBuilder));
 }
