@@ -81,7 +81,7 @@ impl Statement for ConfigurationStatement {
     }
 }
 
-// Analogous to engine::Parser, but can only be called from code.
+// Analogous to engine::CommandBuilder, but can only be called from code.
 impl ConfigurationStatement {
     pub fn parse(root: PathBuf) -> Result<StatementBox> {
         let manifest = root.join(MANIFEST);

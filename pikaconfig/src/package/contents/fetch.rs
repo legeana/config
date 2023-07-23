@@ -84,9 +84,9 @@ impl engine::Statement for FetchIntoStatement {
 }
 
 #[derive(Clone)]
-struct FetchIntoParser;
+struct FetchIntoBuilder;
 
-impl engine::Parser for FetchIntoParser {
+impl engine::CommandBuilder for FetchIntoBuilder {
     fn name(&self) -> String {
         "fetch_into".to_owned()
     }
@@ -108,9 +108,9 @@ impl engine::Parser for FetchIntoParser {
 }
 
 #[derive(Clone)]
-struct FetchExeIntoParser;
+struct FetchExeIntoBuilder;
 
-impl engine::Parser for FetchExeIntoParser {
+impl engine::CommandBuilder for FetchExeIntoBuilder {
     fn name(&self) -> String {
         "fetch_exe_into".to_owned()
     }
@@ -132,6 +132,6 @@ impl engine::Parser for FetchExeIntoParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(FetchIntoParser {}));
-    registry.register_command(Box::new(FetchExeIntoParser {}));
+    registry.register_command(Box::new(FetchIntoBuilder {}));
+    registry.register_command(Box::new(FetchExeIntoBuilder {}));
 }

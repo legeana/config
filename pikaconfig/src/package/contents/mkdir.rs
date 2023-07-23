@@ -39,9 +39,9 @@ impl engine::Statement for MkDirStatement {
 }
 
 #[derive(Clone)]
-struct MkDirParser;
+struct MkDirBuilder;
 
-impl engine::Parser for MkDirParser {
+impl engine::CommandBuilder for MkDirBuilder {
     fn name(&self) -> String {
         "mkdir".to_owned()
     }
@@ -58,5 +58,5 @@ impl engine::Parser for MkDirParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(MkDirParser {}));
+    registry.register_command(Box::new(MkDirBuilder {}));
 }

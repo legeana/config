@@ -38,17 +38,17 @@ impl engine::Statement for IfOsStatement {
 }
 
 #[derive(Clone)]
-struct IfOsParser {
+struct IfOsBuilder {
     os: &'static str,
 }
 
-impl IfOsParser {
+impl IfOsBuilder {
     fn command(&self) -> String {
         format!("if_{}", self.os)
     }
 }
 
-impl engine::Parser for IfOsParser {
+impl engine::CommandBuilder for IfOsBuilder {
     fn name(&self) -> String {
         self.command()
     }
@@ -68,7 +68,7 @@ impl engine::Parser for IfOsParser {
     }
 }
 
-impl inventory::RenderHelper for IfOsParser {
+impl inventory::RenderHelper for IfOsBuilder {
     fn register_render_helper(&self, tera: &mut tera::Tera) {
         let name = format!("is_{}", self.os);
         let os = self.os.to_owned();
@@ -78,10 +78,10 @@ impl inventory::RenderHelper for IfOsParser {
 
 pub fn register(registry: &mut dyn inventory::Registry) {
     let parsers = [
-        IfOsParser { os: "macos" },
-        IfOsParser { os: "linux" },
-        IfOsParser { os: "unix" },
-        IfOsParser { os: "windows" },
+        IfOsBuilder { os: "macos" },
+        IfOsBuilder { os: "linux" },
+        IfOsBuilder { os: "unix" },
+        IfOsBuilder { os: "windows" },
     ];
     for parser in parsers {
         registry.register_command(Box::new(parser.clone()));

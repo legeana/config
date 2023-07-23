@@ -63,9 +63,9 @@ impl engine::Statement for PostInstallStatement {
 }
 
 #[derive(Clone)]
-struct PostInstallExecParser;
+struct PostInstallExecBuilder;
 
-impl engine::Parser for PostInstallExecParser {
+impl engine::CommandBuilder for PostInstallExecBuilder {
     fn name(&self) -> String {
         "post_install_exec".to_owned()
     }
@@ -87,9 +87,9 @@ impl engine::Parser for PostInstallExecParser {
 }
 
 #[derive(Clone)]
-struct PostInstallUpdateParser;
+struct PostInstallUpdateBuilder;
 
-impl engine::Parser for PostInstallUpdateParser {
+impl engine::CommandBuilder for PostInstallUpdateBuilder {
     fn name(&self) -> String {
         "post_install_update".to_owned()
     }
@@ -112,6 +112,6 @@ impl engine::Parser for PostInstallUpdateParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(PostInstallExecParser {}));
-    registry.register_command(Box::new(PostInstallUpdateParser {}));
+    registry.register_command(Box::new(PostInstallExecBuilder {}));
+    registry.register_command(Box::new(PostInstallUpdateBuilder {}));
 }

@@ -29,9 +29,9 @@ impl engine::Statement for RequiresStatement {
 }
 
 #[derive(Clone)]
-struct RequiresParser;
+struct RequiresBuilder;
 
-impl engine::Parser for RequiresParser {
+impl engine::CommandBuilder for RequiresBuilder {
     fn name(&self) -> String {
         "requires".to_owned()
     }
@@ -68,9 +68,9 @@ impl engine::Statement for ConflictsStatement {
 }
 
 #[derive(Clone)]
-struct ConflictsParser;
+struct ConflictsBuilder;
 
-impl engine::Parser for ConflictsParser {
+impl engine::CommandBuilder for ConflictsBuilder {
     fn name(&self) -> String {
         "conflicts".to_owned()
     }
@@ -89,6 +89,6 @@ impl engine::Parser for ConflictsParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(RequiresParser {}));
-    registry.register_command(Box::new(ConflictsParser {}));
+    registry.register_command(Box::new(RequiresBuilder {}));
+    registry.register_command(Box::new(ConflictsBuilder {}));
 }

@@ -52,9 +52,9 @@ impl engine::Statement for SymlinkTreeStatement {
 }
 
 #[derive(Clone)]
-struct SymlinkTreeParser;
+struct SymlinkTreeBuilder;
 
-impl engine::Parser for SymlinkTreeParser {
+impl engine::CommandBuilder for SymlinkTreeBuilder {
     fn name(&self) -> String {
         "symlink_tree".to_owned()
     }
@@ -74,5 +74,5 @@ impl engine::Parser for SymlinkTreeParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(SymlinkTreeParser {}));
+    registry.register_command(Box::new(SymlinkTreeBuilder {}));
 }

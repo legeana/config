@@ -124,9 +124,9 @@ impl engine::Statement for ImporterStatement {
 }
 
 #[derive(Clone)]
-struct ImporterParser;
+struct ImporteBuilder;
 
-impl engine::Parser for ImporterParser {
+impl engine::CommandBuilder for ImporteBuilder {
     fn name(&self) -> String {
         "import_from".to_owned()
     }
@@ -146,5 +146,5 @@ impl engine::Parser for ImporterParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(ImporterParser {}));
+    registry.register_command(Box::new(ImporteBuilder {}));
 }

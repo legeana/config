@@ -90,9 +90,9 @@ impl engine::Statement for GitCloneStatement {
 }
 
 #[derive(Clone)]
-struct GitCloneParser;
+struct GitCloneBuilder;
 
-impl engine::Parser for GitCloneParser {
+impl engine::CommandBuilder for GitCloneBuilder {
     fn name(&self) -> String {
         "git_clone".to_owned()
     }
@@ -113,5 +113,5 @@ impl engine::Parser for GitCloneParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(GitCloneParser {}));
+    registry.register_command(Box::new(GitCloneBuilder {}));
 }

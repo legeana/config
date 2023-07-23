@@ -52,9 +52,9 @@ impl engine::Statement for SetContentsStatement {
 }
 
 #[derive(Clone)]
-struct SetContentsParser;
+struct SetContentsBuilder;
 
-impl engine::Parser for SetContentsParser {
+impl engine::CommandBuilder for SetContentsBuilder {
     fn name(&self) -> String {
         "set_contents".to_owned()
     }
@@ -74,5 +74,5 @@ impl engine::Parser for SetContentsParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(SetContentsParser {}));
+    registry.register_command(Box::new(SetContentsBuilder {}));
 }

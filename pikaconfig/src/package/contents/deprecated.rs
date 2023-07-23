@@ -17,9 +17,9 @@ impl engine::Statement for NoOpStatement {
 }
 
 #[derive(Clone)]
-struct DeprecatedParser(&'static str);
+struct DeprecatedBuilder(&'static str);
 
-impl engine::Parser for DeprecatedParser {
+impl engine::CommandBuilder for DeprecatedBuilder {
     fn name(&self) -> String {
         "deprecated commands, do not use".to_owned()
     }
@@ -36,5 +36,5 @@ impl engine::Parser for DeprecatedParser {
 }
 
 pub fn register(_registry: &mut dyn inventory::Registry) {
-    //registry.register_command(Box::new(DeprecatedParser("<deprecated>")));
+    //registry.register_command(Box::new(DeprecatedBuilder("<deprecated>")));
 }

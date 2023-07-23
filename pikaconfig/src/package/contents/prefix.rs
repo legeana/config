@@ -22,9 +22,9 @@ impl engine::Statement for PrefixStatement {
 }
 
 #[derive(Clone)]
-struct PrefixParser;
+struct PrefixBuilder;
 
-impl engine::Parser for PrefixParser {
+impl engine::CommandBuilder for PrefixBuilder {
     fn name(&self) -> String {
         "prefix".to_owned()
     }
@@ -41,5 +41,5 @@ impl engine::Parser for PrefixParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(PrefixParser {}));
+    registry.register_command(Box::new(PrefixBuilder {}));
 }

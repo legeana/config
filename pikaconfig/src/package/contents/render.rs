@@ -64,9 +64,9 @@ impl engine::Statement for RenderStatement {
 }
 
 #[derive(Clone)]
-struct RenderParser;
+struct RenderBuilder;
 
-impl engine::Parser for RenderParser {
+impl engine::CommandBuilder for RenderBuilder {
     fn name(&self) -> String {
         "render".to_owned()
     }
@@ -87,9 +87,9 @@ impl engine::Parser for RenderParser {
 }
 
 #[derive(Clone)]
-struct RenderToParser;
+struct RenderToBuilder;
 
-impl engine::Parser for RenderToParser {
+impl engine::CommandBuilder for RenderToBuilder {
     fn name(&self) -> String {
         "render_to".to_owned()
     }
@@ -110,6 +110,6 @@ impl engine::Parser for RenderToParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(RenderParser {}));
-    registry.register_command(Box::new(RenderToParser {}));
+    registry.register_command(Box::new(RenderBuilder {}));
+    registry.register_command(Box::new(RenderToBuilder {}));
 }

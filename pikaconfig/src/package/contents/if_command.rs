@@ -59,9 +59,9 @@ impl engine::Statement for IfCommandStatement {
 }
 
 #[derive(Clone)]
-struct IfCommandParser;
+struct IfCommandBuilder;
 
-impl engine::Parser for IfCommandParser {
+impl engine::CommandBuilder for IfCommandBuilder {
     fn name(&self) -> String {
         "if_command".to_owned()
     }
@@ -83,5 +83,5 @@ impl engine::Parser for IfCommandParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(IfCommandParser {}));
+    registry.register_command(Box::new(IfCommandBuilder {}));
 }

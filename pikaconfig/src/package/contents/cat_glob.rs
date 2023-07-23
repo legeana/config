@@ -72,9 +72,9 @@ impl engine::Statement for CatGlobIntoStatement {
 }
 
 #[derive(Clone)]
-struct CatGlobIntoParser;
+struct CatGlobIntoBuilder;
 
-impl engine::Parser for CatGlobIntoParser {
+impl engine::CommandBuilder for CatGlobIntoBuilder {
     fn name(&self) -> String {
         "cat_glob_into".to_owned()
     }
@@ -98,5 +98,5 @@ impl engine::Parser for CatGlobIntoParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(CatGlobIntoParser {}));
+    registry.register_command(Box::new(CatGlobIntoBuilder {}));
 }

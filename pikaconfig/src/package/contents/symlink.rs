@@ -39,9 +39,9 @@ impl engine::Statement for SymlinkStatement {
 }
 
 #[derive(Clone)]
-struct SymlinkParser;
+struct SymlinkBuilder;
 
-impl engine::Parser for SymlinkParser {
+impl engine::CommandBuilder for SymlinkBuilder {
     fn name(&self) -> String {
         "symlink".to_owned()
     }
@@ -62,9 +62,9 @@ impl engine::Parser for SymlinkParser {
 }
 
 #[derive(Clone)]
-struct SymlinkToParser;
+struct SymlinkToBuilder;
 
-impl engine::Parser for SymlinkToParser {
+impl engine::CommandBuilder for SymlinkToBuilder {
     fn name(&self) -> String {
         "symlink_to".to_owned()
     }
@@ -85,6 +85,6 @@ impl engine::Parser for SymlinkToParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(SymlinkParser {}));
-    registry.register_command(Box::new(SymlinkToParser {}));
+    registry.register_command(Box::new(SymlinkBuilder {}));
+    registry.register_command(Box::new(SymlinkToBuilder {}));
 }

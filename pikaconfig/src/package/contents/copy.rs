@@ -52,9 +52,9 @@ impl engine::Statement for CopyStatement {
 }
 
 #[derive(Clone)]
-struct CopyParser;
+struct CopyBuilder;
 
-impl engine::Parser for CopyParser {
+impl engine::CommandBuilder for CopyBuilder {
     fn name(&self) -> String {
         "copy".to_owned()
     }
@@ -74,5 +74,5 @@ impl engine::Parser for CopyParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(CopyParser {}));
+    registry.register_command(Box::new(CopyBuilder {}));
 }

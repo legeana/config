@@ -27,9 +27,9 @@ impl engine::Statement for SubdirStatement {
 }
 
 #[derive(Clone)]
-struct SubdirParser;
+struct SubdirBuilder;
 
-impl engine::Parser for SubdirParser {
+impl engine::CommandBuilder for SubdirBuilder {
     fn name(&self) -> String {
         "subdir".to_owned()
     }
@@ -67,9 +67,9 @@ impl engine::Statement for SubdirsStatement {
 }
 
 #[derive(Clone)]
-struct SubdirsParser;
+struct SubdirsBuilder;
 
-impl engine::Parser for SubdirsParser {
+impl engine::CommandBuilder for SubdirsBuilder {
     fn name(&self) -> String {
         "subdirs".to_owned()
     }
@@ -103,6 +103,6 @@ impl engine::Parser for SubdirsParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(SubdirParser {}));
-    registry.register_command(Box::new(SubdirsParser {}));
+    registry.register_command(Box::new(SubdirBuilder {}));
+    registry.register_command(Box::new(SubdirsBuilder {}));
 }

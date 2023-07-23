@@ -38,12 +38,12 @@ struct DirsPrefixParams {
 }
 
 #[derive(Clone)]
-struct DirsPrefixParser {
+struct DirsPrefixBuilder {
     command: &'static str,
     base_dir: Option<PathBuf>,
 }
 
-impl engine::Parser for DirsPrefixParser {
+impl engine::CommandBuilder for DirsPrefixBuilder {
     fn name(&self) -> String {
         self.command.to_owned()
     }
@@ -63,13 +63,13 @@ impl engine::Parser for DirsPrefixParser {
     }
 }
 
-impl inventory::RenderHelper for DirsPrefixParser {
+impl inventory::RenderHelper for DirsPrefixBuilder {
     fn register_render_helper(&self, tera: &mut tera::Tera) {
         let Some(base_dir) = self.base_dir.clone() else {
             return;
         };
         tera.register_function(
-            &engine::Parser::name(self),
+            &engine::CommandBuilder::name(self),
             tera_helper::wrap_fn(move |args: &DirsPrefixParams| {
                 Ok(match args.path {
                     Some(ref path) => base_dir.join(path),
@@ -82,117 +82,117 @@ impl inventory::RenderHelper for DirsPrefixParser {
 
 pub fn register(registry: &mut dyn inventory::Registry) {
     let parsers = [
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "audio_prefix",
             base_dir: dirs::audio_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "cache_prefix",
             base_dir: dirs::cache_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "config_prefix",
             base_dir: dirs::config_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "config_local_prefix",
             base_dir: dirs::config_local_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "data_prefix",
             base_dir: dirs::data_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "data_local_prefix",
             base_dir: dirs::data_local_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "desktop_prefix",
             base_dir: dirs::desktop_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "document_prefix",
             base_dir: dirs::document_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "download_prefix",
             base_dir: dirs::download_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "executable_prefix",
             base_dir: dirs::executable_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "font_prefix",
             base_dir: dirs::font_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "home_prefix",
             base_dir: dirs::home_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "picture_prefix",
             base_dir: dirs::picture_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "preference_prefix",
             base_dir: dirs::preference_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "public_prefix",
             base_dir: dirs::public_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "runtime_prefix",
             base_dir: dirs::runtime_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "state_prefix",
             base_dir: dirs::state_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "template_prefix",
             base_dir: dirs::template_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "video_prefix",
             base_dir: dirs::video_dir(),
         },
         // XDG
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "xdg_cache_prefix",
             base_dir: xdg::cache_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "xdg_config_prefix",
             base_dir: xdg::config_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "xdg_data_prefix",
             base_dir: xdg::data_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "xdg_state_prefix",
             base_dir: xdg::state_dir(),
         },
         // XDG (for UNIX) or Windows.
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "xdg_or_win_cache_prefix",
             base_dir: xdg_or_win::cache_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "xdg_or_win_config_prefix",
             base_dir: xdg_or_win::config_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "xdg_or_win_config_local_prefix",
             base_dir: xdg_or_win::config_local_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "xdg_or_win_data_prefix",
             base_dir: xdg_or_win::data_dir(),
         },
-        DirsPrefixParser {
+        DirsPrefixBuilder {
             command: "xdg_or_win_data_local_prefix",
             base_dir: xdg_or_win::data_local_dir(),
         },

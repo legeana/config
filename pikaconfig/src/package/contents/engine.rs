@@ -27,7 +27,7 @@ impl Context {
 // TODO: rename Parser into something better
 /// Parses a Statement.
 /// This should be purely syntactical.
-pub trait Parser: Sync + Send {
+pub trait CommandBuilder: Sync + Send {
     fn name(&self) -> String;
     fn help(&self) -> String;
     fn parse(&self, workdir: &Path, args: &[&str]) -> Result<StatementBox>;
@@ -36,7 +36,7 @@ pub trait Parser: Sync + Send {
     }
 }
 
-pub type ParserBox = Box<dyn Parser>;
+pub type CommandBuilderBox = Box<dyn CommandBuilder>;
 
 pub trait ConditionBuilder: Sync + Send {
     fn name(&self) -> String;

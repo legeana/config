@@ -61,9 +61,9 @@ impl engine::Statement for IfMissingStatement {
 }
 
 #[derive(Clone)]
-struct IfMissingParser;
+struct IfMissingBuilder;
 
-impl engine::Parser for IfMissingParser {
+impl engine::CommandBuilder for IfMissingBuilder {
     fn name(&self) -> String {
         "if_missing".to_owned()
     }
@@ -84,5 +84,5 @@ impl engine::Parser for IfMissingParser {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(IfMissingParser {}));
+    registry.register_command(Box::new(IfMissingBuilder {}));
 }

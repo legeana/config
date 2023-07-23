@@ -7,7 +7,7 @@ use tera::Tera;
 use super::engine;
 
 pub trait Registry {
-    fn register_command(&mut self, parser: engine::ParserBox);
+    fn register_command(&mut self, parser: engine::CommandBuilderBox);
     fn register_condition(&mut self, builder: engine::ConditionBuilderBox);
     fn register_render_helper(&mut self, render_helper: Box<dyn RenderHelper>);
 }
@@ -18,7 +18,7 @@ pub trait RenderHelper: Sync + Send {
 
 #[derive(Default)]
 struct RegistryImpl {
-    commands: HashMap<String, engine::ParserBox>,
+    commands: HashMap<String, engine::CommandBuilderBox>,
     commands_order: Vec<String>,
     conditions: HashMap<String, engine::ConditionBuilderBox>,
     conditions_order: Vec<String>,
@@ -26,7 +26,7 @@ struct RegistryImpl {
 }
 
 impl Registry for RegistryImpl {
-    fn register_command(&mut self, parser: engine::ParserBox) {
+    fn register_command(&mut self, parser: engine::CommandBuilderBox) {
         let name = parser.name();
         let former = self.commands.insert(parser.name(), parser);
         if let Some(former) = former {
@@ -85,7 +85,7 @@ fn registry() -> &'static RegistryImpl {
     })
 }
 
-pub fn parsers() -> impl Iterator<Item = &'static engine::ParserBox> {
+pub fn parsers() -> impl Iterator<Item = &'static engine::CommandBuilderBox> {
     registry().commands_order.iter().map(|name| {
         registry()
             .commands
@@ -94,7 +94,7 @@ pub fn parsers() -> impl Iterator<Item = &'static engine::ParserBox> {
     })
 }
 
-pub fn parser(name: &str) -> Result<&dyn engine::Parser> {
+pub fn parser(name: &str) -> Result<&dyn engine::CommandBuilder> {
     registry()
         .commands
         .get(name)
