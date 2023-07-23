@@ -44,14 +44,8 @@ mod tests {
     #[test]
     fn test_multiple_args_trailing_comma() {
         assert_eq!(
-            args![
-                "test 1",
-                "test 2",
-            ],
-            Arguments(vec![
-                "test 1".to_owned(),
-                "test 2".to_owned(),
-            ])
+            args!["test 1", "test 2",],
+            Arguments(vec!["test 1".to_owned(), "test 2".to_owned(),])
         );
     }
 }

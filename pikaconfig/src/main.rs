@@ -55,8 +55,11 @@ struct Cli {
     no_update: bool,
     #[clap(subcommand)]
     command: Commands,
-    #[clap(short = 'k', long,
-           help = "Don't interrupt installation process if a package fails")]
+    #[clap(
+        short = 'k',
+        long,
+        help = "Don't interrupt installation process if a package fails"
+    )]
     keep_going: bool,
 }
 

@@ -103,13 +103,12 @@ pub fn parser(name: &str) -> Result<&dyn engine::CommandBuilder> {
 }
 
 pub fn conditions() -> impl Iterator<Item = &'static engine::ConditionBuilderBox> {
-    registry()
-        .conditions_order.iter().map(|name| {
-            registry()
-                .conditions
-                .get(name)
-                .expect("conditions_order must match conditions")
-        })
+    registry().conditions_order.iter().map(|name| {
+        registry()
+            .conditions
+            .get(name)
+            .expect("conditions_order must match conditions")
+    })
 }
 
 pub fn condition(name: &str) -> Result<&dyn engine::ConditionBuilder> {
@@ -138,7 +137,10 @@ mod tests {
 
     #[test]
     fn test_conditions_index() {
-        assert_eq!(registry().conditions.len(), registry().conditions_order.len());
+        assert_eq!(
+            registry().conditions.len(),
+            registry().conditions_order.len()
+        );
         assert_eq!(conditions().count(), registry().conditions.len());
     }
 }

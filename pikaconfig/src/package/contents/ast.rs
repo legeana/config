@@ -46,8 +46,8 @@ pub struct IfStatement {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::super::args::args;
+    use super::*;
 
     #[test]
     fn test_empty_manifest() {
@@ -181,11 +181,7 @@ mod tests {
                     Statement::Command(Invocation {
                         location: lexer::Location::new_p_l_c(17, 2, 17),
                         name: "symlink".to_owned(),
-                        args: args![
-                            "some/path",
-                            "and",
-                            "another",
-                        ],
+                        args: args!["some/path", "and", "another",],
                     }),
                     Statement::Command(Invocation {
                         location: lexer::Location::new_p_l_c(67, 3, 17),

@@ -32,7 +32,9 @@ pub struct WantsCommand {
 
 impl WantsCommand {
     pub fn new(command: impl Into<PathBuf>) -> Self {
-        Self { command: command.into() }
+        Self {
+            command: command.into(),
+        }
     }
 }
 

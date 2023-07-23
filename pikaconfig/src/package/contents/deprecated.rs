@@ -27,10 +27,7 @@ impl engine::CommandBuilder for DeprecatedBuilder {
         "DEPRECATED: N/A".to_owned()
     }
     fn parse(&self, workdir: &Path, _args: &[&str]) -> Result<engine::StatementBox> {
-        log::warn!(
-            "{workdir:?}: {:?} is unsupported",
-            self.0
-        );
+        log::warn!("{workdir:?}: {:?} is unsupported", self.0);
         Ok(Box::new(NoOpStatement {}))
     }
 }

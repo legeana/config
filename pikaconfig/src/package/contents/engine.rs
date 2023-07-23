@@ -32,7 +32,10 @@ pub trait CommandBuilder: Sync + Send {
     fn help(&self) -> String;
     fn parse(&self, workdir: &Path, args: &[&str]) -> Result<StatementBox>;
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<StatementBox> {
-        self.parse(workdir, &args.0.iter().map(String::as_str).collect::<Vec<_>>())
+        self.parse(
+            workdir,
+            &args.0.iter().map(String::as_str).collect::<Vec<_>>(),
+        )
     }
 }
 
