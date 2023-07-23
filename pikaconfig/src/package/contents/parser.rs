@@ -38,7 +38,7 @@ pub fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<engine::Stateme
     for statement in manifest_ast.statements {
         match statement {
             ast::Statement::Command(cmd) => {
-                builders.push(parse_statement(
+                builders.push(parse_command(
                     cmd.location.line_number,
                     workdir,
                     manifest_path,
@@ -54,7 +54,7 @@ pub fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<engine::Stateme
     Ok(builders)
 }
 
-pub fn parse_statement(
+pub fn parse_command(
     line_num: usize,
     workdir: &Path,
     manifest_path: &Path,
