@@ -45,26 +45,40 @@ Invocation: ast::Invocation = {
 
 IfStatement: ast::IfStatement = {
     <start:@L>
+    <if_clause:IfClause>
+    <else_if_clauses:ElseIfClause*>
+    <else_statements:ElseClause?>
+    => ast::IfStatement {
+        location: start,
+        if_clause,
+        else_if_clauses,
+        else_statements: else_statements.unwrap_or_default(),
+    },
+};
+
+IfClause: ast::IfClause = {
+    <start:@L>
     If
     <condition:Invocation>
-    <statements:Block>
-    <else_statements:ElseBlock?>
-    => ast::IfStatement {
+    <statements:Block> => ast::IfClause {
         location: start,
         condition,
         statements,
-        else_statements: else_statements.unwrap_or_default(),
     },
+};
+
+ElseIfClause = {
+    Else <IfClause>,
+};
+
+ElseClause = {
+    Else <Block>,
 };
 
 Block = {
     Begin
     <StatementList>
     End
-};
-
-ElseBlock = {
-    Else <Block>
 };
 
 LineTerminator = {

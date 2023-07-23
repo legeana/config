@@ -6,6 +6,7 @@ use crate::module::ModuleBox;
 
 use super::ast;
 use super::engine;
+use super::engine::Statement;
 
 #[derive(Debug)]
 struct ParsedStatement {
@@ -27,16 +28,16 @@ impl engine::Statement for ParsedStatement {
 }
 
 #[derive(Debug)]
-struct IfStatement {
+struct IfClauseStatement {
     manifest_path: PathBuf,
     line: String,
     cond: engine::ConditionBox,
-    if_true: VecStatement,
-    if_false: VecStatement,
+    statements: VecStatement,
 }
 
-impl engine::Statement for IfStatement {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+impl IfClauseStatement {
+    /// Returns Some(_) if condition is true, None otherwise (try next IfClause).
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<Option<ModuleBox>>> {
         if self.cond.eval(ctx).with_context(|| {
             format!(
                 "failed to evaluate {manifest_path:?}: {line:?}",
@@ -44,10 +45,28 @@ impl engine::Statement for IfStatement {
                 line = self.line,
             )
         })? {
-            self.if_true.eval(ctx)
+            let opt_mod = self.statements.eval(ctx)?;
+            Ok(Some(opt_mod))
         } else {
-            self.if_false.eval(ctx)
+            Ok(None)
         }
+    }
+}
+
+#[derive(Debug)]
+struct IfStatement {
+    if_clauses: Vec<IfClauseStatement>,
+    else_clause: VecStatement,
+}
+
+impl engine::Statement for IfStatement {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+        for if_clause in &self.if_clauses {
+            if let Some(opt_mod) = if_clause.eval(ctx)? {
+                return Ok(opt_mod);
+            }
+        }
+        self.else_clause.eval(ctx)
     }
 }
 
@@ -95,7 +114,7 @@ pub fn parse_statements<'a>(
         .collect()
 }
 
-pub fn parse_command(
+fn parse_command(
     workdir: &Path,
     manifest_path: &Path,
     cmd: &ast::Invocation,
@@ -110,29 +129,49 @@ pub fn parse_command(
     }))
 }
 
-pub fn parse_if_statement(
+fn parse_if_clause(
+    workdir: &Path,
+    manifest_path: &Path,
+    if_clause: &ast::IfClause,
+) -> Result<IfClauseStatement> {
+    let line = if_clause.condition.to_string();
+    let cond = engine::new_condition(
+        workdir,
+        &if_clause.condition.name,
+        &if_clause.condition.args,
+    )
+    .with_context(|| format!("failed to parse {manifest_path:?} line: {line}"))?;
+    let statements = VecStatement(parse_statements(
+        workdir,
+        manifest_path,
+        if_clause.statements.iter(),
+    )?);
+    Ok(IfClauseStatement {
+        manifest_path: manifest_path.to_owned(),
+        line,
+        cond,
+        statements,
+    })
+}
+
+fn parse_if_statement(
     workdir: &Path,
     manifest_path: &Path,
     if_st: &ast::IfStatement,
 ) -> Result<engine::StatementBox> {
-    let line = if_st.condition.to_string();
-    let cond = engine::new_condition(workdir, &if_st.condition.name, &if_st.condition.args)
-        .with_context(|| format!("failed to parse {manifest_path:?} line: {line}"))?;
-    let if_true = VecStatement(parse_statements(
-        workdir,
-        manifest_path,
-        if_st.statements.iter(),
-    )?);
-    let if_false = VecStatement(parse_statements(
+    let mut if_clauses: Vec<IfClauseStatement> =
+        Vec::with_capacity(if_st.else_if_clauses.len() + 1);
+    if_clauses.push(parse_if_clause(workdir, manifest_path, &if_st.if_clause)?);
+    for if_clause in &if_st.else_if_clauses {
+        if_clauses.push(parse_if_clause(workdir, manifest_path, if_clause)?);
+    }
+    let else_clause = VecStatement(parse_statements(
         workdir,
         manifest_path,
         if_st.else_statements.iter(),
     )?);
     Ok(Box::new(IfStatement {
-        manifest_path: manifest_path.to_owned(),
-        line,
-        cond,
-        if_true,
-        if_false,
+        if_clauses,
+        else_clause,
     }))
 }
