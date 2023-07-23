@@ -7,6 +7,7 @@ use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 use crate::tera_helpers;
 
+use super::args::Arguments;
 use super::engine;
 use super::inventory;
 use super::local_state;
@@ -76,7 +77,7 @@ impl engine::CommandBuilder for RenderBuilder {
                 render template
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> anyhow::Result<engine::StatementBox> {
+    fn build(&self, workdir: &Path, args: &Arguments) -> anyhow::Result<engine::StatementBox> {
         let filename = util::single_arg(&self.name(), args)?;
         Ok(Box::new(RenderStatement {
             workdir: workdir.to_owned(),
@@ -99,7 +100,7 @@ impl engine::CommandBuilder for RenderToBuilder {
                 render template <filename> into <destination>
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
         let (dst, src) = util::double_arg(&self.name(), args)?;
         Ok(Box::new(RenderStatement {
             workdir: workdir.to_owned(),

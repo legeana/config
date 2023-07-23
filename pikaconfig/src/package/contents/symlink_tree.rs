@@ -3,6 +3,7 @@ use std::path::{Path, PathBuf};
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
+use super::args::Arguments;
 use super::engine;
 use super::file_util;
 use super::inventory;
@@ -64,7 +65,7 @@ impl engine::CommandBuilder for SymlinkTreeBuilder {
                 create a symlink for every file in a directory recursively
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
         let directory = util::single_arg(&self.name(), args)?.to_owned();
         Ok(Box::new(SymlinkTreeStatement {
             workdir: workdir.to_owned(),

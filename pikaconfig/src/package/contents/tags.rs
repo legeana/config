@@ -6,6 +6,7 @@ use indoc::formatdoc;
 use crate::module::ModuleBox;
 use crate::tag_util;
 
+use super::args::Arguments;
 use super::engine;
 use super::inventory;
 use super::util;
@@ -41,10 +42,10 @@ impl engine::CommandBuilder for RequiresBuilder {
                 do not process current directory if any of the tags is not present
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
         let (_, tags) = util::multiple_args(&self.name(), args, 0)?;
         Ok(Box::new(RequiresStatement {
-            tags: tags.iter().map(|&s| s.to_owned()).collect(),
+            tags: tags.to_vec(),
         }))
     }
 }
@@ -80,10 +81,10 @@ impl engine::CommandBuilder for ConflictsBuilder {
                 do not process current directory if any of the tags is present
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
         let (_, tags) = util::multiple_args(&self.name(), args, 0)?;
         Ok(Box::new(ConflictsStatement {
-            tags: tags.iter().map(|&s| s.to_owned()).collect(),
+            tags: tags.to_vec(),
         }))
     }
 }

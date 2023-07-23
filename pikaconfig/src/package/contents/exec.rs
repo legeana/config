@@ -5,6 +5,7 @@ use crate::module::{Module, ModuleBox, Rules};
 use crate::process_utils;
 use crate::registry::Registry;
 
+use super::args::Arguments;
 use super::engine;
 use super::inventory;
 use super::util;
@@ -75,13 +76,13 @@ impl engine::CommandBuilder for PostInstallExecBuilder {
                 execute a command in a post-install phase
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
         let (command, args) = util::multiple_args(&self.name(), args, 1)?;
         assert!(command.len() == 1);
         Ok(Box::new(PostInstallStatement {
             exec_condition: ExecCondition::Always,
             cmd: command[0].to_owned(),
-            args: args.iter().map(|&s| s.to_owned()).collect(),
+            args: args.to_vec(),
         }))
     }
 }
@@ -100,13 +101,13 @@ impl engine::CommandBuilder for PostInstallUpdateBuilder {
                 only if executed via 'setup update' command
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
         let (command, args) = util::multiple_args(&self.name(), args, 1)?;
         assert!(command.len() == 1);
         Ok(Box::new(PostInstallStatement {
             exec_condition: ExecCondition::UpdateOnly,
             cmd: command[0].to_owned(),
-            args: args.iter().map(|&s| s.to_owned()).collect(),
+            args: args.to_vec(),
         }))
     }
 }

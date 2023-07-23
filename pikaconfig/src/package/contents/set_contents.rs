@@ -6,6 +6,7 @@ use indoc::formatdoc;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
+use super::args::Arguments;
 use super::engine;
 use super::inventory;
 use super::local_state;
@@ -64,7 +65,7 @@ impl engine::CommandBuilder for SetContentsBuilder {
                 overwrites <filename> with <contents>
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
         let (filename, contents) = util::double_arg(&self.name(), args)?;
         Ok(Box::new(SetContentsStatement {
             filename: filename.to_owned(),

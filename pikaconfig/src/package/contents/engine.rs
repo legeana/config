@@ -30,13 +30,7 @@ impl Context {
 pub trait CommandBuilder: Sync + Send {
     fn name(&self) -> String;
     fn help(&self) -> String;
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<StatementBox>;
-    fn build(&self, workdir: &Path, args: &Arguments) -> Result<StatementBox> {
-        self.parse(
-            workdir,
-            &args.0.iter().map(String::as_str).collect::<Vec<_>>(),
-        )
-    }
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<StatementBox>;
 }
 
 pub type CommandBuilderBox = Box<dyn CommandBuilder>;

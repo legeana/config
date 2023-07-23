@@ -6,6 +6,7 @@ use indoc::formatdoc;
 
 use crate::module::ModuleBox;
 
+use super::args::Arguments;
 use super::engine;
 use super::inventory;
 use super::util;
@@ -39,7 +40,7 @@ impl engine::CommandBuilder for SubdirBuilder {
                 load subdirectory configuration recursively
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
         let subdir = util::single_arg(&self.name(), args)?;
         let subroot = workdir.join(subdir);
         Ok(Box::new(SubdirStatement {
@@ -79,7 +80,7 @@ impl engine::CommandBuilder for SubdirsBuilder {
                 load all subdirectories recursively
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
         util::no_args(&self.name(), args)?;
         let mut subdirs: Vec<SubdirStatement> = Vec::new();
         for entry in workdir

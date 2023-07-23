@@ -7,6 +7,7 @@ use crate::command::is_command;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
+use super::args::Arguments;
 use super::engine;
 use super::inventory;
 use super::util;
@@ -72,12 +73,13 @@ impl engine::CommandBuilder for IfCommandBuilder {
                 in PATH
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
         let (exe, cmd_args) = util::multiple_args(&self.name(), args, 1)?;
         assert_eq!(exe.len(), 1);
+        let cmd_args: Vec<_> = cmd_args.iter().map(String::as_str).collect();
         Ok(Box::new(IfCommandStatement {
             executable: exe[0].to_owned(),
-            cmd: engine::parse_args(workdir, cmd_args)?,
+            cmd: engine::parse_args(workdir, &cmd_args)?,
         }))
     }
 }

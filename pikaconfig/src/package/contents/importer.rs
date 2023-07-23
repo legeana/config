@@ -5,6 +5,7 @@ use std::{fs::File, io::Write};
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
+use super::args::Arguments;
 use super::engine;
 use super::inventory;
 use super::local_state;
@@ -136,7 +137,7 @@ impl engine::CommandBuilder for ImporteBuilder {
                 create a symlink for filename in prefix to a local persistent state
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
         let filename = util::single_arg(&self.name(), args)?.to_owned();
         Ok(Box::new(ImporterStatement {
             workdir: workdir.to_owned(),

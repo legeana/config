@@ -3,6 +3,7 @@ use std::path::{Path, PathBuf};
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
+use super::args::Arguments;
 use super::engine;
 use super::inventory;
 use super::util;
@@ -51,7 +52,7 @@ impl engine::CommandBuilder for MkDirBuilder {
                 create a directory in prefix
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
         let dir = util::single_arg(&self.name(), args)?.to_owned();
         Ok(Box::new(MkDirStatement { dir }))
     }

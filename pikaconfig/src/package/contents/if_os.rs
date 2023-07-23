@@ -3,6 +3,7 @@ use std::path::Path;
 use crate::module::ModuleBox;
 use crate::tera_helper;
 
+use super::args::Arguments;
 use super::engine;
 use super::inventory;
 use super::util;
@@ -58,12 +59,13 @@ impl engine::CommandBuilder for IfOsBuilder {
                 execute a MANIFEST <command> only if os (or family) is {os}
         ", os=self.os, command=self.command()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
         let (empty, cmd_args) = util::multiple_args(&self.command(), args, 0)?;
         assert!(empty.is_empty());
+        let cmd_args: Vec<_> = cmd_args.iter().map(String::as_str).collect();
         Ok(Box::new(IfOsStatement {
             os: self.os,
-            cmd: engine::parse_args(workdir, cmd_args)?,
+            cmd: engine::parse_args(workdir, &cmd_args)?,
         }))
     }
 }

@@ -6,6 +6,7 @@ use indoc::formatdoc;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
+use super::args::Arguments;
 use super::engine;
 use super::inventory;
 use super::local_state;
@@ -48,7 +49,7 @@ impl engine::CommandBuilder for OutputFileBuilder {
                 create a symlink for filename in prefix to a local persistent state
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
         let filename = util::single_arg(&self.name(), args)?.to_owned();
         Ok(Box::new(OutputFileStatement { filename }))
     }

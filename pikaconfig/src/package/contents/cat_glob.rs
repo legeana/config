@@ -4,6 +4,7 @@ use std::path::Path;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
+use super::args::Arguments;
 use super::engine;
 use super::inventory;
 use super::local_state;
@@ -84,15 +85,11 @@ impl engine::CommandBuilder for CatGlobIntoBuilder {
                 create filename in local storage by concatenating globs
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
         let (fname, globs) = util::multiple_args(&self.name(), args, 1)?;
         assert!(fname.len() == 1);
         let filename = fname[0].to_owned();
-        let globs: Vec<_> = globs
-            .iter()
-            .map(|&s| s.to_owned())
-            //.map(String::from)
-            .collect();
+        let globs: Vec<_> = globs.to_vec();
         Ok(Box::new(CatGlobIntoStatement { filename, globs }))
     }
 }

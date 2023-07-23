@@ -7,6 +7,7 @@ use crate::git_utils;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
+use super::args::Arguments;
 use super::engine;
 use super::inventory;
 use super::local_state;
@@ -103,7 +104,7 @@ impl engine::CommandBuilder for GitCloneBuilder {
                 if <branch> is specified clone <branch> instead of default HEAD
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
         let (url, dst) = util::double_arg(&self.name(), args)?;
         Ok(Box::new(GitCloneStatement {
             url: url.to_owned(),

@@ -4,6 +4,7 @@ use std::path::PathBuf;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
+use super::args::Arguments;
 use super::engine;
 use super::inventory;
 use super::util;
@@ -73,12 +74,13 @@ impl engine::CommandBuilder for IfMissingBuilder {
                 execute a MANIFEST <command> only if <path> is missing
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
         let (path, cmd_args) = util::multiple_args(&self.name(), args, 1)?;
         assert_eq!(path.len(), 1);
+        let cmd_args: Vec<_> = cmd_args.iter().map(String::as_str).collect();
         Ok(Box::new(IfMissingStatement {
             path: path[0].to_owned(),
-            cmd: engine::parse_args(workdir, cmd_args)?,
+            cmd: engine::parse_args(workdir, &cmd_args)?,
         }))
     }
 }

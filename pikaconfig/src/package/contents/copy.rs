@@ -3,6 +3,7 @@ use std::path::{Path, PathBuf};
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
+use super::args::Arguments;
 use super::engine;
 use super::inventory;
 use super::local_state;
@@ -64,7 +65,7 @@ impl engine::CommandBuilder for CopyBuilder {
                 create a copy of a filename in local storage and install a symlink to it
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
         let filename = util::single_arg(&self.name(), args)?.to_owned();
         Ok(Box::new(CopyStatement {
             workdir: workdir.to_owned(),

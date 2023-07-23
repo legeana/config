@@ -9,6 +9,7 @@ use crate::tera_helper;
 use crate::xdg;
 use crate::xdg_or_win;
 
+use super::args::Arguments;
 use super::engine;
 use super::inventory;
 use super::util;
@@ -53,7 +54,7 @@ impl engine::CommandBuilder for DirsPrefixBuilder {
                 set current installation prefix to {base_dir:?}/<directory>
         ", command=self.name(), base_dir=self.base_dir}
     }
-    fn parse(&self, _workdir: &std::path::Path, args: &[&str]) -> Result<engine::StatementBox> {
+    fn build(&self, _workdir: &std::path::Path, args: &Arguments) -> Result<engine::StatementBox> {
         let subdir = util::single_arg(&self.name(), args)?.to_owned();
         Ok(Box::new(DirsPrefixStatement {
             command: self.command,

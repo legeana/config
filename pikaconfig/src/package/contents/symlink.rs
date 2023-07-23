@@ -6,6 +6,7 @@ use indoc::formatdoc;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
+use super::args::Arguments;
 use super::engine;
 use super::file_util;
 use super::inventory;
@@ -51,7 +52,7 @@ impl engine::CommandBuilder for SymlinkBuilder {
                 create a symlink for filename in prefix
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
         let filename = util::single_arg(&self.name(), args)?;
         Ok(Box::new(SymlinkStatement {
             workdir: workdir.to_owned(),
@@ -74,7 +75,7 @@ impl engine::CommandBuilder for SymlinkToBuilder {
                 create a symlink for filename in prefix
         ", command=self.name()}
     }
-    fn parse(&self, workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
         let (dst, src) = util::double_arg(&self.name(), args)?;
         Ok(Box::new(SymlinkStatement {
             workdir: workdir.to_owned(),

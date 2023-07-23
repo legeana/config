@@ -5,6 +5,7 @@ use indoc::formatdoc;
 
 use crate::module::ModuleBox;
 
+use super::args::Arguments;
 use super::engine;
 use super::inventory;
 use super::util;
@@ -34,7 +35,7 @@ impl engine::CommandBuilder for PrefixBuilder {
                 set current installation prefix to <directory>
         ", command=self.name()}
     }
-    fn parse(&self, _workdir: &Path, args: &[&str]) -> Result<engine::StatementBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
         let prefix = util::single_arg(&self.name(), args)?.to_owned();
         Ok(Box::new(PrefixStatement { prefix }))
     }
