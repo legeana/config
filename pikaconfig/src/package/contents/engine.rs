@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 
 use crate::module::ModuleBox;
 
@@ -54,15 +54,6 @@ pub trait Statement: std::fmt::Debug {
 }
 
 pub type StatementBox = Box<dyn Statement>;
-
-pub fn parse_args(workdir: &Path, args: &[&str]) -> Result<StatementBox> {
-    if args.is_empty() {
-        return Err(anyhow!("command with no args[0] should not exist"));
-    }
-    let name = args[0];
-    let args = Arguments(args[1..].iter().cloned().map(String::from).collect());
-    new_command(workdir, name, &args)
-}
 
 pub fn new_command(workdir: &Path, command: &str, args: &Arguments) -> Result<StatementBox> {
     let builder = super::inventory::command(command)?;
