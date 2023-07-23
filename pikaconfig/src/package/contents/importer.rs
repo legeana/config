@@ -137,7 +137,7 @@ impl engine::CommandBuilder for ImporteBuilder {
         ", command=self.name()}
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let filename = args.expect_single_arg(&self.name())?.to_owned();
+        let filename = args.expect_single_arg(self.name())?.to_owned();
         Ok(Box::new(ImporterStatement {
             workdir: workdir.to_owned(),
             filename,

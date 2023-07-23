@@ -17,7 +17,8 @@ pub(crate) use args;
 pub struct Arguments(pub Vec<String>);
 
 impl Arguments {
-    pub fn expect_no_args(&self, command: &str) -> Result<()> {
+    pub fn expect_no_args(&self, command: impl AsRef<str>) -> Result<()> {
+        let command = command.as_ref();
         if !self.0.is_empty() {
             return Err(anyhow!(
                 "{} builder: want no arguments, got {}: {:?}",
@@ -29,16 +30,17 @@ impl Arguments {
         Ok(())
     }
 
-    pub fn expect_single_arg(&self, command: &str) -> Result<&str> {
+    pub fn expect_single_arg(&self, command: impl AsRef<str>) -> Result<&str> {
         Ok(&self.expect_fixed_args(command, 1)?[0])
     }
 
-    pub fn expect_double_arg(&self, command: &str) -> Result<(&str, &str)> {
+    pub fn expect_double_arg(&self, command: impl AsRef<str>) -> Result<(&str, &str)> {
         let args = self.expect_fixed_args(command, 2)?;
         Ok((&args[0], &args[1]))
     }
 
-    pub fn expect_fixed_args(&self, command: &str, len: usize) -> Result<&[String]> {
+    pub fn expect_fixed_args(&self, command: impl AsRef<str>, len: usize) -> Result<&[String]> {
+        let command = command.as_ref();
         if self.0.len() != len {
             return Err(anyhow!(
                 "{command} builder: want {len} arguments, got {}: {:?}",
@@ -52,9 +54,10 @@ impl Arguments {
     /// Returns (required_args, remainder_args).
     pub fn expect_variadic_args(
         &self,
-        command: &str,
+        command: impl AsRef<str>,
         required: usize,
     ) -> Result<(&[String], &[String])> {
+        let command = command.as_ref();
         if self.0.len() < required {
             return Err(anyhow!(
                 "{} builder: want at least {} arguments, got {}: {:?}",

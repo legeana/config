@@ -65,7 +65,7 @@ impl engine::CommandBuilder for SymlinkTreeBuilder {
         ", command=self.name()}
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let directory = args.expect_single_arg(&self.name())?.to_owned();
+        let directory = args.expect_single_arg(self.name())?.to_owned();
         Ok(Box::new(SymlinkTreeStatement {
             workdir: workdir.to_owned(),
             directory,

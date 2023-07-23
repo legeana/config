@@ -40,7 +40,7 @@ impl engine::CommandBuilder for SubdirBuilder {
         ", command=self.name()}
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let subdir = args.expect_single_arg(&self.name())?;
+        let subdir = args.expect_single_arg(self.name())?;
         let subroot = workdir.join(subdir);
         Ok(Box::new(SubdirStatement {
             subdir: subdir.into(),
@@ -80,7 +80,7 @@ impl engine::CommandBuilder for SubdirsBuilder {
         ", command=self.name()}
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        args.expect_no_args(&self.name())?;
+        args.expect_no_args(self.name())?;
         let mut subdirs: Vec<SubdirStatement> = Vec::new();
         for entry in workdir
             .read_dir()

@@ -104,7 +104,7 @@ impl engine::CommandBuilder for GitCloneBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let (url, dst) = args.expect_double_arg(&self.name())?;
+        let (url, dst) = args.expect_double_arg(self.name())?;
         Ok(Box::new(GitCloneStatement {
             url: url.to_owned(),
             dst: dst.to_owned(),

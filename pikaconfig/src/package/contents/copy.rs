@@ -65,7 +65,7 @@ impl engine::CommandBuilder for CopyBuilder {
         ", command=self.name()}
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let filename = args.expect_single_arg(&self.name())?.to_owned();
+        let filename = args.expect_single_arg(self.name())?.to_owned();
         Ok(Box::new(CopyStatement {
             workdir: workdir.to_owned(),
             filename,

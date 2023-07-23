@@ -77,7 +77,7 @@ impl engine::CommandBuilder for RenderBuilder {
         ", command=self.name()}
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> anyhow::Result<engine::StatementBox> {
-        let filename = args.expect_single_arg(&self.name())?;
+        let filename = args.expect_single_arg(self.name())?;
         Ok(Box::new(RenderStatement {
             workdir: workdir.to_owned(),
             src: filename.to_owned(),
@@ -100,7 +100,7 @@ impl engine::CommandBuilder for RenderToBuilder {
         ", command=self.name()}
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let (dst, src) = args.expect_double_arg(&self.name())?;
+        let (dst, src) = args.expect_double_arg(self.name())?;
         Ok(Box::new(RenderStatement {
             workdir: workdir.to_owned(),
             src: src.to_owned(),

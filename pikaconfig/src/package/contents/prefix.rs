@@ -35,7 +35,7 @@ impl engine::CommandBuilder for PrefixBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let prefix = args.expect_single_arg(&self.name())?.to_owned();
+        let prefix = args.expect_single_arg(self.name())?.to_owned();
         Ok(Box::new(PrefixStatement { prefix }))
     }
 }

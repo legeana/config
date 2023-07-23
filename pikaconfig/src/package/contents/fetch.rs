@@ -98,7 +98,7 @@ impl engine::CommandBuilder for FetchIntoBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let (filename, url) = args.expect_double_arg(&self.name())?;
+        let (filename, url) = args.expect_double_arg(self.name())?;
         Ok(Box::new(FetchIntoStatement {
             filename: filename.to_owned(),
             url: url.to_owned(),
@@ -122,7 +122,7 @@ impl engine::CommandBuilder for FetchExeIntoBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let (filename, url) = args.expect_double_arg(&self.name())?;
+        let (filename, url) = args.expect_double_arg(self.name())?;
         Ok(Box::new(FetchIntoStatement {
             filename: filename.to_owned(),
             url: url.to_owned(),
