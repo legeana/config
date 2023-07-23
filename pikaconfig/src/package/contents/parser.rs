@@ -62,7 +62,7 @@ pub fn parse_command(
     args: &Arguments,
 ) -> Result<engine::StatementBox> {
     let line = args.command_line(cmd.as_ref());
-    let statement = engine::parse(workdir, cmd.as_ref(), args).with_context(|| {
+    let statement = engine::new_command(workdir, cmd.as_ref(), args).with_context(|| {
         format!("failed to parse line {line_num} {line:?} from {manifest_path:?}")
     })?;
     Ok(Box::new(ParsedStatement {

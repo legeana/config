@@ -85,7 +85,7 @@ fn registry() -> &'static RegistryImpl {
     })
 }
 
-pub fn parsers() -> impl Iterator<Item = &'static engine::CommandBuilderBox> {
+pub fn commands() -> impl Iterator<Item = &'static engine::CommandBuilderBox> {
     registry().commands_order.iter().map(|name| {
         registry()
             .commands
@@ -94,7 +94,7 @@ pub fn parsers() -> impl Iterator<Item = &'static engine::CommandBuilderBox> {
     })
 }
 
-pub fn parser(name: &str) -> Result<&dyn engine::CommandBuilder> {
+pub fn command(name: &str) -> Result<&dyn engine::CommandBuilder> {
     registry()
         .commands
         .get(name)
@@ -132,7 +132,7 @@ mod tests {
     #[test]
     fn test_parsers_index() {
         assert_eq!(registry().commands.len(), registry().commands_order.len());
-        assert_eq!(parsers().count(), registry().commands.len());
+        assert_eq!(commands().count(), registry().commands.len());
     }
 
     #[test]

@@ -24,8 +24,7 @@ impl Context {
     }
 }
 
-// TODO: rename Parser into something better
-/// Parses a Statement.
+/// Builds a Statement.
 /// This should be purely syntactical.
 pub trait CommandBuilder: Sync + Send {
     fn name(&self) -> String;
@@ -62,12 +61,12 @@ pub fn parse_args(workdir: &Path, args: &[&str]) -> Result<StatementBox> {
     }
     let name = args[0];
     let args = Arguments(args[1..].iter().cloned().map(String::from).collect());
-    parse(workdir, name, &args)
+    new_command(workdir, name, &args)
 }
 
-pub fn parse(workdir: &Path, command: &str, args: &Arguments) -> Result<StatementBox> {
-    let parser = super::inventory::parser(command)?;
-    parser.build(workdir, args)
+pub fn new_command(workdir: &Path, command: &str, args: &Arguments) -> Result<StatementBox> {
+    let builder = super::inventory::command(command)?;
+    builder.build(workdir, args)
 }
 
 pub fn new_condition(workdir: &Path, name: &str, args: &Arguments) -> Result<ConditionBox> {
@@ -78,7 +77,7 @@ pub fn new_condition(workdir: &Path, name: &str, args: &Arguments) -> Result<Con
 pub fn help() -> String {
     let mut help = String::new();
     help.push_str("## Commands\n");
-    for parser in super::inventory::parsers() {
+    for parser in super::inventory::commands() {
         help.push_str(parser.help().trim_end());
         help.push('\n');
     }
