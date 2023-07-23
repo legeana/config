@@ -36,6 +36,16 @@ pub struct Invocation {
     pub args: Arguments,
 }
 
+impl std::fmt::Display for Invocation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}: {}", self.location, shlex::quote(&self.name))?;
+        for arg in &self.args.0 {
+            write!(f, " {}", shlex::quote(arg))?;
+        }
+        Ok(())
+    }
+}
+
 #[derive(Debug, PartialEq)]
 pub struct IfStatement {
     pub location: lexer::Location,

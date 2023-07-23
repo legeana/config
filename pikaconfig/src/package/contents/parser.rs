@@ -4,13 +4,11 @@ use anyhow::{Context, Result};
 
 use crate::module::ModuleBox;
 
-use super::args::Arguments;
 use super::ast;
 use super::engine;
 
 #[derive(Debug)]
 struct ParsedStatement {
-    line_num: usize,
     line: String,
     manifest_path: PathBuf,
     statement: engine::StatementBox,
@@ -20,9 +18,8 @@ impl engine::Statement for ParsedStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         self.statement.eval(ctx).with_context(|| {
             format!(
-                "failed to evaluate {manifest_path:?} line {line_num}: {line:?}",
+                "failed to evaluate {manifest_path:?}: {line:?}",
                 manifest_path = self.manifest_path,
-                line_num = self.line_num,
                 line = self.line,
             )
         })
@@ -39,11 +36,9 @@ pub fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<engine::Stateme
         match statement {
             ast::Statement::Command(cmd) => {
                 builders.push(parse_command(
-                    cmd.location.line_number,
                     workdir,
                     manifest_path,
-                    cmd.name,
-                    &cmd.args,
+                    &cmd,
                 )?);
             }
             ast::Statement::IfStatement(_if_st) => {
@@ -55,19 +50,16 @@ pub fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<engine::Stateme
 }
 
 pub fn parse_command(
-    line_num: usize,
     workdir: &Path,
     manifest_path: &Path,
-    cmd: impl AsRef<str>,
-    args: &Arguments,
+    cmd: &ast::Invocation,
 ) -> Result<engine::StatementBox> {
-    let line = args.command_line(cmd.as_ref());
-    let statement = engine::new_command(workdir, cmd.as_ref(), args).with_context(|| {
-        format!("failed to parse line {line_num} {line:?} from {manifest_path:?}")
+    let line = cmd.to_string();
+    let statement = engine::new_command(workdir, &cmd.name, &cmd.args).with_context(|| {
+        format!("failed to parse line {manifest_path:?}: {line}")
     })?;
     Ok(Box::new(ParsedStatement {
         line,
-        line_num,
         manifest_path: manifest_path.to_owned(),
         statement,
     }))
