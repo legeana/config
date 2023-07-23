@@ -61,8 +61,7 @@ pub fn parse_command(
     cmd: impl AsRef<str>,
     args: &Arguments,
 ) -> Result<engine::StatementBox> {
-    // TODO: use the actual source
-    let line = shlex::join(std::iter::once(cmd.as_ref()).chain(args.0.iter().map(String::as_str)));
+    let line = args.command_line(cmd.as_ref());
     let statement = engine::parse(workdir, cmd.as_ref(), args).with_context(|| {
         format!("failed to parse line {line_num} {line:?} from {manifest_path:?}")
     })?;

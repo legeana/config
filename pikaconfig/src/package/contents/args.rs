@@ -17,6 +17,11 @@ pub(crate) use args;
 pub struct Arguments(pub Vec<String>);
 
 impl Arguments {
+    pub fn command_line(&self, command: impl AsRef<str>) -> String {
+        // TODO: use the actual source
+        shlex::join(std::iter::once(command.as_ref()).chain(self.0.iter().map(String::as_str)))
+    }
+
     pub fn expect_no_args(&self, command: impl AsRef<str>) -> Result<()> {
         let command = command.as_ref();
         if !self.0.is_empty() {
