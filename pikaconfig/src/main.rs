@@ -20,15 +20,15 @@ mod uninstaller;
 mod xdg;
 mod xdg_or_win;
 
-use module::{Module, Rules};
-use uninstaller::Uninstaller;
-
-use anyhow::{anyhow, Context, Result};
-use clap::{Parser, Subcommand};
-
 use std::env;
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
+
+use anyhow::{anyhow, Context, Result, bail};
+use clap::{Parser, Subcommand};
+
+use module::{Module, Rules};
+use uninstaller::Uninstaller;
 
 const NO_UPDATE_ENV: &str = "PIKACONFIG_NO_UPDATE";
 const INSTALL_REGISTRY: &str = ".install";
@@ -135,11 +135,20 @@ fn system_install(rules: &Rules, root: &Path) -> Result<()> {
 
 fn main() -> Result<()> {
     let args = Cli::parse();
-    stderrlog::new()
-        .timestamp(stderrlog::Timestamp::Off)
-        .verbosity(usize::from(args.verbose))
-        .init()
-        .context("failed to initialize stderrlog")?;
+    env_logger::Builder::new()
+        .filter_level(match args.verbose {
+            0 => log::LevelFilter::Off,
+            1 => log::LevelFilter::Error,
+            2 => log::LevelFilter::Warn,
+            3 => log::LevelFilter::Info,
+            4 => log::LevelFilter::Debug,
+            5 => log::LevelFilter::Trace,
+            6.. => bail!("invalid log level: {}", args.verbose),
+        })
+        .default_format()
+        .format_timestamp(None)
+        .format_target(false)
+        .try_init()?;
     // Main code.
     let root = config_root(SETUP)?;
     let setup = root.join(SETUP);

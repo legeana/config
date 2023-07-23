@@ -23,7 +23,6 @@ serde_yaml = "0.9.21"
 sha2 = "0.10.6"
 shellexpand = "3.1"
 shlex = "1.1.0"
-stderrlog = "0.5.4"
 sysinfo = { version = "0.28.4", default-features = false }
 tera = { version = "1.19.0", default-features = false }
 thiserror = "1.0"
@@ -31,6 +30,11 @@ toml = "0.7.3"
 ureq = "2.6.2"
 walkdir = "2"
 which = "4.4.0"
+
+[dependencies.env_logger]
+version = "0.10.0"
+default-features = false
+features = ["auto-color"]
 
 # https://lalrpop.github.io/lalrpop/quick_start_guide.html
 # See also build.rs.
