@@ -48,10 +48,15 @@ impl engine::CommandBuilder for DirsPrefixBuilder {
         self.command.to_owned()
     }
     fn help(&self) -> String {
+        let prefix = self
+            .base_dir
+            .as_ref()
+            .map(|base| base.join("<directory>"))
+            .unwrap_or("<unavailable>".into());
         formatdoc! {"
             {command} <directory>
-                set current installation prefix to {base_dir:?}/<directory>
-        ", command=self.name(), base_dir=self.base_dir}
+                set current installation prefix to {prefix:?}
+        ", command=self.name(), prefix=prefix}
     }
     fn build(&self, _workdir: &std::path::Path, args: &Arguments) -> Result<engine::StatementBox> {
         let subdir = args.expect_single_arg(self.name())?.to_owned();
