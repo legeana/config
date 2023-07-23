@@ -8,7 +8,6 @@ use super::args::Arguments;
 use super::engine;
 use super::inventory;
 use super::local_state;
-use super::util;
 
 use anyhow::{anyhow, Context, Result};
 use glob::glob as glob_iter;
@@ -86,7 +85,7 @@ impl engine::CommandBuilder for CatGlobIntoBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let (fname, globs) = util::multiple_args(&self.name(), args, 1)?;
+        let (fname, globs) = args.expect_variadic_args(&self.name(), 1)?;
         assert!(fname.len() == 1);
         let filename = fname[0].to_owned();
         let globs: Vec<_> = globs.to_vec();

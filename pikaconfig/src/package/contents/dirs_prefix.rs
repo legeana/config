@@ -12,7 +12,6 @@ use crate::xdg_or_win;
 use super::args::Arguments;
 use super::engine;
 use super::inventory;
-use super::util;
 
 #[derive(Debug)]
 struct DirsPrefixStatement {
@@ -55,7 +54,7 @@ impl engine::CommandBuilder for DirsPrefixBuilder {
         ", command=self.name(), base_dir=self.base_dir}
     }
     fn build(&self, _workdir: &std::path::Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let subdir = util::single_arg(&self.name(), args)?.to_owned();
+        let subdir = args.expect_single_arg(&self.name())?.to_owned();
         Ok(Box::new(DirsPrefixStatement {
             command: self.command,
             base_dir: self.base_dir.clone(),

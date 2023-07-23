@@ -8,7 +8,6 @@ use crate::registry::Registry;
 use super::args::Arguments;
 use super::engine;
 use super::inventory;
-use super::util;
 
 use anyhow::Result;
 use indoc::formatdoc;
@@ -77,7 +76,7 @@ impl engine::CommandBuilder for PostInstallExecBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let (command, args) = util::multiple_args(&self.name(), args, 1)?;
+        let (command, args) = args.expect_variadic_args(&self.name(), 1)?;
         assert!(command.len() == 1);
         Ok(Box::new(PostInstallStatement {
             exec_condition: ExecCondition::Always,
@@ -102,7 +101,7 @@ impl engine::CommandBuilder for PostInstallUpdateBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let (command, args) = util::multiple_args(&self.name(), args, 1)?;
+        let (command, args) = args.expect_variadic_args(&self.name(), 1)?;
         assert!(command.len() == 1);
         Ok(Box::new(PostInstallStatement {
             exec_condition: ExecCondition::UpdateOnly,

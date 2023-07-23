@@ -11,7 +11,6 @@ use super::args::Arguments;
 use super::engine;
 use super::inventory;
 use super::local_state;
-use super::util;
 
 struct GitClone {
     remote: git_utils::Remote,
@@ -105,7 +104,7 @@ impl engine::CommandBuilder for GitCloneBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let (url, dst) = util::double_arg(&self.name(), args)?;
+        let (url, dst) = args.expect_double_arg(&self.name())?;
         Ok(Box::new(GitCloneStatement {
             url: url.to_owned(),
             dst: dst.to_owned(),

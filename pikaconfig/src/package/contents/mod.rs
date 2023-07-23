@@ -26,7 +26,6 @@ mod subdir;
 mod symlink;
 mod symlink_tree;
 mod tags;
-mod util;
 
 use std::path::{Path, PathBuf};
 

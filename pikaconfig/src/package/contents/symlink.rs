@@ -10,7 +10,6 @@ use super::args::Arguments;
 use super::engine;
 use super::file_util;
 use super::inventory;
-use super::util;
 
 struct Symlink {
     src: PathBuf,
@@ -53,7 +52,7 @@ impl engine::CommandBuilder for SymlinkBuilder {
         ", command=self.name()}
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let filename = util::single_arg(&self.name(), args)?;
+        let filename = args.expect_single_arg(&self.name())?;
         Ok(Box::new(SymlinkStatement {
             workdir: workdir.to_owned(),
             src: filename.to_owned(),
@@ -76,7 +75,7 @@ impl engine::CommandBuilder for SymlinkToBuilder {
         ", command=self.name()}
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let (dst, src) = util::double_arg(&self.name(), args)?;
+        let (dst, src) = args.expect_double_arg(&self.name())?;
         Ok(Box::new(SymlinkStatement {
             workdir: workdir.to_owned(),
             src: src.to_owned(),

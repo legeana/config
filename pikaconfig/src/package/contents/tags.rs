@@ -9,7 +9,6 @@ use crate::tag_util;
 use super::args::Arguments;
 use super::engine;
 use super::inventory;
-use super::util;
 
 #[derive(Debug)]
 struct RequiresStatement {
@@ -43,7 +42,7 @@ impl engine::CommandBuilder for RequiresBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let (_, tags) = util::multiple_args(&self.name(), args, 0)?;
+        let (_, tags) = args.expect_variadic_args(&self.name(), 0)?;
         Ok(Box::new(RequiresStatement {
             tags: tags.to_vec(),
         }))
@@ -82,7 +81,7 @@ impl engine::CommandBuilder for ConflictsBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let (_, tags) = util::multiple_args(&self.name(), args, 0)?;
+        let (_, tags) = args.expect_variadic_args(&self.name(), 0)?;
         Ok(Box::new(ConflictsStatement {
             tags: tags.to_vec(),
         }))

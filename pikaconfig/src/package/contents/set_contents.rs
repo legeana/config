@@ -10,7 +10,6 @@ use super::args::Arguments;
 use super::engine;
 use super::inventory;
 use super::local_state;
-use super::util;
 
 struct SetContents {
     output: local_state::FileState,
@@ -66,7 +65,7 @@ impl engine::CommandBuilder for SetContentsBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let (filename, contents) = util::double_arg(&self.name(), args)?;
+        let (filename, contents) = args.expect_double_arg(&self.name())?;
         Ok(Box::new(SetContentsStatement {
             filename: filename.to_owned(),
             contents: contents.to_owned(),

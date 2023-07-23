@@ -11,7 +11,6 @@ use super::args::Arguments;
 use super::engine;
 use super::inventory;
 use super::local_state;
-use super::util;
 
 const TEMPLATE_NAME: &str = "template";
 
@@ -78,7 +77,7 @@ impl engine::CommandBuilder for RenderBuilder {
         ", command=self.name()}
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> anyhow::Result<engine::StatementBox> {
-        let filename = util::single_arg(&self.name(), args)?;
+        let filename = args.expect_single_arg(&self.name())?;
         Ok(Box::new(RenderStatement {
             workdir: workdir.to_owned(),
             src: filename.to_owned(),
@@ -101,7 +100,7 @@ impl engine::CommandBuilder for RenderToBuilder {
         ", command=self.name()}
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let (dst, src) = util::double_arg(&self.name(), args)?;
+        let (dst, src) = args.expect_double_arg(&self.name())?;
         Ok(Box::new(RenderStatement {
             workdir: workdir.to_owned(),
             src: src.to_owned(),

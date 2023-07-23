@@ -9,7 +9,6 @@ use crate::module::ModuleBox;
 use super::args::Arguments;
 use super::engine;
 use super::inventory;
-use super::util;
 
 #[derive(Debug)]
 struct SubdirStatement {
@@ -41,7 +40,7 @@ impl engine::CommandBuilder for SubdirBuilder {
         ", command=self.name()}
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let subdir = util::single_arg(&self.name(), args)?;
+        let subdir = args.expect_single_arg(&self.name())?;
         let subroot = workdir.join(subdir);
         Ok(Box::new(SubdirStatement {
             subdir: subdir.into(),
@@ -81,7 +80,7 @@ impl engine::CommandBuilder for SubdirsBuilder {
         ", command=self.name()}
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        util::no_args(&self.name(), args)?;
+        args.expect_no_args(&self.name())?;
         let mut subdirs: Vec<SubdirStatement> = Vec::new();
         for entry in workdir
             .read_dir()

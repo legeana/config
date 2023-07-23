@@ -7,7 +7,6 @@ use crate::registry::Registry;
 use super::args::Arguments;
 use super::engine;
 use super::inventory;
-use super::util;
 
 use anyhow::{Context, Result};
 use indoc::formatdoc;
@@ -75,7 +74,7 @@ impl engine::CommandBuilder for IfMissingBuilder {
         ", command=self.name()}
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let (path, cmd_args) = util::multiple_args(&self.name(), args, 1)?;
+        let (path, cmd_args) = args.expect_variadic_args(&self.name(), 1)?;
         assert_eq!(path.len(), 1);
         let cmd_args: Vec<_> = cmd_args.iter().map(String::as_str).collect();
         Ok(Box::new(IfMissingStatement {

@@ -8,7 +8,6 @@ use crate::module::ModuleBox;
 use super::args::Arguments;
 use super::engine;
 use super::inventory;
-use super::util;
 
 #[derive(Debug)]
 struct PrefixStatement {
@@ -36,7 +35,7 @@ impl engine::CommandBuilder for PrefixBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let prefix = util::single_arg(&self.name(), args)?.to_owned();
+        let prefix = args.expect_single_arg(&self.name())?.to_owned();
         Ok(Box::new(PrefixStatement { prefix }))
     }
 }

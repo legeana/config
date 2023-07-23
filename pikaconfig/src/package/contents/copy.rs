@@ -7,7 +7,6 @@ use super::args::Arguments;
 use super::engine;
 use super::inventory;
 use super::local_state;
-use super::util;
 
 use anyhow::{Context, Result};
 use indoc::formatdoc;
@@ -66,7 +65,7 @@ impl engine::CommandBuilder for CopyBuilder {
         ", command=self.name()}
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let filename = util::single_arg(&self.name(), args)?.to_owned();
+        let filename = args.expect_single_arg(&self.name())?.to_owned();
         Ok(Box::new(CopyStatement {
             workdir: workdir.to_owned(),
             filename,

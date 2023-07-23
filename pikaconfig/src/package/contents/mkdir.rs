@@ -6,7 +6,6 @@ use crate::registry::Registry;
 use super::args::Arguments;
 use super::engine;
 use super::inventory;
-use super::util;
 
 use anyhow::{Context, Result};
 use indoc::formatdoc;
@@ -53,7 +52,7 @@ impl engine::CommandBuilder for MkDirBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let dir = util::single_arg(&self.name(), args)?.to_owned();
+        let dir = args.expect_single_arg(&self.name())?.to_owned();
         Ok(Box::new(MkDirStatement { dir }))
     }
 }

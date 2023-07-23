@@ -6,7 +6,6 @@ use crate::tera_helper;
 use super::args::Arguments;
 use super::engine;
 use super::inventory;
-use super::util;
 
 use anyhow::Result;
 use indoc::formatdoc;
@@ -60,7 +59,7 @@ impl engine::CommandBuilder for IfOsBuilder {
         ", os=self.os, command=self.command()}
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let (empty, cmd_args) = util::multiple_args(&self.command(), args, 0)?;
+        let (empty, cmd_args) = args.expect_variadic_args(&self.command(), 0)?;
         assert!(empty.is_empty());
         let cmd_args: Vec<_> = cmd_args.iter().map(String::as_str).collect();
         Ok(Box::new(IfOsStatement {
