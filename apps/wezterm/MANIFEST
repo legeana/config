@@ -1,5 +1,9 @@
-if_unix xdg_config_prefix wezterm
-if_unix render wezterm.lua
+if is_unix {
+    xdg_config_prefix wezterm
+    render wezterm.lua
+}
 
-if_windows prefix ~
-if_windows render_to .wezterm.lua wezterm.lua
+if is_windows {
+    prefix ~
+    render_to .wezterm.lua wezterm.lua
+}
