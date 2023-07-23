@@ -38,7 +38,7 @@ impl engine::CommandBuilder for RequiresBuilder {
     fn help(&self) -> String {
         formatdoc! {"
             {command} <tags>
-                do not process current directory if any of the tags is not present
+                only process the current directory if all of the tags are present
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
@@ -77,7 +77,7 @@ impl engine::CommandBuilder for ConflictsBuilder {
     fn help(&self) -> String {
         formatdoc! {"
             {command} <tags>
-                do not process current directory if any of the tags is present
+                only process the current directory if none of the tags are present
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
