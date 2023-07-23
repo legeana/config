@@ -56,6 +56,8 @@ pub struct IfStatement {
 
 #[cfg(test)]
 mod tests {
+    use pretty_assertions::assert_eq;
+
     use super::super::args::args;
     use super::*;
 

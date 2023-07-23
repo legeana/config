@@ -42,3 +42,6 @@ features = ["lexer", "unicode"]
 version = "0.20.0"
 default-features = false
 features = ["lexer", "unicode"]
+
+[dev-dependencies]
+pretty_assertions = "1.4.0"
