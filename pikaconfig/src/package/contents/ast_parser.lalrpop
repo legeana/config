@@ -46,12 +46,12 @@ Invocation: ast::Invocation = {
 IfStatement: ast::IfStatement = {
     <start:@L>
     If
-    <conditional:Invocation>
+    <condition:Invocation>
     <statements:Block>
     <else_statements:ElseBlock?>
     => ast::IfStatement {
         location: start,
-        conditional,
+        condition,
         statements,
         else_statements: else_statements.unwrap_or_default(),
     },

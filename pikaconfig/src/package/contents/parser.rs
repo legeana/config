@@ -115,8 +115,8 @@ pub fn parse_if_statement(
     manifest_path: &Path,
     if_st: &ast::IfStatement,
 ) -> Result<engine::StatementBox> {
-    let line = if_st.conditional.to_string();
-    let cond = engine::new_condition(workdir, &if_st.conditional.name, &if_st.conditional.args)
+    let line = if_st.condition.to_string();
+    let cond = engine::new_condition(workdir, &if_st.condition.name, &if_st.condition.args)
         .with_context(|| format!("failed to parse {manifest_path:?} line: {line}"))?;
     let if_true = VecStatement(parse_statements(
         workdir,

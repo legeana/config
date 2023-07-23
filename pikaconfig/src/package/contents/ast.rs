@@ -49,7 +49,7 @@ impl std::fmt::Display for Invocation {
 #[derive(Debug, PartialEq)]
 pub struct IfStatement {
     pub location: lexer::Location,
-    pub conditional: Invocation,
+    pub condition: Invocation,
     pub statements: Vec<Statement>,
     pub else_statements: Vec<Statement>,
 }
@@ -219,7 +219,7 @@ mod tests {
                 location: "".into(),
                 statements: vec![Statement::IfStatement(IfStatement {
                     location: lexer::Location::new_p_l_c(17, 2, 17),
-                    conditional: Invocation {
+                    condition: Invocation {
                         location: lexer::Location::new_p_l_c(20, 2, 20),
                         name: "cond".to_owned(),
                         args: args![],
@@ -251,7 +251,7 @@ mod tests {
                 location: "".into(),
                 statements: vec![Statement::IfStatement(IfStatement {
                     location: lexer::Location::new_p_l_c(17, 2, 17),
-                    conditional: Invocation {
+                    condition: Invocation {
                         location: lexer::Location::new_p_l_c(20, 2, 20),
                         name: "cond".to_owned(),
                         args: args!["with", "args"],
@@ -285,7 +285,7 @@ mod tests {
                 location: "".into(),
                 statements: vec![Statement::IfStatement(IfStatement {
                     location: lexer::Location::new_p_l_c(17, 2, 17),
-                    conditional: Invocation {
+                    condition: Invocation {
                         location: lexer::Location::new_p_l_c(20, 2, 20),
                         name: "cond".to_owned(),
                         args: args![],
@@ -323,14 +323,14 @@ mod tests {
                 location: "".into(),
                 statements: vec![Statement::IfStatement(IfStatement {
                     location: lexer::Location::new_p_l_c(17, 2, 17),
-                    conditional: Invocation {
+                    condition: Invocation {
                         location: lexer::Location::new_p_l_c(20, 2, 20),
                         name: "cond".to_owned(),
                         args: args!["one"],
                     },
                     statements: vec![Statement::IfStatement(IfStatement {
                         location: lexer::Location::new_p_l_c(51, 3, 21),
-                        conditional: Invocation {
+                        condition: Invocation {
                             location: lexer::Location::new_p_l_c(54, 3, 24),
                             name: "cond".to_owned(),
                             args: args!["two"],
