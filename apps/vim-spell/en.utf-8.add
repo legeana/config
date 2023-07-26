@@ -460,6 +460,7 @@ returncode
 rhai
 ripgrep
 rlua
+ro
 rofi
 rollout
 rollouts
@@ -633,6 +634,7 @@ vimdiff
 vimrc
 vimscript
 vlan
+vscode
 vsync
 vulkan
 walkdir
