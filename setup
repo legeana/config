@@ -46,6 +46,7 @@ native_setup() {
 }
 
 base_docker_setup() {
+    log_eval $OPTIONAL_SUDO docker pull rust
     mkdir -p "${SRC?}/target/release"
     log_eval $OPTIONAL_SUDO docker run \
         --volume="${SRC?}/cargo-registry:/usr/local/cargo/registry" \
