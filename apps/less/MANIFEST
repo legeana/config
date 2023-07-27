@@ -1,7 +1,7 @@
-if unix {
+if is_unix {
     xdg_config_prefix .
     symlink lesskey
-} else if windows {
+} else if is_windows {
     prefix ~
     symlink_to _lesskey lesskey
 }
