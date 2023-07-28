@@ -1,2 +1,4 @@
-set -e MANPATH
-manpath | sed 's|:| |g;s|^|set -gx MANPATH |' | source
+if command -q manpath
+    set -e MANPATH
+    set -gx MANPATH string replace --all : \n (manpath)
+end
