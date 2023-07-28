@@ -1,6 +1,11 @@
 if is_unix {
     xdg_config_prefix .
     symlink lesskey
+
+    # Workaround for certain versions of less that don't try to read
+    # ~/.config/lesskey if XDG_CONFIG_HOME is unset.
+    prefix ~
+    symlink_to .lesskey lesskey
 } else if is_windows {
     prefix ~
     symlink_to _lesskey lesskey
