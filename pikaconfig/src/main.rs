@@ -16,6 +16,7 @@ mod tag_criteria;
 mod tag_util;
 mod tera_helper;
 mod tera_helpers;
+mod unarchiver;
 mod uninstaller;
 mod xdg;
 mod xdg_or_win;
@@ -24,7 +25,7 @@ use std::env;
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
-use anyhow::{anyhow, Context, Result, bail};
+use anyhow::{anyhow, bail, Context, Result};
 use clap::{Parser, Subcommand};
 
 use module::{Module, Rules};
