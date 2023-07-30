@@ -16,7 +16,7 @@ struct PrefixStatement {
 
 impl engine::Statement for PrefixStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
-        ctx.prefix = shellexpand::tilde(&self.prefix).as_ref().into();
+        ctx.prefix = ctx.expand(&self.prefix).into();
         Ok(None)
     }
 }

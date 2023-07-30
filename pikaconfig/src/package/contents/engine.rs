@@ -19,8 +19,12 @@ impl Context {
             prefix: dirs::home_dir().expect("failed to determine home dir"),
         }
     }
-    pub fn dst_path<P: AsRef<Path>>(&self, path: P) -> PathBuf {
+    pub fn dst_path(&self, path: impl AsRef<Path>) -> PathBuf {
         self.prefix.join(path)
+    }
+    /// Expands tilde and environment variables.
+    pub fn expand(&self, arg: impl AsRef<str>) -> String {
+        shellexpand::tilde(arg.as_ref()).to_string()
     }
 }
 

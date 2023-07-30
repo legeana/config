@@ -47,12 +47,7 @@ struct PostInstallStatement {
 
 impl engine::Statement for PostInstallStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
-        let args: Vec<String> = self
-            .args
-            .iter()
-            .map(shellexpand::tilde)
-            .map(String::from)
-            .collect();
+        let args: Vec<String> = self.args.iter().map(|s| ctx.expand(s)).collect();
         Ok(Some(Box::new(PostInstallExec {
             exec_condition: self.exec_condition.clone(),
             current_dir: ctx.prefix.clone(),
