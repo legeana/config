@@ -1,3 +1,4 @@
+use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
 use anyhow::Result;
@@ -23,8 +24,12 @@ impl Context {
         self.prefix.join(path)
     }
     /// Expands tilde and environment variables.
-    pub fn expand(&self, arg: impl AsRef<str>) -> String {
-        shellexpand::tilde(arg.as_ref()).to_string()
+    pub fn expand(&self, input: impl AsRef<str>) -> OsString {
+        // TODO: maybe use safer prefix expansion.
+        match shellexpand::path::tilde(input.as_ref()) {
+            std::borrow::Cow::Borrowed(p) => p.as_os_str().to_owned(),
+            std::borrow::Cow::Owned(p) => p.into(),
+        }
     }
 }
 

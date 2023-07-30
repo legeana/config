@@ -1,3 +1,4 @@
+use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 use std::process;
 
@@ -22,7 +23,7 @@ struct PostInstallExec {
     exec_condition: ExecCondition,
     current_dir: PathBuf,
     cmd: String,
-    args: Vec<String>,
+    args: Vec<OsString>,
 }
 
 impl Module for PostInstallExec {
@@ -47,7 +48,7 @@ struct PostInstallStatement {
 
 impl engine::Statement for PostInstallStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
-        let args: Vec<String> = self.args.iter().map(|s| ctx.expand(s)).collect();
+        let args: Vec<_> = self.args.iter().map(|s| ctx.expand(s)).collect();
         Ok(Some(Box::new(PostInstallExec {
             exec_condition: self.exec_condition.clone(),
             current_dir: ctx.prefix.clone(),
