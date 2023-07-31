@@ -61,6 +61,8 @@ pub enum Token {
     Begin,
     #[token("}")]
     End,
+    #[token("=")]
+    Assign,
 }
 
 impl std::fmt::Display for Token {
@@ -74,6 +76,7 @@ impl std::fmt::Display for Token {
             Token::Else => write!(f, "Token::Else"),
             Token::Begin => write!(f, "Token::Begin"),
             Token::End => write!(f, "Token::End"),
+            Token::Assign => write!(f, "Token::Assign"),
         }
     }
 }
@@ -515,6 +518,22 @@ mod tests {
         assert_token!(lex.next(), Token::Literal("command".into()));
         assert_token!(lex.next(), Token::Newline);
         assert_token!(lex.next(), Token::End);
+        assert_token!(lex.next(), Token::Newline);
+        assert_eoi!(lex);
+    }
+
+    #[test]
+    fn test_assignment() {
+        let mut lex = TestLexer::new(
+            r#"
+            x = command arg
+            "#,
+        );
+        assert_token!(lex.next(), Token::Newline);
+        assert_token!(lex.next(), Token::Literal("x".into()));
+        assert_token!(lex.next(), Token::Assign);
+        assert_token!(lex.next(), Token::Literal("command".into()));
+        assert_token!(lex.next(), Token::Literal("arg".into()));
         assert_token!(lex.next(), Token::Newline);
         assert_eoi!(lex);
     }
