@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
@@ -11,6 +12,8 @@ use super::engine;
 pub struct Context {
     pub enabled: bool,
     pub prefix: PathBuf,
+    #[allow(dead_code)]
+    vars: HashMap<String, OsString>,
 }
 
 impl Context {
@@ -18,6 +21,14 @@ impl Context {
         Self {
             enabled: true,
             prefix: dirs::home_dir().expect("failed to determine home dir"),
+            vars: HashMap::new(), // Variables are not inherited.
+        }
+    }
+    pub fn subdir(&self, path: impl AsRef<Path>) -> Self {
+        Self {
+            enabled: true,
+            prefix: self.prefix.join(path.as_ref()),
+            vars: HashMap::new(), // Variables are not inherited.
         }
     }
     pub fn dst_path(&self, path: impl AsRef<Path>) -> PathBuf {

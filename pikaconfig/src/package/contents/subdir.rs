@@ -18,10 +18,7 @@ struct SubdirStatement {
 
 impl engine::Statement for SubdirStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
-        let mut substate = engine::Context {
-            enabled: true,
-            prefix: ctx.prefix.join(&self.subdir),
-        };
+        let mut substate = ctx.subdir(&self.subdir);
         self.config.eval(&mut substate)
     }
 }
