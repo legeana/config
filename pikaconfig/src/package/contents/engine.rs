@@ -12,15 +12,18 @@ use super::engine;
 pub struct Context {
     pub enabled: bool,
     pub prefix: PathBuf,
-    #[allow(dead_code)]
+    home_var: OsString,
     vars: HashMap<String, OsString>,
 }
 
 impl Context {
     pub fn new() -> Self {
+        let home = dirs::home_dir().expect("failed to determine home dir");
+        let home_var: OsString = home.clone().into();
         Self {
             enabled: true,
-            prefix: dirs::home_dir().expect("failed to determine home dir"),
+            prefix: home,
+            home_var,
             vars: HashMap::new(), // Variables are not inherited.
         }
     }
@@ -28,6 +31,7 @@ impl Context {
         Self {
             enabled: true,
             prefix: self.prefix.join(path.as_ref()),
+            home_var: self.home_var.clone(),
             vars: HashMap::new(), // Variables are not inherited.
         }
     }
@@ -36,8 +40,15 @@ impl Context {
     }
     /// Expands tilde and environment variables.
     pub fn expand(&self, input: impl AsRef<str>) -> OsString {
+        let input = input.as_ref();
+        let get_var = |var: &str| -> Option<&OsString> {
+            match var {
+                "HOME" => Some(&self.home_var),
+                _ => self.vars.get(var),
+            }
+        };
         // TODO: maybe use safer prefix expansion.
-        match shellexpand::path::tilde(input.as_ref()) {
+        match shellexpand::path::full_with_context_no_errors(input, dirs::home_dir, get_var) {
             std::borrow::Cow::Borrowed(p) => p.as_os_str().to_owned(),
             std::borrow::Cow::Owned(p) => p.into(),
         }
