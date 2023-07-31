@@ -109,6 +109,7 @@ pub fn parse_statements<'a>(
                 ast::Statement::IfStatement(if_st) => {
                     parse_if_statement(workdir, manifest_path, if_st)
                 }
+                ast::Statement::Assignment(_) => todo!(),
             }
         })
         .collect()

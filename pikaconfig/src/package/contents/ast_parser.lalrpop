@@ -31,6 +31,7 @@ EmptyLine = {
 Statement: ast::Statement = {
     <Invocation> LineTerminator => ast::Statement::Command(<>),
     <IfStatement> LineTerminator => ast::Statement::IfStatement(<>),
+    <Assignment> LineTerminator => ast::Statement::Assignment(<>),
 };
 
 Invocation: ast::Invocation = {
@@ -81,6 +82,17 @@ Block = {
     End
 };
 
+Assignment: ast::Assignment = {
+    <start:@L>
+    <var:Literal>
+    Assign
+    <command:Invocation> => ast::Assignment {
+        location: start,
+        var,
+        command,
+    },
+};
+
 LineTerminator = {
     Newline,
     EndOfInput,
@@ -98,5 +110,6 @@ extern {
         Else => lexer::Token::Else,
         Begin => lexer::Token::Begin,
         End => lexer::Token::End,
+        Assign => lexer::Token::Assign,
     }
 }

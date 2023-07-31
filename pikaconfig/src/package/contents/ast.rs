@@ -27,6 +27,7 @@ impl Manifest {
 pub enum Statement {
     Command(Invocation),
     IfStatement(IfStatement),
+    Assignment(Assignment),
 }
 
 #[derive(Debug, PartialEq)]
@@ -59,6 +60,13 @@ pub struct IfStatement {
     pub if_clause: IfClause,
     pub else_if_clauses: Vec<IfClause>,
     pub else_statements: Vec<Statement>,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct Assignment {
+    pub location: lexer::Location,
+    pub var: String,
+    pub command: Invocation,
 }
 
 #[cfg(test)]
@@ -479,6 +487,31 @@ mod tests {
                         args: args!["else"],
                     })],
                 }),],
+            }
+        );
+    }
+
+    #[test]
+    fn test_assignment() {
+        assert_eq!(
+            Manifest::parse(
+                "",
+                r#"
+                my_var = command arg
+            "#
+            )
+            .unwrap(),
+            Manifest {
+                location: "".into(),
+                statements: vec![Statement::Assignment(Assignment {
+                    location: lexer::Location::new_p_l_c(17, 2, 17),
+                    var: "my_var".into(),
+                    command: Invocation {
+                        location: lexer::Location::new_p_l_c(26, 2, 26),
+                        name: "command".into(),
+                        args: args!["arg"],
+                    }
+                })],
             }
         );
     }
