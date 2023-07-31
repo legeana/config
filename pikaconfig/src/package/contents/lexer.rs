@@ -198,22 +198,23 @@ impl<'input> LalrpopLexer<'input> {
             return None;
         }
         loop {
-            match self.lexer.next() {
-                Some(Ok(Token::Literal(lit))) => {
+            let next = self.lexer.next();
+            match next {
+                Some(Ok(Token::Literal(_))) => {
                     if self.prev_literal {
                         self.stop_iteration = true;
                         return Some(Err(LexerError::LiteralsWithoutSeparator));
                     }
                     self.prev_literal = true;
-                    return Some(Ok(Token::Literal(lit)));
+                    return next;
                 }
                 Some(Ok(Token::Space)) => {
                     self.prev_literal = false;
                     continue; // Skip spaces.
                 }
-                Some(Ok(tok)) => {
+                Some(Ok(_)) => {
                     self.prev_literal = false;
-                    return Some(Ok(tok));
+                    return next;
                 }
                 Some(Err(err)) => return Some(Err(err)),
                 None => {
