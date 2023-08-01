@@ -84,12 +84,15 @@ impl engine::CommandBuilder for CatGlobIntoBuilder {
                 create filename in local storage by concatenating globs
         ", command=self.name()}
     }
-    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (fname, globs) = args.expect_variadic_args(self.name(), 1)?;
         assert!(fname.len() == 1);
         let filename = fname[0].to_owned();
         let globs: Vec<_> = globs.to_vec();
-        Ok(Box::new(CatGlobIntoStatement { filename, globs }))
+        Ok(engine::Command::new_statement(CatGlobIntoStatement {
+            filename,
+            globs,
+        }))
     }
 }
 

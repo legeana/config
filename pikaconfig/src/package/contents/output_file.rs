@@ -48,9 +48,11 @@ impl engine::CommandBuilder for OutputFileBuilder {
                 create a symlink for filename in prefix to a local persistent state
         ", command=self.name()}
     }
-    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let filename = args.expect_single_arg(self.name())?.to_owned();
-        Ok(Box::new(OutputFileStatement { filename }))
+        Ok(engine::Command::new_statement(OutputFileStatement {
+            filename,
+        }))
     }
 }
 

@@ -51,9 +51,9 @@ impl engine::CommandBuilder for SymlinkBuilder {
                 create a symlink for filename in prefix
         ", command=self.name()}
     }
-    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let filename = args.expect_single_arg(self.name())?;
-        Ok(Box::new(SymlinkStatement {
+        Ok(engine::Command::new_statement(SymlinkStatement {
             workdir: workdir.to_owned(),
             src: filename.to_owned(),
             dst: filename.to_owned(),
@@ -74,9 +74,9 @@ impl engine::CommandBuilder for SymlinkToBuilder {
                 create a symlink for filename in prefix
         ", command=self.name()}
     }
-    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (dst, src) = args.expect_double_arg(self.name())?;
-        Ok(Box::new(SymlinkStatement {
+        Ok(engine::Command::new_statement(SymlinkStatement {
             workdir: workdir.to_owned(),
             src: src.to_owned(),
             dst: dst.to_owned(),

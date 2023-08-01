@@ -64,9 +64,9 @@ impl engine::CommandBuilder for CopyBuilder {
                 create a copy of a filename in local storage and install a symlink to it
         ", command=self.name()}
     }
-    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let filename = args.expect_single_arg(self.name())?.to_owned();
-        Ok(Box::new(CopyStatement {
+        Ok(engine::Command::new_statement(CopyStatement {
             workdir: workdir.to_owned(),
             filename,
         }))

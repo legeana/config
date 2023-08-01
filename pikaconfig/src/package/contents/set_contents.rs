@@ -64,9 +64,9 @@ impl engine::CommandBuilder for SetContentsBuilder {
                 overwrites <filename> with <contents>
         ", command=self.name()}
     }
-    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (filename, contents) = args.expect_double_arg(self.name())?;
-        Ok(Box::new(SetContentsStatement {
+        Ok(engine::Command::new_statement(SetContentsStatement {
             filename: filename.to_owned(),
             contents: contents.to_owned(),
         }))

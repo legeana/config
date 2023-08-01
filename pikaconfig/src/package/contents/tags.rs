@@ -41,9 +41,9 @@ impl engine::CommandBuilder for RequiresBuilder {
                 only process the current directory if all of the tags are present
         ", command=self.name()}
     }
-    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (_, tags) = args.expect_variadic_args(self.name(), 0)?;
-        Ok(Box::new(RequiresStatement {
+        Ok(engine::Command::new_statement(RequiresStatement {
             tags: tags.to_vec(),
         }))
     }
@@ -80,9 +80,9 @@ impl engine::CommandBuilder for ConflictsBuilder {
                 only process the current directory if none of the tags are present
         ", command=self.name()}
     }
-    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (_, tags) = args.expect_variadic_args(self.name(), 0)?;
-        Ok(Box::new(ConflictsStatement {
+        Ok(engine::Command::new_statement(ConflictsStatement {
             tags: tags.to_vec(),
         }))
     }

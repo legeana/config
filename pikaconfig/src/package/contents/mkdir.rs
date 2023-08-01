@@ -51,9 +51,9 @@ impl engine::CommandBuilder for MkDirBuilder {
                 create a directory in prefix
         ", command=self.name()}
     }
-    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let dir = args.expect_single_arg(self.name())?.to_owned();
-        Ok(Box::new(MkDirStatement { dir }))
+        Ok(engine::Command::new_statement(MkDirStatement { dir }))
     }
 }
 

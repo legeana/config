@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 
 use crate::module::ModuleBox;
 
@@ -121,8 +121,11 @@ fn parse_command(
     cmd: &ast::Invocation,
 ) -> Result<engine::StatementBox> {
     let line = cmd.to_string();
-    let statement = engine::new_command(workdir, &cmd.name, &cmd.args)
+    let command = engine::new_command(workdir, &cmd.name, &cmd.args)
         .with_context(|| format!("failed to parse {manifest_path:?} line: {line}"))?;
+    let engine::Command::Statement(statement) = command else {
+        bail!("{name} is an expression and returns a value, use it in `var = {name} ...` context", name=cmd.name);
+    };
     Ok(Box::new(ParsedStatement {
         manifest_path: manifest_path.to_owned(),
         line,

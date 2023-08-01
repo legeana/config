@@ -55,12 +55,25 @@ impl Context {
     }
 }
 
+#[derive(Debug)]
+pub enum Command {
+    Statement(StatementBox),
+    #[allow(dead_code)]
+    Expression(ExpressionBox),
+}
+
+impl Command {
+    pub fn new_statement(statement: impl Statement + 'static) -> Self {
+        Self::Statement(Box::new(statement))
+    }
+}
+
 /// Builds a Statement.
 /// This should be purely syntactical.
 pub trait CommandBuilder: Sync + Send {
     fn name(&self) -> String;
     fn help(&self) -> String;
-    fn build(&self, workdir: &Path, args: &Arguments) -> Result<StatementBox>;
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<Command>;
 }
 
 pub type CommandBuilderBox = Box<dyn CommandBuilder>;
@@ -86,7 +99,19 @@ pub trait Statement: std::fmt::Debug {
 
 pub type StatementBox = Box<dyn Statement>;
 
-pub fn new_command(workdir: &Path, command: &str, args: &Arguments) -> Result<StatementBox> {
+#[allow(dead_code)]
+pub struct ExpressionOutput {
+    module: Option<ModuleBox>,
+    output: OsString,
+}
+
+pub trait Expression: std::fmt::Debug {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<ExpressionOutput>;
+}
+
+pub type ExpressionBox = Box<dyn Expression>;
+
+pub fn new_command(workdir: &Path, command: &str, args: &Arguments) -> Result<Command> {
     let builder = super::inventory::command(command)?;
     builder.build(workdir, args)
 }

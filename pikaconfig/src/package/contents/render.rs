@@ -76,9 +76,9 @@ impl engine::CommandBuilder for RenderBuilder {
                 render template
         ", command=self.name()}
     }
-    fn build(&self, workdir: &Path, args: &Arguments) -> anyhow::Result<engine::StatementBox> {
+    fn build(&self, workdir: &Path, args: &Arguments) -> anyhow::Result<engine::Command> {
         let filename = args.expect_single_arg(self.name())?;
-        Ok(Box::new(RenderStatement {
+        Ok(engine::Command::new_statement(RenderStatement {
             workdir: workdir.to_owned(),
             src: filename.to_owned(),
             dst: filename.to_owned(),
@@ -99,9 +99,9 @@ impl engine::CommandBuilder for RenderToBuilder {
                 render template <filename> into <destination>
         ", command=self.name()}
     }
-    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (dst, src) = args.expect_double_arg(self.name())?;
-        Ok(Box::new(RenderStatement {
+        Ok(engine::Command::new_statement(RenderStatement {
             workdir: workdir.to_owned(),
             src: src.to_owned(),
             dst: dst.to_owned(),

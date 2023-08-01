@@ -71,10 +71,10 @@ impl engine::CommandBuilder for PostInstallExecBuilder {
                 execute a command in a post-install phase
         ", command=self.name()}
     }
-    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (command, args) = args.expect_variadic_args(self.name(), 1)?;
         assert!(command.len() == 1);
-        Ok(Box::new(PostInstallStatement {
+        Ok(engine::Command::new_statement(PostInstallStatement {
             exec_condition: ExecCondition::Always,
             cmd: command[0].to_owned(),
             args: args.to_vec(),
@@ -96,10 +96,10 @@ impl engine::CommandBuilder for PostInstallUpdateBuilder {
                 only if executed via 'setup update' command
         ", command=self.name()}
     }
-    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (command, args) = args.expect_variadic_args(self.name(), 1)?;
         assert!(command.len() == 1);
-        Ok(Box::new(PostInstallStatement {
+        Ok(engine::Command::new_statement(PostInstallStatement {
             exec_condition: ExecCondition::UpdateOnly,
             cmd: command[0].to_owned(),
             args: args.to_vec(),

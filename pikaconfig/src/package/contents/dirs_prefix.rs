@@ -58,9 +58,9 @@ impl engine::CommandBuilder for DirsPrefixBuilder {
                 set current installation prefix to {prefix:?}
         ", command=self.name(), prefix=prefix}
     }
-    fn build(&self, _workdir: &std::path::Path, args: &Arguments) -> Result<engine::StatementBox> {
+    fn build(&self, _workdir: &std::path::Path, args: &Arguments) -> Result<engine::Command> {
         let subdir = args.expect_single_arg(self.name())?.to_owned();
-        Ok(Box::new(DirsPrefixStatement {
+        Ok(engine::Command::new_statement(DirsPrefixStatement {
             command: self.command,
             base_dir: self.base_dir.clone(),
             subdir,

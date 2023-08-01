@@ -136,9 +136,9 @@ impl engine::CommandBuilder for ImporteBuilder {
                 create a symlink for filename in prefix to a local persistent state
         ", command=self.name()}
     }
-    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let filename = args.expect_single_arg(self.name())?.to_owned();
-        Ok(Box::new(ImporterStatement {
+        Ok(engine::Command::new_statement(ImporterStatement {
             workdir: workdir.to_owned(),
             filename,
         }))
