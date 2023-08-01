@@ -67,13 +67,15 @@ impl Context {
 #[derive(Debug)]
 pub enum Command {
     Statement(StatementBox),
-    #[allow(dead_code)]
     Expression(ExpressionBox),
 }
 
 impl Command {
     pub fn new_statement(statement: impl Statement + 'static) -> Self {
         Self::Statement(Box::new(statement))
+    }
+    pub fn new_expression(expression: impl Expression + 'static) -> Self {
+        Self::Expression(Box::new(expression))
     }
 }
 

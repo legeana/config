@@ -69,6 +69,7 @@ fn register_all(registry: &mut dyn Registry) {
     // Exec.
     super::exec::register(registry);
     // Control.
+    super::literal::register(registry);
     super::is_command::register(registry);
     super::is_missing::register(registry);
     super::is_os::register(registry);

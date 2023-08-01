@@ -15,6 +15,7 @@ mod is_command;
 mod is_missing;
 mod is_os;
 mod lexer;
+mod literal;
 mod local_state;
 mod mkdir;
 mod output_file;
