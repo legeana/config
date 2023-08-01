@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
-use anyhow::Result;
+use anyhow::{bail, Result};
 
 use crate::module::ModuleBox;
 
@@ -53,6 +53,15 @@ impl Context {
             std::borrow::Cow::Owned(p) => p.into(),
         }
     }
+    pub fn set_var(&mut self, name: impl Into<String>, value: impl Into<OsString>) -> Result<()> {
+        let name = name.into();
+        let key = name.clone();
+        let value = value.into();
+        if self.vars.insert(key, value).is_some() {
+            bail!("{name} is already set");
+        }
+        Ok(())
+    }
 }
 
 #[derive(Debug)]
@@ -99,10 +108,9 @@ pub trait Statement: std::fmt::Debug {
 
 pub type StatementBox = Box<dyn Statement>;
 
-#[allow(dead_code)]
 pub struct ExpressionOutput {
-    module: Option<ModuleBox>,
-    output: OsString,
+    pub module: Option<ModuleBox>,
+    pub output: OsString,
 }
 
 pub trait Expression: std::fmt::Debug {
