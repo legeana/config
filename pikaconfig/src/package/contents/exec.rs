@@ -10,7 +10,7 @@ use super::args::Arguments;
 use super::engine;
 use super::inventory;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use indoc::formatdoc;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -74,10 +74,15 @@ impl engine::CommandBuilder for PostInstallExecBuilder {
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (command, args) = args.expect_variadic_args(self.name(), 1)?;
         assert!(command.len() == 1);
+        let cmd = command[0].expect_raw().context("command")?.to_owned();
+        let args: Vec<_> = args
+            .iter()
+            .map(|arg| arg.expect_raw().context("argument").map(str::to_string))
+            .collect::<Result<_>>()?;
         Ok(engine::Command::new_statement(PostInstallStatement {
             exec_condition: ExecCondition::Always,
-            cmd: command[0].to_owned(),
-            args: args.to_vec(),
+            cmd,
+            args,
         }))
     }
 }
@@ -99,10 +104,15 @@ impl engine::CommandBuilder for PostInstallUpdateBuilder {
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (command, args) = args.expect_variadic_args(self.name(), 1)?;
         assert!(command.len() == 1);
+        let cmd = command[0].expect_raw().context("command")?.to_owned();
+        let args: Vec<_> = args
+            .iter()
+            .map(|arg| arg.expect_raw().context("argument").map(str::to_string))
+            .collect::<Result<_>>()?;
         Ok(engine::Command::new_statement(PostInstallStatement {
             exec_condition: ExecCondition::UpdateOnly,
-            cmd: command[0].to_owned(),
-            args: args.to_vec(),
+            cmd,
+            args,
         }))
     }
 }

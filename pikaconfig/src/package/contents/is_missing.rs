@@ -34,7 +34,10 @@ impl engine::ConditionBuilder for IsMissingBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::ConditionBox> {
-        let path = args.expect_single_arg(self.name())?;
+        let path = args
+            .expect_single_arg(self.name())?
+            .expect_raw()
+            .context("path")?;
         Ok(Box::new(IsMissing(path.into())))
     }
 }

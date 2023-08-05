@@ -65,7 +65,11 @@ impl engine::CommandBuilder for CopyBuilder {
         ", command=self.name()}
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::Command> {
-        let filename = args.expect_single_arg(self.name())?.to_owned();
+        let filename = args
+            .expect_single_arg(self.name())?
+            .expect_raw()
+            .context("filename")?
+            .to_owned();
         Ok(engine::Command::new_statement(CopyStatement {
             workdir: workdir.to_owned(),
             filename,

@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, Context, Result};
 use indoc::formatdoc;
 use serde::Deserialize;
 
@@ -59,7 +59,11 @@ impl engine::CommandBuilder for DirsPrefixBuilder {
         ", command=self.name(), prefix=prefix}
     }
     fn build(&self, _workdir: &std::path::Path, args: &Arguments) -> Result<engine::Command> {
-        let subdir = args.expect_single_arg(self.name())?.to_owned();
+        let subdir = args
+            .expect_single_arg(self.name())?
+            .expect_raw()
+            .context("subdir")?
+            .to_owned();
         Ok(engine::Command::new_statement(DirsPrefixStatement {
             command: self.command,
             base_dir: self.base_dir.clone(),

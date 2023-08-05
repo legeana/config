@@ -52,7 +52,11 @@ impl engine::CommandBuilder for MkDirBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
-        let dir = args.expect_single_arg(self.name())?.to_owned();
+        let dir = args
+            .expect_single_arg(self.name())?
+            .expect_raw()
+            .context("directory")?
+            .to_owned();
         Ok(engine::Command::new_statement(MkDirStatement { dir }))
     }
 }

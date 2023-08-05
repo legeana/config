@@ -1,7 +1,7 @@
 use std::ffi::OsString;
 use std::path::Path;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use indoc::formatdoc;
 
 use super::args::Arguments;
@@ -34,7 +34,11 @@ impl engine::CommandBuilder for LiteralBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
-        let value = args.expect_single_arg(self.name())?.to_owned();
+        let value = args
+            .expect_single_arg(self.name())?
+            .expect_raw()
+            .context("literal")?
+            .to_owned();
         Ok(engine::Command::new_expression(LiteralExpression(
             value.into(),
         )))

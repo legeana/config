@@ -100,8 +100,8 @@ impl engine::CommandBuilder for FetchIntoBuilder {
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (filename, url) = args.expect_double_arg(self.name())?;
         Ok(engine::Command::new_statement(FetchIntoStatement {
-            filename: filename.to_owned(),
-            url: url.to_owned(),
+            filename: filename.expect_raw().context("filename")?.to_owned(),
+            url: url.expect_raw().context("url")?.to_owned(),
             executable: false,
         }))
     }
@@ -124,8 +124,8 @@ impl engine::CommandBuilder for FetchExeIntoBuilder {
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (filename, url) = args.expect_double_arg(self.name())?;
         Ok(engine::Command::new_statement(FetchIntoStatement {
-            filename: filename.to_owned(),
-            url: url.to_owned(),
+            filename: filename.expect_raw().context("filename")?.to_owned(),
+            url: url.expect_raw().context("url")?.to_owned(),
             executable: true,
         }))
     }

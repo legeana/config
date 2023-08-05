@@ -77,7 +77,10 @@ impl engine::CommandBuilder for RenderBuilder {
         ", command=self.name()}
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> anyhow::Result<engine::Command> {
-        let filename = args.expect_single_arg(self.name())?;
+        let filename = args
+            .expect_single_arg(self.name())?
+            .expect_raw()
+            .context("template")?;
         Ok(engine::Command::new_statement(RenderStatement {
             workdir: workdir.to_owned(),
             src: filename.to_owned(),
@@ -103,8 +106,8 @@ impl engine::CommandBuilder for RenderToBuilder {
         let (dst, src) = args.expect_double_arg(self.name())?;
         Ok(engine::Command::new_statement(RenderStatement {
             workdir: workdir.to_owned(),
-            src: src.to_owned(),
-            dst: dst.to_owned(),
+            src: src.expect_raw().context("template")?.to_owned(),
+            dst: dst.expect_raw().context("destination")?.to_owned(),
         }))
     }
 }

@@ -67,8 +67,8 @@ impl engine::CommandBuilder for SetContentsBuilder {
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (filename, contents) = args.expect_double_arg(self.name())?;
         Ok(engine::Command::new_statement(SetContentsStatement {
-            filename: filename.to_owned(),
-            contents: contents.to_owned(),
+            filename: filename.expect_raw().context("filename")?.to_owned(),
+            contents: contents.expect_raw().context("contents")?.to_owned(),
         }))
     }
 }

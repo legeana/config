@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use indoc::formatdoc;
 
 use crate::module::{Module, ModuleBox, Rules};
@@ -52,7 +52,10 @@ impl engine::CommandBuilder for SymlinkBuilder {
         ", command=self.name()}
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::Command> {
-        let filename = args.expect_single_arg(self.name())?;
+        let filename = args
+            .expect_single_arg(self.name())?
+            .expect_raw()
+            .context("filename")?;
         Ok(engine::Command::new_statement(SymlinkStatement {
             workdir: workdir.to_owned(),
             src: filename.to_owned(),
@@ -78,8 +81,8 @@ impl engine::CommandBuilder for SymlinkToBuilder {
         let (dst, src) = args.expect_double_arg(self.name())?;
         Ok(engine::Command::new_statement(SymlinkStatement {
             workdir: workdir.to_owned(),
-            src: src.to_owned(),
-            dst: dst.to_owned(),
+            src: src.expect_raw().context("filename")?.to_owned(),
+            dst: dst.expect_raw().context("destination")?.to_owned(),
         }))
     }
 }

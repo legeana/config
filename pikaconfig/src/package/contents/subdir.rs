@@ -37,7 +37,10 @@ impl engine::CommandBuilder for SubdirBuilder {
         ", command=self.name()}
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::Command> {
-        let subdir = args.expect_single_arg(self.name())?;
+        let subdir = args
+            .expect_single_arg(self.name())?
+            .expect_raw()
+            .context("subdir")?;
         let subroot = workdir.join(subdir);
         Ok(engine::Command::new_statement(SubdirStatement {
             subdir: subdir.into(),

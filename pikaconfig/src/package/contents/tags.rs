@@ -43,9 +43,11 @@ impl engine::CommandBuilder for RequiresBuilder {
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (_, tags) = args.expect_variadic_args(self.name(), 0)?;
-        Ok(engine::Command::new_statement(RequiresStatement {
-            tags: tags.to_vec(),
-        }))
+        let tags: Vec<_> = tags
+            .iter()
+            .map(|t| t.expect_raw().context("tag").map(str::to_string))
+            .collect::<Result<_>>()?;
+        Ok(engine::Command::new_statement(RequiresStatement { tags }))
     }
 }
 
@@ -82,9 +84,11 @@ impl engine::CommandBuilder for ConflictsBuilder {
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (_, tags) = args.expect_variadic_args(self.name(), 0)?;
-        Ok(engine::Command::new_statement(ConflictsStatement {
-            tags: tags.to_vec(),
-        }))
+        let tags: Vec<_> = tags
+            .iter()
+            .map(|t| t.expect_raw().context("tag").map(str::to_string))
+            .collect::<Result<_>>()?;
+        Ok(engine::Command::new_statement(ConflictsStatement { tags }))
     }
 }
 

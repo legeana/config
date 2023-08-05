@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use indoc::formatdoc;
 
 use crate::module::ModuleBox;
@@ -35,7 +35,11 @@ impl engine::CommandBuilder for PrefixBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
-        let prefix = args.expect_single_arg(self.name())?.to_owned();
+        let prefix = args
+            .expect_single_arg(self.name())?
+            .expect_raw()
+            .context("prefix")?
+            .to_owned();
         Ok(engine::Command::new_statement(PrefixStatement { prefix }))
     }
 }

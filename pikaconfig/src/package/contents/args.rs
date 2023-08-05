@@ -2,11 +2,41 @@ use anyhow::{anyhow, Result};
 
 #[macro_export]
 macro_rules! args {
-    ($($x:expr,)*) => {
-        $crate::package::contents::args::Arguments(vec![$($x.into(),)*])
+    (@as_raw $e:expr) => {
+        $crate::package::contents::args::Argument::Raw($e.into())
     };
-    ($($x:expr),*) => {
-        args![$($x,)*]
+    (@as_template $e:expr) => {
+        $crate::package::contents::args::Argument::Template($e.into())
+    };
+    [@build $($body:tt)*] => {
+        $crate::package::contents::args::Arguments(vec![$($body)*])
+    };
+    [@push_down () -> ($($body:tt)*)] => {
+        args![@build $($body)*]
+    };
+    [@push_down (@ $e:expr $(, $($tail:tt)*)?) -> ($($body:tt)*)] => {
+        args!(
+            @push_down
+            ($($($tail)*)?)
+            ->
+            ($($body)* args!(@as_template $e),)
+        )
+    };
+    [@push_down ($e:expr $(, $($tail:tt)*)?) -> ($($body:tt)*)] => {
+        args!(
+            @push_down
+            ($($($tail)*)?)
+            ->
+            ($($body)* args!(@as_raw $e),)
+        )
+    };
+    [$($body:tt)*] => {
+        args!(
+            @push_down
+            ($($body)*)
+            ->
+            ()
+        )
     };
 }
 
@@ -14,7 +44,33 @@ macro_rules! args {
 pub(crate) use args;
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct Arguments(pub Vec<String>);
+pub enum Argument {
+    Raw(String),
+    #[allow(dead_code)]
+    Template(String),
+}
+
+impl Argument {
+    pub fn expect_raw(&self) -> Result<&str> {
+        match self {
+            Self::Raw(s) => Ok(s),
+            Self::Template(_) => Err(anyhow!("can't use string template in this context")),
+        }
+    }
+}
+
+impl std::fmt::Display for Argument {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let s = match self {
+            Self::Raw(s) => s,
+            Self::Template(s) => s,
+        };
+        write!(f, "{}", shlex::quote(s))
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct Arguments(pub Vec<Argument>);
 
 impl Arguments {
     pub fn expect_no_args(&self, command: impl AsRef<str>) -> Result<()> {
@@ -30,16 +86,16 @@ impl Arguments {
         Ok(())
     }
 
-    pub fn expect_single_arg(&self, command: impl AsRef<str>) -> Result<&str> {
+    pub fn expect_single_arg(&self, command: impl AsRef<str>) -> Result<&Argument> {
         Ok(&self.expect_fixed_args(command, 1)?[0])
     }
 
-    pub fn expect_double_arg(&self, command: impl AsRef<str>) -> Result<(&str, &str)> {
+    pub fn expect_double_arg(&self, command: impl AsRef<str>) -> Result<(&Argument, &Argument)> {
         let args = self.expect_fixed_args(command, 2)?;
         Ok((&args[0], &args[1]))
     }
 
-    pub fn expect_fixed_args(&self, command: impl AsRef<str>, len: usize) -> Result<&[String]> {
+    pub fn expect_fixed_args(&self, command: impl AsRef<str>, len: usize) -> Result<&[Argument]> {
         let command = command.as_ref();
         if self.0.len() != len {
             return Err(anyhow!(
@@ -56,7 +112,7 @@ impl Arguments {
         &self,
         command: impl AsRef<str>,
         required: usize,
-    ) -> Result<(&[String], &[String])> {
+    ) -> Result<(&[Argument], &[Argument])> {
         let command = command.as_ref();
         if self.0.len() < required {
             return Err(anyhow!(
@@ -84,19 +140,36 @@ mod tests {
 
     #[test]
     fn test_single_arg() {
-        assert_eq!(args!["test"], Arguments(vec!["test".to_owned()]));
+        assert_eq!(
+            args!["test"],
+            Arguments(vec![Argument::Raw("test".to_owned())])
+        );
+        assert_eq!(
+            args![@"test"],
+            Arguments(vec![Argument::Template("test".to_owned())])
+        );
     }
 
     #[test]
     fn test_single_arg_trailing_comma() {
-        assert_eq!(args!["test",], Arguments(vec!["test".to_owned()]));
+        assert_eq!(
+            args!["test",],
+            Arguments(vec![Argument::Raw("test".to_owned())])
+        );
+        assert_eq!(
+            args![@"test",],
+            Arguments(vec![Argument::Template("test".to_owned())])
+        );
     }
 
     #[test]
     fn test_multiple_args() {
         assert_eq!(
-            args!["test 1", "test 2"],
-            Arguments(vec!["test 1".to_owned(), "test 2".to_owned()])
+            args!["test 1", @"test 2"],
+            Arguments(vec![
+                Argument::Raw("test 1".to_owned()),
+                Argument::Template("test 2".to_owned())
+            ])
         );
     }
 
@@ -104,7 +177,10 @@ mod tests {
     fn test_multiple_args_trailing_comma() {
         assert_eq!(
             args!["test 1", "test 2",],
-            Arguments(vec!["test 1".to_owned(), "test 2".to_owned(),])
+            Arguments(vec![
+                Argument::Raw("test 1".to_owned()),
+                Argument::Raw("test 2".to_owned()),
+            ])
         );
     }
 }

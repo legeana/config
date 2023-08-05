@@ -2,7 +2,7 @@ use std::path::Path;
 
 use crate::package::contents::lexer;
 
-use super::args::Arguments;
+use super::args;
 use super::ast;
 
 grammar(location: &Path);
@@ -37,10 +37,10 @@ Statement: ast::Statement = {
 Invocation: ast::Invocation = {
     <start:@L>
     <name:Literal>
-    <args:(<Literal>)*> => ast::Invocation {
+    <args:Arguments> => ast::Invocation {
         location: start,
         name,
-        args: Arguments(args),
+        args,
     },
 };
 
@@ -91,6 +91,15 @@ Assignment: ast::Assignment = {
         var,
         command,
     },
+};
+
+Arguments: args::Arguments = {
+    <Argument*> => args::Arguments(<>),
+};
+
+Argument: args::Argument = {
+    <Literal> => args::Argument::Raw(<>),
+    // TODO: args::Argument::Template(<>),
 };
 
 LineTerminator = {
