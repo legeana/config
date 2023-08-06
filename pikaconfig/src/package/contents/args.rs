@@ -54,7 +54,28 @@ impl Argument {
     pub fn expect_raw(&self) -> Result<&str> {
         match self {
             Self::Raw(s) => Ok(s),
-            Self::Template(_) => Err(anyhow!("can't use string template in this context")),
+            Self::Template(t) => {
+                let make_err = || anyhow!("can't use string template in this context");
+                let mut called_home = false;
+                let home_dir = || -> Option<String> {
+                    called_home = true;
+                    None
+                };
+                let get_env = |_: &_| -> Result<Option<String>, anyhow::Error> { Err(make_err()) };
+                let raw_result = shellexpand::full_with_context(t, home_dir, get_env);
+                if called_home {
+                    return Err(anyhow!(
+                        "failed to coerce template to a raw string: ~ expansion is not allowed"
+                    ));
+                }
+                match raw_result {
+                    Err(e) => Err(anyhow!("failed to coerce template to a raw string: {e}")),
+                    Ok(std::borrow::Cow::Borrowed(s)) => Ok(s),
+                    Ok(std::borrow::Cow::Owned(_)) => {
+                        Err(anyhow!("can't use string template in this context"))
+                    }
+                }
+            }
         }
     }
 }
@@ -132,6 +153,25 @@ impl Arguments {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_expect_raw_from_raw() {
+        assert_eq!(Argument::Raw("test".into()).expect_raw().unwrap(), "test");
+    }
+
+    #[test]
+    fn test_expect_raw_from_template() {
+        assert_eq!(
+            Argument::Template("test".into()).expect_raw().unwrap(),
+            "test"
+        );
+        assert_eq!(
+            Argument::Template("test~".into()).expect_raw().unwrap(),
+            "test~"
+        );
+        assert!(Argument::Template("~/test".into()).expect_raw().is_err());
+        assert!(Argument::Template("${test}".into()).expect_raw().is_err());
+    }
 
     #[test]
     fn test_empty_args() {
