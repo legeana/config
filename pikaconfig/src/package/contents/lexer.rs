@@ -202,7 +202,7 @@ impl<'input> LalrpopLexer<'input> {
             match next {
                 Some(Ok(Token::Literal(_))) => {
                     if self.prev_literal {
-                        self.stop_iteration = true;
+                        self.terminate();
                         return Some(Err(LexerError::LiteralsWithoutSeparator));
                     }
                     self.prev_literal = true;
@@ -216,13 +216,19 @@ impl<'input> LalrpopLexer<'input> {
                     self.prev_literal = false;
                     return next;
                 }
-                Some(Err(err)) => return Some(Err(err)),
+                Some(Err(_)) => {
+                    self.terminate();
+                    return next;
+                }
                 None => {
-                    self.stop_iteration = true;
+                    self.terminate();
                     return Some(Ok(Token::EndOfInput));
                 }
             }
         }
+    }
+    fn terminate(&mut self) {
+        self.stop_iteration = true;
     }
 }
 
@@ -234,7 +240,6 @@ impl<'input> Iterator for LalrpopLexer<'input> {
             Some(Ok(tok)) => {
                 let span = self.lexer.span();
                 let (start, end) = self.lexer.extras.span_location(&span);
-                self.prev_literal = matches!(tok, Token::Literal(_));
                 Some(Ok((start, tok, end)))
             }
             Some(Err(err)) => {
