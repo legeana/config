@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use anyhow::{anyhow, Result};
 
 #[macro_export]
@@ -5,8 +7,11 @@ macro_rules! args {
     (@as_raw $e:expr) => {
         $crate::package::contents::args::Argument::Raw($e.into())
     };
-    (@as_template $e:expr) => {
-        $crate::package::contents::args::Argument::Template($e.into())
+    (@as_vars $e:expr) => {
+        $crate::package::contents::args::Argument::OnlyVars($e.into())
+    };
+    (@as_vars_and_home $e:expr) => {
+        $crate::package::contents::args::Argument::VarsAndHome($e.into())
     };
     [@build $($body:tt)*] => {
         $crate::package::contents::args::Arguments(vec![$($body)*])
@@ -19,7 +24,15 @@ macro_rules! args {
             @push_down
             ($($($tail)*)?)
             ->
-            ($($body)* args!(@as_template $e),)
+            ($($body)* args!(@as_vars $e),)
+        )
+    };
+    [@push_down (~ $e:expr $(, $($tail:tt)*)?) -> ($($body:tt)*)] => {
+        args!(
+            @push_down
+            ($($($tail)*)?)
+            ->
+            ($($body)* args!(@as_vars_and_home $e),)
         )
     };
     [@push_down ($e:expr $(, $($tail:tt)*)?) -> ($($body:tt)*)] => {
@@ -47,35 +60,38 @@ pub(crate) use args;
 pub enum Argument {
     Raw(String),
     #[allow(dead_code)]
-    Template(String),
+    OnlyVars(String),
+    #[allow(dead_code)]
+    VarsAndHome(String),
 }
 
 impl Argument {
     pub fn expect_raw(&self) -> Result<&str> {
-        match self {
-            Self::Raw(s) => Ok(s),
-            Self::Template(t) => {
-                let make_err = || anyhow!("can't use string template in this context");
+        let get_env = |_: &_| -> Result<Option<String>, anyhow::Error> {
+            Err(anyhow!("can't use string template in this context"))
+        };
+        let result = match self {
+            Self::Raw(s) => return Ok(s),
+            Self::OnlyVars(t) => shellexpand::env_with_context(t, get_env),
+            Self::VarsAndHome(t) => {
                 let mut called_home = false;
                 let home_dir = || -> Option<String> {
                     called_home = true;
                     None
                 };
-                let get_env = |_: &_| -> Result<Option<String>, anyhow::Error> { Err(make_err()) };
                 let raw_result = shellexpand::full_with_context(t, home_dir, get_env);
                 if called_home {
                     return Err(anyhow!(
                         "failed to coerce template to a raw string: ~ expansion is not allowed"
                     ));
                 }
-                match raw_result {
-                    Err(e) => Err(anyhow!("failed to coerce template to a raw string: {e}")),
-                    Ok(std::borrow::Cow::Borrowed(s)) => Ok(s),
-                    Ok(std::borrow::Cow::Owned(_)) => {
-                        Err(anyhow!("can't use string template in this context"))
-                    }
-                }
+                raw_result
             }
+        };
+        match result {
+            Err(e) => Err(anyhow!("failed to coerce template to a raw string: {e}")),
+            Ok(Cow::Borrowed(s)) => Ok(s),
+            Ok(Cow::Owned(_)) => Err(anyhow!("can't use string template in this context")),
         }
     }
 }
@@ -84,7 +100,8 @@ impl std::fmt::Display for Argument {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let s = match self {
             Self::Raw(s) => s,
-            Self::Template(s) => s,
+            Self::OnlyVars(s) => s,
+            Self::VarsAndHome(s) => s,
         };
         write!(f, "{}", shlex::quote(s))
     }
@@ -161,16 +178,35 @@ mod tests {
 
     #[test]
     fn test_expect_raw_from_template() {
+        // "test"
         assert_eq!(
-            Argument::Template("test".into()).expect_raw().unwrap(),
+            Argument::OnlyVars("test".into()).expect_raw().unwrap(),
             "test"
         );
         assert_eq!(
-            Argument::Template("test~".into()).expect_raw().unwrap(),
+            Argument::VarsAndHome("test".into()).expect_raw().unwrap(),
+            "test"
+        );
+        // "test~"
+        assert_eq!(
+            Argument::OnlyVars("test~".into()).expect_raw().unwrap(),
             "test~"
         );
-        assert!(Argument::Template("~/test".into()).expect_raw().is_err());
-        assert!(Argument::Template("${test}".into()).expect_raw().is_err());
+        assert_eq!(
+            Argument::VarsAndHome("test~".into()).expect_raw().unwrap(),
+            "test~"
+        );
+        // "~/test"
+        assert_eq!(
+            Argument::OnlyVars("~/test".into()).expect_raw().unwrap(),
+            "~/test"
+        );
+        assert!(Argument::VarsAndHome("~/test".into()).expect_raw().is_err());
+        // "${test}"
+        assert!(Argument::OnlyVars("${test}".into()).expect_raw().is_err());
+        assert!(Argument::VarsAndHome("${test}".into())
+            .expect_raw()
+            .is_err());
     }
 
     #[test]
@@ -186,7 +222,11 @@ mod tests {
         );
         assert_eq!(
             args![@"test"],
-            Arguments(vec![Argument::Template("test".to_owned())])
+            Arguments(vec![Argument::OnlyVars("test".to_owned())])
+        );
+        assert_eq!(
+            args![~"test"],
+            Arguments(vec![Argument::VarsAndHome("test".to_owned())])
         );
     }
 
@@ -198,17 +238,22 @@ mod tests {
         );
         assert_eq!(
             args![@"test",],
-            Arguments(vec![Argument::Template("test".to_owned())])
+            Arguments(vec![Argument::OnlyVars("test".to_owned())])
+        );
+        assert_eq!(
+            args![~"test",],
+            Arguments(vec![Argument::VarsAndHome("test".to_owned())])
         );
     }
 
     #[test]
     fn test_multiple_args() {
         assert_eq!(
-            args!["test 1", @"test 2"],
+            args!["test 1", @"test 2", ~"test 3"],
             Arguments(vec![
                 Argument::Raw("test 1".to_owned()),
-                Argument::Template("test 2".to_owned())
+                Argument::OnlyVars("test 2".to_owned()),
+                Argument::VarsAndHome("test 3".to_owned()),
             ])
         );
     }
