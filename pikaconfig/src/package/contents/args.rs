@@ -167,6 +167,12 @@ impl Arguments {
     }
 }
 
+impl AsRef<[Argument]> for Arguments {
+    fn as_ref(&self) -> &[Argument] {
+        &self.0
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
