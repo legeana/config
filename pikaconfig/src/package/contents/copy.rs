@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::args::Arguments;
+use super::args::{Argument, Arguments};
 use super::engine;
 use super::inventory;
 use super::local_state;
@@ -36,18 +36,17 @@ impl Module for Copy {
 #[derive(Debug)]
 struct CopyStatement {
     workdir: PathBuf,
-    filename: String,
+    src: Argument,
+    dst: Argument,
 }
 
 impl engine::Statement for CopyStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
-        let dst = ctx.dst_path(&self.filename);
+        let src = self.workdir.join(ctx.expand_arg(&self.src)?);
+        let dst = ctx.dst_path(ctx.expand_arg(&self.dst)?);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
-        Ok(Some(Box::new(Copy {
-            src: self.workdir.join(&self.filename),
-            output,
-        })))
+        Ok(Some(Box::new(Copy { src, output })))
     }
 }
 
@@ -65,14 +64,11 @@ impl engine::CommandBuilder for CopyBuilder {
         ", command=self.name()}
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::Command> {
-        let filename = args
-            .expect_single_arg(self.name())?
-            .expect_raw()
-            .context("filename")?
-            .to_owned();
+        let filename = args.expect_single_arg(self.name())?;
         Ok(engine::Command::new_statement(CopyStatement {
             workdir: workdir.to_owned(),
-            filename,
+            src: filename.clone(),
+            dst: filename.clone(),
         }))
     }
 }
