@@ -133,7 +133,7 @@ impl Arguments {
         Ok((&args[0], &args[1]))
     }
 
-    pub fn expect_fixed_args(&self, command: impl AsRef<str>, len: usize) -> Result<&[Argument]> {
+    fn expect_fixed_args(&self, command: impl AsRef<str>, len: usize) -> Result<&[Argument]> {
         let command = command.as_ref();
         if self.0.len() != len {
             return Err(anyhow!(
