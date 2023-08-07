@@ -59,7 +59,9 @@ impl Module for FetchInto {
             self.set_executable(&output)
                 .with_context(|| format!("failed to make {:?} executable", self.output.path()))?;
         }
-        Ok(())
+        output
+            .sync_all()
+            .with_context(|| format!("failed to flush {:?}", self.output.path()))
     }
 }
 
@@ -132,6 +134,6 @@ impl engine::CommandBuilder for FetchExeIntoBuilder {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(FetchIntoBuilder {}));
-    registry.register_command(Box::new(FetchExeIntoBuilder {}));
+    registry.register_command(Box::new(FetchIntoBuilder));
+    registry.register_command(Box::new(FetchExeIntoBuilder));
 }
