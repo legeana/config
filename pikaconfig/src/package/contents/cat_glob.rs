@@ -4,7 +4,7 @@ use std::path::Path;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::args::Arguments;
+use super::args::{Argument, Arguments};
 use super::engine;
 use super::inventory;
 use super::local_state;
@@ -46,7 +46,7 @@ impl Module for CatGlobInto {
 
 #[derive(Debug)]
 struct CatGlobIntoStatement {
-    filename: String,
+    filename: Argument,
     globs: Vec<String>,
 }
 
@@ -61,7 +61,7 @@ impl engine::Statement for CatGlobIntoStatement {
         let glob_prefix = current_prefix.to_owned() + std::path::MAIN_SEPARATOR_STR;
         let concatenated_globs: Vec<String> =
             self.globs.iter().map(|g| glob_prefix.clone() + g).collect();
-        let dst = ctx.dst_path(&self.filename);
+        let dst = ctx.dst_path(ctx.expand_arg(&self.filename)?);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
         Ok(Some(Box::new(CatGlobInto {
@@ -85,8 +85,8 @@ impl engine::CommandBuilder for CatGlobIntoBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
-        let (fname, globs) = args.expect_at_least_one_arg(self.name())?;
-        let filename = fname.expect_raw().context("filename")?.to_owned();
+        let (filename, globs) = args.expect_at_least_one_arg(self.name())?;
+        let filename = filename.clone();
         let globs: Vec<_> = globs
             .iter()
             .map(|g| g.expect_raw().context("glob").map(str::to_string))
