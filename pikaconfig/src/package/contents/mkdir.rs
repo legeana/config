@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::args::Arguments;
+use super::args::{Argument, Arguments};
 use super::engine;
 use super::inventory;
 
@@ -27,13 +27,13 @@ impl Module for MkDir {
 
 #[derive(Debug)]
 struct MkDirStatement {
-    dir: String,
+    dir: Argument,
 }
 
 impl engine::Statement for MkDirStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         Ok(Some(Box::new(MkDir {
-            dst: ctx.dst_path(&self.dir),
+            dst: ctx.dst_path(ctx.expand_arg(&self.dir)?),
         })))
     }
 }
@@ -52,11 +52,7 @@ impl engine::CommandBuilder for MkDirBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
-        let dir = args
-            .expect_single_arg(self.name())?
-            .expect_raw()
-            .context("directory")?
-            .to_owned();
+        let dir = args.expect_single_arg(self.name())?.clone();
         Ok(engine::Command::new_statement(MkDirStatement { dir }))
     }
 }
