@@ -5,7 +5,7 @@ use std::{fs::File, io::Write};
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::args::Arguments;
+use super::args::{Argument, Arguments};
 use super::engine;
 use super::inventory;
 use super::local_state;
@@ -104,12 +104,12 @@ impl Module for Importer {
 #[derive(Debug)]
 struct ImporterStatement {
     workdir: PathBuf,
-    filename: String,
+    filename: Argument,
 }
 
 impl engine::Statement for ImporterStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
-        let dst = ctx.dst_path(&self.filename);
+        let dst = ctx.dst_path(ctx.expand_arg(&self.filename)?);
         let prefix = dst
             .parent()
             .ok_or_else(|| anyhow!("failed to get parent of {dst:?}"))?;
@@ -117,7 +117,7 @@ impl engine::Statement for ImporterStatement {
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
         Ok(Some(Box::new(Importer {
             prefix: prefix.to_owned(),
-            src: self.workdir.join(&self.filename),
+            src: self.workdir.join(ctx.expand_arg(&self.filename)?),
             output,
         })))
     }
@@ -137,11 +137,7 @@ impl engine::CommandBuilder for ImporteBuilder {
         ", command=self.name()}
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::Command> {
-        let filename = args
-            .expect_single_arg(self.name())?
-            .expect_raw()
-            .context("filename")?
-            .to_owned();
+        let filename = args.expect_single_arg(self.name())?.clone();
         Ok(engine::Command::new_statement(ImporterStatement {
             workdir: workdir.to_owned(),
             filename,
