@@ -1,12 +1,12 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use indoc::formatdoc;
 
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::args::Arguments;
+use super::args::{Argument, Arguments};
 use super::engine;
 use super::file_util;
 use super::inventory;
@@ -25,15 +25,17 @@ impl Module for Symlink {
 #[derive(Debug)]
 struct SymlinkStatement {
     workdir: PathBuf,
-    src: String,
-    dst: String,
+    src: Argument,
+    dst: Argument,
 }
 
 impl engine::Statement for SymlinkStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+        let src = ctx.expand_arg(&self.src)?;
+        let dst = ctx.expand_arg(&self.dst)?;
         Ok(Some(Box::new(Symlink {
-            src: self.workdir.join(&self.src),
-            dst: ctx.dst_path(&self.dst),
+            src: self.workdir.join(src),
+            dst: ctx.dst_path(dst),
         })))
     }
 }
@@ -52,14 +54,11 @@ impl engine::CommandBuilder for SymlinkBuilder {
         ", command=self.name()}
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::Command> {
-        let filename = args
-            .expect_single_arg(self.name())?
-            .expect_raw()
-            .context("filename")?;
+        let filename = args.expect_single_arg(self.name())?;
         Ok(engine::Command::new_statement(SymlinkStatement {
             workdir: workdir.to_owned(),
-            src: filename.to_owned(),
-            dst: filename.to_owned(),
+            src: filename.clone(),
+            dst: filename.clone(),
         }))
     }
 }
@@ -81,8 +80,8 @@ impl engine::CommandBuilder for SymlinkToBuilder {
         let (dst, src) = args.expect_double_arg(self.name())?;
         Ok(engine::Command::new_statement(SymlinkStatement {
             workdir: workdir.to_owned(),
-            src: src.expect_raw().context("filename")?.to_owned(),
-            dst: dst.expect_raw().context("destination")?.to_owned(),
+            src: src.clone(),
+            dst: dst.clone(),
         }))
     }
 }
