@@ -42,7 +42,7 @@ impl engine::CommandBuilder for RequiresBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
-        let (_, tags) = args.expect_variadic_args(self.name(), 0)?;
+        let tags = args.expect_any_args(self.name())?;
         let tags: Vec<_> = tags
             .iter()
             .map(|t| t.expect_raw().context("tag").map(str::to_string))
@@ -83,7 +83,7 @@ impl engine::CommandBuilder for ConflictsBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
-        let (_, tags) = args.expect_variadic_args(self.name(), 0)?;
+        let tags = args.expect_any_args(self.name())?;
         let tags: Vec<_> = tags
             .iter()
             .map(|t| t.expect_raw().context("tag").map(str::to_string))

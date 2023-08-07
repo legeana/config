@@ -72,9 +72,8 @@ impl engine::CommandBuilder for PostInstallExecBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
-        let (command, args) = args.expect_variadic_args(self.name(), 1)?;
-        assert!(command.len() == 1);
-        let cmd = command[0].expect_raw().context("command")?.to_owned();
+        let (command, args) = args.expect_at_least_one_arg(self.name())?;
+        let cmd = command.expect_raw().context("command")?.to_owned();
         let args = args.to_vec();
         Ok(engine::Command::new_statement(PostInstallStatement {
             exec_condition: ExecCondition::Always,
@@ -99,9 +98,8 @@ impl engine::CommandBuilder for PostInstallUpdateBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
-        let (command, args) = args.expect_variadic_args(self.name(), 1)?;
-        assert!(command.len() == 1);
-        let cmd = command[0].expect_raw().context("command")?.to_owned();
+        let (command, args) = args.expect_at_least_one_arg(self.name())?;
+        let cmd = command.expect_raw().context("command")?.to_owned();
         let args = args.to_vec();
         Ok(engine::Command::new_statement(PostInstallStatement {
             exec_condition: ExecCondition::UpdateOnly,

@@ -85,9 +85,8 @@ impl engine::CommandBuilder for CatGlobIntoBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
-        let (fname, globs) = args.expect_variadic_args(self.name(), 1)?;
-        assert!(fname.len() == 1);
-        let filename = fname[0].expect_raw().context("filename")?.to_owned();
+        let (fname, globs) = args.expect_at_least_one_arg(self.name())?;
+        let filename = fname.expect_raw().context("filename")?.to_owned();
         let globs: Vec<_> = globs
             .iter()
             .map(|g| g.expect_raw().context("glob").map(str::to_string))

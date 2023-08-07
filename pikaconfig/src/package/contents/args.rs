@@ -124,8 +124,22 @@ impl Arguments {
         Ok(())
     }
 
+    pub fn expect_any_args(&self, command: impl AsRef<str>) -> Result<&[Argument]> {
+        let (_, args) = self.expect_variadic_args(command, 0)?;
+        Ok(args)
+    }
+
     pub fn expect_single_arg(&self, command: impl AsRef<str>) -> Result<&Argument> {
         Ok(&self.expect_fixed_args(command, 1)?[0])
+    }
+
+    pub fn expect_at_least_one_arg(
+        &self,
+        command: impl AsRef<str>,
+    ) -> Result<(&Argument, &[Argument])> {
+        let (arg, tail) = self.expect_variadic_args(command, 1)?;
+        assert_eq!(arg.len(), 1);
+        Ok((&arg[0], tail))
     }
 
     pub fn expect_double_arg(&self, command: impl AsRef<str>) -> Result<(&Argument, &Argument)> {
@@ -146,7 +160,7 @@ impl Arguments {
     }
 
     /// Returns (required_args, remainder_args).
-    pub fn expect_variadic_args(
+    fn expect_variadic_args(
         &self,
         command: impl AsRef<str>,
         required: usize,
