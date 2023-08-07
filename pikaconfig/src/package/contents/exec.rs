@@ -6,7 +6,7 @@ use crate::module::{Module, ModuleBox, Rules};
 use crate::process_utils;
 use crate::registry::Registry;
 
-use super::args::Arguments;
+use super::args::{Argument, Arguments};
 use super::engine;
 use super::inventory;
 
@@ -43,12 +43,12 @@ impl Module for PostInstallExec {
 struct PostInstallStatement {
     exec_condition: ExecCondition,
     cmd: String,
-    args: Vec<String>,
+    args: Vec<Argument>,
 }
 
 impl engine::Statement for PostInstallStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
-        let args: Vec<_> = self.args.iter().map(|s| ctx.expand(s)).collect();
+        let args = ctx.expand_args(&self.args)?;
         Ok(Some(Box::new(PostInstallExec {
             exec_condition: self.exec_condition.clone(),
             current_dir: ctx.prefix.clone(),
@@ -75,10 +75,7 @@ impl engine::CommandBuilder for PostInstallExecBuilder {
         let (command, args) = args.expect_variadic_args(self.name(), 1)?;
         assert!(command.len() == 1);
         let cmd = command[0].expect_raw().context("command")?.to_owned();
-        let args: Vec<_> = args
-            .iter()
-            .map(|arg| arg.expect_raw().context("argument").map(str::to_string))
-            .collect::<Result<_>>()?;
+        let args = args.to_vec();
         Ok(engine::Command::new_statement(PostInstallStatement {
             exec_condition: ExecCondition::Always,
             cmd,
@@ -105,10 +102,7 @@ impl engine::CommandBuilder for PostInstallUpdateBuilder {
         let (command, args) = args.expect_variadic_args(self.name(), 1)?;
         assert!(command.len() == 1);
         let cmd = command[0].expect_raw().context("command")?.to_owned();
-        let args: Vec<_> = args
-            .iter()
-            .map(|arg| arg.expect_raw().context("argument").map(str::to_string))
-            .collect::<Result<_>>()?;
+        let args = args.to_vec();
         Ok(engine::Command::new_statement(PostInstallStatement {
             exec_condition: ExecCondition::UpdateOnly,
             cmd,

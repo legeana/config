@@ -36,7 +36,7 @@ Statement: ast::Statement = {
 
 Invocation: ast::Invocation = {
     <start:@L>
-    <name:Literal>
+    <name:UnquotedLiteral>
     <args:Arguments> => ast::Invocation {
         location: start,
         name,
@@ -84,7 +84,7 @@ Block = {
 
 Assignment: ast::Assignment = {
     <start:@L>
-    <var:Literal>
+    <var:UnquotedLiteral>
     Assign
     <command:Invocation> => ast::Assignment {
         location: start,
@@ -98,8 +98,9 @@ Arguments: args::Arguments = {
 };
 
 Argument: args::Argument = {
-    <Literal> => args::Argument::Raw(<>),
-    // TODO: args::Argument::Template(<>),
+    <SingleQuotedLiteral> => args::Argument::Raw(<>),
+    <DoubleQuotedLiteral> => args::Argument::OnlyVars(<>),
+    <UnquotedLiteral> => args::Argument::VarsAndHome(<>),
 };
 
 LineTerminator = {
@@ -114,7 +115,9 @@ extern {
     enum lexer::Token {
         EndOfInput => lexer::Token::EndOfInput,
         Newline => lexer::Token::Newline,
-        Literal => lexer::Token::Literal(<String>),
+        SingleQuotedLiteral => lexer::Token::SingleQuotedLiteral(<String>),
+        DoubleQuotedLiteral => lexer::Token::DoubleQuotedLiteral(<String>),
+        UnquotedLiteral => lexer::Token::UnquotedLiteral(<String>),
         If => lexer::Token::If,
         Else => lexer::Token::Else,
         Begin => lexer::Token::Begin,

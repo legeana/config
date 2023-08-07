@@ -1,22 +1,22 @@
 use std::path::Path;
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use indoc::formatdoc;
 
 use crate::module::ModuleBox;
 
-use super::args::Arguments;
+use super::args::{Argument, Arguments};
 use super::engine;
 use super::inventory;
 
 #[derive(Debug)]
 struct PrefixStatement {
-    prefix: String,
+    prefix: Argument,
 }
 
 impl engine::Statement for PrefixStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
-        ctx.prefix = ctx.expand(&self.prefix).into();
+        ctx.prefix = ctx.expand_arg(&self.prefix)?.into();
         Ok(None)
     }
 }
@@ -35,11 +35,7 @@ impl engine::CommandBuilder for PrefixBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
-        let prefix = args
-            .expect_single_arg(self.name())?
-            .expect_raw()
-            .context("prefix")?
-            .to_owned();
+        let prefix = args.expect_single_arg(self.name())?.clone();
         Ok(engine::Command::new_statement(PrefixStatement { prefix }))
     }
 }

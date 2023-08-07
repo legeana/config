@@ -39,16 +39,6 @@ impl Context {
     pub fn dst_path(&self, path: impl AsRef<Path>) -> PathBuf {
         self.prefix.join(path)
     }
-    /// Expands tilde and environment variables.
-    pub fn expand<'a>(&'a self, input: impl AsRef<str>) -> OsString {
-        let input = input.as_ref();
-        let get_var = |var: &str| -> Option<&'a OsString> { self.get_var(var) };
-        // TODO: maybe use safer prefix expansion.
-        match shellexpand::path::full_with_context_no_errors(input, dirs::home_dir, get_var) {
-            std::borrow::Cow::Borrowed(p) => p.as_os_str().to_owned(),
-            std::borrow::Cow::Owned(p) => p.into(),
-        }
-    }
     pub fn expand_arg<'a>(&'a self, arg: &Argument) -> Result<OsString> {
         let get_var = |var: &str| -> Result<Option<&'a OsString>> {
             Ok(Some(
