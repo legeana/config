@@ -10,7 +10,7 @@ use super::args::{Argument, Arguments};
 use super::engine;
 use super::inventory;
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use indoc::formatdoc;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -22,7 +22,7 @@ enum ExecCondition {
 struct PostInstallExec {
     exec_condition: ExecCondition,
     current_dir: PathBuf,
-    cmd: String,
+    cmd: OsString,
     args: Vec<OsString>,
 }
 
@@ -42,7 +42,7 @@ impl Module for PostInstallExec {
 #[derive(Debug)]
 struct PostInstallStatement {
     exec_condition: ExecCondition,
-    cmd: String,
+    cmd: Argument,
     args: Vec<Argument>,
 }
 
@@ -52,7 +52,7 @@ impl engine::Statement for PostInstallStatement {
         Ok(Some(Box::new(PostInstallExec {
             exec_condition: self.exec_condition.clone(),
             current_dir: ctx.prefix.clone(),
-            cmd: self.cmd.clone(),
+            cmd: ctx.expand_arg(&self.cmd)?,
             args,
         })))
     }
@@ -73,7 +73,7 @@ impl engine::CommandBuilder for PostInstallExecBuilder {
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (command, args) = args.expect_at_least_one_arg(self.name())?;
-        let cmd = command.expect_raw().context("command")?.to_owned();
+        let cmd = command.clone();
         let args = args.to_vec();
         Ok(engine::Command::new_statement(PostInstallStatement {
             exec_condition: ExecCondition::Always,
@@ -99,7 +99,7 @@ impl engine::CommandBuilder for PostInstallUpdateBuilder {
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (command, args) = args.expect_at_least_one_arg(self.name())?;
-        let cmd = command.expect_raw().context("command")?.to_owned();
+        let cmd = command.clone();
         let args = args.to_vec();
         Ok(engine::Command::new_statement(PostInstallStatement {
             exec_condition: ExecCondition::UpdateOnly,
