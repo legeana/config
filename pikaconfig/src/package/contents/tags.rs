@@ -41,11 +41,13 @@ impl engine::CommandBuilder for RequiresBuilder {
                 only process the current directory if all of the tags are present
         ", command=self.name()}
     }
-    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let (_, tags) = args.expect_variadic_args(self.name(), 0)?;
-        Ok(Box::new(RequiresStatement {
-            tags: tags.to_vec(),
-        }))
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
+        let tags = args.expect_any_args(self.name())?;
+        let tags: Vec<_> = tags
+            .iter()
+            .map(|t| t.expect_raw().context("tag").map(str::to_string))
+            .collect::<Result<_>>()?;
+        Ok(engine::Command::new_statement(RequiresStatement { tags }))
     }
 }
 
@@ -80,11 +82,13 @@ impl engine::CommandBuilder for ConflictsBuilder {
                 only process the current directory if none of the tags are present
         ", command=self.name()}
     }
-    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let (_, tags) = args.expect_variadic_args(self.name(), 0)?;
-        Ok(Box::new(ConflictsStatement {
-            tags: tags.to_vec(),
-        }))
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
+        let tags = args.expect_any_args(self.name())?;
+        let tags: Vec<_> = tags
+            .iter()
+            .map(|t| t.expect_raw().context("tag").map(str::to_string))
+            .collect::<Result<_>>()?;
+        Ok(engine::Command::new_statement(ConflictsStatement { tags }))
     }
 }
 

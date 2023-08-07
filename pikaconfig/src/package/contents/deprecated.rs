@@ -27,9 +27,9 @@ impl engine::CommandBuilder for DeprecatedBuilder {
     fn help(&self) -> String {
         "DEPRECATED: N/A".to_owned()
     }
-    fn build(&self, workdir: &Path, _args: &Arguments) -> Result<engine::StatementBox> {
+    fn build(&self, workdir: &Path, _args: &Arguments) -> Result<engine::Command> {
         log::warn!("{workdir:?}: {:?} is unsupported", self.0);
-        Ok(Box::new(NoOpStatement {}))
+        Ok(engine::Command::new_statement(NoOpStatement {}))
     }
 }
 

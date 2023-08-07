@@ -6,7 +6,7 @@ use indoc::formatdoc;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::args::Arguments;
+use super::args::{Argument, Arguments};
 use super::engine;
 use super::inventory;
 use super::local_state;
@@ -35,13 +35,16 @@ impl Module for SetContents {
 
 #[derive(Debug)]
 struct SetContentsStatement {
-    filename: String,
+    filename: Argument,
+    // This should be an Argument as well.
+    // The challenge is writing OsString to file.
+    // encode_wide() and as_bytes() can be used to achieve that.
     contents: String,
 }
 
 impl engine::Statement for SetContentsStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
-        let dst = ctx.dst_path(&self.filename);
+        let dst = ctx.dst_path(ctx.expand_arg(&self.filename)?);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
         Ok(Some(Box::new(SetContents {
@@ -64,11 +67,11 @@ impl engine::CommandBuilder for SetContentsBuilder {
                 overwrites <filename> with <contents>
         ", command=self.name()}
     }
-    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (filename, contents) = args.expect_double_arg(self.name())?;
-        Ok(Box::new(SetContentsStatement {
-            filename: filename.to_owned(),
-            contents: contents.to_owned(),
+        Ok(engine::Command::new_statement(SetContentsStatement {
+            filename: filename.clone(),
+            contents: contents.expect_raw().context("contents")?.to_owned(),
         }))
     }
 }

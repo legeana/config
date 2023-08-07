@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 
 use crate::module::ModuleBox;
 
@@ -89,6 +89,30 @@ impl engine::Statement for VecStatement {
     }
 }
 
+#[derive(Debug)]
+struct AssignmentStatement {
+    manifest_path: PathBuf,
+    line: String,
+    var_name: String,
+    expression: engine::ExpressionBox,
+}
+
+impl engine::Statement for AssignmentStatement {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+        let engine::ExpressionOutput { module, output } = self.expression.eval(ctx)?;
+        ctx.set_var(self.var_name.clone(), output)
+            .with_context(|| {
+                format!(
+                    "failed to set variable {var} {manifest_path:?}: {line:?}",
+                    var = self.var_name,
+                    manifest_path = self.manifest_path,
+                    line = self.line
+                )
+            })?;
+        Ok(module)
+    }
+}
+
 pub fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<engine::StatementBox>> {
     let manifest = std::fs::read_to_string(manifest_path)
         .with_context(|| format!("failed to read {manifest_path:?}"))?;
@@ -109,6 +133,9 @@ pub fn parse_statements<'a>(
                 ast::Statement::IfStatement(if_st) => {
                     parse_if_statement(workdir, manifest_path, if_st)
                 }
+                ast::Statement::Assignment(assignment) => {
+                    parse_assignment(workdir, manifest_path, assignment)
+                }
             }
         })
         .collect()
@@ -120,12 +147,35 @@ fn parse_command(
     cmd: &ast::Invocation,
 ) -> Result<engine::StatementBox> {
     let line = cmd.to_string();
-    let statement = engine::new_command(workdir, &cmd.name, &cmd.args)
+    let command = engine::new_command(workdir, &cmd.name, &cmd.args)
         .with_context(|| format!("failed to parse {manifest_path:?} line: {line}"))?;
+    let engine::Command::Statement(statement) = command else {
+        bail!("{name} is an expression and returns a value, use it in `var = {name} ...` context", name=cmd.name);
+    };
     Ok(Box::new(ParsedStatement {
         manifest_path: manifest_path.to_owned(),
         line,
         statement,
+    }))
+}
+
+fn parse_assignment(
+    workdir: &Path,
+    manifest_path: &Path,
+    assignment: &ast::Assignment,
+) -> Result<engine::StatementBox> {
+    let cmd = &assignment.command;
+    let line = cmd.to_string();
+    let command = engine::new_command(workdir, &cmd.name, &cmd.args)
+        .with_context(|| format!("failed to parse {manifest_path:?} line: {line}"))?;
+    let engine::Command::Expression(expression) = command else {
+        bail!("{name} is a statement and doesn't return a value, remove `{var} = ...`", name=cmd.name, var=assignment.var);
+    };
+    Ok(Box::new(AssignmentStatement {
+        manifest_path: manifest_path.to_owned(),
+        line,
+        var_name: assignment.var.clone(),
+        expression,
     }))
 }
 

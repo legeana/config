@@ -6,7 +6,7 @@ use crate::module::{Module, ModuleBox, Rules};
 use crate::process_utils;
 use crate::registry::Registry;
 
-use super::args::Arguments;
+use super::args::{Argument, Arguments};
 use super::engine;
 use super::inventory;
 
@@ -22,7 +22,7 @@ enum ExecCondition {
 struct PostInstallExec {
     exec_condition: ExecCondition,
     current_dir: PathBuf,
-    cmd: String,
+    cmd: OsString,
     args: Vec<OsString>,
 }
 
@@ -42,17 +42,17 @@ impl Module for PostInstallExec {
 #[derive(Debug)]
 struct PostInstallStatement {
     exec_condition: ExecCondition,
-    cmd: String,
-    args: Vec<String>,
+    cmd: Argument,
+    args: Vec<Argument>,
 }
 
 impl engine::Statement for PostInstallStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
-        let args: Vec<_> = self.args.iter().map(|s| ctx.expand(s)).collect();
+        let args = ctx.expand_args(&self.args)?;
         Ok(Some(Box::new(PostInstallExec {
             exec_condition: self.exec_condition.clone(),
             current_dir: ctx.prefix.clone(),
-            cmd: self.cmd.clone(),
+            cmd: ctx.expand_arg(&self.cmd)?,
             args,
         })))
     }
@@ -71,13 +71,14 @@ impl engine::CommandBuilder for PostInstallExecBuilder {
                 execute a command in a post-install phase
         ", command=self.name()}
     }
-    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let (command, args) = args.expect_variadic_args(self.name(), 1)?;
-        assert!(command.len() == 1);
-        Ok(Box::new(PostInstallStatement {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
+        let (command, args) = args.expect_at_least_one_arg(self.name())?;
+        let cmd = command.clone();
+        let args = args.to_vec();
+        Ok(engine::Command::new_statement(PostInstallStatement {
             exec_condition: ExecCondition::Always,
-            cmd: command[0].to_owned(),
-            args: args.to_vec(),
+            cmd,
+            args,
         }))
     }
 }
@@ -96,13 +97,14 @@ impl engine::CommandBuilder for PostInstallUpdateBuilder {
                 only if executed via 'setup update' command
         ", command=self.name()}
     }
-    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let (command, args) = args.expect_variadic_args(self.name(), 1)?;
-        assert!(command.len() == 1);
-        Ok(Box::new(PostInstallStatement {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
+        let (command, args) = args.expect_at_least_one_arg(self.name())?;
+        let cmd = command.clone();
+        let args = args.to_vec();
+        Ok(engine::Command::new_statement(PostInstallStatement {
             exec_condition: ExecCondition::UpdateOnly,
-            cmd: command[0].to_owned(),
-            args: args.to_vec(),
+            cmd,
+            args,
         }))
     }
 }

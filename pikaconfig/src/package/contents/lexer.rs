@@ -50,9 +50,11 @@ pub enum Token {
     #[token("\n", |lex| lex.extras.record_line(lex.span().end))]
     Newline,
     #[regex(r#"'([^'\n\\]|\\[^\n])*'"#, |lex| quote::unquote(lex.slice()))]
+    SingleQuotedLiteral(String),
     #[regex(r#""([^"\n\\]|\\[^\n])*""#, |lex| quote::unquote(lex.slice()))]
+    DoubleQuotedLiteral(String),
     #[regex(r#"[^\s'"]+"#, |lex| lex.slice().to_owned())]
-    Literal(String),
+    UnquotedLiteral(String),
     #[token("if")]
     If,
     #[token("else")]
@@ -61,6 +63,8 @@ pub enum Token {
     Begin,
     #[token("}")]
     End,
+    #[token("=")]
+    Assign,
 }
 
 impl std::fmt::Display for Token {
@@ -69,11 +73,14 @@ impl std::fmt::Display for Token {
             Token::EndOfInput => write!(f, "Token::EndOfInput"),
             Token::Space => write!(f, "Token::Space"),
             Token::Newline => write!(f, "Token::Newline"),
-            Token::Literal(s) => write!(f, "Token::Literal({s:?})"),
+            Token::SingleQuotedLiteral(s) => write!(f, "Token::SingleQuotedLiteral({s:?})"),
+            Token::DoubleQuotedLiteral(s) => write!(f, "Token::DoubleQuotedLiteral({s:?})"),
+            Token::UnquotedLiteral(s) => write!(f, "Token::UnquotedLiteral({s:?})"),
             Token::If => write!(f, "Token::If"),
             Token::Else => write!(f, "Token::Else"),
             Token::Begin => write!(f, "Token::Begin"),
             Token::End => write!(f, "Token::End"),
+            Token::Assign => write!(f, "Token::Assign"),
         }
     }
 }
@@ -200,7 +207,11 @@ impl<'input> LalrpopLexer<'input> {
         loop {
             let next = self.lexer.next();
             match next {
-                Some(Ok(Token::Literal(_))) => {
+                Some(Ok(
+                    Token::SingleQuotedLiteral(_)
+                    | Token::DoubleQuotedLiteral(_)
+                    | Token::UnquotedLiteral(_),
+                )) => {
                     if self.prev_literal {
                         self.terminate();
                         return Some(Err(LexerError::LiteralsWithoutSeparator));
@@ -308,14 +319,14 @@ mod tests {
         "#,
         );
         assert_token!(lex.next(), Token::Newline);
-        assert_token!(lex.next(), Token::Literal("simple".into()));
-        assert_token!(lex.next(), Token::Literal("command".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("simple".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("command".into()));
         assert_token!(lex.next(), Token::Newline);
-        assert_token!(lex.next(), Token::Literal("another".into()));
-        assert_token!(lex.next(), Token::Literal("command".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("another".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("command".into()));
         assert_token!(lex.next(), Token::Newline);
-        assert_token!(lex.next(), Token::Literal("do".into()));
-        assert_token!(lex.next(), Token::Literal("some/path".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("do".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("some/path".into()));
         assert_token!(lex.next(), Token::Newline);
         assert_eoi!(lex);
     }
@@ -329,10 +340,10 @@ mod tests {
         "#,
         );
         assert_token!(lex.next(), Token::Newline);
-        assert_token!(lex.next(), Token::Literal("simple".into()));
-        assert_token!(lex.next(), Token::Literal("command".into()));
-        assert_token!(lex.next(), Token::Literal("multiple".into()));
-        assert_token!(lex.next(), Token::Literal("args".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("simple".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("command".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("multiple".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("args".into()));
         assert_token!(lex.next(), Token::Newline);
         assert_eoi!(lex);
     }
@@ -348,13 +359,25 @@ mod tests {
         "#,
         );
         assert_token!(lex.next(), Token::Newline);
-        assert_token!(lex.next(), Token::Literal("single-quoted".into()));
+        assert_token!(
+            lex.next(),
+            Token::SingleQuotedLiteral("single-quoted".into())
+        );
         assert_token!(lex.next(), Token::Newline);
-        assert_token!(lex.next(), Token::Literal("single quoted".into()));
+        assert_token!(
+            lex.next(),
+            Token::SingleQuotedLiteral("single quoted".into())
+        );
         assert_token!(lex.next(), Token::Newline);
-        assert_token!(lex.next(), Token::Literal("single 'quoted'".into()));
+        assert_token!(
+            lex.next(),
+            Token::SingleQuotedLiteral("single 'quoted'".into())
+        );
         assert_token!(lex.next(), Token::Newline);
-        assert_token!(lex.next(), Token::Literal(r#""single quoted""#.into()));
+        assert_token!(
+            lex.next(),
+            Token::SingleQuotedLiteral(r#""single quoted""#.into())
+        );
         assert_token!(lex.next(), Token::Newline);
         assert_eoi!(lex);
     }
@@ -370,13 +393,25 @@ mod tests {
         "#,
         );
         assert_token!(lex.next(), Token::Newline);
-        assert_token!(lex.next(), Token::Literal("double-quoted".into()));
+        assert_token!(
+            lex.next(),
+            Token::DoubleQuotedLiteral("double-quoted".into())
+        );
         assert_token!(lex.next(), Token::Newline);
-        assert_token!(lex.next(), Token::Literal(r#"double quoted"#.into()));
+        assert_token!(
+            lex.next(),
+            Token::DoubleQuotedLiteral(r#"double quoted"#.into())
+        );
         assert_token!(lex.next(), Token::Newline);
-        assert_token!(lex.next(), Token::Literal(r#"double "quoted""#.into()));
+        assert_token!(
+            lex.next(),
+            Token::DoubleQuotedLiteral(r#"double "quoted""#.into())
+        );
         assert_token!(lex.next(), Token::Newline);
-        assert_token!(lex.next(), Token::Literal("'double quoted'".into()));
+        assert_token!(
+            lex.next(),
+            Token::DoubleQuotedLiteral("'double quoted'".into())
+        );
         assert_token!(lex.next(), Token::Newline);
         assert_eoi!(lex);
     }
@@ -391,16 +426,37 @@ mod tests {
         "#,
         );
         assert_token!(lex.next(), Token::Newline);
-        assert_token!(lex.next(), Token::Literal("unquoted".into()));
-        assert_token!(lex.next(), Token::Literal("single quoted".into()));
-        assert_token!(lex.next(), Token::Literal("double quoted".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("unquoted".into()));
+        assert_token!(
+            lex.next(),
+            Token::SingleQuotedLiteral("single quoted".into())
+        );
+        assert_token!(
+            lex.next(),
+            Token::DoubleQuotedLiteral("double quoted".into())
+        );
         assert_token!(lex.next(), Token::Newline);
-        assert_token!(lex.next(), Token::Literal("unquoted\\escaped".into()));
-        assert_token!(lex.next(), Token::Literal("single 'quoted'".into()));
-        assert_token!(lex.next(), Token::Literal(r#"double "quoted""#.into()));
+        assert_token!(
+            lex.next(),
+            Token::UnquotedLiteral("unquoted\\escaped".into())
+        );
+        assert_token!(
+            lex.next(),
+            Token::SingleQuotedLiteral("single 'quoted'".into())
+        );
+        assert_token!(
+            lex.next(),
+            Token::DoubleQuotedLiteral(r#"double "quoted""#.into())
+        );
         assert_token!(lex.next(), Token::Newline);
-        assert_token!(lex.next(), Token::Literal(r#"mixed 'quoted'"#.into()));
-        assert_token!(lex.next(), Token::Literal(r#"mixed "quoted""#.into()));
+        assert_token!(
+            lex.next(),
+            Token::DoubleQuotedLiteral(r#"mixed 'quoted'"#.into())
+        );
+        assert_token!(
+            lex.next(),
+            Token::SingleQuotedLiteral(r#"mixed "quoted""#.into())
+        );
         assert_token!(lex.next(), Token::Newline);
         assert_eoi!(lex);
     }
@@ -413,7 +469,7 @@ mod tests {
         "#,
         );
         assert_token!(lex.next(), Token::Newline);
-        assert_token!(lex.next(), Token::Literal("hello".into()));
+        assert_token!(lex.next(), Token::DoubleQuotedLiteral("hello".into()));
         assert_err!(
             lex.next(),
             LocationError {
@@ -452,13 +508,13 @@ mod tests {
         assert_token!(lex.next(), Token::Newline);
         // Skipped comment 1.
         assert_token!(lex.next(), Token::Newline);
-        assert_token!(lex.next(), Token::Literal("command".into()));
-        assert_token!(lex.next(), Token::Literal("one".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("command".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("one".into()));
         assert_token!(lex.next(), Token::Newline);
         // Skipped comment 2.
         assert_token!(lex.next(), Token::Newline);
-        assert_token!(lex.next(), Token::Literal("command".into()));
-        assert_token!(lex.next(), Token::Literal("two".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("command".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("two".into()));
         assert_token!(lex.next(), Token::Newline);
         assert_eoi!(lex);
     }
@@ -500,21 +556,37 @@ mod tests {
         );
         assert_token!(lex.next(), Token::Newline);
         assert_token!(lex.next(), Token::If);
-        assert_token!(lex.next(), Token::Literal("test".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("test".into()));
         assert_token!(lex.next(), Token::Begin);
         assert_token!(lex.next(), Token::Newline);
-        assert_token!(lex.next(), Token::Literal("command".into()));
-        assert_token!(lex.next(), Token::Literal("hello".into()));
-        assert_token!(lex.next(), Token::Literal("world".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("command".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("hello".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("world".into()));
         assert_token!(lex.next(), Token::Newline);
         assert_token!(lex.next(), Token::End);
         assert_token!(lex.next(), Token::Else);
         assert_token!(lex.next(), Token::Begin);
         assert_token!(lex.next(), Token::Newline);
-        assert_token!(lex.next(), Token::Literal("alternative".into()));
-        assert_token!(lex.next(), Token::Literal("command".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("alternative".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("command".into()));
         assert_token!(lex.next(), Token::Newline);
         assert_token!(lex.next(), Token::End);
+        assert_token!(lex.next(), Token::Newline);
+        assert_eoi!(lex);
+    }
+
+    #[test]
+    fn test_assignment() {
+        let mut lex = TestLexer::new(
+            r#"
+            x = command arg
+            "#,
+        );
+        assert_token!(lex.next(), Token::Newline);
+        assert_token!(lex.next(), Token::UnquotedLiteral("x".into()));
+        assert_token!(lex.next(), Token::Assign);
+        assert_token!(lex.next(), Token::UnquotedLiteral("command".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("arg".into()));
         assert_token!(lex.next(), Token::Newline);
         assert_eoi!(lex);
     }

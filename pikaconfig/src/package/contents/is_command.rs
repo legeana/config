@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use indoc::formatdoc;
 
 use crate::command::is_command;
@@ -32,7 +32,11 @@ impl engine::ConditionBuilder for IsCommandBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::ConditionBox> {
-        let exe = args.expect_single_arg(self.name())?.to_owned();
+        let exe = args
+            .expect_single_arg(self.name())?
+            .expect_raw()
+            .context("executable")?
+            .to_owned();
         Ok(Box::new(IsCommand(exe)))
     }
 }

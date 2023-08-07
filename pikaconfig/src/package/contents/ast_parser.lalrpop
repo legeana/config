@@ -2,7 +2,7 @@ use std::path::Path;
 
 use crate::package::contents::lexer;
 
-use super::args::Arguments;
+use super::args;
 use super::ast;
 
 grammar(location: &Path);
@@ -31,15 +31,16 @@ EmptyLine = {
 Statement: ast::Statement = {
     <Invocation> LineTerminator => ast::Statement::Command(<>),
     <IfStatement> LineTerminator => ast::Statement::IfStatement(<>),
+    <Assignment> LineTerminator => ast::Statement::Assignment(<>),
 };
 
 Invocation: ast::Invocation = {
     <start:@L>
-    <name:Literal>
-    <args:(<Literal>)*> => ast::Invocation {
+    <name:UnquotedLiteral>
+    <args:Arguments> => ast::Invocation {
         location: start,
         name,
-        args: Arguments(args),
+        args,
     },
 };
 
@@ -81,6 +82,27 @@ Block = {
     End
 };
 
+Assignment: ast::Assignment = {
+    <start:@L>
+    <var:UnquotedLiteral>
+    Assign
+    <command:Invocation> => ast::Assignment {
+        location: start,
+        var,
+        command,
+    },
+};
+
+Arguments: args::Arguments = {
+    <Argument*> => args::Arguments(<>),
+};
+
+Argument: args::Argument = {
+    <SingleQuotedLiteral> => args::Argument::Raw(<>),
+    <DoubleQuotedLiteral> => args::Argument::OnlyVars(<>),
+    <UnquotedLiteral> => args::Argument::VarsAndHome(<>),
+};
+
 LineTerminator = {
     Newline,
     EndOfInput,
@@ -93,10 +115,13 @@ extern {
     enum lexer::Token {
         EndOfInput => lexer::Token::EndOfInput,
         Newline => lexer::Token::Newline,
-        Literal => lexer::Token::Literal(<String>),
+        SingleQuotedLiteral => lexer::Token::SingleQuotedLiteral(<String>),
+        DoubleQuotedLiteral => lexer::Token::DoubleQuotedLiteral(<String>),
+        UnquotedLiteral => lexer::Token::UnquotedLiteral(<String>),
         If => lexer::Token::If,
         Else => lexer::Token::Else,
         Begin => lexer::Token::Begin,
         End => lexer::Token::End,
+        Assign => lexer::Token::Assign,
     }
 }

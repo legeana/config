@@ -1,12 +1,55 @@
+use std::borrow::Cow;
+
 use anyhow::{anyhow, Result};
 
 #[macro_export]
 macro_rules! args {
-    ($($x:expr,)*) => {
-        $crate::package::contents::args::Arguments(vec![$($x.into(),)*])
+    (@as_raw $e:expr) => {
+        $crate::package::contents::args::Argument::Raw($e.into())
     };
-    ($($x:expr),*) => {
-        args![$($x,)*]
+    (@as_vars $e:expr) => {
+        $crate::package::contents::args::Argument::OnlyVars($e.into())
+    };
+    (@as_vars_and_home $e:expr) => {
+        $crate::package::contents::args::Argument::VarsAndHome($e.into())
+    };
+    [@build $($body:tt)*] => {
+        $crate::package::contents::args::Arguments(vec![$($body)*])
+    };
+    [@push_down () -> ($($body:tt)*)] => {
+        args![@build $($body)*]
+    };
+    [@push_down (@ $e:expr $(, $($tail:tt)*)?) -> ($($body:tt)*)] => {
+        args!(
+            @push_down
+            ($($($tail)*)?)
+            ->
+            ($($body)* args!(@as_vars $e),)
+        )
+    };
+    [@push_down (~ $e:expr $(, $($tail:tt)*)?) -> ($($body:tt)*)] => {
+        args!(
+            @push_down
+            ($($($tail)*)?)
+            ->
+            ($($body)* args!(@as_vars_and_home $e),)
+        )
+    };
+    [@push_down ($e:expr $(, $($tail:tt)*)?) -> ($($body:tt)*)] => {
+        args!(
+            @push_down
+            ($($($tail)*)?)
+            ->
+            ($($body)* args!(@as_raw $e),)
+        )
+    };
+    [$($body:tt)*] => {
+        args!(
+            @push_down
+            ($($body)*)
+            ->
+            ()
+        )
     };
 }
 
@@ -14,7 +57,58 @@ macro_rules! args {
 pub(crate) use args;
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct Arguments(pub Vec<String>);
+pub enum Argument {
+    Raw(String),
+    #[allow(dead_code)]
+    OnlyVars(String),
+    #[allow(dead_code)]
+    VarsAndHome(String),
+}
+
+impl Argument {
+    pub fn expect_raw(&self) -> Result<&str> {
+        let get_env = |_: &_| -> Result<Option<String>, anyhow::Error> {
+            Err(anyhow!("can't use string template in this context"))
+        };
+        let result = match self {
+            Self::Raw(s) => return Ok(s),
+            Self::OnlyVars(t) => shellexpand::env_with_context(t, get_env),
+            Self::VarsAndHome(t) => {
+                let mut called_home = false;
+                let home_dir = || -> Option<String> {
+                    called_home = true;
+                    None
+                };
+                let raw_result = shellexpand::full_with_context(t, home_dir, get_env);
+                if called_home {
+                    return Err(anyhow!(
+                        "failed to coerce template to a raw string: ~ expansion is not allowed"
+                    ));
+                }
+                raw_result
+            }
+        };
+        match result {
+            Err(e) => Err(anyhow!("failed to coerce template to a raw string: {e}")),
+            Ok(Cow::Borrowed(s)) => Ok(s),
+            Ok(Cow::Owned(_)) => Err(anyhow!("can't use string template in this context")),
+        }
+    }
+}
+
+impl std::fmt::Display for Argument {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let s = match self {
+            Self::Raw(s) => s,
+            Self::OnlyVars(s) => s,
+            Self::VarsAndHome(s) => s,
+        };
+        write!(f, "{}", shlex::quote(s))
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct Arguments(pub Vec<Argument>);
 
 impl Arguments {
     pub fn expect_no_args(&self, command: impl AsRef<str>) -> Result<()> {
@@ -30,16 +124,30 @@ impl Arguments {
         Ok(())
     }
 
-    pub fn expect_single_arg(&self, command: impl AsRef<str>) -> Result<&str> {
+    pub fn expect_any_args(&self, command: impl AsRef<str>) -> Result<&[Argument]> {
+        let (_, args) = self.expect_variadic_args(command, 0)?;
+        Ok(args)
+    }
+
+    pub fn expect_single_arg(&self, command: impl AsRef<str>) -> Result<&Argument> {
         Ok(&self.expect_fixed_args(command, 1)?[0])
     }
 
-    pub fn expect_double_arg(&self, command: impl AsRef<str>) -> Result<(&str, &str)> {
+    pub fn expect_at_least_one_arg(
+        &self,
+        command: impl AsRef<str>,
+    ) -> Result<(&Argument, &[Argument])> {
+        let (arg, tail) = self.expect_variadic_args(command, 1)?;
+        assert_eq!(arg.len(), 1);
+        Ok((&arg[0], tail))
+    }
+
+    pub fn expect_double_arg(&self, command: impl AsRef<str>) -> Result<(&Argument, &Argument)> {
         let args = self.expect_fixed_args(command, 2)?;
         Ok((&args[0], &args[1]))
     }
 
-    pub fn expect_fixed_args(&self, command: impl AsRef<str>, len: usize) -> Result<&[String]> {
+    fn expect_fixed_args(&self, command: impl AsRef<str>, len: usize) -> Result<&[Argument]> {
         let command = command.as_ref();
         if self.0.len() != len {
             return Err(anyhow!(
@@ -52,11 +160,11 @@ impl Arguments {
     }
 
     /// Returns (required_args, remainder_args).
-    pub fn expect_variadic_args(
+    fn expect_variadic_args(
         &self,
         command: impl AsRef<str>,
         required: usize,
-    ) -> Result<(&[String], &[String])> {
+    ) -> Result<(&[Argument], &[Argument])> {
         let command = command.as_ref();
         if self.0.len() < required {
             return Err(anyhow!(
@@ -73,9 +181,53 @@ impl Arguments {
     }
 }
 
+impl AsRef<[Argument]> for Arguments {
+    fn as_ref(&self) -> &[Argument] {
+        &self.0
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_expect_raw_from_raw() {
+        assert_eq!(Argument::Raw("test".into()).expect_raw().unwrap(), "test");
+    }
+
+    #[test]
+    fn test_expect_raw_from_template() {
+        // "test"
+        assert_eq!(
+            Argument::OnlyVars("test".into()).expect_raw().unwrap(),
+            "test"
+        );
+        assert_eq!(
+            Argument::VarsAndHome("test".into()).expect_raw().unwrap(),
+            "test"
+        );
+        // "test~"
+        assert_eq!(
+            Argument::OnlyVars("test~".into()).expect_raw().unwrap(),
+            "test~"
+        );
+        assert_eq!(
+            Argument::VarsAndHome("test~".into()).expect_raw().unwrap(),
+            "test~"
+        );
+        // "~/test"
+        assert_eq!(
+            Argument::OnlyVars("~/test".into()).expect_raw().unwrap(),
+            "~/test"
+        );
+        assert!(Argument::VarsAndHome("~/test".into()).expect_raw().is_err());
+        // "${test}"
+        assert!(Argument::OnlyVars("${test}".into()).expect_raw().is_err());
+        assert!(Argument::VarsAndHome("${test}".into())
+            .expect_raw()
+            .is_err());
+    }
 
     #[test]
     fn test_empty_args() {
@@ -84,19 +236,45 @@ mod tests {
 
     #[test]
     fn test_single_arg() {
-        assert_eq!(args!["test"], Arguments(vec!["test".to_owned()]));
+        assert_eq!(
+            args!["test"],
+            Arguments(vec![Argument::Raw("test".to_owned())])
+        );
+        assert_eq!(
+            args![@"test"],
+            Arguments(vec![Argument::OnlyVars("test".to_owned())])
+        );
+        assert_eq!(
+            args![~"test"],
+            Arguments(vec![Argument::VarsAndHome("test".to_owned())])
+        );
     }
 
     #[test]
     fn test_single_arg_trailing_comma() {
-        assert_eq!(args!["test",], Arguments(vec!["test".to_owned()]));
+        assert_eq!(
+            args!["test",],
+            Arguments(vec![Argument::Raw("test".to_owned())])
+        );
+        assert_eq!(
+            args![@"test",],
+            Arguments(vec![Argument::OnlyVars("test".to_owned())])
+        );
+        assert_eq!(
+            args![~"test",],
+            Arguments(vec![Argument::VarsAndHome("test".to_owned())])
+        );
     }
 
     #[test]
     fn test_multiple_args() {
         assert_eq!(
-            args!["test 1", "test 2"],
-            Arguments(vec!["test 1".to_owned(), "test 2".to_owned()])
+            args!["test 1", @"test 2", ~"test 3"],
+            Arguments(vec![
+                Argument::Raw("test 1".to_owned()),
+                Argument::OnlyVars("test 2".to_owned()),
+                Argument::VarsAndHome("test 3".to_owned()),
+            ])
         );
     }
 
@@ -104,7 +282,10 @@ mod tests {
     fn test_multiple_args_trailing_comma() {
         assert_eq!(
             args!["test 1", "test 2",],
-            Arguments(vec!["test 1".to_owned(), "test 2".to_owned(),])
+            Arguments(vec![
+                Argument::Raw("test 1".to_owned()),
+                Argument::Raw("test 2".to_owned()),
+            ])
         );
     }
 }

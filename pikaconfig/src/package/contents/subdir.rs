@@ -18,10 +18,7 @@ struct SubdirStatement {
 
 impl engine::Statement for SubdirStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
-        let mut substate = engine::Context {
-            enabled: true,
-            prefix: ctx.prefix.join(&self.subdir),
-        };
+        let mut substate = ctx.subdir(&self.subdir);
         self.config.eval(&mut substate)
     }
 }
@@ -39,10 +36,13 @@ impl engine::CommandBuilder for SubdirBuilder {
                 load subdirectory configuration recursively
         ", command=self.name()}
     }
-    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let subdir = args.expect_single_arg(self.name())?;
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::Command> {
+        let subdir = args
+            .expect_single_arg(self.name())?
+            .expect_raw()
+            .context("subdir")?;
         let subroot = workdir.join(subdir);
-        Ok(Box::new(SubdirStatement {
+        Ok(engine::Command::new_statement(SubdirStatement {
             subdir: subdir.into(),
             config: super::ConfigurationStatement::parse(subroot)?,
         }))
@@ -79,7 +79,7 @@ impl engine::CommandBuilder for SubdirsBuilder {
                 load all subdirectories recursively
         ", command=self.name()}
     }
-    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         args.expect_no_args(self.name())?;
         let mut subdirs: Vec<SubdirStatement> = Vec::new();
         for entry in workdir
@@ -98,7 +98,7 @@ impl engine::CommandBuilder for SubdirsBuilder {
                 config: super::ConfigurationStatement::parse(entry.path())?,
             });
         }
-        Ok(Box::new(SubdirsStatement { subdirs }))
+        Ok(engine::Command::new_statement(SubdirsStatement { subdirs }))
     }
 }
 

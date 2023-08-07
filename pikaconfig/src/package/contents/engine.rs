@@ -1,35 +1,103 @@
+use std::borrow::Cow;
+use std::collections::HashMap;
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
-use anyhow::Result;
+use anyhow::{anyhow, bail, Result};
 
 use crate::module::ModuleBox;
 
-use super::args::Arguments;
+use super::args::{Argument, Arguments};
 use super::engine;
 
 pub struct Context {
     pub enabled: bool,
     pub prefix: PathBuf,
+    home_var: OsString,
+    vars: HashMap<String, OsString>,
 }
 
 impl Context {
     pub fn new() -> Self {
+        let home = dirs::home_dir().expect("failed to determine home dir");
+        let home_var: OsString = home.clone().into();
         Self {
             enabled: true,
-            prefix: dirs::home_dir().expect("failed to determine home dir"),
+            prefix: home,
+            home_var,
+            vars: HashMap::new(), // Variables are not inherited.
+        }
+    }
+    pub fn subdir(&self, path: impl AsRef<Path>) -> Self {
+        Self {
+            enabled: true,
+            prefix: self.prefix.join(path.as_ref()),
+            home_var: self.home_var.clone(),
+            vars: HashMap::new(), // Variables are not inherited.
         }
     }
     pub fn dst_path(&self, path: impl AsRef<Path>) -> PathBuf {
         self.prefix.join(path)
     }
-    /// Expands tilde and environment variables.
-    pub fn expand(&self, input: impl AsRef<str>) -> OsString {
-        // TODO: maybe use safer prefix expansion.
-        match shellexpand::path::tilde(input.as_ref()) {
-            std::borrow::Cow::Borrowed(p) => p.as_os_str().to_owned(),
-            std::borrow::Cow::Owned(p) => p.into(),
+    pub fn expand_arg<'a>(&'a self, arg: &Argument) -> Result<OsString> {
+        let get_var = |var: &str| -> Result<Option<&'a OsString>> {
+            Ok(Some(
+                self.get_var(var)
+                    .ok_or_else(|| anyhow!("failed to resolve {var:?}"))?,
+            ))
+        };
+        let home_dir = || -> Option<&Path> {
+            // Must never return None, or ~ will not get expanded.
+            // This leads to pretty nasty behaviour in the code.
+            Some(self.home_var.as_ref())
+        };
+        let rendered = match arg {
+            Argument::Raw(s) => return Ok(s.into()),
+            Argument::OnlyVars(t) => shellexpand::path::env_with_context(t, get_var),
+            Argument::VarsAndHome(t) => shellexpand::path::full_with_context(t, home_dir, get_var),
+        };
+        match rendered {
+            Err(e) => Err(anyhow!("failed to expand {arg:?}: {e}")),
+            Ok(Cow::Borrowed(p)) => Ok(p.as_os_str().to_owned()),
+            Ok(Cow::Owned(p)) => Ok(p.into()),
         }
+    }
+    #[allow(dead_code)]
+    pub fn expand_args(&self, args: impl AsRef<[Argument]>) -> Result<Vec<OsString>> {
+        args.as_ref()
+            .iter()
+            .map(|arg| self.expand_arg(arg))
+            .collect()
+    }
+    fn get_var(&self, var: &str) -> Option<&OsString> {
+        match var {
+            "HOME" => Some(&self.home_var),
+            _ => self.vars.get(var),
+        }
+    }
+    pub fn set_var(&mut self, name: impl Into<String>, value: impl Into<OsString>) -> Result<()> {
+        let name = name.into();
+        let key = name.clone();
+        let value = value.into();
+        if self.vars.insert(key, value).is_some() {
+            bail!("{name} is already set");
+        }
+        Ok(())
+    }
+}
+
+#[derive(Debug)]
+pub enum Command {
+    Statement(StatementBox),
+    Expression(ExpressionBox),
+}
+
+impl Command {
+    pub fn new_statement(statement: impl Statement + 'static) -> Self {
+        Self::Statement(Box::new(statement))
+    }
+    pub fn new_expression(expression: impl Expression + 'static) -> Self {
+        Self::Expression(Box::new(expression))
     }
 }
 
@@ -38,7 +106,7 @@ impl Context {
 pub trait CommandBuilder: Sync + Send {
     fn name(&self) -> String;
     fn help(&self) -> String;
-    fn build(&self, workdir: &Path, args: &Arguments) -> Result<StatementBox>;
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<Command>;
 }
 
 pub type CommandBuilderBox = Box<dyn CommandBuilder>;
@@ -64,7 +132,18 @@ pub trait Statement: std::fmt::Debug {
 
 pub type StatementBox = Box<dyn Statement>;
 
-pub fn new_command(workdir: &Path, command: &str, args: &Arguments) -> Result<StatementBox> {
+pub struct ExpressionOutput {
+    pub module: Option<ModuleBox>,
+    pub output: OsString,
+}
+
+pub trait Expression: std::fmt::Debug {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<ExpressionOutput>;
+}
+
+pub type ExpressionBox = Box<dyn Expression>;
+
+pub fn new_command(workdir: &Path, command: &str, args: &Arguments) -> Result<Command> {
     let builder = super::inventory::command(command)?;
     builder.build(workdir, args)
 }
@@ -88,4 +167,97 @@ pub fn help() -> String {
         help.push('\n');
     }
     help
+}
+
+#[cfg(test)]
+mod tests {
+    use super::super::args::args;
+    use super::*;
+
+    macro_rules! os {
+        ($s:literal) => {
+            std::ffi::OsStr::new($s)
+        };
+    }
+
+    #[test]
+    fn test_context_expand_arg_raw() {
+        let ctx = Context::new();
+        assert_eq!(
+            ctx.expand_arg(&Argument::Raw("hello".into())).unwrap(),
+            os!("hello")
+        );
+        assert_eq!(
+            ctx.expand_arg(&Argument::Raw("~/hello".into())).unwrap(),
+            os!("~/hello")
+        );
+        assert_eq!(
+            ctx.expand_arg(&Argument::Raw("${hello}".into())).unwrap(),
+            os!("${hello}")
+        );
+    }
+
+    #[test]
+    fn test_context_expand_arg_only_vars() {
+        let mut ctx = Context::new();
+        ctx.set_var("hello", "world").unwrap();
+
+        assert_eq!(
+            ctx.expand_arg(&Argument::OnlyVars("hello".into())).unwrap(),
+            os!("hello")
+        );
+        assert_eq!(
+            ctx.expand_arg(&Argument::OnlyVars("${hello}".into()))
+                .unwrap(),
+            os!("world")
+        );
+    }
+
+    #[test]
+    fn test_context_expand_arg_unset_var() {
+        let ctx = Context::new();
+        assert!(ctx
+            .expand_arg(&Argument::OnlyVars("$hello".into()))
+            .err()
+            .unwrap()
+            .to_string()
+            .contains("hello"));
+    }
+
+    #[test]
+    fn test_context_expand_arg_vars_and_home() {
+        let mut ctx = Context::new();
+        ctx.set_var("hello", "world").unwrap();
+        assert_eq!(
+            ctx.expand_arg(&Argument::VarsAndHome("hello".into()))
+                .unwrap(),
+            os!("hello")
+        );
+        assert_eq!(
+            ctx.expand_arg(&Argument::VarsAndHome("${hello}".into()))
+                .unwrap(),
+            os!("world")
+        );
+
+        let mut want = dirs::home_dir().unwrap().as_os_str().to_owned();
+        want.push("/subdir");
+        assert_eq!(
+            ctx.expand_arg(&Argument::VarsAndHome("~/subdir".into()))
+                .unwrap(),
+            want
+        );
+    }
+
+    #[test]
+    fn test_context_expand_args() {
+        let mut ctx = Context::new();
+        ctx.set_var("var_1", "val_1").unwrap();
+        ctx.set_var("var_2", "val_2").unwrap();
+
+        assert_eq!(
+            ctx.expand_args(args!["hello", @"$var_1", ~"$var_2"])
+                .unwrap(),
+            vec![os!("hello"), os!("val_1"), os!("val_2")]
+        );
+    }
 }

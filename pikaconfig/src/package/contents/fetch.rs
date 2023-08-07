@@ -6,7 +6,7 @@ use indoc::formatdoc;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::args::Arguments;
+use super::args::{Argument, Arguments};
 use super::engine;
 use super::inventory;
 use super::local_state;
@@ -65,14 +65,14 @@ impl Module for FetchInto {
 
 #[derive(Debug)]
 struct FetchIntoStatement {
-    filename: String,
+    filename: Argument,
     url: String,
     executable: bool,
 }
 
 impl engine::Statement for FetchIntoStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
-        let dst = ctx.dst_path(&self.filename);
+        let dst = ctx.dst_path(ctx.expand_arg(&self.filename)?);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
         Ok(Some(Box::new(FetchInto {
@@ -97,11 +97,11 @@ impl engine::CommandBuilder for FetchIntoBuilder {
                 and installs a symlink to it
         ", command=self.name()}
     }
-    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (filename, url) = args.expect_double_arg(self.name())?;
-        Ok(Box::new(FetchIntoStatement {
-            filename: filename.to_owned(),
-            url: url.to_owned(),
+        Ok(engine::Command::new_statement(FetchIntoStatement {
+            filename: filename.clone(),
+            url: url.expect_raw().context("url")?.to_owned(),
             executable: false,
         }))
     }
@@ -121,11 +121,11 @@ impl engine::CommandBuilder for FetchExeIntoBuilder {
                 and installs a symlink to it
         ", command=self.name()}
     }
-    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (filename, url) = args.expect_double_arg(self.name())?;
-        Ok(Box::new(FetchIntoStatement {
-            filename: filename.to_owned(),
-            url: url.to_owned(),
+        Ok(engine::Command::new_statement(FetchIntoStatement {
+            filename: filename.clone(),
+            url: url.expect_raw().context("url")?.to_owned(),
             executable: true,
         }))
     }

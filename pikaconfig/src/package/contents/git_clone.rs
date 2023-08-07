@@ -7,7 +7,7 @@ use crate::git_utils;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::args::Arguments;
+use super::args::{Argument, Arguments};
 use super::engine;
 use super::inventory;
 use super::local_state;
@@ -74,12 +74,12 @@ impl Module for GitClone {
 #[derive(Debug)]
 struct GitCloneStatement {
     url: String,
-    dst: String,
+    dst: Argument,
 }
 
 impl engine::Statement for GitCloneStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
-        let dst = ctx.dst_path(&self.dst);
+        let dst = ctx.dst_path(ctx.expand_arg(&self.dst)?);
         let output = local_state::DirectoryState::new(dst.clone())
             .with_context(|| format!("failed to create DirectoryState from {dst:?}"))?;
         Ok(Some(Box::new(GitClone {
@@ -103,11 +103,11 @@ impl engine::CommandBuilder for GitCloneBuilder {
                 if <branch> is specified clone <branch> instead of default HEAD
         ", command=self.name()}
     }
-    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (url, dst) = args.expect_double_arg(self.name())?;
-        Ok(Box::new(GitCloneStatement {
-            url: url.to_owned(),
-            dst: dst.to_owned(),
+        Ok(engine::Command::new_statement(GitCloneStatement {
+            url: url.expect_raw().context("url")?.to_owned(),
+            dst: dst.clone(),
         }))
     }
 }

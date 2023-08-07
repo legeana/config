@@ -6,7 +6,7 @@ use indoc::formatdoc;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
-use super::args::Arguments;
+use super::args::{Argument, Arguments};
 use super::engine;
 use super::inventory;
 use super::local_state;
@@ -23,12 +23,12 @@ impl Module for OutputFile {
 
 #[derive(Debug)]
 struct OutputFileStatement {
-    filename: String,
+    filename: Argument,
 }
 
 impl engine::Statement for OutputFileStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
-        let dst = ctx.dst_path(&self.filename);
+        let dst = ctx.dst_path(ctx.expand_arg(&self.filename)?);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
         Ok(Some(Box::new(OutputFile { output })))
@@ -48,9 +48,11 @@ impl engine::CommandBuilder for OutputFileBuilder {
                 create a symlink for filename in prefix to a local persistent state
         ", command=self.name()}
     }
-    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let filename = args.expect_single_arg(self.name())?.to_owned();
-        Ok(Box::new(OutputFileStatement { filename }))
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
+        let filename = args.expect_single_arg(self.name())?.clone();
+        Ok(engine::Command::new_statement(OutputFileStatement {
+            filename,
+        }))
     }
 }
 

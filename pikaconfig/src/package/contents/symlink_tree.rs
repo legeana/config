@@ -64,9 +64,13 @@ impl engine::CommandBuilder for SymlinkTreeBuilder {
                 create a symlink for every file in a directory recursively
         ", command=self.name()}
     }
-    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::StatementBox> {
-        let directory = args.expect_single_arg(self.name())?.to_owned();
-        Ok(Box::new(SymlinkTreeStatement {
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::Command> {
+        let directory = args
+            .expect_single_arg(self.name())?
+            .expect_raw()
+            .context("directory")?
+            .to_owned();
+        Ok(engine::Command::new_statement(SymlinkTreeStatement {
             workdir: workdir.to_owned(),
             directory,
         }))

@@ -1,7 +1,6 @@
 use std::path::Path;
-use std::path::PathBuf;
 
-use super::args::Arguments;
+use super::args::{Argument, Arguments};
 use super::engine;
 use super::inventory;
 
@@ -9,14 +8,13 @@ use anyhow::{Context, Result};
 use indoc::formatdoc;
 
 #[derive(Debug)]
-struct IsMissing(PathBuf);
+struct IsMissing(Argument);
 
 impl engine::Condition for IsMissing {
-    fn eval(&self, _ctx: &engine::Context) -> Result<bool> {
-        // TODO: should this depend on prefix?
-        self.0
-            .try_exists()
-            .with_context(|| format!("failed to check if {:?} exists", &self.0))
+    fn eval(&self, ctx: &engine::Context) -> Result<bool> {
+        let path = ctx.dst_path(ctx.expand_arg(&self.0)?);
+        path.try_exists()
+            .with_context(|| format!("failed to check if {path:?} exists"))
     }
 }
 
@@ -34,8 +32,8 @@ impl engine::ConditionBuilder for IsMissingBuilder {
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::ConditionBox> {
-        let path = args.expect_single_arg(self.name())?;
-        Ok(Box::new(IsMissing(path.into())))
+        let path = args.expect_single_arg(self.name())?.clone();
+        Ok(Box::new(IsMissing(path)))
     }
 }
 
