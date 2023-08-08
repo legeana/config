@@ -8,6 +8,7 @@ use crate::registry::Registry;
 
 use super::args::{Argument, Arguments};
 use super::engine;
+use super::file_util;
 use super::inventory;
 use super::local_state;
 
@@ -15,23 +16,6 @@ struct FetchInto {
     executable: bool,
     url: String,
     output: local_state::FileState,
-}
-
-impl FetchInto {
-    #[cfg(unix)]
-    fn set_executable(&self, f: &std::fs::File) -> Result<()> {
-        use std::os::unix::fs::PermissionsExt;
-        let metadata = f.metadata()?;
-        let mut permissions = metadata.permissions();
-        permissions.set_mode(permissions.mode() | 0o111);
-        f.set_permissions(permissions)?;
-        Ok(())
-    }
-    #[cfg(windows)]
-    fn set_executable(&self, _f: &std::fs::File) -> Result<()> {
-        // Nothing to do on Windows.
-        Ok(())
-    }
 }
 
 impl Module for FetchInto {
@@ -56,12 +40,12 @@ impl Module for FetchInto {
         std::io::copy(&mut reader, &mut writer)
             .with_context(|| format!("failed to write {state:?}"))?;
         if self.executable {
-            self.set_executable(&output)
-                .with_context(|| format!("failed to make {:?} executable", self.output.path()))?;
+            file_util::set_executable(&output)
+                .with_context(|| format!("failed to make {state:?} executable"))?;
         }
         output
             .sync_all()
-            .with_context(|| format!("failed to flush {:?}", self.output.path()))
+            .with_context(|| format!("failed to flush {state:?}"))
     }
 }
 

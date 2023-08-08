@@ -40,3 +40,19 @@ pub fn make_symlink(registry: &mut dyn Registry, src: &Path, dst: &Path) -> Resu
     log::info!("Symlink {src:?} -> {dst:?}");
     Ok(())
 }
+
+#[cfg(unix)]
+pub fn set_executable(f: &std::fs::File) -> Result<()> {
+    use std::os::unix::fs::PermissionsExt;
+    let metadata = f.metadata()?;
+    let mut permissions = metadata.permissions();
+    permissions.set_mode(permissions.mode() | 0o111);
+    f.set_permissions(permissions)?;
+    Ok(())
+}
+
+#[cfg(windows)]
+pub fn set_executable(_f: &std::fs::File) -> Result<()> {
+    // Nothing to do on Windows.
+    Ok(())
+}
