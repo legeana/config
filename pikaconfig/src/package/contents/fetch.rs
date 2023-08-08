@@ -40,7 +40,7 @@ impl Module for FetchInto {
         std::io::copy(&mut reader, &mut writer)
             .with_context(|| format!("failed to write {state:?}"))?;
         if self.executable {
-            file_util::set_executable(&output)
+            file_util::set_file_executable(&output)
                 .with_context(|| format!("failed to make {state:?} executable"))?;
         }
         output
