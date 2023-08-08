@@ -1,6 +1,6 @@
+requires = ["family=unix"]
 has_contents = false
 
 [[user_dependencies]]
-requires = ["family=unix"]
 cargo = ["exa"]
 wants = { command = "exa" }
