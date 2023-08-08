@@ -90,41 +90,30 @@ impl<T: Module> Module for [T] {
     }
 }
 
-impl<T: Module> Module for Vec<T> {
-    fn pre_uninstall(&self, rules: &Rules) -> Result<()> {
-        self.as_slice().pre_uninstall(rules)
-    }
-    fn pre_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-        self.as_slice().pre_install(rules, registry)
-    }
-    fn install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-        self.as_slice().install(rules, registry)
-    }
-    fn post_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-        self.as_slice().post_install(rules, registry)
-    }
-    fn system_install(&self, rules: &Rules) -> Result<()> {
-        self.as_slice().system_install(rules)
-    }
+macro_rules! impl_for_part {
+    (($($impl:tt)*), $t:ty, ($sel:ident $($part:tt)*)) => {
+        impl $($impl)* Module for $t {
+            fn pre_uninstall(&$sel, rules: &Rules) -> Result<()> {
+                $sel$($part)*.pre_uninstall(rules)
+            }
+            fn pre_install(&$sel, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+                $sel$($part)*.pre_install(rules, registry)
+            }
+            fn install(&$sel, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+                $sel$($part)*.install(rules, registry)
+            }
+            fn post_install(&$sel, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+                $sel$($part)*.post_install(rules, registry)
+            }
+            fn system_install(&$sel, rules: &Rules) -> Result<()> {
+                $sel$($part)*.system_install(rules)
+            }
+        }
+    };
 }
 
-impl Module for ModuleBox {
-    fn pre_uninstall(&self, rules: &Rules) -> Result<()> {
-        self.as_ref().pre_uninstall(rules)
-    }
-    fn pre_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-        self.as_ref().pre_install(rules, registry)
-    }
-    fn install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-        self.as_ref().install(rules, registry)
-    }
-    fn post_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-        self.as_ref().post_install(rules, registry)
-    }
-    fn system_install(&self, rules: &Rules) -> Result<()> {
-        self.as_ref().system_install(rules)
-    }
-}
+impl_for_part!((<T: Module>), Vec<T>, (self.as_slice()));
+impl_for_part!((), ModuleBox, (self.as_ref()));
 
 struct WrappedModule<T: Module> {
     module: T,
