@@ -3,23 +3,12 @@ use std::path::Path;
 use anyhow::{Context, Result};
 use indoc::formatdoc;
 
-use crate::module::{Module, ModuleBox, Rules};
-use crate::registry::Registry;
+use crate::module::ModuleBox;
 
 use super::args::{Argument, Arguments};
 use super::engine;
 use super::inventory;
 use super::local_state;
-
-struct OutputFile {
-    output: local_state::FileState,
-}
-
-impl Module for OutputFile {
-    fn install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-        self.output.install(rules, registry)
-    }
-}
 
 #[derive(Debug)]
 struct OutputFileStatement {
@@ -31,7 +20,7 @@ impl engine::Statement for OutputFileStatement {
         let dst = ctx.dst_path(ctx.expand_arg(&self.filename)?);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
-        Ok(Some(Box::new(OutputFile { output })))
+        Ok(Some(Box::new(output)))
     }
 }
 
