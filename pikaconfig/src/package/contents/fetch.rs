@@ -11,6 +11,7 @@ use super::engine;
 use super::file_util;
 use super::inventory;
 use super::local_state;
+use super::net_util;
 
 struct FetchInto {
     executable: bool,
@@ -32,22 +33,12 @@ impl Module for FetchInto {
                 .with_context(|| format!("failed to make {state:?} executable"))?;
             return Ok(());
         }
-        let mut reader = ureq::get(&self.url)
-            .call()
-            .with_context(|| format!("failed to fetch {:?}", self.url))?
-            .into_reader();
-        let output =
-            std::fs::File::create(state).with_context(|| format!("failed to open {state:?}"))?;
-        let mut writer = std::io::BufWriter::new(&output);
-        std::io::copy(&mut reader, &mut writer)
-            .with_context(|| format!("failed to write {state:?}"))?;
-        if self.executable {
-            file_util::set_file_executable(&output)
-                .with_context(|| format!("failed to make {state:?} executable"))?;
-        }
-        output
-            .sync_all()
-            .with_context(|| format!("failed to flush {state:?}"))
+        net_util::fetch(
+            &self.url,
+            state,
+            net_util::FetchOptions::new().executable(self.executable),
+        )
+        .with_context(|| format!("failed to fetch {:?}", self.url))
     }
 }
 
