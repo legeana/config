@@ -57,7 +57,7 @@ pub trait Module {
 
 pub type ModuleBox = Box<dyn Module>;
 
-impl<T: Module> Module for Vec<T> {
+impl<T: Module> Module for [T] {
     fn pre_uninstall(&self, rules: &Rules) -> Result<()> {
         for module in self {
             module.pre_uninstall(rules)?;
@@ -87,6 +87,24 @@ impl<T: Module> Module for Vec<T> {
             module.system_install(rules)?;
         }
         Ok(())
+    }
+}
+
+impl<T: Module> Module for Vec<T> {
+    fn pre_uninstall(&self, rules: &Rules) -> Result<()> {
+        self.as_slice().pre_uninstall(rules)
+    }
+    fn pre_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+        self.as_slice().pre_install(rules, registry)
+    }
+    fn install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+        self.as_slice().install(rules, registry)
+    }
+    fn post_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+        self.as_slice().post_install(rules, registry)
+    }
+    fn system_install(&self, rules: &Rules) -> Result<()> {
+        self.as_slice().system_install(rules)
     }
 }
 
