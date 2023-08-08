@@ -22,6 +22,7 @@ mod net_util;
 mod output_file;
 mod parser;
 mod prefix;
+mod remote_source;
 mod render;
 mod set_contents;
 mod subdir;

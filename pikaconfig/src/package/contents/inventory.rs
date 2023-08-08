@@ -66,6 +66,7 @@ fn register_all(registry: &mut dyn Registry) {
     // Downloads.
     super::fetch::register(registry);
     super::git_clone::register(registry);
+    super::remote_source::register(registry);
     // Exec.
     super::exec::register(registry);
     // Control.
