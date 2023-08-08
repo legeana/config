@@ -1,3 +1,5 @@
+requires = ["family=unix"]
+
 [[user_dependencies]]
 cargo = ["zellij"]
 wants = { command = "zellij" }
