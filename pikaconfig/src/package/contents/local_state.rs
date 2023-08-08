@@ -16,6 +16,8 @@ const DIR_STATE: StateType = "dirs";
 
 fn path_hash(path: &Path) -> Result<PathBuf> {
     let path_str = path
+        // TODO: this is not cross-platform.
+        // Maybe use to_string_lossy(), os_str_bytes or OsStrExt.
         .to_str()
         .ok_or_else(|| anyhow!("unable to convert {path:?} path to string"))?;
 
