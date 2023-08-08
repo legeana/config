@@ -26,8 +26,10 @@ impl Module for FetchInto {
             .try_exists()
             .with_context(|| format!("unable to check if {state:?} exists"))?
         {
-            log::info!("Copy: skipping already existing state for {state:?}");
-            // TODO: set_executable if necessary
+            log::info!("Fetch: skipping already existing state for {state:?}");
+            log::info!("Fetch: setting {state:?} executable");
+            file_util::set_path_executable(state)
+                .with_context(|| format!("failed to make {state:?} executable"))?;
             return Ok(());
         }
         let mut reader = ureq::get(&self.url)
