@@ -48,6 +48,7 @@ pub enum Token {
     #[regex(r#"[ \t]+"#)]
     Space,
     #[token("\n", |lex| lex.extras.record_line(lex.span().end))]
+    #[token("\r\n", |lex| lex.extras.record_line(lex.span().end))]
     Newline,
     #[regex(r#"'([^'\n\\]|\\[^\n])*'"#, |lex| quote::unquote(lex.slice()))]
     SingleQuotedLiteral(String),
@@ -307,6 +308,16 @@ mod tests {
             assert_eq!($lex.next(), Some(Ok(Token::EndOfInput)));
             assert_eq!($lex.next(), None);
         };
+    }
+
+    #[test]
+    fn test_crlf_newlines() {
+        let mut lex = TestLexer::new("hello\r\nworld\r\n");
+        assert_token!(lex.next(), Token::UnquotedLiteral("hello".into()));
+        assert_token!(lex.next(), Token::Newline);
+        assert_token!(lex.next(), Token::UnquotedLiteral("world".into()));
+        assert_token!(lex.next(), Token::Newline);
+        assert_eoi!(lex);
     }
 
     #[test]
