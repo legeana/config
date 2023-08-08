@@ -28,7 +28,8 @@ impl Module for Render {
         self.tera
             .render_to(TEMPLATE_NAME, &self.context, &mut file)
             .with_context(|| format!("failed to render to file {:?}", self.output.path()))?;
-        Ok(())
+        file.sync_all()
+            .with_context(|| format!("failed to flush {:?}", self.output.path()))
     }
 }
 
