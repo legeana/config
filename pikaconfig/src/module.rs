@@ -91,29 +91,35 @@ impl<T: Module> Module for [T] {
 }
 
 macro_rules! impl_for_part {
-    (($($impl:tt)*), $t:ty, ($sel:ident $($part:tt)*)) => {
+    (($($impl:tt)*), $t:ty, $sel:ident, $($part:tt)*) => {
         impl $($impl)* Module for $t {
             fn pre_uninstall(&$sel, rules: &Rules) -> Result<()> {
-                $sel$($part)*.pre_uninstall(rules)
+                $($part.pre_uninstall(rules)?;)*
+                Ok(())
             }
             fn pre_install(&$sel, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-                $sel$($part)*.pre_install(rules, registry)
+                $($part.pre_install(rules, registry)?;)*
+                Ok(())
             }
             fn install(&$sel, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-                $sel$($part)*.install(rules, registry)
+                $($part.install(rules, registry)?;)*
+                Ok(())
             }
             fn post_install(&$sel, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-                $sel$($part)*.post_install(rules, registry)
+                $($part.post_install(rules, registry)?;)*
+                Ok(())
             }
             fn system_install(&$sel, rules: &Rules) -> Result<()> {
-                $sel$($part)*.system_install(rules)
+                $($part.system_install(rules)?;)*
+                Ok(())
             }
         }
     };
 }
 
-impl_for_part!((<T: Module>), Vec<T>, (self.as_slice()));
-impl_for_part!((), ModuleBox, (self.as_ref()));
+impl_for_part!((<T: Module>), Vec<T>, self, (self.as_slice()));
+impl_for_part!((), ModuleBox, self, (self.as_ref()));
+impl_for_part!((<T0: Module, T1: Module>), (T0, T1), self, (self.0) (self.1));
 
 struct WrappedModule<T: Module> {
     module: T,
