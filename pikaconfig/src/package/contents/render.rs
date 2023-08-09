@@ -17,12 +17,12 @@ const TEMPLATE_NAME: &str = "template";
 struct Render {
     tera: tera::Tera,
     context: tera::Context,
-    output: PathBuf,
+    output: local_state::StateMapping,
 }
 
 impl Module for Render {
     fn install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
-        let mut file = std::fs::File::create(&self.output)
+        let mut file = std::fs::File::create(self.output.path())
             .with_context(|| format!("failed to create a file {:?}", self.output))?;
         self.tera
             .render_to(TEMPLATE_NAME, &self.context, &mut file)
@@ -45,7 +45,7 @@ impl engine::Statement for RenderStatement {
         let dst = ctx.dst_path(ctx.expand_arg(&self.dst)?);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
-        let output_path = output.path().to_owned();
+        let output_mapping = output.mapping();
         let mut tera = tera::Tera::default();
         tera.add_template_file(&src, Some(TEMPLATE_NAME))
             .with_context(|| format!("failed to load template from {src:?}"))?;
@@ -61,7 +61,7 @@ impl engine::Statement for RenderStatement {
             Render {
                 tera,
                 context,
-                output: output_path,
+                output: output_mapping,
             },
         ))))
     }

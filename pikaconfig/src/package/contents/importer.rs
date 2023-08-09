@@ -17,8 +17,7 @@ use walkdir::WalkDir;
 struct Importer {
     prefix: PathBuf,
     src: PathBuf,
-    output: PathBuf,
-    link: PathBuf,
+    output: local_state::StateMapping,
 }
 
 /// Returns true if parser matched.
@@ -86,15 +85,11 @@ fn render<W: Write>(prefix: &Path, src: &Path, out: &mut W) -> Result<()> {
 
 impl Module for Importer {
     fn post_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
-        let f = File::create(&self.output)
+        let f = File::create(self.output.path())
             .with_context(|| format!("failed to open {:?}", self.output))?;
         let mut out = BufWriter::new(f);
-        render(&self.prefix, &self.src, &mut out).with_context(|| {
-            format!(
-                "failed to render state {:?} for {:?}",
-                self.output, self.link,
-            )
-        })
+        render(&self.prefix, &self.src, &mut out)
+            .with_context(|| format!("failed to render {:?}", self.output))
     }
 }
 
@@ -112,15 +107,13 @@ impl engine::Statement for ImporterStatement {
             .ok_or_else(|| anyhow!("failed to get parent of {dst:?}"))?;
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
-        let output_path = output.path().to_owned();
-        let link = output.link().to_owned();
+        let output_mapping = output.mapping();
         Ok(Some(Box::new((
             output,
             Importer {
                 prefix: prefix.to_owned(),
                 src: self.workdir.join(ctx.expand_arg(&self.filename)?),
-                output: output_path,
-                link,
+                output: output_mapping,
             },
         ))))
     }

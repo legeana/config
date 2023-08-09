@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use anyhow::{Context, Result};
 use indoc::formatdoc;
@@ -16,25 +16,29 @@ use super::net_util;
 struct FetchInto {
     executable: bool,
     url: String,
-    output: PathBuf,
+    output: local_state::StateMapping,
 }
 
 impl Module for FetchInto {
     fn install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
-        let output = &self.output;
-        if output
+        if self
+            .output
+            .path()
             .try_exists()
-            .with_context(|| format!("unable to check if {output:?} exists"))?
+            .with_context(|| format!("unable to check if {:?} exists", self.output))?
         {
-            log::info!("Fetch: skipping already existing state for {output:?}");
-            log::info!("Fetch: setting {output:?} executable");
-            file_util::set_path_executable(output)
-                .with_context(|| format!("failed to make {output:?} executable"))?;
+            log::info!(
+                "Fetch: skipping already existing state for {:?}",
+                self.output
+            );
+            log::info!("Fetch: setting {:?} executable", self.output);
+            file_util::set_path_executable(self.output.path())
+                .with_context(|| format!("failed to make {:?} executable", self.output))?;
             return Ok(());
         }
         net_util::fetch(
             &self.url,
-            output,
+            self.output.path(),
             net_util::FetchOptions::new().executable(self.executable),
         )
         .with_context(|| format!("failed to fetch {:?}", self.url))
@@ -53,13 +57,13 @@ impl engine::Statement for FetchIntoStatement {
         let dst = ctx.dst_path(ctx.expand_arg(&self.filename)?);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
-        let output_path = output.path().to_owned();
+        let output_mapping = output.mapping();
         Ok(Some(Box::new((
             output,
             FetchInto {
                 executable: self.executable,
                 url: self.url.clone(),
-                output: output_path,
+                output: output_mapping,
             },
         ))))
     }

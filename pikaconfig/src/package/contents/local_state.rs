@@ -51,6 +51,26 @@ fn state_path(path: &Path, state_type: StateType) -> Result<PathBuf> {
     Ok(state_dir_for_type(state_type)?.join(hash))
 }
 
+pub struct StateMapping {
+    /// The actual file.
+    path: PathBuf,
+    /// The destination symlink.
+    link: PathBuf,
+}
+
+impl StateMapping {
+    /// The actual file.
+    pub fn path(&self) -> &Path {
+        &self.path
+    }
+}
+
+impl std::fmt::Debug for StateMapping {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?} (actual {:?})", self.link, self.path)
+    }
+}
+
 pub struct FileState {
     state: PathBuf,
     dst: PathBuf,
@@ -61,6 +81,12 @@ impl FileState {
         let state = state_path(&dst, FILE_STATE)
             .with_context(|| format!("failed to build state path for {dst:?}"))?;
         Ok(Self { state, dst })
+    }
+    pub fn mapping(&self) -> StateMapping {
+        StateMapping {
+            path: self.path().to_owned(),
+            link: self.link().to_owned(),
+        }
     }
     pub fn path(&self) -> &Path {
         &self.state
@@ -93,11 +119,11 @@ impl DirectoryState {
             .with_context(|| format!("failed to build state path for {dst:?}"))?;
         Ok(Self { state, dst })
     }
-    pub fn path(&self) -> &Path {
-        &self.state
-    }
-    pub fn link(&self) -> &Path {
-        &self.dst
+    pub fn mapping(&self) -> StateMapping {
+        StateMapping {
+            path: self.state.clone(),
+            link: self.dst.clone(),
+        }
     }
 }
 

@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use anyhow::{Context, Result};
 use indoc::formatdoc;
@@ -12,22 +12,26 @@ use super::inventory;
 use super::local_state;
 
 struct SetContents {
-    output: PathBuf,
+    output: local_state::StateMapping,
     contents: String,
 }
 
 impl Module for SetContents {
     fn install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
-        let output = &self.output;
-        if output
+        if self
+            .output
+            .path()
             .try_exists()
-            .with_context(|| format!("unable to check if {output:?} exists"))?
+            .with_context(|| format!("unable to check if {:?} exists", self.output))?
         {
-            log::info!("Copy: skipping already existing state for {output:?}");
+            log::info!(
+                "Copy: skipping already existing state for {:?}",
+                self.output
+            );
             return Ok(());
         }
-        std::fs::write(output, &self.contents)
-            .with_context(|| format!("unable to write {:?} to {output:?}", self.contents))?;
+        std::fs::write(self.output.path(), &self.contents)
+            .with_context(|| format!("unable to write {:?} to {:?}", self.contents, self.output))?;
         Ok(())
     }
 }
@@ -46,11 +50,11 @@ impl engine::Statement for SetContentsStatement {
         let dst = ctx.dst_path(ctx.expand_arg(&self.filename)?);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
-        let output_path = output.path().to_owned();
+        let output_mapping = output.mapping();
         Ok(Some(Box::new((
             output,
             SetContents {
-                output: output_path,
+                output: output_mapping,
                 contents: self.contents.clone(),
             },
         ))))

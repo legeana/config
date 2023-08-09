@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use anyhow::{Context, Result};
 use indoc::formatdoc;
@@ -14,32 +14,31 @@ use super::local_state;
 
 struct GitClone {
     remote: git_utils::Remote,
-    root: PathBuf,
-    link: PathBuf,
+    repo: local_state::StateMapping,
 }
 
 impl GitClone {
     fn need_update(&self) -> Result<bool> {
-        let remote_url = git_utils::get_remote_url(&self.root)?;
+        let remote_url = git_utils::get_remote_url(self.repo.path())?;
         if remote_url != self.remote.url {
             return Ok(true);
         }
         let target_branch = match self.remote.branch {
             Some(ref branch) => branch.clone(),
-            None => git_utils::get_remote_head_ref(&self.root)?,
+            None => git_utils::get_remote_head_ref(self.repo.path())?,
         };
-        let current_branch = git_utils::get_head_ref(&self.root)?;
+        let current_branch = git_utils::get_head_ref(self.repo.path())?;
         Ok(target_branch != current_branch)
     }
     fn force_pull(&self) -> Result<()> {
-        git_utils::git_force_shallow_pull(&self.root, &self.remote)
+        git_utils::git_force_shallow_pull(self.repo.path(), &self.remote)
     }
     fn clone(&self) -> Result<()> {
-        git_utils::git_shallow_clone(&self.remote, &self.root)
+        git_utils::git_shallow_clone(&self.remote, self.repo.path())
     }
     fn is_empty(&self) -> Result<bool> {
-        let count = std::fs::read_dir(&self.root)
-            .with_context(|| format!("failed to read dir {:?}", self.root))?
+        let count = std::fs::read_dir(self.repo.path())
+            .with_context(|| format!("failed to read dir {:?}", self.repo))?
             .count();
         Ok(count == 0)
     }
@@ -48,15 +47,14 @@ impl GitClone {
 impl Module for GitClone {
     fn install(&self, rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
         if self.is_empty()? {
-            self.clone().with_context(|| {
-                format!("failed to git clone {:?} for {:?}", self.root, self.link,)
-            })
+            self.clone()
+                .with_context(|| format!("failed to git clone into {:?}", self.repo))
         } else {
             if !self.need_update()? && !rules.force_download {
                 return Ok(());
             }
             self.force_pull()
-                .with_context(|| format!("failed to git pull {:?} for {:?}", self.root, self.link,))
+                .with_context(|| format!("failed to git pull {:?}", self.repo))
         }
     }
 }
@@ -72,14 +70,12 @@ impl engine::Statement for GitCloneStatement {
         let dst = ctx.dst_path(ctx.expand_arg(&self.dst)?);
         let output = local_state::DirectoryState::new(dst.clone())
             .with_context(|| format!("failed to create DirectoryState from {dst:?}"))?;
-        let root = output.path().to_owned();
-        let link = output.link().to_owned();
+        let repo = output.mapping();
         Ok(Some(Box::new((
             output,
             GitClone {
                 remote: git_utils::Remote::new(&self.url),
-                root,
-                link,
+                repo,
             },
         ))))
     }

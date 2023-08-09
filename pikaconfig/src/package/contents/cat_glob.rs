@@ -1,5 +1,5 @@
 use std::io::Write;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
@@ -15,12 +15,12 @@ use indoc::formatdoc;
 
 struct CatGlobInto {
     globs: Vec<String>,
-    output: PathBuf,
+    output: local_state::StateMapping,
 }
 
 impl Module for CatGlobInto {
     fn post_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
-        let out_file = std::fs::File::create(&self.output)
+        let out_file = std::fs::File::create(self.output.path())
             .with_context(|| format!("unable to create {:?}", self.output))?;
         let mut out = std::io::BufWriter::new(out_file);
         for glob in self.globs.iter() {
@@ -61,12 +61,12 @@ impl engine::Statement for CatGlobIntoStatement {
         let dst = ctx.dst_path(ctx.expand_arg(&self.filename)?);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
-        let output_path = output.path().to_owned();
+        let output_mapping = output.mapping();
         Ok(Some(Box::new((
             output,
             CatGlobInto {
                 globs: concatenated_globs,
-                output: output_path,
+                output: output_mapping,
             },
         ))))
     }

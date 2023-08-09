@@ -13,21 +13,25 @@ use indoc::formatdoc;
 
 struct Copy {
     src: PathBuf,
-    output: PathBuf,
+    output: local_state::StateMapping,
 }
 
 impl Module for Copy {
     fn install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
-        let output = &self.output;
-        if output
+        if self
+            .output
+            .path()
             .try_exists()
-            .with_context(|| format!("unable to check if {output:?} exists"))?
+            .with_context(|| format!("unable to check if {:?} exists", self.output))?
         {
-            log::info!("Copy: skipping already existing state for {output:?}");
+            log::info!(
+                "Copy: skipping already existing state for {:?}",
+                self.output
+            );
             return Ok(());
         }
-        std::fs::copy(&self.src, output)
-            .with_context(|| format!("unable to copy {:?} to {output:?}", self.src))?;
+        std::fs::copy(&self.src, self.output.path())
+            .with_context(|| format!("unable to copy {:?} to {:?}", self.src, self.output))?;
         Ok(())
     }
 }
@@ -45,12 +49,12 @@ impl engine::Statement for CopyStatement {
         let dst = ctx.dst_path(ctx.expand_arg(&self.dst)?);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
-        let output_path = output.path().to_owned();
+        let output_mapping = output.mapping();
         Ok(Some(Box::new((
             output,
             Copy {
                 src,
-                output: output_path,
+                output: output_mapping,
             },
         ))))
     }
