@@ -17,7 +17,8 @@ use walkdir::WalkDir;
 struct Importer {
     prefix: PathBuf,
     src: PathBuf,
-    output: local_state::FileState,
+    output: PathBuf,
+    link: PathBuf,
 }
 
 /// Returns true if parser matched.
@@ -84,18 +85,14 @@ fn render<W: Write>(prefix: &Path, src: &Path, out: &mut W) -> Result<()> {
 }
 
 impl Module for Importer {
-    fn install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-        self.output.install(rules, registry)
-    }
-    fn post_install(&self, _rules: &super::Rules, _registry: &mut dyn Registry) -> Result<()> {
-        let f = File::create(self.output.path())
-            .with_context(|| format!("failed to open {:?}", self.output.path()))?;
+    fn post_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
+        let f = File::create(&self.output)
+            .with_context(|| format!("failed to open {:?}", self.output))?;
         let mut out = BufWriter::new(f);
         render(&self.prefix, &self.src, &mut out).with_context(|| {
             format!(
                 "failed to render state {:?} for {:?}",
-                self.output.path(),
-                self.output.link(),
+                self.output, self.link,
             )
         })
     }
@@ -115,11 +112,17 @@ impl engine::Statement for ImporterStatement {
             .ok_or_else(|| anyhow!("failed to get parent of {dst:?}"))?;
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
-        Ok(Some(Box::new(Importer {
-            prefix: prefix.to_owned(),
-            src: self.workdir.join(ctx.expand_arg(&self.filename)?),
+        let output_path = output.path().to_owned();
+        let link = output.link().to_owned();
+        Ok(Some(Box::new((
             output,
-        })))
+            Importer {
+                prefix: prefix.to_owned(),
+                src: self.workdir.join(ctx.expand_arg(&self.filename)?),
+                output: output_path,
+                link,
+            },
+        ))))
     }
 }
 

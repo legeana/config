@@ -1,5 +1,5 @@
 use std::io::Write;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
@@ -15,16 +15,13 @@ use indoc::formatdoc;
 
 struct CatGlobInto {
     globs: Vec<String>,
-    output: local_state::FileState,
+    output: PathBuf,
 }
 
 impl Module for CatGlobInto {
-    fn install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-        self.output.install(rules, registry)
-    }
-    fn post_install(&self, _rules: &super::Rules, _registry: &mut dyn Registry) -> Result<()> {
-        let out_file = std::fs::File::create(self.output.path())
-            .with_context(|| format!("unable to create {:?}", self.output.path()))?;
+    fn post_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
+        let out_file = std::fs::File::create(&self.output)
+            .with_context(|| format!("unable to create {:?}", self.output))?;
         let mut out = std::io::BufWriter::new(out_file);
         for glob in self.globs.iter() {
             for entry in glob_iter(glob).with_context(|| format!("failed to glob {}", glob))? {
@@ -34,12 +31,12 @@ impl Module for CatGlobInto {
                     .with_context(|| format!("failed to open {path:?}"))?;
                 let mut inp = std::io::BufReader::new(inp_file);
                 std::io::copy(&mut inp, &mut out).with_context(|| {
-                    format!("failed to copy from {path:?} to {:?}", self.output.path())
+                    format!("failed to copy from {path:?} to {:?}", self.output)
                 })?;
             }
         }
         out.flush()
-            .with_context(|| format!("failed to flush {:?}", self.output.path()))?;
+            .with_context(|| format!("failed to flush {:?}", self.output))?;
         Ok(())
     }
 }
@@ -64,10 +61,14 @@ impl engine::Statement for CatGlobIntoStatement {
         let dst = ctx.dst_path(ctx.expand_arg(&self.filename)?);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
-        Ok(Some(Box::new(CatGlobInto {
-            globs: concatenated_globs,
+        let output_path = output.path().to_owned();
+        Ok(Some(Box::new((
             output,
-        })))
+            CatGlobInto {
+                globs: concatenated_globs,
+                output: output_path,
+            },
+        ))))
     }
 }
 

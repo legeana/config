@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use indoc::formatdoc;
@@ -16,26 +16,25 @@ use super::net_util;
 struct FetchInto {
     executable: bool,
     url: String,
-    output: local_state::FileState,
+    output: PathBuf,
 }
 
 impl Module for FetchInto {
-    fn install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-        self.output.install(rules, registry)?;
-        let state = self.output.path();
-        if state
+    fn install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
+        let output = &self.output;
+        if output
             .try_exists()
-            .with_context(|| format!("unable to check if {state:?} exists"))?
+            .with_context(|| format!("unable to check if {output:?} exists"))?
         {
-            log::info!("Fetch: skipping already existing state for {state:?}");
-            log::info!("Fetch: setting {state:?} executable");
-            file_util::set_path_executable(state)
-                .with_context(|| format!("failed to make {state:?} executable"))?;
+            log::info!("Fetch: skipping already existing state for {output:?}");
+            log::info!("Fetch: setting {output:?} executable");
+            file_util::set_path_executable(output)
+                .with_context(|| format!("failed to make {output:?} executable"))?;
             return Ok(());
         }
         net_util::fetch(
             &self.url,
-            state,
+            output,
             net_util::FetchOptions::new().executable(self.executable),
         )
         .with_context(|| format!("failed to fetch {:?}", self.url))
@@ -54,11 +53,15 @@ impl engine::Statement for FetchIntoStatement {
         let dst = ctx.dst_path(ctx.expand_arg(&self.filename)?);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
-        Ok(Some(Box::new(FetchInto {
-            executable: self.executable,
-            url: self.url.clone(),
+        let output_path = output.path().to_owned();
+        Ok(Some(Box::new((
             output,
-        })))
+            FetchInto {
+                executable: self.executable,
+                url: self.url.clone(),
+                output: output_path,
+            },
+        ))))
     }
 }
 

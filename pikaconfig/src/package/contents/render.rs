@@ -17,19 +17,18 @@ const TEMPLATE_NAME: &str = "template";
 struct Render {
     tera: tera::Tera,
     context: tera::Context,
-    output: local_state::FileState,
+    output: PathBuf,
 }
 
 impl Module for Render {
-    fn install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-        self.output.install(rules, registry)?;
-        let mut file = std::fs::File::create(self.output.path())
-            .with_context(|| format!("failed to create a file {:?}", self.output.path()))?;
+    fn install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
+        let mut file = std::fs::File::create(&self.output)
+            .with_context(|| format!("failed to create a file {:?}", self.output))?;
         self.tera
             .render_to(TEMPLATE_NAME, &self.context, &mut file)
-            .with_context(|| format!("failed to render to file {:?}", self.output.path()))?;
+            .with_context(|| format!("failed to render to file {:?}", self.output))?;
         file.sync_all()
-            .with_context(|| format!("failed to flush {:?}", self.output.path()))
+            .with_context(|| format!("failed to flush {:?}", self.output))
     }
 }
 
@@ -46,6 +45,7 @@ impl engine::Statement for RenderStatement {
         let dst = ctx.dst_path(ctx.expand_arg(&self.dst)?);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
+        let output_path = output.path().to_owned();
         let mut tera = tera::Tera::default();
         tera.add_template_file(&src, Some(TEMPLATE_NAME))
             .with_context(|| format!("failed to load template from {src:?}"))?;
@@ -56,11 +56,14 @@ impl engine::Statement for RenderStatement {
         context.insert("destination_file", &dst);
         context.insert("workdir", &self.workdir);
         context.insert("prefix", &ctx.prefix);
-        Ok(Some(Box::new(Render {
-            tera,
-            context,
+        Ok(Some(Box::new((
             output,
-        })))
+            Render {
+                tera,
+                context,
+                output: output_path,
+            },
+        ))))
     }
 }
 

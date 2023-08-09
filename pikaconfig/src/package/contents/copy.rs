@@ -13,22 +13,21 @@ use indoc::formatdoc;
 
 struct Copy {
     src: PathBuf,
-    output: local_state::FileState,
+    output: PathBuf,
 }
 
 impl Module for Copy {
-    fn install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-        self.output.install(rules, registry)?;
-        let state = self.output.path();
-        if state
+    fn install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
+        let output = &self.output;
+        if output
             .try_exists()
-            .with_context(|| format!("unable to check if {state:?} exists"))?
+            .with_context(|| format!("unable to check if {output:?} exists"))?
         {
-            log::info!("Copy: skipping already existing state for {state:?}");
+            log::info!("Copy: skipping already existing state for {output:?}");
             return Ok(());
         }
-        std::fs::copy(&self.src, state)
-            .with_context(|| format!("unable to copy {:?} to {state:?}", self.src))?;
+        std::fs::copy(&self.src, output)
+            .with_context(|| format!("unable to copy {:?} to {output:?}", self.src))?;
         Ok(())
     }
 }
@@ -46,7 +45,14 @@ impl engine::Statement for CopyStatement {
         let dst = ctx.dst_path(ctx.expand_arg(&self.dst)?);
         let output = local_state::FileState::new(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
-        Ok(Some(Box::new(Copy { src, output })))
+        let output_path = output.path().to_owned();
+        Ok(Some(Box::new((
+            output,
+            Copy {
+                src,
+                output: output_path,
+            },
+        ))))
     }
 }
 
