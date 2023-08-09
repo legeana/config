@@ -22,6 +22,7 @@ struct RemoteArchive {
 
 impl Module for RemoteArchive {
     fn pre_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
+        // TODO: don't download this every time.
         net_util::fetch(&self.url, &self.archive, &net_util::FetchOptions::new())
             .with_context(|| format!("failed to fetch {:?}", self.url))?;
         self.unarchiver
@@ -47,6 +48,8 @@ impl engine::Expression for RemoteArchiveExpression {
         let archive_path = archive.path().to_owned();
         let source = local_state::EphemeralDirState::new(&self.workdir, Path::new(&self.filename))?;
         let source_path = source.path().to_owned();
+        // TODO: consider building this in Builder.
+        // This will not evaluate in a false branch of an if statement.
         let unarchiver = unarchiver::by_filename(&archive_path)
             .with_context(|| format!("failed to find unarchiver for {archive_path:?}"))?;
         Ok(engine::ExpressionOutput {
@@ -81,6 +84,8 @@ impl engine::CommandBuilder for RemoteArchiveBuilder {
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (filename, url) = args.expect_double_arg(self.name())?;
+        // TODO: make sure url looks like a URL.
+        // TODO: add checksum.
         Ok(engine::Command::new_expression(RemoteArchiveExpression {
             workdir: workdir.to_owned(),
             filename: filename.expect_raw().context("filename")?.to_owned(),
