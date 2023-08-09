@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use indoc::formatdoc;
 
 use crate::module::{Module, ModuleBox, Rules};
@@ -37,6 +37,22 @@ impl engine::Statement for SymlinkStatement {
             src: self.workdir.join(src),
             dst: ctx.dst_path(dst),
         })))
+    }
+}
+
+#[derive(Debug)]
+struct SymlinkFromStatement {
+    path: Argument,
+}
+
+impl engine::Statement for SymlinkFromStatement {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+        let src: PathBuf = ctx.expand_arg(&self.path)?.into();
+        let dst = ctx.dst_path(
+            src.file_name()
+                .ok_or_else(|| anyhow!("failed to get basename from {src:?}"))?,
+        );
+        Ok(Some(Box::new(Symlink { src, dst })))
     }
 }
 
@@ -86,7 +102,29 @@ impl engine::CommandBuilder for SymlinkToBuilder {
     }
 }
 
+#[derive(Clone)]
+struct SymlinkFromBuilder;
+
+impl engine::CommandBuilder for SymlinkFromBuilder {
+    fn name(&self) -> String {
+        "symlink_from".to_owned()
+    }
+    fn help(&self) -> String {
+        formatdoc! {"
+            {command} <path>
+                create a symlink to <path> from <path.basename> in prefix
+        ", command=self.name()}
+    }
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
+        let path = args.expect_single_arg(self.name())?.clone();
+        Ok(engine::Command::new_statement(SymlinkFromStatement {
+            path,
+        }))
+    }
+}
+
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(SymlinkBuilder {}));
-    registry.register_command(Box::new(SymlinkToBuilder {}));
+    registry.register_command(Box::new(SymlinkBuilder));
+    registry.register_command(Box::new(SymlinkToBuilder));
+    registry.register_command(Box::new(SymlinkFromBuilder));
 }
