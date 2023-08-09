@@ -14,6 +14,10 @@ type StateType = &'static str;
 const FILE_STATE: StateType = "output";
 const DIR_STATE: StateType = "dirs";
 
+type EphemeralStateType = &'static str;
+const EPHEMERAL_FILE: EphemeralStateType = "ephemeral_file";
+const EPHEMERAL_DIR: EphemeralStateType = "ephemeral_dir";
+
 fn path_hash(path: &Path) -> Result<PathBuf> {
     let path_str = path
         // TODO: this is not cross-platform.
@@ -49,6 +53,17 @@ fn state_dir_for_type(state_type: StateType) -> Result<PathBuf> {
 fn state_path(path: &Path, state_type: StateType) -> Result<PathBuf> {
     let hash = path_hash(path).with_context(|| format!("unable to make hash of {path:?}"))?;
     Ok(state_dir_for_type(state_type)?.join(hash))
+}
+
+fn ephemeral_state_path(
+    workdir: &Path,
+    filename: &Path,
+    state_type: EphemeralStateType,
+) -> Result<PathBuf> {
+    let ephemeral_path = workdir.join(filename);
+    let hash = path_hash(&ephemeral_path)
+        .with_context(|| format!("failed to make hash of {ephemeral_path:?}"))?;
+    Ok(state_dir_for_type(state_type)?.join(hash).join(filename))
 }
 
 pub struct StateMapping {
@@ -132,5 +147,56 @@ impl Module for DirectoryState {
         std::fs::create_dir_all(&self.state)
             .with_context(|| format!("failed to create {:?}", &self.state))?;
         file_util::make_symlink(registry, &self.state, &self.dst)
+    }
+}
+
+pub struct EphemeralFileState {
+    state: PathBuf,
+}
+
+impl EphemeralFileState {
+    pub fn new(workdir: &Path, filename: &Path) -> Result<Self> {
+        let state = ephemeral_state_path(workdir, filename, EPHEMERAL_FILE).with_context(|| {
+            format!("failed to build state path for {workdir:?} with {filename:?}")
+        })?;
+        Ok(Self { state })
+    }
+    pub fn path(&self) -> &Path {
+        &self.state
+    }
+}
+
+impl Module for EphemeralFileState {
+    fn pre_install(&self, _rules: &super::Rules, _registry: &mut dyn Registry) -> Result<()> {
+        let state_dir = self
+            .state
+            .parent()
+            .ok_or_else(|| anyhow!("failed to get {:?} parent", self.state))?;
+        std::fs::create_dir_all(state_dir)
+            .with_context(|| format!("failed to create {state_dir:?}"))?;
+        Ok(())
+    }
+}
+
+pub struct EphemeralDirState {
+    state: PathBuf,
+}
+
+impl EphemeralDirState {
+    pub fn new(workdir: &Path, filename: &Path) -> Result<Self> {
+        let state = ephemeral_state_path(workdir, filename, EPHEMERAL_DIR).with_context(|| {
+            format!("failed to build state path for {workdir:?} with {filename:?}")
+        })?;
+        Ok(Self { state })
+    }
+    pub fn path(&self) -> &Path {
+        &self.state
+    }
+}
+
+impl Module for EphemeralDirState {
+    fn pre_install(&self, _rules: &super::Rules, _registry: &mut dyn Registry) -> Result<()> {
+        std::fs::create_dir_all(&self.state)
+            .with_context(|| format!("failed to create {:?}", &self.state))
     }
 }

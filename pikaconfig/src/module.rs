@@ -119,7 +119,14 @@ macro_rules! impl_for_part {
 
 impl_for_part!((<T: Module>), Vec<T>, self, (self.as_slice()));
 impl_for_part!((), ModuleBox, self, (self.as_ref()));
-impl_for_part!((<T0: Module, T1: Module>), (T0, T1), self, (self.0) (self.1));
+impl_for_part!(
+    (<T0: Module, T1: Module>), (T0, T1),
+    self, (self.0) (self.1)
+);
+impl_for_part!(
+    (<T0: Module, T1: Module, T2: Module>), (T0, T1, T2),
+    self, (self.0) (self.1) (self.2)
+);
 
 struct WrappedModule<T: Module> {
     module: T,
