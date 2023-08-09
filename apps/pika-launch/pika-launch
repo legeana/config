@@ -40,8 +40,8 @@ add_to_path() {
     local path="$1"
     case "$PATH" in
         # Don't add to $PATH if it is already there.
-        *":$path:"*) ;&
-        "$path:"*) ;&
+        *":$path:"*) ;;
+        "$path:"*) ;;
         *":$path") ;;
         # Do add to $PATH if it's not.
         *) export PATH="$path:$PATH" ;;
