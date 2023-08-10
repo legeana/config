@@ -84,12 +84,16 @@ impl engine::CommandBuilder for RemoteArchiveBuilder {
     }
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (filename, url) = args.expect_double_arg(self.name())?;
-        // TODO: make sure url looks like a URL.
+        let filename = filename.expect_raw().context("filename")?.to_owned();
+        let url = url.expect_raw().context("url")?.to_owned();
+        url::Url::parse(&url)
+            .with_context(|| format!("failed to parse URL {url:?}"))
+            .context("URL verification")?;
         // TODO: add checksum.
         Ok(engine::Command::new_expression(RemoteArchiveExpression {
             workdir: workdir.to_owned(),
-            filename: filename.expect_raw().context("filename")?.to_owned(),
-            url: url.expect_raw().context("url")?.to_owned(),
+            filename,
+            url,
         }))
     }
 }

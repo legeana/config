@@ -827,6 +827,7 @@ dependencies = [
  "thiserror",
  "toml",
  "ureq",
+ "url",
  "walkdir",
  "which",
 ]
