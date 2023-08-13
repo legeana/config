@@ -41,6 +41,7 @@ fn has_tag_kv(key: &str, value: &str) -> bool {
         "family" => SYSINFO.match_family(value),
         "hostname" => SYSINFO.match_hostname(value),
         "os" => SYSINFO.match_os(value),
+        "uid" => SYSINFO.match_uid(value),
         _ => false,
     }
 }
@@ -95,6 +96,15 @@ impl SystemInfo {
     }
     fn match_distro(&self, want_distro: &str) -> bool {
         want_distro == self.distro()
+    }
+    #[cfg(unix)]
+    fn match_uid(&self, want_uid: &str) -> bool {
+        let uid = unsafe { libc::getuid() };
+        uid.to_string() == want_uid
+    }
+    #[cfg(windows)]
+    fn match_uid(&self, _want_uid: &str) -> bool {
+        false
     }
 }
 
