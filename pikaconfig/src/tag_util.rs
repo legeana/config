@@ -7,6 +7,9 @@ use sysinfo::{System, SystemExt};
 static SYSINFO: Lazy<SystemInfo> = Lazy::new(SystemInfo::new);
 
 pub fn has_tag(tag: &str) -> Result<bool> {
+    if let Some((key, value)) = tag.split_once("!=") {
+        return Ok(!has_tag_kv(key, value));
+    }
     match tag.split_once('=') {
         Some((key, value)) => Ok(has_tag_kv(key, value)),
         None => Err(anyhow!("invalid tag: must contain '=', got {tag}")),
@@ -129,5 +132,19 @@ mod tests {
     fn test_tags() {
         let tags = tags().expect("tags()");
         assert!(!tags.is_empty());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_family() {
+        assert!(has_tag("family=unix").unwrap());
+        assert!(!has_tag("family!=unix").unwrap());
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn test_family() {
+        assert!(has_tag("family=windows").unwrap());
+        assert!(!has_tag("family!=windows").unwrap());
     }
 }
