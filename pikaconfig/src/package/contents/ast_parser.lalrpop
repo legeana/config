@@ -57,10 +57,14 @@ IfStatement: ast::IfStatement = {
     },
 };
 
+Condition: ast::Condition = {
+    <command:Invocation> => ast::Condition::Command(command),
+};
+
 IfClause: ast::IfClause = {
     <start:@L>
     If
-    <condition:Invocation>
+    <condition:Condition>
     <statements:Block> => ast::IfClause {
         location: start,
         condition,
