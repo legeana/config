@@ -62,13 +62,8 @@ struct Cli {
         help = "Don't interrupt installation process if a package fails"
     )]
     keep_going: bool,
-    #[clap(
-        long,
-        default_value_t = true,
-        action = clap::ArgAction::Set,
-        help = "Install user dependencies",
-    )]
-    user_deps: bool,
+    #[clap(long, help = "Don't install user dependencies")]
+    no_user_deps: bool,
 }
 
 #[derive(Debug, Subcommand)]
@@ -182,7 +177,7 @@ fn main() -> Result<()> {
             let rules = Rules {
                 force_download: false,
                 keep_going: args.keep_going,
-                user_deps: args.user_deps,
+                user_deps: !args.no_user_deps,
             };
             install(&rules, &root).context("failed to install")?;
         }
@@ -193,7 +188,7 @@ fn main() -> Result<()> {
             let rules = Rules {
                 force_download: true,
                 keep_going: args.keep_going,
-                user_deps: args.user_deps,
+                user_deps: !args.no_user_deps,
             };
             install(&rules, &root).context("failed to install")?;
         }
