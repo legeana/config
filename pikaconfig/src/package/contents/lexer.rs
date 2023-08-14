@@ -66,6 +66,8 @@ pub enum Token {
     End,
     #[token("=")]
     Assign,
+    #[token("!")]
+    Not,
 }
 
 impl std::fmt::Display for Token {
@@ -82,6 +84,7 @@ impl std::fmt::Display for Token {
             Token::Begin => write!(f, "Token::Begin"),
             Token::End => write!(f, "Token::End"),
             Token::Assign => write!(f, "Token::Assign"),
+            Token::Not => write!(f, "Token::Not"),
         }
     }
 }
@@ -580,6 +583,53 @@ mod tests {
         assert_token!(lex.next(), Token::Newline);
         assert_token!(lex.next(), Token::UnquotedLiteral("alternative".into()));
         assert_token!(lex.next(), Token::UnquotedLiteral("command".into()));
+        assert_token!(lex.next(), Token::Newline);
+        assert_token!(lex.next(), Token::End);
+        assert_token!(lex.next(), Token::Newline);
+        assert_eoi!(lex);
+    }
+
+    #[test]
+    fn test_if_not_block() {
+        let mut lex = TestLexer::new(
+            r#"
+            if ! test {
+                command hello world
+            }
+            "#,
+        );
+        assert_token!(lex.next(), Token::Newline);
+        assert_token!(lex.next(), Token::If);
+        assert_token!(lex.next(), Token::Not);
+        assert_token!(lex.next(), Token::UnquotedLiteral("test".into()));
+        assert_token!(lex.next(), Token::Begin);
+        assert_token!(lex.next(), Token::Newline);
+        assert_token!(lex.next(), Token::UnquotedLiteral("command".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("hello".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("world".into()));
+        assert_token!(lex.next(), Token::Newline);
+        assert_token!(lex.next(), Token::End);
+        assert_token!(lex.next(), Token::Newline);
+        assert_eoi!(lex);
+    }
+
+    #[test]
+    fn test_if_block_where_not_is_a_part_of_the_command() {
+        let mut lex = TestLexer::new(
+            r#"
+            if !test {
+                command hello world
+            }
+            "#,
+        );
+        assert_token!(lex.next(), Token::Newline);
+        assert_token!(lex.next(), Token::If);
+        assert_token!(lex.next(), Token::UnquotedLiteral("!test".into()));
+        assert_token!(lex.next(), Token::Begin);
+        assert_token!(lex.next(), Token::Newline);
+        assert_token!(lex.next(), Token::UnquotedLiteral("command".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("hello".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("world".into()));
         assert_token!(lex.next(), Token::Newline);
         assert_token!(lex.next(), Token::End);
         assert_token!(lex.next(), Token::Newline);
