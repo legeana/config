@@ -6,6 +6,7 @@ use crate::registry::Registry;
 pub struct Rules {
     pub force_download: bool,
     pub keep_going: bool,
+    pub user_deps: bool,
 }
 
 impl Rules {
@@ -132,19 +133,19 @@ macro_rules! impl_wrap {
     ($t:ident, ($($wrap:tt)*), ($sel:ident .$($module:tt)*)) => {
         impl<T: Module> Module for $t<T> {
             fn pre_uninstall(&$sel, rules: &Rules) -> Result<()> {
-                $($wrap)*("pre_uninstall", || $sel.$($module)*.pre_uninstall(rules))
+                $($wrap)*("pre_uninstall", rules, || $sel.$($module)*.pre_uninstall(rules))
             }
             fn pre_install(&$sel, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-                $($wrap)*("pre_install", || $sel.$($module)*.pre_install(rules, registry))
+                $($wrap)*("pre_install", rules, || $sel.$($module)*.pre_install(rules, registry))
             }
             fn install(&$sel, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-                $($wrap)*("install", || $sel.$($module)*.install(rules, registry))
+                $($wrap)*("install", rules, || $sel.$($module)*.install(rules, registry))
             }
             fn post_install(&$sel, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-                $($wrap)*("post_install", || $sel.$($module)*.post_install(rules, registry))
+                $($wrap)*("post_install", rules, || $sel.$($module)*.post_install(rules, registry))
             }
             fn system_install(&$sel, rules: &Rules) -> Result<()> {
-                $($wrap)*("system_install", || $sel.$($module)*.system_install(rules))
+                $($wrap)*("system_install", rules, || $sel.$($module)*.system_install(rules))
             }
         }
     };
@@ -156,7 +157,7 @@ struct WrappedModule<T: Module> {
 }
 
 impl<T: Module> WrappedModule<T> {
-    fn wrap<F>(&self, method: &str, f: F) -> Result<()>
+    fn wrap<F>(&self, method: &str, _rules: &Rules, f: F) -> Result<()>
     where
         F: FnOnce() -> Result<()>,
     {
@@ -215,6 +216,30 @@ where
     T: Module + 'static,
 {
     Box::new(WrappedKeepGoing { modules })
+}
+
+struct WrappedUserDeps<T>(T);
+
+impl<T: Module> WrappedUserDeps<T> {
+    fn wrap<F>(&self, _method: &str, rules: &Rules, f: F) -> Result<()>
+    where
+        F: FnOnce() -> Result<()>,
+    {
+        if rules.user_deps {
+            f()
+        } else {
+            Ok(())
+        }
+    }
+}
+
+impl_wrap!(WrappedUserDeps, (self.wrap), (self.0));
+
+pub fn wrap_user_deps<T>(module: T) -> ModuleBox
+where
+    T: Module + 'static,
+{
+    Box::new(WrappedUserDeps(module))
 }
 
 pub struct Dummy;

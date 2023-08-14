@@ -87,7 +87,7 @@ impl Package {
             modules: vec![
                 configuration,
                 module::wrap_keep_going(system_dependencies),
-                module::wrap_keep_going(user_dependencies),
+                module::wrap_user_deps(module::wrap_keep_going(user_dependencies)),
             ],
             dependencies,
         })
