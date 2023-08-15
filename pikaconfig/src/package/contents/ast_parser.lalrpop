@@ -59,6 +59,7 @@ IfStatement: ast::IfStatement = {
 
 Condition: ast::Condition = {
     <command:Invocation> => ast::Condition::Command(command),
+    Not <condition:Condition> => ast::Condition::Not(Box::new(condition)),
 };
 
 IfClause: ast::IfClause = {
@@ -127,5 +128,6 @@ extern {
         Begin => lexer::Token::Begin,
         End => lexer::Token::End,
         Assign => lexer::Token::Assign,
+        Not => lexer::Token::Not,
     }
 }

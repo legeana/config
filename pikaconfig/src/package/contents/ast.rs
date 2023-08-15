@@ -50,6 +50,7 @@ impl std::fmt::Display for Invocation {
 #[derive(Debug, PartialEq)]
 pub enum Condition {
     Command(Invocation),
+    Not(Box<Condition>),
 }
 
 #[derive(Debug, PartialEq)]
@@ -492,6 +493,80 @@ mod tests {
                         args: args![@"else"],
                     })],
                 }),],
+            }
+        );
+    }
+
+    #[test]
+    fn test_if_not_statement() {
+        assert_eq!(
+            Manifest::parse(
+                "",
+                r#"
+                if ! cond {
+                    statement
+                }
+            "#
+            )
+            .unwrap(),
+            Manifest {
+                location: "".into(),
+                statements: vec![Statement::IfStatement(IfStatement {
+                    location: lexer::Location::new_p_l_c(17, 2, 17),
+                    if_clause: IfClause {
+                        location: lexer::Location::new_p_l_c(17, 2, 17),
+                        condition: Condition::Not(Box::new(Condition::Command(Invocation {
+                            location: lexer::Location::new_p_l_c(22, 2, 22),
+                            name: "cond".to_owned(),
+                            args: args![],
+                        }))),
+                        statements: vec![Statement::Command(Invocation {
+                            location: lexer::Location::new_p_l_c(49, 3, 21),
+                            name: "statement".to_owned(),
+                            args: args![],
+                        }),],
+                    },
+                    else_if_clauses: vec![],
+                    else_statements: vec![],
+                })],
+            }
+        );
+    }
+
+    #[test]
+    fn test_if_not_not_not_statement() {
+        assert_eq!(
+            Manifest::parse(
+                "",
+                r#"
+                if ! ! ! cond {
+                    statement
+                }
+            "#
+            )
+            .unwrap(),
+            Manifest {
+                location: "".into(),
+                statements: vec![Statement::IfStatement(IfStatement {
+                    location: lexer::Location::new_p_l_c(17, 2, 17),
+                    if_clause: IfClause {
+                        location: lexer::Location::new_p_l_c(17, 2, 17),
+                        condition: Condition::Not(Box::new(Condition::Not(Box::new(
+                            Condition::Not(Box::new(Condition::Command(Invocation {
+                                location: lexer::Location::new_p_l_c(26, 2, 26),
+                                name: "cond".to_owned(),
+                                args: args![],
+                            })))
+                        )))),
+                        statements: vec![Statement::Command(Invocation {
+                            location: lexer::Location::new_p_l_c(53, 3, 21),
+                            name: "statement".to_owned(),
+                            args: args![],
+                        }),],
+                    },
+                    else_if_clauses: vec![],
+                    else_statements: vec![],
+                })],
             }
         );
     }

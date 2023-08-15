@@ -47,15 +47,23 @@ impl engine::Condition for Condition {
 }
 
 #[derive(Debug)]
+struct NotCondition(engine::ConditionBox);
+
+impl engine::Condition for NotCondition {
+    fn eval(&self, ctx: &engine::Context) -> Result<bool> {
+        Ok(!self.0.eval(ctx)?)
+    }
+}
+
+#[derive(Debug)]
 struct IfClauseStatement {
-    cond: Condition,
+    cond: engine::ConditionBox,
     statements: VecStatement,
 }
 
 impl IfClauseStatement {
     /// Returns Some(_) if condition is true, None otherwise (try next IfClause).
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<Option<ModuleBox>>> {
-        use engine::Condition;
         if self.cond.eval(ctx)? {
             let opt_mod = self.statements.eval(ctx)?;
             Ok(Some(opt_mod))
@@ -195,18 +203,23 @@ fn parse_condition(
     workdir: &Path,
     manifest_path: &Path,
     condition: &ast::Condition,
-) -> Result<Condition> {
+) -> Result<engine::ConditionBox> {
     match condition {
         ast::Condition::Command(cmd) => {
             let line = cmd.to_string();
             let cond = engine::new_condition(workdir, &cmd.name, &cmd.args)
                 .with_context(|| format!("failed to parse {manifest_path:?} line: {line}"))?;
-            Ok(Condition {
+            Ok(Box::new(Condition {
                 manifest_path: manifest_path.to_owned(),
                 line,
                 cond,
-            })
+            }))
         }
+        ast::Condition::Not(cond) => Ok(Box::new(NotCondition(parse_condition(
+            workdir,
+            manifest_path,
+            cond,
+        )?))),
     }
 }
 
