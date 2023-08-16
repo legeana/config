@@ -8,9 +8,9 @@ use anyhow::{Context, Result};
 use indoc::formatdoc;
 
 #[derive(Debug)]
-struct IsMissing(Argument);
+struct Exists(Argument);
 
-impl engine::Condition for IsMissing {
+impl engine::Condition for Exists {
     fn eval(&self, ctx: &engine::Context) -> Result<bool> {
         let path = ctx.dst_path(ctx.expand_arg(&self.0)?);
         path.try_exists()
@@ -19,24 +19,24 @@ impl engine::Condition for IsMissing {
 }
 
 #[derive(Clone)]
-struct IsMissingBuilder;
+struct ExistsBuilder;
 
-impl engine::ConditionBuilder for IsMissingBuilder {
+impl engine::ConditionBuilder for ExistsBuilder {
     fn name(&self) -> String {
-        "is_missing".to_owned()
+        "exists".to_owned()
     }
     fn help(&self) -> String {
         formatdoc! {"
             {command} <path>
-                true if <path> does not exist
+                true if <path> exists
         ", command=self.name()}
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::ConditionBox> {
         let path = args.expect_single_arg(self.name())?.clone();
-        Ok(Box::new(IsMissing(path)))
+        Ok(Box::new(Exists(path)))
     }
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_condition(Box::new(IsMissingBuilder));
+    registry.register_condition(Box::new(ExistsBuilder));
 }

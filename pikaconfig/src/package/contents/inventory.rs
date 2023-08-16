@@ -70,9 +70,9 @@ fn register_all(registry: &mut dyn Registry) {
     // Exec.
     super::exec::register(registry);
     // Control.
+    super::file_tests::register(registry);
     super::literal::register(registry);
     super::is_command::register(registry);
-    super::is_missing::register(registry);
     super::is_os::register(registry);
     // Deprecation.
     super::deprecated::register(registry);
