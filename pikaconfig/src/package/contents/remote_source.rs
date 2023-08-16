@@ -20,16 +20,64 @@ struct RemoteArchive {
     unarchiver: &'static dyn unarchiver::Unarchiver,
 }
 
-impl Module for RemoteArchive {
-    fn pre_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
-        // TODO: don't download this every time.
+fn is_dir_empty(path: &Path) -> Result<bool> {
+    Ok(path
+        .read_dir()
+        .with_context(|| format!("failed to read {path:?}"))?
+        .next()
+        .is_none())
+}
+
+impl RemoteArchive {
+    fn fetch(&self, rules: &Rules, force: bool) -> Result<bool> {
+        if !force
+            && !rules.force_download
+            && self
+                .archive
+                .try_exists()
+                .with_context(|| format!("failed to check if {:?} exists", self.archive))?
+        {
+            log::info!(
+                "Fetch: skipping {:?} for already existing {:?}",
+                self.url,
+                self.archive
+            );
+            return Ok(false);
+        }
+        log::info!("Fetch: {:?} -> {:?}", self.url, self.archive);
+        // TODO: Use checksum to verify version/integrity.
         net_util::fetch(&self.url, &self.archive, &net_util::FetchOptions::new())
             .with_context(|| format!("failed to fetch {:?}", self.url))?;
+        Ok(true)
+    }
+    fn unpack(&self, rules: &Rules, force: bool) -> Result<bool> {
+        if !force
+            && !rules.force_download
+            && !is_dir_empty(&self.source)
+                .with_context(|| format!("failed to check if {:?} is empty", self.source))?
+        {
+            log::info!(
+                "Unpack: skipping already existing {:?} -> {:?}",
+                self.archive,
+                self.source
+            );
+            return Ok(false);
+        }
+        log::info!("Unpack: {:?} -> {:?}", self.archive, self.source);
         self.unarchiver
             .unarchive(&self.archive, &self.source)
             .with_context(|| {
                 format!("failed to unpack {:?} into {:?}", self.archive, self.source)
             })?;
+        Ok(true)
+    }
+}
+
+impl Module for RemoteArchive {
+    fn pre_install(&self, rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
+        let force = false;
+        let force = self.fetch(rules, force)? || force;
+        let _force = self.unpack(rules, force)? || force;
         Ok(())
     }
 }
