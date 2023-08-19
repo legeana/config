@@ -97,15 +97,9 @@ impl FileState {
     }
     pub fn mapping(&self) -> StateMapping {
         StateMapping {
-            path: self.path().to_owned(),
-            link: self.link().to_owned(),
+            path: self.state.clone(),
+            link: self.dst.clone(),
         }
-    }
-    pub fn path(&self) -> &Path {
-        &self.state
-    }
-    pub fn link(&self) -> &Path {
-        &self.dst
     }
 }
 
