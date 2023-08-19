@@ -10,13 +10,13 @@ use crate::registry::Registry;
 
 use super::file_util;
 
-type StateType = &'static str;
-const FILE_STATE: StateType = "output";
-const DIR_STATE: StateType = "dirs";
+struct StateType(&'static str);
 
-type EphemeralStateType = &'static str;
-const EPHEMERAL_FILE: EphemeralStateType = "ephemeral_file";
-const EPHEMERAL_DIR: EphemeralStateType = "ephemeral_dir";
+const FILE_STATE: StateType = StateType("output");
+const DIR_STATE: StateType = StateType("dirs");
+
+const EPHEMERAL_FILE: StateType = StateType("ephemeral_file");
+const EPHEMERAL_DIR: StateType = StateType("ephemeral_dir");
 
 fn path_hash(path: &Path) -> Result<PathBuf> {
     let path_str = path
@@ -47,7 +47,7 @@ fn state_dir_for_type(state_type: StateType) -> Result<PathBuf> {
     Ok(state_dir()
         .ok_or_else(|| anyhow!("failed to get state dir"))?
         .join("pikaconfig")
-        .join(state_type))
+        .join(state_type.0))
 }
 
 fn state_path(path: &Path, state_type: StateType) -> Result<PathBuf> {
@@ -55,11 +55,7 @@ fn state_path(path: &Path, state_type: StateType) -> Result<PathBuf> {
     Ok(state_dir_for_type(state_type)?.join(hash))
 }
 
-fn ephemeral_state_path(
-    workdir: &Path,
-    filename: &Path,
-    state_type: EphemeralStateType,
-) -> Result<PathBuf> {
+fn ephemeral_state_path(workdir: &Path, filename: &Path, state_type: StateType) -> Result<PathBuf> {
     let ephemeral_path = workdir.join(filename);
     let hash = path_hash(&ephemeral_path)
         .with_context(|| format!("failed to make hash of {ephemeral_path:?}"))?;
