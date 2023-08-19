@@ -19,6 +19,7 @@ mod literal;
 mod local_state;
 mod mkdir;
 mod net_util;
+mod once;
 mod output_file;
 mod parser;
 mod prefix;
