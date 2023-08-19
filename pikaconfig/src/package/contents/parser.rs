@@ -156,6 +156,9 @@ pub fn parse_statements<'a>(
                 ast::Statement::Assignment(assignment) => {
                     parse_assignment(workdir, manifest_path, assignment)
                 }
+                ast::Statement::WithStatement(_) => {
+                    todo!()
+                }
             }
         })
         .collect()
