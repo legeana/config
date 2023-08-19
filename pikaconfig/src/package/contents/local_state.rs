@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Context, Result};
@@ -20,13 +22,29 @@ fn state_dir() -> Option<PathBuf> {
     dirs::data_local_dir()
 }
 
+trait LocalStateRoot {
+    fn path(&self) -> Result<PathBuf>;
+}
+
 struct StateType(&'static str);
 
-impl StateType {
+impl LocalStateRoot for StateType {
     fn path(&self) -> Result<PathBuf> {
         Ok(state_dir()
             .ok_or_else(|| anyhow!("failed to get state dir"))?
             .join("pikaconfig")
+            .join(self.0))
+    }
+}
+
+struct CacheType(&'static str);
+
+impl LocalStateRoot for CacheType {
+    fn path(&self) -> Result<PathBuf> {
+        Ok(dirs::cache_dir()
+            .ok_or_else(|| anyhow!("failed to get cache dir"))?
+            .join("pikaconfig")
+            .join("cache")
             .join(self.0))
     }
 }
@@ -36,6 +54,9 @@ const DIR_STATE: StateType = StateType("dirs");
 
 const EPHEMERAL_FILE: StateType = StateType("ephemeral_file");
 const EPHEMERAL_DIR: StateType = StateType("ephemeral_dir");
+
+const FILE_CACHE: CacheType = CacheType("files");
+const DIR_CACHE: CacheType = CacheType("dirs");
 
 fn path_hash(path: &Path) -> Result<PathBuf> {
     let path_str = path
@@ -52,16 +73,16 @@ fn path_hash(path: &Path) -> Result<PathBuf> {
     Ok(URL_SAFE.encode(result).into())
 }
 
-fn state_path(path: &Path, state_type: StateType) -> Result<PathBuf> {
+fn linked_path<R: LocalStateRoot>(path: &Path, root: R) -> Result<PathBuf> {
     let hash = path_hash(path).with_context(|| format!("unable to make hash of {path:?}"))?;
-    Ok(state_type.path()?.join(hash))
+    Ok(root.path()?.join(hash))
 }
 
-fn ephemeral_state_path(workdir: &Path, filename: &Path, state_type: StateType) -> Result<PathBuf> {
+fn ephemeral_path<R: LocalStateRoot>(workdir: &Path, filename: &Path, root: R) -> Result<PathBuf> {
     let ephemeral_path = workdir.join(filename);
     let hash = path_hash(&ephemeral_path)
         .with_context(|| format!("failed to make hash of {ephemeral_path:?}"))?;
-    Ok(state_type.path()?.join(hash).join(filename))
+    Ok(root.path()?.join(hash).join(filename))
 }
 
 fn create_file_dir(path: &Path) -> Result<()> {
@@ -102,7 +123,7 @@ pub struct FileState {
 
 impl FileState {
     pub fn new(dst: PathBuf) -> Result<Self> {
-        let state = state_path(&dst, FILE_STATE)
+        let state = linked_path(&dst, FILE_STATE)
             .with_context(|| format!("failed to build state path for {dst:?}"))?;
         Ok(Self { state, dst })
     }
@@ -130,7 +151,7 @@ pub struct DirectoryState {
 
 impl DirectoryState {
     pub fn new(dst: PathBuf) -> Result<Self> {
-        let state = state_path(&dst, DIR_STATE)
+        let state = linked_path(&dst, DIR_STATE)
             .with_context(|| format!("failed to build state path for {dst:?}"))?;
         Ok(Self { state, dst })
     }
@@ -157,7 +178,7 @@ pub struct EphemeralFileState {
 
 impl EphemeralFileState {
     pub fn new(workdir: &Path, filename: &Path) -> Result<Self> {
-        let state = ephemeral_state_path(workdir, filename, EPHEMERAL_FILE).with_context(|| {
+        let state = ephemeral_path(workdir, filename, EPHEMERAL_FILE).with_context(|| {
             format!("failed to build state path for {workdir:?} with {filename:?}")
         })?;
         Ok(Self { state })
@@ -179,7 +200,7 @@ pub struct EphemeralDirState {
 
 impl EphemeralDirState {
     pub fn new(workdir: &Path, filename: &Path) -> Result<Self> {
-        let state = ephemeral_state_path(workdir, filename, EPHEMERAL_DIR).with_context(|| {
+        let state = ephemeral_path(workdir, filename, EPHEMERAL_DIR).with_context(|| {
             format!("failed to build state path for {workdir:?} with {filename:?}")
         })?;
         Ok(Self { state })
@@ -192,5 +213,45 @@ impl EphemeralDirState {
 impl Module for EphemeralDirState {
     fn pre_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
         create_dir(&self.state)
+    }
+}
+
+pub struct EphemeralFileCache(PathBuf);
+
+impl EphemeralFileCache {
+    pub fn new(workdir: &Path, filename: &Path) -> Result<Self> {
+        let cache = ephemeral_path(workdir, filename, FILE_CACHE).with_context(|| {
+            format!("failed to build path for {workdir:?} cache file {filename:?}")
+        })?;
+        Ok(Self(cache))
+    }
+    pub fn path(&self) -> &Path {
+        &self.0
+    }
+}
+
+impl Module for EphemeralFileCache {
+    fn pre_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
+        create_file_dir(&self.0)
+    }
+}
+
+pub struct EphemeralDirCache(PathBuf);
+
+impl EphemeralDirCache {
+    pub fn new(workdir: &Path, filename: &Path) -> Result<Self> {
+        let cache = ephemeral_path(workdir, filename, FILE_CACHE).with_context(|| {
+            format!("failed to build path for {workdir:?} cache directory {filename:?}")
+        })?;
+        Ok(Self(cache))
+    }
+    pub fn path(&self) -> &Path {
+        &self.0
+    }
+}
+
+impl Module for EphemeralDirCache {
+    fn pre_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
+        create_dir(&self.0)
     }
 }
