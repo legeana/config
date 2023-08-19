@@ -240,7 +240,7 @@ pub struct EphemeralDirCache(PathBuf);
 
 impl EphemeralDirCache {
     pub fn new(workdir: &Path, filename: &Path) -> Result<Self> {
-        let cache = ephemeral_path(workdir, filename, FILE_CACHE).with_context(|| {
+        let cache = ephemeral_path(workdir, filename, DIR_CACHE).with_context(|| {
             format!("failed to build path for {workdir:?} cache directory {filename:?}")
         })?;
         Ok(Self(cache))
