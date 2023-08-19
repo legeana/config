@@ -8,7 +8,6 @@ use anyhow::{anyhow, bail, Result};
 use crate::module::ModuleBox;
 
 use super::args::{Argument, Arguments};
-use super::engine;
 
 pub struct Context {
     pub enabled: bool,
@@ -120,14 +119,14 @@ pub trait ConditionBuilder: Sync + Send {
 pub type ConditionBuilderBox = Box<dyn ConditionBuilder>;
 
 pub trait Condition: std::fmt::Debug {
-    fn eval(&self, ctx: &engine::Context) -> Result<bool>;
+    fn eval(&self, ctx: &Context) -> Result<bool>;
 }
 
 pub type ConditionBox = Box<dyn Condition>;
 
 /// Command creates a Module or modifies State.
 pub trait Statement: std::fmt::Debug {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>>;
+    fn eval(&self, ctx: &mut Context) -> Result<Option<ModuleBox>>;
 }
 
 pub type StatementBox = Box<dyn Statement>;
@@ -138,7 +137,7 @@ pub struct ExpressionOutput {
 }
 
 pub trait Expression: std::fmt::Debug {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<ExpressionOutput>;
+    fn eval(&self, ctx: &mut Context) -> Result<ExpressionOutput>;
 }
 
 pub type ExpressionBox = Box<dyn Expression>;
