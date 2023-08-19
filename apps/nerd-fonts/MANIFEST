@@ -1,0 +1,28 @@
+if is_linux {
+    src = remote_archive Hack.zip 'https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/Hack.zip'
+
+    prefix ~/.local/share/fonts
+    symlink_from $src/HackNerdFont-BoldItalic.ttf
+    symlink_from $src/HackNerdFont-Bold.ttf
+    symlink_from $src/HackNerdFont-Italic.ttf
+    symlink_from $src/HackNerdFontMono-BoldItalic.ttf
+    symlink_from $src/HackNerdFontMono-Bold.ttf
+    symlink_from $src/HackNerdFontMono-Italic.ttf
+    symlink_from $src/HackNerdFontMono-Regular.ttf
+    symlink_from $src/HackNerdFontPropo-BoldItalic.ttf
+    symlink_from $src/HackNerdFontPropo-Bold.ttf
+    symlink_from $src/HackNerdFontPropo-Italic.ttf
+    symlink_from $src/HackNerdFontPropo-Regular.ttf
+    symlink_from $src/HackNerdFont-Regular.ttf
+
+    if is_command fc-cache {
+        with once fc-cache {
+            post_install_exec fc-cache --force
+        }
+    }
+} else if is_windows {
+    # https://support.microsoft.com/en-us/office/add-a-font-b7c5f17c-4426-4b53-967f-455339c564c1
+    # https://www.itprotoday.com/compute-engines/how-can-i-install-font-command-linebatch-file
+    # raw copy fonts
+    # post_install_exec regedit /s font.reg
+}
