@@ -32,6 +32,7 @@ Statement: ast::Statement = {
     <Invocation> LineTerminator => ast::Statement::Command(<>),
     <IfStatement> LineTerminator => ast::Statement::IfStatement(<>),
     <Assignment> LineTerminator => ast::Statement::Assignment(<>),
+    <WithStatement> LineTerminator => ast::Statement::WithStatement(<>),
 };
 
 Invocation: ast::Invocation = {
@@ -98,6 +99,17 @@ Assignment: ast::Assignment = {
     },
 };
 
+WithStatement: ast::WithStatement = {
+    With
+    <wrapper:Invocation>
+    Begin
+    <statements:StatementList>
+    End => ast::WithStatement {
+        wrapper,
+        statements,
+    },
+};
+
 Arguments: args::Arguments = {
     <Argument*> => args::Arguments(<>),
 };
@@ -129,5 +141,6 @@ extern {
         End => lexer::Token::End,
         Assign => lexer::Token::Assign,
         Not => lexer::Token::Not,
+        With => lexer::Token::With,
     }
 }

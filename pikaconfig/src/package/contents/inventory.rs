@@ -9,6 +9,7 @@ use super::engine;
 pub trait Registry {
     fn register_command(&mut self, parser: engine::CommandBuilderBox);
     fn register_condition(&mut self, builder: engine::ConditionBuilderBox);
+    fn register_with_wrapper(&mut self, builder: engine::WithWrapperBuilderBox);
     fn register_render_helper(&mut self, render_helper: Box<dyn RenderHelper>);
 }
 
@@ -22,6 +23,8 @@ struct RegistryImpl {
     commands_order: Vec<String>,
     conditions: HashMap<String, engine::ConditionBuilderBox>,
     conditions_order: Vec<String>,
+    with_wrappers: HashMap<String, engine::WithWrapperBuilderBox>,
+    with_wrappers_order: Vec<String>,
     render_helpers: Vec<Box<dyn RenderHelper>>,
 }
 
@@ -41,6 +44,14 @@ impl Registry for RegistryImpl {
             panic!("ConditionBuilder name conflict: {:?}", former.name());
         }
         self.conditions_order.push(name);
+    }
+    fn register_with_wrapper(&mut self, builder: engine::WithWrapperBuilderBox) {
+        let name = builder.name();
+        let former = self.with_wrappers.insert(builder.name(), builder);
+        if let Some(former) = former {
+            panic!("WithWrapperBuilder name conflict: {:?}", former.name());
+        }
+        self.with_wrappers_order.push(name);
     }
     fn register_render_helper(&mut self, render_helper: Box<dyn RenderHelper>) {
         self.render_helpers.push(render_helper);
@@ -74,6 +85,7 @@ fn register_all(registry: &mut dyn Registry) {
     super::literal::register(registry);
     super::is_command::register(registry);
     super::is_os::register(registry);
+    super::once::register(registry);
     // Deprecation.
     super::deprecated::register(registry);
 }
@@ -121,6 +133,23 @@ pub fn condition(name: &str) -> Result<&dyn engine::ConditionBuilder> {
         .map(|p| p.as_ref())
 }
 
+pub fn with_wrappers() -> impl Iterator<Item = &'static engine::WithWrapperBuilderBox> {
+    registry().with_wrappers_order.iter().map(|name| {
+        registry()
+            .with_wrappers
+            .get(name)
+            .expect("conditions_order must match conditions")
+    })
+}
+
+pub fn with_wrapper(name: &str) -> Result<&dyn engine::WithWrapperBuilder> {
+    registry()
+        .with_wrappers
+        .get(name)
+        .ok_or_else(|| anyhow!("unknown with wrapper {name}"))
+        .map(|p| p.as_ref())
+}
+
 pub fn register_render_helpers(tera: &mut Tera) {
     for rh in &registry().render_helpers {
         rh.register_render_helper(tera);
@@ -144,5 +173,14 @@ mod tests {
             registry().conditions_order.len()
         );
         assert_eq!(conditions().count(), registry().conditions.len());
+    }
+
+    #[test]
+    fn test_with_wrappers_index() {
+        assert_eq!(
+            registry().with_wrappers.len(),
+            registry().with_wrappers_order.len()
+        );
+        assert_eq!(with_wrappers().count(), registry().with_wrappers.len());
     }
 }

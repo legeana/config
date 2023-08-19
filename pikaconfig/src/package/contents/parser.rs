@@ -156,6 +156,9 @@ pub fn parse_statements<'a>(
                 ast::Statement::Assignment(assignment) => {
                     parse_assignment(workdir, manifest_path, assignment)
                 }
+                ast::Statement::WithStatement(with_st) => {
+                    parse_with_statement(workdir, manifest_path, with_st)
+                }
             }
         })
         .collect()
@@ -257,4 +260,23 @@ fn parse_if_statement(
         if_clauses,
         else_clause,
     }))
+}
+
+fn parse_with_statement(
+    workdir: &Path,
+    manifest_path: &Path,
+    with_st: &ast::WithStatement,
+) -> Result<engine::StatementBox> {
+    let statement = Box::new(VecStatement(parse_statements(
+        workdir,
+        manifest_path,
+        with_st.statements.iter(),
+    )?));
+    let wrapper = engine::new_with_wrapper(
+        workdir,
+        &with_st.wrapper.name,
+        &with_st.wrapper.args,
+        statement,
+    )?;
+    Ok(wrapper)
 }

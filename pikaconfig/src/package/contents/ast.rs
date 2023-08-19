@@ -28,6 +28,7 @@ pub enum Statement {
     Command(Invocation),
     IfStatement(IfStatement),
     Assignment(Assignment),
+    WithStatement(WithStatement),
 }
 
 #[derive(Debug, PartialEq)]
@@ -73,6 +74,12 @@ pub struct Assignment {
     pub location: lexer::Location,
     pub var: String,
     pub command: Invocation,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct WithStatement {
+    pub wrapper: Invocation,
+    pub statements: Vec<Statement>,
 }
 
 #[cfg(test)]
@@ -268,7 +275,7 @@ mod tests {
             Manifest::parse(
                 "",
                 r#"
-                if cond with args {
+                if cond "with" args {
                     statement
                 }
             "#
@@ -283,10 +290,10 @@ mod tests {
                         condition: Condition::Command(Invocation {
                             location: lexer::Location::new_p_l_c(20, 2, 20),
                             name: "cond".to_owned(),
-                            args: args![~"with", ~"args"],
+                            args: args![@"with", ~"args"],
                         }),
                         statements: vec![Statement::Command(Invocation {
-                            location: lexer::Location::new_p_l_c(57, 3, 21),
+                            location: lexer::Location::new_p_l_c(59, 3, 21),
                             name: "statement".to_owned(),
                             args: args![],
                         })],
@@ -591,6 +598,36 @@ mod tests {
                         name: "command".into(),
                         args: args![~"arg"],
                     }
+                })],
+            }
+        );
+    }
+
+    #[test]
+    fn test_with_statement() {
+        assert_eq!(
+            Manifest::parse(
+                "",
+                r#"
+                with command one {
+                    wrapped command
+                }
+            "#
+            )
+            .unwrap(),
+            Manifest {
+                location: "".into(),
+                statements: vec![Statement::WithStatement(WithStatement {
+                    wrapper: Invocation {
+                        location: lexer::Location::new_p_l_c(22, 2, 22),
+                        name: "command".into(),
+                        args: args![~"one"],
+                    },
+                    statements: vec![Statement::Command(Invocation {
+                        location: lexer::Location::new_p_l_c(56, 3, 21),
+                        name: "wrapped".into(),
+                        args: args![~"command"],
+                    }),],
                 })],
             }
         );
