@@ -64,6 +64,17 @@ fn ephemeral_state_path(workdir: &Path, filename: &Path, state_type: StateType) 
     Ok(state_type.path()?.join(hash).join(filename))
 }
 
+fn create_file_dir(path: &Path) -> Result<()> {
+    let dir = path
+        .parent()
+        .ok_or_else(|| anyhow!("failed to get {path:?} parent"))?;
+    create_dir(dir)
+}
+
+fn create_dir(dir: &Path) -> Result<()> {
+    std::fs::create_dir_all(dir).with_context(|| format!("failed to create {dir:?}"))
+}
+
 pub struct StateMapping {
     /// The actual file.
     path: PathBuf,
@@ -105,12 +116,7 @@ impl FileState {
 
 impl Module for FileState {
     fn install(&self, _rules: &super::Rules, registry: &mut dyn Registry) -> Result<()> {
-        let state_dir = self
-            .state
-            .parent()
-            .ok_or_else(|| anyhow!("failed to get {:?} parent", self.state))?;
-        std::fs::create_dir_all(state_dir)
-            .with_context(|| format!("failed to create {state_dir:?}"))?;
+        create_file_dir(&self.state)?; // TODO: pre_install?
         file_util::make_symlink(registry, &self.state, &self.dst)
     }
 }
@@ -136,8 +142,7 @@ impl DirectoryState {
 
 impl Module for DirectoryState {
     fn install(&self, _rules: &super::Rules, registry: &mut dyn Registry) -> Result<()> {
-        std::fs::create_dir_all(&self.state)
-            .with_context(|| format!("failed to create {:?}", &self.state))?;
+        create_dir(&self.state)?; // TODO pre_install?
         file_util::make_symlink(registry, &self.state, &self.dst)
     }
 }
@@ -160,13 +165,7 @@ impl EphemeralFileState {
 
 impl Module for EphemeralFileState {
     fn pre_install(&self, _rules: &super::Rules, _registry: &mut dyn Registry) -> Result<()> {
-        let state_dir = self
-            .state
-            .parent()
-            .ok_or_else(|| anyhow!("failed to get {:?} parent", self.state))?;
-        std::fs::create_dir_all(state_dir)
-            .with_context(|| format!("failed to create {state_dir:?}"))?;
-        Ok(())
+        create_file_dir(&self.state)
     }
 }
 
@@ -188,7 +187,6 @@ impl EphemeralDirState {
 
 impl Module for EphemeralDirState {
     fn pre_install(&self, _rules: &super::Rules, _registry: &mut dyn Registry) -> Result<()> {
-        std::fs::create_dir_all(&self.state)
-            .with_context(|| format!("failed to create {:?}", &self.state))
+        create_dir(&self.state)
     }
 }
