@@ -10,7 +10,26 @@ use crate::registry::Registry;
 
 use super::file_util;
 
+#[cfg(unix)]
+fn state_dir() -> Option<PathBuf> {
+    dirs::state_dir()
+}
+
+#[cfg(windows)]
+fn state_dir() -> Option<PathBuf> {
+    dirs::data_local_dir()
+}
+
 struct StateType(&'static str);
+
+impl StateType {
+    fn path(&self) -> Result<PathBuf> {
+        Ok(state_dir()
+            .ok_or_else(|| anyhow!("failed to get state dir"))?
+            .join("pikaconfig")
+            .join(self.0))
+    }
+}
 
 const FILE_STATE: StateType = StateType("output");
 const DIR_STATE: StateType = StateType("dirs");
@@ -33,33 +52,16 @@ fn path_hash(path: &Path) -> Result<PathBuf> {
     Ok(URL_SAFE.encode(result).into())
 }
 
-#[cfg(unix)]
-fn state_dir() -> Option<PathBuf> {
-    dirs::state_dir()
-}
-
-#[cfg(windows)]
-fn state_dir() -> Option<PathBuf> {
-    dirs::data_local_dir()
-}
-
-fn state_dir_for_type(state_type: StateType) -> Result<PathBuf> {
-    Ok(state_dir()
-        .ok_or_else(|| anyhow!("failed to get state dir"))?
-        .join("pikaconfig")
-        .join(state_type.0))
-}
-
 fn state_path(path: &Path, state_type: StateType) -> Result<PathBuf> {
     let hash = path_hash(path).with_context(|| format!("unable to make hash of {path:?}"))?;
-    Ok(state_dir_for_type(state_type)?.join(hash))
+    Ok(state_type.path()?.join(hash))
 }
 
 fn ephemeral_state_path(workdir: &Path, filename: &Path, state_type: StateType) -> Result<PathBuf> {
     let ephemeral_path = workdir.join(filename);
     let hash = path_hash(&ephemeral_path)
         .with_context(|| format!("failed to make hash of {ephemeral_path:?}"))?;
-    Ok(state_dir_for_type(state_type)?.join(hash).join(filename))
+    Ok(state_type.path()?.join(hash).join(filename))
 }
 
 pub struct StateMapping {
