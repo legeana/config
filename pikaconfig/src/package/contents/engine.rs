@@ -110,6 +110,19 @@ pub trait CommandBuilder: Sync + Send {
 
 pub type CommandBuilderBox = Box<dyn CommandBuilder>;
 
+pub trait WithWrapperBuilder: Sync + Send {
+    fn name(&self) -> String;
+    fn help(&self) -> String;
+    fn build(
+        &self,
+        workdir: &Path,
+        args: &Arguments,
+        statement: StatementBox,
+    ) -> Result<StatementBox>;
+}
+
+pub type WithWrapperBuilderBox = Box<dyn WithWrapperBuilder>;
+
 pub trait ConditionBuilder: Sync + Send {
     fn name(&self) -> String;
     fn help(&self) -> String;
@@ -147,6 +160,16 @@ pub fn new_command(workdir: &Path, command: &str, args: &Arguments) -> Result<Co
     builder.build(workdir, args)
 }
 
+pub fn new_with_wrapper(
+    workdir: &Path,
+    name: &str,
+    args: &Arguments,
+    statement: StatementBox,
+) -> Result<StatementBox> {
+    let builder = super::inventory::with_wrapper(name)?;
+    builder.build(workdir, args, statement)
+}
+
 pub fn new_condition(workdir: &Path, name: &str, args: &Arguments) -> Result<ConditionBox> {
     let builder = super::inventory::condition(name)?;
     builder.build(workdir, args)
@@ -163,6 +186,12 @@ pub fn help() -> String {
     help.push_str("## Conditions\n");
     for condition in super::inventory::conditions() {
         help.push_str(condition.help().trim());
+        help.push('\n');
+    }
+    help.push('\n');
+    help.push_str("## with statement wrappers\n");
+    for with_wrapper in super::inventory::with_wrappers() {
+        help.push_str(with_wrapper.help().trim());
         help.push('\n');
     }
     help
