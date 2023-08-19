@@ -5,7 +5,7 @@ use base64::engine::general_purpose::URL_SAFE;
 use base64::Engine;
 use sha2::{Digest, Sha256};
 
-use crate::module::Module;
+use crate::module::{Module, Rules};
 use crate::registry::Registry;
 
 use super::file_util;
@@ -115,8 +115,10 @@ impl FileState {
 }
 
 impl Module for FileState {
-    fn install(&self, _rules: &super::Rules, registry: &mut dyn Registry) -> Result<()> {
-        create_file_dir(&self.state)?; // TODO: pre_install?
+    fn pre_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
+        create_file_dir(&self.state)
+    }
+    fn install(&self, _rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         file_util::make_symlink(registry, &self.state, &self.dst)
     }
 }
@@ -141,8 +143,10 @@ impl DirectoryState {
 }
 
 impl Module for DirectoryState {
-    fn install(&self, _rules: &super::Rules, registry: &mut dyn Registry) -> Result<()> {
-        create_dir(&self.state)?; // TODO pre_install?
+    fn pre_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
+        create_dir(&self.state)
+    }
+    fn install(&self, _rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         file_util::make_symlink(registry, &self.state, &self.dst)
     }
 }
@@ -164,7 +168,7 @@ impl EphemeralFileState {
 }
 
 impl Module for EphemeralFileState {
-    fn pre_install(&self, _rules: &super::Rules, _registry: &mut dyn Registry) -> Result<()> {
+    fn pre_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
         create_file_dir(&self.state)
     }
 }
@@ -186,7 +190,7 @@ impl EphemeralDirState {
 }
 
 impl Module for EphemeralDirState {
-    fn pre_install(&self, _rules: &super::Rules, _registry: &mut dyn Registry) -> Result<()> {
+    fn pre_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
         create_dir(&self.state)
     }
 }
