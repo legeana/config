@@ -68,6 +68,8 @@ pub enum Token {
     Assign,
     #[token("!")]
     Not,
+    #[token("with")]
+    With,
 }
 
 impl std::fmt::Display for Token {
@@ -85,6 +87,7 @@ impl std::fmt::Display for Token {
             Token::End => write!(f, "Token::End"),
             Token::Assign => write!(f, "Token::Assign"),
             Token::Not => write!(f, "Token::Not"),
+            Token::With => write!(f, "Token::With"),
         }
     }
 }
@@ -648,6 +651,32 @@ mod tests {
         assert_token!(lex.next(), Token::Assign);
         assert_token!(lex.next(), Token::UnquotedLiteral("command".into()));
         assert_token!(lex.next(), Token::UnquotedLiteral("arg".into()));
+        assert_token!(lex.next(), Token::Newline);
+        assert_eoi!(lex);
+    }
+
+    #[test]
+    fn test_with_statement() {
+        let mut lex = TestLexer::new(
+            r#"
+            with wrapper {
+                statement one
+                statement two
+            }
+            "#,
+        );
+        assert_token!(lex.next(), Token::Newline);
+        assert_token!(lex.next(), Token::With);
+        assert_token!(lex.next(), Token::UnquotedLiteral("wrapper".into()));
+        assert_token!(lex.next(), Token::Begin);
+        assert_token!(lex.next(), Token::Newline);
+        assert_token!(lex.next(), Token::UnquotedLiteral("statement".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("one".into()));
+        assert_token!(lex.next(), Token::Newline);
+        assert_token!(lex.next(), Token::UnquotedLiteral("statement".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("two".into()));
+        assert_token!(lex.next(), Token::Newline);
+        assert_token!(lex.next(), Token::End);
         assert_token!(lex.next(), Token::Newline);
         assert_eoi!(lex);
     }

@@ -268,7 +268,7 @@ mod tests {
             Manifest::parse(
                 "",
                 r#"
-                if cond with args {
+                if cond "with" args {
                     statement
                 }
             "#
@@ -283,10 +283,10 @@ mod tests {
                         condition: Condition::Command(Invocation {
                             location: lexer::Location::new_p_l_c(20, 2, 20),
                             name: "cond".to_owned(),
-                            args: args![~"with", ~"args"],
+                            args: args![@"with", ~"args"],
                         }),
                         statements: vec![Statement::Command(Invocation {
-                            location: lexer::Location::new_p_l_c(57, 3, 21),
+                            location: lexer::Location::new_p_l_c(59, 3, 21),
                             name: "statement".to_owned(),
                             args: args![],
                         })],
