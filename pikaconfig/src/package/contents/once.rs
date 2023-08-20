@@ -79,8 +79,8 @@ impl engine::Statement for OnceStatement {
                 let tags =
                     local_state::EphemeralDirCache::new(&self.workdir, Path::new(&self.tag))?;
                 let pre_install_tag = tags.path().join("pre_install");
-                let install_tag = tags.path().join("pre_install");
-                let post_install_tag = tags.path().join("pre_install");
+                let install_tag = tags.path().join("install");
+                let post_install_tag = tags.path().join("post_install");
                 Ok(Some(Box::new((
                     tags,
                     Once {
