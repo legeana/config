@@ -30,7 +30,11 @@ where
         return Ok(());
     }
     f()?;
-    std::fs::create_dir(tag).with_context(|| format!("failed to create {tag:?} directory"))
+    match std::fs::create_dir(tag) {
+        Ok(()) => Ok(()),
+        Err(err) if err.kind() == std::io::ErrorKind::AlreadyExists => Ok(()),
+        Err(err) => Err(err).with_context(|| format!("failed to create {tag:?} directory")),
+    }
 }
 
 impl Module for Once {
