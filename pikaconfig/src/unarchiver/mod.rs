@@ -18,7 +18,6 @@ pub fn by_name(name: impl AsRef<str>) -> Result<&'static dyn Unarchiver> {
     inventory::by_name(name.as_ref())
 }
 
-#[allow(dead_code)]
 pub fn by_filename(path: impl AsRef<Path>) -> Result<&'static dyn Unarchiver> {
     let path = path.as_ref();
     let Some(ext) = path.extension() else {

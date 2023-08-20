@@ -61,7 +61,6 @@ impl Context {
             Ok(Cow::Owned(p)) => Ok(p.into()),
         }
     }
-    #[allow(dead_code)]
     pub fn expand_args(&self, args: impl AsRef<[Argument]>) -> Result<Vec<OsString>> {
         args.as_ref()
             .iter()

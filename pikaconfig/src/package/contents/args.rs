@@ -59,9 +59,7 @@ pub(crate) use args;
 #[derive(Clone, Debug, PartialEq)]
 pub enum Argument {
     Raw(String),
-    #[allow(dead_code)]
     OnlyVars(String),
-    #[allow(dead_code)]
     VarsAndHome(String),
 }
 
