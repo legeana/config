@@ -33,6 +33,7 @@ use uninstaller::Uninstaller;
 
 const NO_UPDATE_ENV: &str = "PIKACONFIG_NO_UPDATE";
 const INSTALL_REGISTRY: &str = ".install";
+const STATE_REGISTRY: &str = ".state";
 const SETUP: &str = "setup";
 
 fn config_root(file_in_root: &str) -> Result<PathBuf> {
@@ -89,7 +90,9 @@ fn reload(setup: impl AsRef<Path>) -> Result<()> {
 }
 
 fn registry(root: &Path) -> file_registry::FileRegistry {
-    file_registry::FileRegistry::new(root.join(INSTALL_REGISTRY))
+    let user_files_path = root.join(INSTALL_REGISTRY);
+    let state_files_path = root.join(STATE_REGISTRY);
+    file_registry::FileRegistry::new(user_files_path, state_files_path)
 }
 
 fn uninstall(root: &Path) -> Result<()> {

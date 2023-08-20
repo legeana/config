@@ -52,12 +52,14 @@ impl FileList {
 
 pub struct FileRegistry {
     user_files: FileList,
+    state_files: FileList,
 }
 
 impl FileRegistry {
-    pub fn new(path: PathBuf) -> Self {
+    pub fn new(user_files_path: PathBuf, state_files_path: PathBuf) -> Self {
         Self {
-            user_files: FileList(path),
+            user_files: FileList(user_files_path),
+            state_files: FileList(state_files_path),
         }
     }
 }
@@ -71,5 +73,14 @@ impl Registry for FileRegistry {
     }
     fn clear_user_files(&mut self) -> Result<()> {
         self.user_files.clear()
+    }
+    fn register_state_file(&mut self, path: &Path, _file_type: FileType) -> Result<()> {
+        self.state_files.push(path)
+    }
+    fn state_files(&self) -> Result<Vec<PathBuf>> {
+        self.state_files.list()
+    }
+    fn clear_state_files(&mut self) -> Result<()> {
+        self.state_files.clear()
     }
 }

@@ -8,6 +8,8 @@ use crate::symlink_util;
 
 pub trait Uninstaller {
     fn uninstall(&mut self) -> Result<()>;
+    /// Removes all state.
+    fn cleanup(&mut self) -> Result<()>;
 }
 
 impl<T> Uninstaller for T
@@ -16,13 +18,28 @@ where
 {
     fn uninstall(&mut self) -> Result<()> {
         let paths = self.user_files().context("failed to get installed files")?;
-        for path in paths.iter().rev() {
-            if let Err(err) = remove(path) {
-                log::error!("Failed to remove {path:?}: {err}");
-            }
-        }
+        remove_all(paths.iter().rev())?;
         self.clear_user_files()
     }
+    fn cleanup(&mut self) -> Result<()> {
+        let paths = self.state_files().context("failed to get state files")?;
+        remove_all(paths.iter().rev())?;
+        self.clear_state_files()
+    }
+}
+
+fn remove_all<P, I>(iter: I) -> Result<()>
+where
+    P: AsRef<Path>,
+    I: Iterator<Item = P>,
+{
+    for path in iter {
+        let path = path.as_ref();
+        if let Err(err) = remove(path) {
+            log::error!("Failed to remove {path:?}: {err}");
+        }
+    }
+    Ok(())
 }
 
 fn remove_symlink(path: &Path) -> Result<()> {
