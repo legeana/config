@@ -1,4 +1,4 @@
-use crate::registry;
+use crate::registry::{FileType, Registry};
 
 use std::{
     io::{ErrorKind, Write},
@@ -17,9 +17,9 @@ impl FileRegistry {
     }
 }
 
-impl registry::Registry for FileRegistry {
-    fn register(&mut self, path: &Path) -> Result<()> {
-        let mut paths = self.paths()?;
+impl Registry for FileRegistry {
+    fn register_user_file(&mut self, path: &Path, _file_type: FileType) -> Result<()> {
+        let mut paths = self.user_files()?;
         paths.push(path.to_owned());
         let db = std::fs::File::create(&self.path)
             .with_context(|| format!("unable to open {:?}", self.path))?;
@@ -35,7 +35,7 @@ impl registry::Registry for FileRegistry {
             .flush()
             .with_context(|| format!("unable to write to {:?}", self.path))
     }
-    fn paths(&self) -> Result<Vec<PathBuf>> {
+    fn user_files(&self) -> Result<Vec<PathBuf>> {
         if !self.path.exists() {
             return Ok(Vec::new());
         }
@@ -50,7 +50,7 @@ impl registry::Registry for FileRegistry {
             .map(PathBuf::from)
             .collect())
     }
-    fn clear(&mut self) -> Result<()> {
+    fn clear_user_files(&mut self) -> Result<()> {
         match std::fs::remove_file(&self.path) {
             Err(err) if err.kind() == ErrorKind::NotFound => Ok(()),
             r => r.with_context(|| format!("failed to remove {:?}", self.path)),
