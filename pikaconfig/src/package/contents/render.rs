@@ -43,7 +43,7 @@ impl engine::Statement for RenderStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         let src = self.workdir.join(ctx.expand_arg(&self.src)?);
         let dst = ctx.dst_path(ctx.expand_arg(&self.dst)?);
-        let output = local_state::FileState::new(dst.clone())
+        let output = local_state::file_state(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
         let output_mapping = output.mapping();
         let mut tera = tera::Tera::default();

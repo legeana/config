@@ -23,23 +23,51 @@ fn state_dir() -> Option<PathBuf> {
 }
 
 trait LocalStateRoot {
-    fn path(&self) -> Result<PathBuf>;
+    fn root(&self) -> Result<PathBuf>;
     fn for_linked_path(&self, path: &Path) -> Result<PathBuf> {
         let hash = path_hash(path).with_context(|| format!("unable to make hash of {path:?}"))?;
-        Ok(self.path()?.join(hash))
+        Ok(self.root()?.join(hash))
     }
     fn for_ephemeral_path(&self, workdir: &Path, filename: &Path) -> Result<PathBuf> {
         let ephemeral_path = workdir.join(filename);
         let hash = path_hash(&ephemeral_path)
             .with_context(|| format!("failed to make hash of {ephemeral_path:?}"))?;
-        Ok(self.path()?.join(hash).join(filename))
+        Ok(self.root()?.join(hash).join(filename))
+    }
+
+    // Builders.
+    fn linked_dir(&self, link: PathBuf) -> Result<LinkedDir> {
+        let path = self
+            .for_linked_path(&link)
+            .with_context(|| format!("failed to build path for {link:?}"))?;
+        Ok(LinkedDir(StateMapping { path, link }))
+    }
+    fn linked_file(&self, link: PathBuf) -> Result<LinkedFile> {
+        let path = self
+            .for_linked_path(&link)
+            .with_context(|| format!("failed to build state path for {link:?}"))?;
+        Ok(LinkedFile(StateMapping { path, link }))
+    }
+    fn ephemeral_dir(&self, workdir: &Path, filename: &Path) -> Result<EphemeralDir> {
+        let path = self
+            .for_ephemeral_path(workdir, filename)
+            .with_context(|| {
+                format!("failed to build path for {workdir:?} directory {filename:?}")
+            })?;
+        Ok(EphemeralDir(path))
+    }
+    fn ephemeral_file(&self, workdir: &Path, filename: &Path) -> Result<EphemeralFile> {
+        let path = self
+            .for_ephemeral_path(workdir, filename)
+            .with_context(|| format!("failed to build path for {workdir:?} file {filename:?}"))?;
+        Ok(EphemeralFile(path))
     }
 }
 
 struct StateType(&'static str);
 
 impl LocalStateRoot for StateType {
-    fn path(&self) -> Result<PathBuf> {
+    fn root(&self) -> Result<PathBuf> {
         Ok(state_dir()
             .ok_or_else(|| anyhow!("failed to get state dir"))?
             .join("pikaconfig")
@@ -50,7 +78,7 @@ impl LocalStateRoot for StateType {
 struct CacheType(&'static str);
 
 impl LocalStateRoot for CacheType {
-    fn path(&self) -> Result<PathBuf> {
+    fn root(&self) -> Result<PathBuf> {
         Ok(dirs::cache_dir()
             .ok_or_else(|| anyhow!("failed to get cache dir"))?
             .join("pikaconfig")
@@ -58,15 +86,6 @@ impl LocalStateRoot for CacheType {
             .join(self.0))
     }
 }
-
-const FILE_STATE: StateType = StateType("output");
-const DIR_STATE: StateType = StateType("dirs");
-
-const EPHEMERAL_FILE: StateType = StateType("ephemeral_file");
-const EPHEMERAL_DIR: StateType = StateType("ephemeral_dir");
-
-const FILE_CACHE: CacheType = CacheType("files");
-const DIR_CACHE: CacheType = CacheType("dirs");
 
 fn path_hash(path: &Path) -> Result<PathBuf> {
     let path_str = path
@@ -94,6 +113,7 @@ fn create_dir(dir: &Path) -> Result<()> {
     std::fs::create_dir_all(dir).with_context(|| format!("failed to create {dir:?}"))
 }
 
+#[derive(Clone, PartialEq)]
 pub struct StateMapping {
     /// The actual file.
     path: PathBuf,
@@ -114,152 +134,81 @@ impl std::fmt::Debug for StateMapping {
     }
 }
 
-pub struct FileState {
-    state: PathBuf,
-    dst: PathBuf,
-}
+pub struct EphemeralDir(PathBuf);
 
-impl FileState {
-    pub fn new(dst: PathBuf) -> Result<Self> {
-        let state = FILE_STATE
-            .for_linked_path(&dst)
-            .with_context(|| format!("failed to build state path for {dst:?}"))?;
-        Ok(Self { state, dst })
-    }
-    pub fn mapping(&self) -> StateMapping {
-        StateMapping {
-            path: self.state.clone(),
-            link: self.dst.clone(),
-        }
-    }
-}
-
-impl Module for FileState {
-    fn pre_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
-        create_file_dir(&self.state)
-    }
-    fn install(&self, _rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-        file_util::make_symlink(registry, &self.state, &self.dst)
-    }
-}
-
-pub struct DirectoryState {
-    state: PathBuf,
-    dst: PathBuf,
-}
-
-impl DirectoryState {
-    pub fn new(dst: PathBuf) -> Result<Self> {
-        let state = DIR_STATE
-            .for_linked_path(&dst)
-            .with_context(|| format!("failed to build state path for {dst:?}"))?;
-        Ok(Self { state, dst })
-    }
-    pub fn mapping(&self) -> StateMapping {
-        StateMapping {
-            path: self.state.clone(),
-            link: self.dst.clone(),
-        }
-    }
-}
-
-impl Module for DirectoryState {
-    fn pre_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
-        create_dir(&self.state)
-    }
-    fn install(&self, _rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
-        file_util::make_symlink(registry, &self.state, &self.dst)
-    }
-}
-
-pub struct EphemeralFileState {
-    state: PathBuf,
-}
-
-impl EphemeralFileState {
-    pub fn new(workdir: &Path, filename: &Path) -> Result<Self> {
-        let state = EPHEMERAL_FILE
-            .for_ephemeral_path(workdir, filename)
-            .with_context(|| {
-                format!("failed to build state path for {workdir:?} with {filename:?}")
-            })?;
-        Ok(Self { state })
-    }
-    pub fn path(&self) -> &Path {
-        &self.state
-    }
-}
-
-impl Module for EphemeralFileState {
-    fn pre_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
-        create_file_dir(&self.state)
-    }
-}
-
-pub struct EphemeralDirState {
-    state: PathBuf,
-}
-
-impl EphemeralDirState {
-    pub fn new(workdir: &Path, filename: &Path) -> Result<Self> {
-        let state = EPHEMERAL_DIR
-            .for_ephemeral_path(workdir, filename)
-            .with_context(|| {
-                format!("failed to build state path for {workdir:?} with {filename:?}")
-            })?;
-        Ok(Self { state })
-    }
-    pub fn path(&self) -> &Path {
-        &self.state
-    }
-}
-
-impl Module for EphemeralDirState {
-    fn pre_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
-        create_dir(&self.state)
-    }
-}
-
-pub struct EphemeralFileCache(PathBuf);
-
-impl EphemeralFileCache {
-    pub fn new(workdir: &Path, filename: &Path) -> Result<Self> {
-        let cache = FILE_CACHE
-            .for_ephemeral_path(workdir, filename)
-            .with_context(|| {
-                format!("failed to build path for {workdir:?} cache file {filename:?}")
-            })?;
-        Ok(Self(cache))
-    }
+impl EphemeralDir {
     pub fn path(&self) -> &Path {
         &self.0
     }
 }
 
-impl Module for EphemeralFileCache {
+impl Module for EphemeralDir {
+    fn pre_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
+        create_dir(&self.0)
+    }
+}
+
+pub struct EphemeralFile(PathBuf);
+
+impl EphemeralFile {
+    pub fn path(&self) -> &Path {
+        &self.0
+    }
+}
+
+impl Module for EphemeralFile {
     fn pre_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
         create_file_dir(&self.0)
     }
 }
 
-pub struct EphemeralDirCache(PathBuf);
+pub struct LinkedDir(StateMapping);
 
-impl EphemeralDirCache {
-    pub fn new(workdir: &Path, filename: &Path) -> Result<Self> {
-        let cache = DIR_CACHE
-            .for_ephemeral_path(workdir, filename)
-            .with_context(|| {
-                format!("failed to build path for {workdir:?} cache directory {filename:?}")
-            })?;
-        Ok(Self(cache))
-    }
-    pub fn path(&self) -> &Path {
-        &self.0
+impl LinkedDir {
+    pub fn mapping(&self) -> StateMapping {
+        self.0.clone()
     }
 }
 
-impl Module for EphemeralDirCache {
+impl Module for LinkedDir {
     fn pre_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
-        create_dir(&self.0)
+        create_dir(&self.0.path)
     }
+    fn install(&self, _rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+        file_util::make_symlink(registry, &self.0.path, &self.0.link)
+    }
+}
+
+pub struct LinkedFile(StateMapping);
+
+impl LinkedFile {
+    pub fn mapping(&self) -> StateMapping {
+        self.0.clone()
+    }
+}
+
+impl Module for LinkedFile {
+    fn pre_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
+        create_file_dir(&self.0.path)
+    }
+    fn install(&self, _rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
+        file_util::make_symlink(registry, &self.0.path, &self.0.link)
+    }
+}
+
+// Available directories.
+pub fn dir_state(link: PathBuf) -> Result<LinkedDir> {
+    StateType("dirs").linked_dir(link)
+}
+
+pub fn file_state(link: PathBuf) -> Result<LinkedFile> {
+    StateType("output").linked_file(link)
+}
+
+pub fn dir_cache(workdir: &Path, filename: &Path) -> Result<EphemeralDir> {
+    CacheType("dirs").ephemeral_dir(workdir, filename)
+}
+
+pub fn file_cache(workdir: &Path, filename: &Path) -> Result<EphemeralFile> {
+    CacheType("files").ephemeral_file(workdir, filename)
 }

@@ -59,7 +59,7 @@ impl engine::Statement for CatGlobIntoStatement {
         let concatenated_globs: Vec<String> =
             self.globs.iter().map(|g| glob_prefix.clone() + g).collect();
         let dst = ctx.dst_path(ctx.expand_arg(&self.filename)?);
-        let output = local_state::FileState::new(dst.clone())
+        let output = local_state::file_state(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
         let output_mapping = output.mapping();
         Ok(Some(Box::new((

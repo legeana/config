@@ -91,10 +91,9 @@ struct RemoteArchiveExpression {
 
 impl engine::Expression for RemoteArchiveExpression {
     fn eval(&self, _ctx: &mut engine::Context) -> Result<engine::ExpressionOutput> {
-        let archive =
-            local_state::EphemeralFileCache::new(&self.workdir, Path::new(&self.filename))?;
+        let archive = local_state::file_cache(&self.workdir, Path::new(&self.filename))?;
         let archive_path = archive.path().to_owned();
-        let source = local_state::EphemeralDirCache::new(&self.workdir, Path::new(&self.filename))?;
+        let source = local_state::dir_cache(&self.workdir, Path::new(&self.filename))?;
         let source_path = source.path().to_owned();
         // TODO: consider building this in Builder.
         // This will not evaluate in a false branch of an if statement.

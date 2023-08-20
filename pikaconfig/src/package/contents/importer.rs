@@ -105,7 +105,7 @@ impl engine::Statement for ImporterStatement {
         let prefix = dst
             .parent()
             .ok_or_else(|| anyhow!("failed to get parent of {dst:?}"))?;
-        let output = local_state::FileState::new(dst.clone())
+        let output = local_state::file_state(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
         let output_mapping = output.mapping();
         Ok(Some(Box::new((
