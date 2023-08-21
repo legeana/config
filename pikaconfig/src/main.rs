@@ -99,7 +99,8 @@ fn uninstall(root: &Path) -> Result<()> {
     let mut registry = registry(root);
     registry
         .uninstall()
-        .context("failed to uninstall before installing")?;
+        .context("failed to uninstall user files")?;
+    registry.cleanup().context("failed to cleanup state")?;
     Ok(())
 }
 
