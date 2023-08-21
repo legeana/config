@@ -86,6 +86,7 @@ fn register_all(registry: &mut dyn Registry) {
     super::is_command::register(registry);
     super::is_os::register(registry);
     super::once::register(registry);
+    super::return_::register(registry);
     // Deprecation.
     super::deprecated::register(registry);
 }
