@@ -4,7 +4,7 @@ use anyhow::{Context, Result};
 use indoc::formatdoc;
 
 use crate::module::{Module, ModuleBox, Rules};
-use crate::registry::Registry;
+use crate::registry::{FileType, Registry};
 
 use super::args::Arguments;
 use super::engine;
@@ -18,9 +18,9 @@ struct Once {
     module: ModuleBox,
 }
 
-fn wrap<F>(tag: &Path, f: F, force: bool) -> Result<()>
+fn wrap<F>(tag: &Path, f: F, force: bool, registry: &mut dyn Registry) -> Result<()>
 where
-    F: FnOnce() -> Result<()>,
+    F: FnOnce(&mut dyn Registry) -> Result<()>,
 {
     if !force
         && tag
@@ -29,12 +29,15 @@ where
     {
         return Ok(());
     }
-    f()?;
+    f(registry)?;
     match std::fs::create_dir(tag) {
         Ok(()) => Ok(()),
         Err(err) if err.kind() == std::io::ErrorKind::AlreadyExists => Ok(()),
         Err(err) => Err(err).with_context(|| format!("failed to create {tag:?} directory")),
-    }
+    }?;
+    registry
+        .register_state_file(tag, FileType::Directory)
+        .with_context(|| format!("failed to register state file {tag:?}"))
 }
 
 impl Module for Once {
@@ -46,22 +49,25 @@ impl Module for Once {
     fn pre_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         wrap(
             &self.pre_install_tag,
-            || self.module.pre_install(rules, registry),
+            |registry| self.module.pre_install(rules, registry),
             rules.force_download,
+            registry,
         )
     }
     fn install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         wrap(
             &self.install_tag,
-            || self.module.install(rules, registry),
+            |registry| self.module.install(rules, registry),
             rules.force_download,
+            registry,
         )
     }
     fn post_install(&self, rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
         wrap(
             &self.post_install_tag,
-            || self.module.post_install(rules, registry),
+            |registry| self.module.post_install(rules, registry),
             rules.force_download,
+            registry,
         )
     }
     fn system_install(&self, rules: &Rules) -> Result<()> {
