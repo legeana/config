@@ -201,6 +201,10 @@ pub fn dir_state(link: PathBuf) -> Result<LinkedDir> {
     StateType("dirs").linked_dir(link)
 }
 
+pub fn ephemeral_dir_state(workdir: &Path, filename: &Path) -> Result<EphemeralDir> {
+    StateType("ephemeral_dir").ephemeral_dir(workdir, filename)
+}
+
 pub fn file_state(link: PathBuf) -> Result<LinkedFile> {
     StateType("output").linked_file(link)
 }
