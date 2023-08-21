@@ -196,6 +196,27 @@ pub fn help() -> String {
     help
 }
 
+#[derive(Debug)]
+pub struct VecStatement(pub Vec<StatementBox>);
+
+impl Statement for VecStatement {
+    fn eval(&self, ctx: &mut Context) -> Result<Option<ModuleBox>> {
+        let mut modules: Vec<_> = Vec::new();
+        for statement in self.0.iter() {
+            if !ctx.enabled {
+                break;
+            }
+            if let Some(module) = statement.eval(ctx)? {
+                modules.push(module);
+            }
+        }
+        if modules.is_empty() {
+            return Ok(None);
+        }
+        Ok(Some(Box::new(modules)))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::super::args::args;

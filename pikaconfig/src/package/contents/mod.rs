@@ -64,24 +64,15 @@ pub fn verify(root: &Path) -> Result<()> {
 #[derive(Debug)]
 struct ConfigurationStatement {
     root: PathBuf,
-    statements: Vec<StatementBox>,
+    statements: engine::VecStatement,
 }
 
 impl Statement for ConfigurationStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
-        let mut modules: Vec<_> = Vec::new();
-        for statement in self.statements.iter() {
-            if !ctx.enabled {
-                break;
-            }
-            if let Some(module) = statement.eval(ctx)? {
-                modules.push(module);
-            }
+        match self.statements.eval(ctx)? {
+            Some(m) => Ok(Some(module::wrap(m, error_context(&self.root)))),
+            None => Ok(None),
         }
-        if modules.is_empty() {
-            return Ok(None);
-        }
-        Ok(Some(module::wrap(modules, error_context(&self.root))))
     }
 }
 
@@ -89,8 +80,10 @@ impl Statement for ConfigurationStatement {
 impl ConfigurationStatement {
     pub fn parse(root: PathBuf) -> Result<StatementBox> {
         let manifest = root.join(MANIFEST);
-        let statements = parser::parse(&root, &manifest)
-            .with_context(|| format!("failed to load {manifest:?}"))?;
+        let statements = engine::VecStatement(
+            parser::parse(&root, &manifest)
+                .with_context(|| format!("failed to load {manifest:?}"))?,
+        );
         Ok(Box::new(ConfigurationStatement { root, statements }))
     }
     pub fn verify(root: &Path) -> Result<()> {

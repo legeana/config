@@ -58,7 +58,7 @@ impl engine::Condition for NotCondition {
 #[derive(Debug)]
 struct IfClauseStatement {
     cond: engine::ConditionBox,
-    statements: VecStatement,
+    statements: engine::VecStatement,
 }
 
 impl IfClauseStatement {
@@ -76,7 +76,7 @@ impl IfClauseStatement {
 #[derive(Debug)]
 struct IfStatement {
     if_clauses: Vec<IfClauseStatement>,
-    else_clause: VecStatement,
+    else_clause: engine::VecStatement,
 }
 
 impl engine::Statement for IfStatement {
@@ -87,25 +87,6 @@ impl engine::Statement for IfStatement {
             }
         }
         self.else_clause.eval(ctx)
-    }
-}
-
-#[derive(Debug)]
-struct VecStatement(Vec<engine::StatementBox>);
-
-impl engine::Statement for VecStatement {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
-        let mut modules: Vec<ModuleBox> = Vec::new();
-        for st in &self.0 {
-            if let Some(m) = st.eval(ctx)? {
-                modules.push(m);
-            }
-        }
-        if modules.is_empty() {
-            Ok(None)
-        } else {
-            Ok(Some(Box::new(modules)))
-        }
     }
 }
 
@@ -232,7 +213,7 @@ fn parse_if_clause(
     if_clause: &ast::IfClause,
 ) -> Result<IfClauseStatement> {
     let cond = parse_condition(workdir, manifest_path, &if_clause.condition)?;
-    let statements = VecStatement(parse_statements(
+    let statements = engine::VecStatement(parse_statements(
         workdir,
         manifest_path,
         if_clause.statements.iter(),
@@ -251,7 +232,7 @@ fn parse_if_statement(
     for if_clause in &if_st.else_if_clauses {
         if_clauses.push(parse_if_clause(workdir, manifest_path, if_clause)?);
     }
-    let else_clause = VecStatement(parse_statements(
+    let else_clause = engine::VecStatement(parse_statements(
         workdir,
         manifest_path,
         if_st.else_statements.iter(),
@@ -267,7 +248,7 @@ fn parse_with_statement(
     manifest_path: &Path,
     with_st: &ast::WithStatement,
 ) -> Result<engine::StatementBox> {
-    let statement = Box::new(VecStatement(parse_statements(
+    let statement = Box::new(engine::VecStatement(parse_statements(
         workdir,
         manifest_path,
         with_st.statements.iter(),
