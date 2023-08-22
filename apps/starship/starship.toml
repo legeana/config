@@ -49,7 +49,6 @@ format = '$env_value '
 
 [status]
 disabled = false
-style = 'bg:blue'
 symbol = '[<$status>](red)'
 success_symbol = '[<$status>](green)'
 format = '$symbol '
