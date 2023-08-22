@@ -56,7 +56,7 @@ format = '$symbol '
 
 [directory]
 format = """\
-[>](purple)[>](orange)[>](green) \
+[>](red)[>](yellow)[>](green) \
 [$path]($style) \
 """
 style = ''
