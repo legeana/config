@@ -61,16 +61,6 @@ function __fish_prompt_profile
     end
 end
 
-function __fish_prompt_cmd_saver --on-event fish_postexec
-    if string length --quiet $argv[1]
-        set -l arg $argv[1]
-        # Use quoted substitution since commands may return multiple tokens.
-        set -l arg (string replace \n ' ' "$arg")
-        set -l arg (string replace -r '^\s*(\S+)\s.*$' '$1' "$arg")
-        set -g __fish_prompt_cmd (string replace -r '^([^ ]*/)?([^/ ]+)(\s.*)?$' '$2' $arg)
-    end
-end
-
 function __fish_prompt_sep
     if test $COLUMNS -gt $argv[1]
         echo -n ' '
@@ -130,7 +120,7 @@ function __fish_prompt_result
     echo -n '>'
     set_color normal
     echo -n ' '
-    echo -n $__fish_prompt_cmd
+    echo -n $PROMPT_LAST_COMMAND
 end
 
 function __fish_prompt_pwd
