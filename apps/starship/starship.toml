@@ -1,0 +1,72 @@
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
+add_newline = false
+
+format = """
+$username\
+$hostname\
+$time\
+$cmd_duration\
+$status\
+${env_var.PROMPT_LAST_COMMAND}
+$directory\
+$git_branch\
+$git_commit\
+$git_state\
+$git_metrics\
+$git_status\
+$hg_branch
+$character"""
+
+# TODO: os?
+
+[username]
+style_user = 'purple'
+format = '[$user]($style)@'
+
+[hostname]
+ssh_only = false
+style = 'cyan'
+# TODO: $ssh_symbol?
+format = '[$hostname]($style) '
+
+[time]
+disabled = false
+format = '[\[$time\]](bold blue) '
+time_format = '%H:%M %a %d'
+
+[cmd_duration]
+min_time = 0
+show_milliseconds = true
+format = '[$duration]($style) '
+
+[env_var.PROMPT_LAST_COMMAND]
+default = ''
+variable = 'PROMPT_LAST_COMMAND'
+format = '$env_value '
+
+[status]
+disabled = false
+style = 'bg:blue'
+symbol = '[<$status>](red)'
+success_symbol = '[<$status>](green)'
+format = '$symbol '
+
+[directory]
+format = """\
+[>](purple)[>](orange)[>](green) \
+[$path]($style) \
+"""
+style = ''
+truncate_to_repo = false
+
+# TODO: git format
+
+# Replace the '❯' symbol in the prompt with '➜'
+[character]
+success_symbol = '[\$](green)'
+
+# Disable the package module, hiding it from the prompt completely
+[package]
+disabled = true

@@ -1,0 +1,2 @@
+prefix ~/.config
+symlink starship.toml
