@@ -24,6 +24,7 @@ $character"""
 [username]
 style_user = 'purple'
 format = '[$user]($style)@'
+show_always = true
 
 [hostname]
 ssh_only = false
