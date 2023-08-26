@@ -1,5 +1,7 @@
-requires = ["family=unix"]
-
 [[user_dependencies]]
+requires = ["family=unix"]
 cargo = ["starship"]
 wants = { command = "starship" }
+
+[[system_dependencies]]
+any = ["starship"]
