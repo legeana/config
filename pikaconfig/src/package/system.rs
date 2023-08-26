@@ -84,6 +84,7 @@ impl Installer for Pacman {
                 .arg("pacman")
                 .arg("-S")
                 .arg("--needed")
+                .arg("--noconfirm")
                 .arg("--")
                 .args(&self.packages),
         )
