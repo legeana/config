@@ -71,6 +71,7 @@ pub struct SystemDependency {
     pub any: Option<Vec<String>>,
     pub apt: Option<Vec<String>>,
     pub pacman: Option<Vec<String>>,
+    pub winget: Option<Vec<String>>,
     /// Custom multi-line shell script.
     /// Use requires/conflicts for platform selection.
     /// This is intentionally non-portable because arbitrary shell commands

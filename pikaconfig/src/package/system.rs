@@ -25,6 +25,9 @@ impl SystemDependency {
         if let Some(pacman) = cfg.pacman.clone().or_else(|| cfg.any.clone()) {
             installers.push(Box::new(Pacman::new(pacman)));
         }
+        if let Some(winget) = cfg.winget.clone().or_else(|| cfg.any.clone()) {
+            installers.push(Box::new(Winget::new(winget)));
+        }
         if let Some(bash) = &cfg.bash {
             installers.push(Box::new(Bash::new(bash.clone())));
         }
@@ -86,6 +89,30 @@ impl Installer for Pacman {
                 .arg("--needed")
                 .arg("--noconfirm")
                 .arg("--")
+                .args(&self.packages),
+        )
+    }
+}
+
+struct Winget {
+    packages: Vec<String>,
+}
+
+impl Winget {
+    fn new(packages: Vec<String>) -> Self {
+        Self { packages }
+    }
+}
+
+impl Installer for Winget {
+    fn install(&self) -> Result<()> {
+        if !is_command("winget")? {
+            return Ok(());
+        }
+        process_utils::run_verbose(
+            std::process::Command::new("winget")
+                .arg("install")
+                .arg("--disable-interactivity")
                 .args(&self.packages),
         )
     }
