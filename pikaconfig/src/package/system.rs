@@ -114,6 +114,8 @@ impl Installer for Winget {
                 .arg("install")
                 .arg("--disable-interactivity")
                 .arg("--no-upgrade")
+                .arg("--exact")
+                .arg("--")
                 .args(&self.packages),
         )
     }
