@@ -113,6 +113,7 @@ impl Installer for Winget {
             std::process::Command::new("winget")
                 .arg("install")
                 .arg("--disable-interactivity")
+                .arg("--no-upgrade")
                 .args(&self.packages),
         )
     }
