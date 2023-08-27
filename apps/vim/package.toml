@@ -3,4 +3,8 @@ names = ["nvim"]
 
 [[system_dependencies]]
 any = ["vim"]
-wants = { command = "vim" }
+winget = ["vim.vim"]
+wants = { any_command = [
+    "nvim",  # nvim is a good enough substitute
+    "vim",
+] }
