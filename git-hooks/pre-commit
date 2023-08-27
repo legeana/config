@@ -1,0 +1,8 @@
+#!/bin/sh -e
+
+./setup -d list
+
+cd pikaconfig
+cargo fmt --check
+cargo clippy -- -Dwarnings  # Treat warnings as errors.
+cargo test
