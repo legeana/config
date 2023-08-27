@@ -5,6 +5,6 @@ cargo = ["bat"]
 wants = { command = "bat" }
 
 [[system_dependencies]]
+any = ["bat"]
 apt = ["batcat"]
-pacman = ["bat"]
 wants = { any_command = ["bat", "batcat"] }
