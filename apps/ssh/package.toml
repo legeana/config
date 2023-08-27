@@ -1,5 +1,5 @@
 # Unraid has managed ssh configuration.
-conflicts = ["distro=unraid"]
+requires = ["distro!=unraid"]
 
 [[system_dependencies]]
 apt = ["openssh-client"]
