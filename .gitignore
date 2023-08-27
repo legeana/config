@@ -1,4 +1,5 @@
 /.install
+/.state
 /.tags
 
 __pycache__
