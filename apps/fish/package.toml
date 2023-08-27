@@ -1,4 +1,11 @@
 requires = ["family=unix"]
 
+[[dependencies]]
+names = [
+    "bat",
+    "ripgrep",
+    "starship",
+]
+
 [[system_dependencies]]
 any = ["fish", "moreutils", "ripgrep"]
