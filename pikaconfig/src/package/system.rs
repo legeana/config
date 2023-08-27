@@ -115,7 +115,9 @@ impl Installer for Winget {
                 .arg("--accept-package-agreements")
                 .arg("--accept-source-agreements")
                 .arg("--disable-interactivity")
-                .arg("--no-upgrade")
+                // Force reinstall. This is the only way to achieve success
+                // code if the package is already installed.
+                .arg("--force")
                 .arg("--exact")
                 .arg("--")
                 .args(&self.packages),
