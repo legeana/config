@@ -112,6 +112,8 @@ impl Installer for Winget {
         process_utils::run_verbose(
             std::process::Command::new("winget")
                 .arg("install")
+                .arg("--accept-package-agreements")
+                .arg("--accept-source-agreements")
                 .arg("--disable-interactivity")
                 .arg("--no-upgrade")
                 .arg("--exact")
