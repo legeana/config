@@ -3,3 +3,8 @@ has_contents = false
 [[user_dependencies]]
 cargo = ["bat"]
 wants = { command = "bat" }
+
+[[system_dependencies]]
+apt = ["batcat"]
+pacman = ["bat"]
+wants = { any_command = ["bat", "batcat"] }
