@@ -1,2 +1,3 @@
 [[system_dependencies]]
 any = ["neovim"]
+wants = { command = "nvim" }

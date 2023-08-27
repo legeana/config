@@ -1,4 +1,5 @@
-requires = ['os=linux']
+requires = ["os=linux"]
 
 [[system_dependencies]]
 any = ["wofi"]
+wants = { command = "wofi" }

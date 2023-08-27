@@ -2,3 +2,4 @@ requires = ["family=unix"]
 
 [[system_dependencies]]
 any = ["rofi"]
+wants = { command = "rofi" }

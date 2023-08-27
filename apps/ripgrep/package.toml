@@ -1,5 +1,5 @@
 has_contents = false
 
 [[user_dependencies]]
-cargo = ['ripgrep']
-wants = { command = 'rg' }
+cargo = ["ripgrep"]
+wants = { command = "rg" }

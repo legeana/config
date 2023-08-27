@@ -5,3 +5,4 @@ wants = { command = "starship" }
 
 [[system_dependencies]]
 any = ["starship"]
+wants = { command = "starship" }

@@ -3,3 +3,4 @@ names = ["nvim"]
 
 [[system_dependencies]]
 any = ["vim"]
+wants = { command = "vim" }

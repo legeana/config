@@ -1,5 +1,5 @@
 has_contents = false
 
 [[user_dependencies]]
-cargo = ['bacon']
-wants = { command = 'bacon' }
+cargo = ["bacon"]
+wants = { command = "bacon" }

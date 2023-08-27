@@ -2,3 +2,4 @@ requires = ["os=linux"]
 
 [[system_dependencies]]
 any = ["foot"]
+wants = { command = "foot" }
