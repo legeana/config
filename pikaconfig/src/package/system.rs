@@ -6,10 +6,12 @@ use crate::process_utils;
 use crate::tag_criteria::Criteria;
 
 use super::config;
+use super::satisficer::{DependencySatisficer, Satisficer};
 use super::Installer;
 
 #[derive(Default)]
 pub struct SystemDependency {
+    wants: Option<DependencySatisficer>,
     installers: Vec<Box<dyn Installer>>,
 }
 
@@ -35,12 +37,18 @@ impl SystemDependency {
         if let Some(bash) = &cfg.bash {
             installers.push(Box::new(Bash::new(bash.clone())));
         }
-        Ok(Self { installers })
+        Ok(Self {
+            wants: cfg.wants.clone(),
+            installers,
+        })
     }
 }
 
 impl Module for SystemDependency {
-    fn system_install(&self, _rules: &Rules) -> Result<()> {
+    fn system_install(&self, rules: &Rules) -> Result<()> {
+        if !rules.force_download && self.wants.is_satisfied()? {
+            return Ok(());
+        }
         self.installers.install()
     }
 }

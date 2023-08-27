@@ -49,6 +49,10 @@ pub struct SystemDependency {
     pub apt: Option<Vec<String>>,
     pub pacman: Option<Vec<String>>,
     pub winget: Option<Vec<String>>,
+    /// Satisfaction criteria.
+    /// Will skip this dependency if met.
+    /// Rules::force_download will force this dependency to be updated.
+    pub wants: Option<DependencySatisficer>,
     /// Custom multi-line shell script.
     /// Use requires for platform selection.
     /// This is intentionally non-portable because arbitrary shell commands
@@ -62,6 +66,7 @@ pub struct SystemDependency {
 pub struct UserDependency {
     pub requires: Option<tag_criteria::TagCriteria>,
     /// Satisfaction criteria.
+    /// Will skip this dependency if met.
     /// Rules::force_download will force this dependency to be updated.
     pub wants: Option<DependencySatisficer>,
     // User-level package managers.
@@ -106,6 +111,8 @@ pub fn load_package(root: &Path) -> Result<Package> {
 
 #[cfg(test)]
 mod tests {
+    use pretty_assertions::assert_eq;
+
     use super::*;
 
     #[test]
@@ -140,6 +147,10 @@ mod tests {
 
             [[system_dependencies]]
             pacman = ['pkg1-part-arch', 'pkg2-part-arch']
+
+            [[system_dependencies]]
+            any = ['pkg']
+            wants = { command = 'pkg' }
 
             [[user_dependencies]]
             pip_user = ['pkg1-pip', 'pkg2-pip']
@@ -188,6 +199,13 @@ mod tests {
                         "pkg1-part-arch".to_owned(),
                         "pkg2-part-arch".to_owned()
                     ]),
+                    ..SystemDependency::default()
+                },
+                SystemDependency {
+                    any: Some(vec!["pkg".to_owned()]),
+                    wants: Some(DependencySatisficer::Command {
+                        command: "pkg".to_owned()
+                    }),
                     ..SystemDependency::default()
                 },
             ])

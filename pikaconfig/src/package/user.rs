@@ -13,7 +13,7 @@ use super::Installer;
 
 #[derive(Default)]
 pub struct UserDependency {
-    satisficer: Option<DependencySatisficer>,
+    wants: Option<DependencySatisficer>,
     installers: Vec<Box<dyn Installer>>,
 }
 
@@ -42,7 +42,7 @@ impl UserDependency {
             return Err(anyhow!("pip_user is not supported yet"));
         }
         Ok(Self {
-            satisficer: cfg.wants.clone(),
+            wants: cfg.wants.clone(),
             installers,
         })
     }
@@ -50,7 +50,7 @@ impl UserDependency {
 
 impl Module for UserDependency {
     fn pre_uninstall(&self, rules: &Rules) -> Result<()> {
-        if !rules.force_download && self.satisficer.is_satisfied()? {
+        if !rules.force_download && self.wants.is_satisfied()? {
             return Ok(());
         }
         self.installers.install()
