@@ -19,7 +19,11 @@ pub struct UserDependency {
 
 impl UserDependency {
     pub fn new(cfg: &config::UserDependency) -> Result<Self> {
-        if !cfg.is_satisfied().context("failed to check tags")? {
+        if !cfg
+            .requires
+            .is_satisfied()
+            .context("failed to check tags")?
+        {
             return Ok(Self::default());
         }
         let satisficer: Option<Box<dyn Satisficer>> = match &cfg.wants {

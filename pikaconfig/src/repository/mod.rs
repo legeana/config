@@ -62,7 +62,12 @@ impl Repository {
         self.packages.iter().map(|p| p.name().to_string()).collect()
     }
     pub fn enabled(&self) -> Result<bool> {
-        if !self.config.is_satisfied().context("failed to check tags")? {
+        if !self
+            .config
+            .requires
+            .is_satisfied()
+            .context("failed to check tags")?
+        {
             return Ok(false);
         }
         Ok(true)

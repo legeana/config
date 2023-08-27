@@ -17,12 +17,6 @@ pub struct Repository {
     pub requires: Option<tag_criteria::TagCriteria>,
 }
 
-impl tag_criteria::Criteria for Repository {
-    fn is_satisfied(&self) -> Result<bool> {
-        self.requires.is_satisfied()
-    }
-}
-
 fn load_toml_string(data: &str) -> Result<Repository> {
     toml::from_str(data).context("failed to deserialize Repository")
 }

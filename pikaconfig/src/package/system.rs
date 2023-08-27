@@ -16,7 +16,11 @@ pub struct SystemDependency {
 impl SystemDependency {
     pub fn new(cfg: &config::SystemDependency) -> Result<Self> {
         let mut installers: Vec<Box<dyn Installer>> = Vec::new();
-        if !cfg.is_satisfied().context("failed to check tags")? {
+        if !cfg
+            .requires
+            .is_satisfied()
+            .context("failed to check tags")?
+        {
             return Ok(Self::default());
         }
         if let Some(apt) = cfg.apt.clone().or_else(|| cfg.any.clone()) {

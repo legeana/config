@@ -29,23 +29,11 @@ pub struct Package {
     pub user_dependencies: Option<Vec<UserDependency>>,
 }
 
-impl tag_criteria::Criteria for Package {
-    fn is_satisfied(&self) -> Result<bool> {
-        self.requires.is_satisfied()
-    }
-}
-
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct Dependency {
     pub requires: Option<tag_criteria::TagCriteria>,
     pub names: Vec<String>,
-}
-
-impl tag_criteria::Criteria for Dependency {
-    fn is_satisfied(&self) -> Result<bool> {
-        self.requires.is_satisfied()
-    }
 }
 
 /// SystemDependency doesn't consider missing package manager a failure.
@@ -67,12 +55,6 @@ pub struct SystemDependency {
     pub bash: Option<String>,
 }
 
-impl tag_criteria::Criteria for SystemDependency {
-    fn is_satisfied(&self) -> Result<bool> {
-        self.requires.is_satisfied()
-    }
-}
-
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields, untagged)]
 pub enum Satisficer {
@@ -91,12 +73,6 @@ pub struct UserDependency {
     pub cargo: Option<Vec<String>>,
     pub npm: Option<Vec<String>>,
     pub pip_user: Option<Vec<String>>,
-}
-
-impl tag_criteria::Criteria for UserDependency {
-    fn is_satisfied(&self) -> Result<bool> {
-        self.requires.is_satisfied()
-    }
 }
 
 fn load_toml_string(data: &str) -> Result<Package> {
