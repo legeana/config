@@ -3,3 +3,7 @@ has_contents = false
 [[user_dependencies]]
 cargo = ["ripgrep"]
 wants = { command = "rg" }
+
+[[system_dependencies]]
+any = ["ripgrep"]
+wants = { command = "rg" }

@@ -8,4 +8,4 @@ names = [
 ]
 
 [[system_dependencies]]
-any = ["fish", "moreutils", "ripgrep"]
+any = ["fish", "moreutils"]
