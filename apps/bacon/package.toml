@@ -3,3 +3,7 @@ has_contents = false
 [[user_dependencies]]
 cargo = ["bacon"]
 wants = { command = "bacon" }
+
+[[system_dependencies]]
+pacman = ["bacon"]
+wants = { command = "bacon" }
