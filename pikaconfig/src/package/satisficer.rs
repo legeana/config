@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use serde::Deserialize;
 
 use anyhow::Result;
@@ -23,7 +25,7 @@ where
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields, untagged)]
 pub enum DependencySatisficer {
-    Command { command: String },
+    Command { command: PathBuf },
 }
 
 impl Satisficer for DependencySatisficer {

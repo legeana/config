@@ -204,7 +204,7 @@ mod tests {
                 SystemDependency {
                     any: Some(vec!["pkg".to_owned()]),
                     wants: Some(DependencySatisficer::Command {
-                        command: "pkg".to_owned()
+                        command: "pkg".into()
                     }),
                     ..SystemDependency::default()
                 },
@@ -220,7 +220,7 @@ mod tests {
                 UserDependency {
                     pip_user: Some(vec!["pkg".to_owned()]),
                     wants: Some(DependencySatisficer::Command {
-                        command: "pkg-cmd".to_owned()
+                        command: "pkg-cmd".into()
                     }),
                     ..UserDependency::default()
                 },
