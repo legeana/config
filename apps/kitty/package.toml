@@ -1,3 +1,5 @@
+requires = ["family=unix"]
+
 [[system_dependencies]]
 any = ["kitty"]
 wants = { command = "kitty" }
