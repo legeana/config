@@ -12,13 +12,13 @@ use anyhow::{anyhow, Context, Result};
 use crate::module::{self, Module, ModuleBox, Rules};
 use crate::package::installer::Installer;
 use crate::registry::Registry;
-use crate::tag_criteria::{self, TagCriteria};
+use crate::tag_criteria::{self, Criteria};
 
 pub use contents::help as manifest_help;
 
 pub struct Package {
     name: String,
-    criteria: tag_criteria::Criteria,
+    criteria: Option<tag_criteria::TagCriteria>,
     modules: Vec<ModuleBox>,
     #[allow(dead_code)]
     dependencies: Vec<String>,
@@ -47,9 +47,7 @@ impl Package {
     pub fn new(root: PathBuf) -> Result<Self> {
         let pkgconfig = config::load_package(&root)
             .with_context(|| format!("failed to load {root:?} package"))?;
-        let criteria = tag_criteria::Criteria {
-            requires: pkgconfig.requires,
-        };
+        let criteria = pkgconfig.requires.clone();
         let backup_name = name_from_path(&root)?;
         let dependencies: Vec<String> = match pkgconfig.dependencies {
             Some(deps) => filter_dependencies(&deps)

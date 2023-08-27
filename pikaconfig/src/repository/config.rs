@@ -11,16 +11,15 @@ const REPOSITORY_CONFIG_TOML: &str = "repository.toml";
 const REPOSITORY_CONFIG_YAML: &str = "repository.yaml";
 
 /// repository.toml file definition
-#[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct Repository {
-    /// Required tags.
-    pub requires: Option<Vec<String>>,
+    pub requires: Option<tag_criteria::TagCriteria>,
 }
 
-impl tag_criteria::TagCriteria for Repository {
-    fn requires(&self) -> Option<&[String]> {
-        self.requires.as_deref()
+impl tag_criteria::Criteria for Repository {
+    fn is_satisfied(&self) -> Result<bool> {
+        self.requires.is_satisfied()
     }
 }
 
@@ -82,6 +81,12 @@ mod tests {
         )
         .expect("load_toml_string");
 
-        assert_eq!(repo.requires, Some(vec!["r1".to_owned(), "r2".to_owned()]));
+        assert_eq!(
+            repo.requires,
+            Some(tag_criteria::TagCriteria::Requires(vec![
+                "r1".to_owned(),
+                "r2".to_owned()
+            ]))
+        );
     }
 }

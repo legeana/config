@@ -17,11 +17,11 @@ fn default_has_contents() -> bool {
 }
 
 /// package.toml file definition
-#[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct Package {
     pub name: Option<String>,
-    pub requires: Option<Vec<String>>,
+    pub requires: Option<tag_criteria::TagCriteria>,
     #[serde(default = "default_has_contents")]
     pub has_contents: bool,
     pub dependencies: Option<Vec<Dependency>>,
@@ -29,32 +29,30 @@ pub struct Package {
     pub user_dependencies: Option<Vec<UserDependency>>,
 }
 
-impl tag_criteria::TagCriteria for Package {
-    fn requires(&self) -> Option<&[String]> {
-        self.requires.as_deref()
+impl tag_criteria::Criteria for Package {
+    fn is_satisfied(&self) -> Result<bool> {
+        self.requires.is_satisfied()
     }
 }
 
-#[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct Dependency {
-    /// Required tags.
-    pub requires: Option<Vec<String>>,
+    pub requires: Option<tag_criteria::TagCriteria>,
     pub names: Vec<String>,
 }
 
-impl tag_criteria::TagCriteria for Dependency {
-    fn requires(&self) -> Option<&[String]> {
-        self.requires.as_deref()
+impl tag_criteria::Criteria for Dependency {
+    fn is_satisfied(&self) -> Result<bool> {
+        self.requires.is_satisfied()
     }
 }
 
 /// SystemDependency doesn't consider missing package manager a failure.
-#[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct SystemDependency {
-    /// Required tags.
-    pub requires: Option<Vec<String>>,
+    pub requires: Option<tag_criteria::TagCriteria>,
     // Package managers.
     // It is expected that only one will be available at any time.
     pub any: Option<Vec<String>>,
@@ -69,23 +67,22 @@ pub struct SystemDependency {
     pub bash: Option<String>,
 }
 
-impl tag_criteria::TagCriteria for SystemDependency {
-    fn requires(&self) -> Option<&[String]> {
-        self.requires.as_deref()
+impl tag_criteria::Criteria for SystemDependency {
+    fn is_satisfied(&self) -> Result<bool> {
+        self.requires.is_satisfied()
     }
 }
 
-#[derive(Deserialize, PartialEq, Eq, Debug, Clone)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields, untagged)]
 pub enum Satisficer {
     Command { command: String },
 }
 
-#[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct UserDependency {
-    /// Required tags.
-    pub requires: Option<Vec<String>>,
+    pub requires: Option<tag_criteria::TagCriteria>,
     /// Satisfaction criteria.
     /// Rules::force_download will force this dependency to be updated.
     pub wants: Option<Satisficer>,
@@ -96,9 +93,9 @@ pub struct UserDependency {
     pub pip_user: Option<Vec<String>>,
 }
 
-impl tag_criteria::TagCriteria for UserDependency {
-    fn requires(&self) -> Option<&[String]> {
-        self.requires.as_deref()
+impl tag_criteria::Criteria for UserDependency {
+    fn is_satisfied(&self) -> Result<bool> {
+        self.requires.is_satisfied()
     }
 }
 
@@ -182,7 +179,13 @@ mod tests {
         )
         .expect("load_toml_string");
         assert_eq!(pkg.name, Some("test".to_owned()));
-        assert_eq!(pkg.requires, Some(vec!["r1".to_owned(), "r2".to_owned()]));
+        assert_eq!(
+            pkg.requires,
+            Some(tag_criteria::TagCriteria::Requires(vec![
+                "r1".to_owned(),
+                "r2".to_owned()
+            ]))
+        );
         assert_eq!(pkg.has_contents, false);
         assert_eq!(
             pkg.dependencies,

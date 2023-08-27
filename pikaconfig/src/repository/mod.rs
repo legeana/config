@@ -8,7 +8,7 @@ use anyhow::{anyhow, Context, Result};
 use crate::module::{Module, Rules};
 use crate::package::Package;
 use crate::registry::Registry;
-use crate::tag_criteria::TagCriteria;
+use crate::tag_criteria::Criteria;
 
 pub use config::is_repository_dir;
 

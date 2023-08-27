@@ -3,7 +3,7 @@ use std::process::Command;
 use anyhow::{anyhow, Context, Result};
 
 use crate::module::{Module, Rules};
-use crate::tag_criteria::TagCriteria;
+use crate::tag_criteria::Criteria;
 
 use crate::process_utils;
 
