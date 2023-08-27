@@ -22,7 +22,6 @@ fn default_has_contents() -> bool {
 pub struct Package {
     pub name: Option<String>,
     pub requires: Option<Vec<String>>,
-    pub conflicts: Option<Vec<String>>,
     #[serde(default = "default_has_contents")]
     pub has_contents: bool,
     pub dependencies: Option<Vec<Dependency>>,
@@ -34,9 +33,6 @@ impl tag_criteria::TagCriteria for Package {
     fn requires(&self) -> Option<&[String]> {
         self.requires.as_deref()
     }
-    fn conflicts(&self) -> Option<&[String]> {
-        self.conflicts.as_deref()
-    }
 }
 
 #[derive(Deserialize, PartialEq, Eq, Default, Debug, Clone)]
@@ -44,17 +40,12 @@ impl tag_criteria::TagCriteria for Package {
 pub struct Dependency {
     /// Required tags.
     pub requires: Option<Vec<String>>,
-    /// Conflicting tags.
-    pub conflicts: Option<Vec<String>>,
     pub names: Vec<String>,
 }
 
 impl tag_criteria::TagCriteria for Dependency {
     fn requires(&self) -> Option<&[String]> {
         self.requires.as_deref()
-    }
-    fn conflicts(&self) -> Option<&[String]> {
-        self.conflicts.as_deref()
     }
 }
 
@@ -64,8 +55,6 @@ impl tag_criteria::TagCriteria for Dependency {
 pub struct SystemDependency {
     /// Required tags.
     pub requires: Option<Vec<String>>,
-    /// Conflicting tags.
-    pub conflicts: Option<Vec<String>>,
     // Package managers.
     // It is expected that only one will be available at any time.
     pub any: Option<Vec<String>>,
@@ -73,7 +62,7 @@ pub struct SystemDependency {
     pub pacman: Option<Vec<String>>,
     pub winget: Option<Vec<String>>,
     /// Custom multi-line shell script.
-    /// Use requires/conflicts for platform selection.
+    /// Use requires for platform selection.
     /// This is intentionally non-portable because arbitrary shell commands
     /// are never portable. It gives a lot of flexibility to write custom
     /// installers.
@@ -83,9 +72,6 @@ pub struct SystemDependency {
 impl tag_criteria::TagCriteria for SystemDependency {
     fn requires(&self) -> Option<&[String]> {
         self.requires.as_deref()
-    }
-    fn conflicts(&self) -> Option<&[String]> {
-        self.conflicts.as_deref()
     }
 }
 
@@ -100,8 +86,6 @@ pub enum Satisficer {
 pub struct UserDependency {
     /// Required tags.
     pub requires: Option<Vec<String>>,
-    /// Conflicting tags.
-    pub conflicts: Option<Vec<String>>,
     /// Satisfaction criteria.
     /// Rules::force_download will force this dependency to be updated.
     pub wants: Option<Satisficer>,
@@ -115,9 +99,6 @@ pub struct UserDependency {
 impl tag_criteria::TagCriteria for UserDependency {
     fn requires(&self) -> Option<&[String]> {
         self.requires.as_deref()
-    }
-    fn conflicts(&self) -> Option<&[String]> {
-        self.conflicts.as_deref()
     }
 }
 
@@ -163,7 +144,6 @@ mod tests {
         let pkg = load_toml_string("").expect("load_toml_string");
         assert_eq!(pkg.name, None);
         assert_eq!(pkg.requires, None);
-        assert_eq!(pkg.conflicts, None);
         assert_eq!(pkg.has_contents, true);
         assert_eq!(pkg.dependencies, None);
         assert_eq!(pkg.system_dependencies, None);
@@ -175,7 +155,6 @@ mod tests {
             "
             name = 'test'
             requires = ['r1', 'r2']
-            conflicts = ['c1', 'c2']
             has_contents = false
 
             [[dependencies]]
@@ -204,7 +183,6 @@ mod tests {
         .expect("load_toml_string");
         assert_eq!(pkg.name, Some("test".to_owned()));
         assert_eq!(pkg.requires, Some(vec!["r1".to_owned(), "r2".to_owned()]));
-        assert_eq!(pkg.conflicts, Some(vec!["c1".to_owned(), "c2".to_owned()]));
         assert_eq!(pkg.has_contents, false);
         assert_eq!(
             pkg.dependencies,

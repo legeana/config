@@ -49,7 +49,6 @@ impl Package {
             .with_context(|| format!("failed to load {root:?} package"))?;
         let criteria = tag_criteria::Criteria {
             requires: pkgconfig.requires,
-            conflicts: pkgconfig.conflicts,
         };
         let backup_name = name_from_path(&root)?;
         let dependencies: Vec<String> = match pkgconfig.dependencies {

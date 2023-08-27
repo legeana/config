@@ -16,16 +16,11 @@ const REPOSITORY_CONFIG_YAML: &str = "repository.yaml";
 pub struct Repository {
     /// Required tags.
     pub requires: Option<Vec<String>>,
-    /// Conflicting tags.
-    pub conflicts: Option<Vec<String>>,
 }
 
 impl tag_criteria::TagCriteria for Repository {
     fn requires(&self) -> Option<&[String]> {
         self.requires.as_deref()
-    }
-    fn conflicts(&self) -> Option<&[String]> {
-        self.conflicts.as_deref()
     }
 }
 
@@ -76,7 +71,6 @@ mod tests {
     fn test_load_empty_string() {
         let repo = load_toml_string("").expect("load_toml_string");
         assert_eq!(repo.requires, None);
-        assert_eq!(repo.conflicts, None);
     }
 
     #[test]
@@ -84,12 +78,10 @@ mod tests {
         let repo = load_toml_string(
             "
             requires = ['r1', 'r2']
-            conflicts = ['c1', 'c2']
             ",
         )
         .expect("load_toml_string");
 
         assert_eq!(repo.requires, Some(vec!["r1".to_owned(), "r2".to_owned()]));
-        assert_eq!(repo.conflicts, Some(vec!["c1".to_owned(), "c2".to_owned()]));
     }
 }

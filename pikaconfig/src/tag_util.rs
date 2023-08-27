@@ -27,17 +27,6 @@ pub fn has_all_tags<T: AsRef<str>>(tags: &[T]) -> Result<bool> {
     Ok(true)
 }
 
-pub fn has_any_tags<T: AsRef<str>>(tags: &[T]) -> Result<bool> {
-    for tag in tags {
-        let tag = tag.as_ref();
-        let has = has_tag(tag).with_context(|| format!("failed to check tag {tag:?}"))?;
-        if has {
-            return Ok(true);
-        }
-    }
-    Ok(false)
-}
-
 fn has_tag_kv(key: &str, value: &str) -> bool {
     match key {
         "distro" => SYSINFO.match_distro(value),
