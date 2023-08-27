@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use serde::Deserialize;
 
 use anyhow::Result;
 
@@ -6,12 +6,6 @@ use crate::command;
 
 pub trait Satisficer {
     fn is_satisfied(&self) -> Result<bool>;
-}
-
-impl Satisficer for Box<dyn Satisficer> {
-    fn is_satisfied(&self) -> Result<bool> {
-        self.as_ref().is_satisfied()
-    }
 }
 
 impl<T> Satisficer for Option<T>
@@ -26,20 +20,16 @@ where
     }
 }
 
-pub struct WantsCommand {
-    command: PathBuf,
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
+#[serde(deny_unknown_fields, untagged)]
+pub enum DependencySatisficer {
+    Command { command: String },
 }
 
-impl WantsCommand {
-    pub fn new(command: impl Into<PathBuf>) -> Self {
-        Self {
-            command: command.into(),
-        }
-    }
-}
-
-impl Satisficer for WantsCommand {
+impl Satisficer for DependencySatisficer {
     fn is_satisfied(&self) -> Result<bool> {
-        command::is_command(&self.command)
+        match self {
+            DependencySatisficer::Command { command } => command::is_command(command),
+        }
     }
 }

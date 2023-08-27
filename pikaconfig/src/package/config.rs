@@ -9,6 +9,8 @@ use crate::file_util;
 use crate::iter_util;
 use crate::tag_criteria;
 
+use super::satisficer::DependencySatisficer;
+
 const PACKAGE_CONFIG_TOML: &str = "package.toml";
 const PACKAGE_CONFIG_YAML: &str = "package.yaml";
 
@@ -55,19 +57,13 @@ pub struct SystemDependency {
     pub bash: Option<String>,
 }
 
-#[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
-#[serde(deny_unknown_fields, untagged)]
-pub enum Satisficer {
-    Command { command: String },
-}
-
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct UserDependency {
     pub requires: Option<tag_criteria::TagCriteria>,
     /// Satisfaction criteria.
     /// Rules::force_download will force this dependency to be updated.
-    pub wants: Option<Satisficer>,
+    pub wants: Option<DependencySatisficer>,
     // User-level package managers.
     pub brew: Option<Vec<String>>,
     pub cargo: Option<Vec<String>>,
@@ -205,7 +201,7 @@ mod tests {
                 },
                 UserDependency {
                     pip_user: Some(vec!["pkg".to_owned()]),
-                    wants: Some(Satisficer::Command {
+                    wants: Some(DependencySatisficer::Command {
                         command: "pkg-cmd".to_owned()
                     }),
                     ..UserDependency::default()

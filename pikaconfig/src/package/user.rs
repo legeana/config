@@ -8,12 +8,12 @@ use crate::tag_criteria::Criteria;
 use crate::process_utils;
 
 use super::config;
-use super::satisficer::{self, Satisficer};
+use super::satisficer::{DependencySatisficer, Satisficer};
 use super::Installer;
 
 #[derive(Default)]
 pub struct UserDependency {
-    satisficer: Option<Box<dyn Satisficer>>,
+    satisficer: Option<DependencySatisficer>,
     installers: Vec<Box<dyn Installer>>,
 }
 
@@ -26,12 +26,6 @@ impl UserDependency {
         {
             return Ok(Self::default());
         }
-        let satisficer: Option<Box<dyn Satisficer>> = match &cfg.wants {
-            Some(config::Satisficer::Command { command }) => {
-                Some(Box::new(satisficer::WantsCommand::new(command)))
-            }
-            None => None,
-        };
         let mut installers: Vec<Box<dyn Installer>> = Vec::new();
         if cfg.brew.is_some() {
             return Err(anyhow!("brew is not supported yet"));
@@ -48,7 +42,7 @@ impl UserDependency {
             return Err(anyhow!("pip_user is not supported yet"));
         }
         Ok(Self {
-            satisficer,
+            satisficer: cfg.wants.clone(),
             installers,
         })
     }
