@@ -351,10 +351,10 @@ mod tests {
     #[test]
     fn test_escaped_newline() {
         let mut lex = TestLexer::new(
-            r#"
+            r"
             simple command \
                 multiple args
-        "#,
+        ",
         );
         assert_token!(lex.next(), Token::Newline);
         assert_token!(lex.next(), Token::UnquotedLiteral("simple".into()));

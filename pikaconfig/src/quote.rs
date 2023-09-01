@@ -134,8 +134,8 @@ mod tests {
     #[test]
     fn test_enquote_with() {
         assert_eq!(enquote_with('\'', "hello world"), "'hello world'");
-        assert_eq!(enquote_with('\'', "'hello'"), r#"'\'hello\''"#);
-        assert_eq!(enquote_with('\'', r#"hello\ world"#), r#"'hello\\ world'"#);
+        assert_eq!(enquote_with('\'', "'hello'"), r"'\'hello\''");
+        assert_eq!(enquote_with('\'', r"hello\ world"), r"'hello\\ world'");
     }
 
     #[test]
@@ -145,7 +145,7 @@ mod tests {
             enquote(r#"test "hello" world"#),
             r#""test \"hello\" world""#
         );
-        assert_eq!(enquote(r#"escaped\ symbol"#), r#""escaped\\ symbol""#);
+        assert_eq!(enquote(r"escaped\ symbol"), r#""escaped\\ symbol""#);
     }
 
     #[test]
