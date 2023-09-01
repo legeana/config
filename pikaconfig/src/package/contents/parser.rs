@@ -154,7 +154,10 @@ fn parse_command(
     let command = engine::new_command(workdir, &cmd.name, &cmd.args)
         .with_context(|| format!("failed to parse {manifest_path:?} line: {line}"))?;
     let engine::Command::Statement(statement) = command else {
-        bail!("{name} is an expression and returns a value, use it in `var = {name} ...` context", name=cmd.name);
+        bail!(
+            "{name} is an expression and returns a value, use it in `var = {name} ...` context",
+            name = cmd.name
+        );
     };
     Ok(Box::new(ParsedStatement {
         manifest_path: manifest_path.to_owned(),
@@ -173,7 +176,11 @@ fn parse_assignment(
     let command = engine::new_command(workdir, &cmd.name, &cmd.args)
         .with_context(|| format!("failed to parse {manifest_path:?} line: {line}"))?;
     let engine::Command::Expression(expression) = command else {
-        bail!("{name} is a statement and doesn't return a value, remove `{var} = ...`", name=cmd.name, var=assignment.var);
+        bail!(
+            "{name} is a statement and doesn't return a value, remove `{var} = ...`",
+            name = cmd.name,
+            var = assignment.var
+        );
     };
     Ok(Box::new(AssignmentStatement {
         manifest_path: manifest_path.to_owned(),
