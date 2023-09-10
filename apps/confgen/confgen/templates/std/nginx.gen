@@ -5,22 +5,22 @@ listen [::]:{{port}} {{modifiers}};
 {% endmacro %}
 
 {% macro listen_http(port=80) %}
-{{_listen(port, "")}}
+{{_listen(port=port, modifiers="")}}
 {% endmacro %}
 
 {% macro listen_https(port=443) %}
-{{_listen(port, "ssl http2")}}
+{{_listen(port=port, modifiers="ssl http2")}}
 {% endmacro %}
 
 {% macro listen_disable() %}
 listen 127.0.0.1:41285;
 {% endmacro %}
 
-{% macro listen_letsencrypt(server_cert_name, port=443) %}
+{% macro listen_letsencrypt(server_cert_name, https_port=443) %}
 {% set ssl_certificate = '/etc/letsencrypt/live/' + server_cert_name + '/fullchain.pem' %}
 {% set ssl_certificate_key = '/etc/letsencrypt/live/' + server_cert_name + '/privkey.pem' %}
 {% if exists(ssl_certificate) and exists(ssl_certificate_key) %}
-    {{listen_https(port)}}
+    {{listen_https(https_port)}}
     ssl_certificate {{ssl_certificate}};
     ssl_certificate_key {{ssl_certificate_key}};
 {% else %}
@@ -40,18 +40,18 @@ error_log   /var/log/nginx/{{server_name}}-error.log error;
 {% endmacro %}
 
 # server
-{% macro server_http(server_name, server_aliases=[]) %}
+{% macro server_http(server_name, http_port=80, server_aliases=[]) %}
 server_name {{server_name}} {{' '.join(server_aliases)}};
-{{listen_http()}}
+{{listen_http(http_port)}}
 {{log(server_name)}}
 {% endmacro %}
 
-{% macro server_letsencrypt(server_name, cert_name=None, server_aliases=[]) %}
+{% macro server_letsencrypt(server_name, cert_name=None, https_port=443, server_aliases=[]) %}
 {% if cert_name == None %}
     {% set cert_name = server_name %}
 {% endif %}
 server_name {{server_name}} {{' '.join(server_aliases)}};
-{{listen_letsencrypt(cert_name)}}
+{{listen_letsencrypt(cert_name, https_port=https_port)}}
 {{log(server_name)}}
 {% endmacro %}
 
@@ -67,11 +67,11 @@ location /.well-known/acme-challenge {
 }
 {% endmacro %}
 
-{% macro acme_servers(server_names) %}
+{% macro acme_servers(server_names, http_port=80) %}
 {% for server_name in server_names %}
 server {
     server_name {{server_name}};
-    {{listen_http()}}
+    {{listen_http(http_port)}}
     {{log(server_name)}}
     {{acme_challenge(server_name)}}
 }
