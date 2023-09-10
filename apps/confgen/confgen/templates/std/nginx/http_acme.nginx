@@ -1,3 +1,0 @@
-{% include "std/nginx/http.nginx" %}
-{% include "std/nginx/logging.nginx" %}
-{% include "std/nginx/acme.nginx" %}

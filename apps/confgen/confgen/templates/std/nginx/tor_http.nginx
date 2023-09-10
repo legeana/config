@@ -1,3 +1,0 @@
-listen      127.0.0.1:{{tor_port}};
-listen      [::1]:{{tor_port}};
-server_name {{server_name}} {{server_aliases}};
