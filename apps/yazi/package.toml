@@ -1,0 +1,5 @@
+has_contents = false
+
+[[system_dependencies]]
+pacman = ["yazi"]
+wants = { command = "yazi" }
