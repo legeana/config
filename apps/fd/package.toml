@@ -1,0 +1,10 @@
+has_contents = false
+
+[[user_dependencies]]
+cargo = ["fd-find"]
+wants = { command = "fd" }
+
+[[system_dependencies]]
+apt = ["fd-find"]
+pacman = ["fd"]
+wants = { command = "fd" }
