@@ -1,0 +1,2 @@
+prefix ~/.config/yazi
+symlink keymap.toml
