@@ -2,9 +2,9 @@ has_contents = false
 
 [[user_dependencies]]
 cargo = ["fd-find"]
-wants = { command = "fd" }
+wants = { any_command = ["fd", "fdfind"] }
 
 [[system_dependencies]]
 apt = ["fd-find"]
 pacman = ["fd"]
-wants = { command = "fd" }
+wants = { any_command = ["fd", "fdfind"] }
