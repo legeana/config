@@ -32,7 +32,7 @@ impl UserDependency {
         }
         if let Some(cargo) = &cfg.cargo {
             installers.push(Box::new(Cargo {
-                packages: cargo.clone(),
+                config: cargo.clone(),
             }));
         }
         if cfg.npm.is_some() {
@@ -58,16 +58,43 @@ impl Module for UserDependency {
 }
 
 struct Cargo {
-    packages: Vec<String>,
+    config: config::CargoDependency,
 }
 
 impl Installer for Cargo {
     fn install(&self) -> Result<()> {
-        process_utils::run_verbose(
-            Command::new("cargo")
-                .arg("install")
-                .arg("--")
-                .args(&self.packages),
-        )
+        let mut cmd = Command::new("cargo");
+        cmd.arg("install");
+        match &self.config {
+            config::CargoDependency::Crates(packages) => {
+                cmd.arg("--").args(packages);
+            }
+            config::CargoDependency::Config {
+                crates,
+                git,
+                branch,
+                tag,
+                path,
+            } => {
+                if let Some(git) = git {
+                    cmd.arg("--git").arg(git);
+                }
+                if let Some(branch) = branch {
+                    cmd.arg("--branch").arg(branch);
+                }
+                if let Some(tag) = tag {
+                    cmd.arg("--tag").arg(tag);
+                }
+                if let Some(path) = path {
+                    cmd.arg("--path").arg(path);
+                }
+                // Must be trailing arguments.
+                cmd.arg("--");
+                if let Some(crates) = crates {
+                    cmd.args(crates);
+                }
+            }
+        }
+        process_utils::run_verbose(&mut cmd)
     }
 }

@@ -1,6 +1,6 @@
 #![allow(clippy::bool_assert_comparison)]
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Context, Result};
 use serde::Deserialize;
@@ -61,6 +61,19 @@ pub struct SystemDependency {
     pub bash: Option<String>,
 }
 
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
+#[serde(deny_unknown_fields, untagged)]
+pub enum CargoDependency {
+    Crates(Vec<String>),
+    Config {
+        crates: Option<Vec<String>>,
+        git: Option<String>,
+        tag: Option<String>,
+        branch: Option<String>,
+        path: Option<PathBuf>,
+    },
+}
+
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct UserDependency {
@@ -71,7 +84,7 @@ pub struct UserDependency {
     pub wants: Option<DependencySatisficer>,
     // User-level package managers.
     pub brew: Option<Vec<String>>,
-    pub cargo: Option<Vec<String>>,
+    pub cargo: Option<CargoDependency>,
     pub npm: Option<Vec<String>>,
     pub pip_user: Option<Vec<String>>,
 }
@@ -158,6 +171,12 @@ mod tests {
             [[user_dependencies]]
             pip_user = ['pkg']
             wants = {command = 'pkg-cmd'}
+
+            [[user_dependencies]]
+            cargo = ['pkg1', 'pkg2']
+
+            [[user_dependencies]]
+            cargo = { git = 'https://github.com/example/project.git' }
         ",
         )
         .expect("load_toml_string");
@@ -223,6 +242,23 @@ mod tests {
                         command: "pkg-cmd".into()
                     }),
                     ..UserDependency::default()
+                },
+                UserDependency {
+                    cargo: Some(CargoDependency::Crates(vec![
+                        "pkg1".to_owned(),
+                        "pkg2".to_owned()
+                    ])),
+                    ..Default::default()
+                },
+                UserDependency {
+                    cargo: Some(CargoDependency::Config {
+                        crates: None,
+                        git: Some("https://github.com/example/project.git".to_owned()),
+                        branch: None,
+                        tag: None,
+                        path: None,
+                    }),
+                    ..Default::default()
                 },
             ])
         );
