@@ -14,7 +14,8 @@ src_root() {
     pwd
 }
 
-SRC="$(src_root)/pikaconfig"
+ROOT="$(src_root)"
+SRC="${ROOT?}/pikaconfig"
 
 log() {
     echo "$@" >&2
@@ -46,6 +47,8 @@ native_setup() {
 }
 
 base_docker_setup() {
+    # Updating self isn't well supported through docker right now.
+    git -C "${ROOT?}" pull --ff-only
     mkdir -p "${SRC?}/target/release"
     log_eval $OPTIONAL_SUDO docker run \
         --pull=always \
@@ -55,7 +58,7 @@ base_docker_setup() {
         --workdir=/app \
         rust:latest \
         cargo build --release
-    "${SRC?}/target/release/pikaconfig" "$@"
+    "${SRC?}/target/release/pikaconfig" --no-update "$@"
 }
 
 docker_setup() {
