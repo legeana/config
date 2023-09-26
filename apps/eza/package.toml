@@ -2,9 +2,9 @@ requires = ["family=unix"]
 has_contents = false
 
 [[user_dependencies]]
-cargo = ["exa"]
-wants = { command = "exa" }
+cargo = ["eza"]
+wants = { command = "eza" }
 
 [[system_dependencies]]
-pacman = ["exa"]
-wants = { command = "exa" }
+pacman = ["eza"]
+wants = { command = "eza" }
