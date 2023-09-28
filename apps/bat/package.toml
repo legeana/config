@@ -2,7 +2,7 @@ has_contents = false
 
 [[user_dependencies]]
 cargo = ["bat"]
-wants = { command = "bat" }
+wants = { any_command = ["bat", "batcat"] }
 
 [[system_dependencies]]
 any = ["bat"]
