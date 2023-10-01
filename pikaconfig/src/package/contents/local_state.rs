@@ -25,13 +25,19 @@ fn state_dir() -> Option<PathBuf> {
 trait LocalStateRoot {
     fn root(&self) -> Result<PathBuf>;
     fn for_linked_path(&self, path: &Path) -> Result<PathBuf> {
-        let hash = path_hash(path).with_context(|| format!("unable to make hash of {path:?}"))?;
+        let hash =
+            path_hash(path, &[]).with_context(|| format!("unable to make hash of {path:?}"))?;
         Ok(self.root()?.join(hash))
     }
-    fn for_ephemeral_path(&self, workdir: &Path, filename: &Path) -> Result<PathBuf> {
+    fn for_ephemeral_path(
+        &self,
+        workdir: &Path,
+        filename: &Path,
+        resource_id: &str,
+    ) -> Result<PathBuf> {
         let ephemeral_path = workdir.join(filename);
-        let hash = path_hash(&ephemeral_path)
-            .with_context(|| format!("failed to make hash of {ephemeral_path:?}"))?;
+        let hash = path_hash(&ephemeral_path, &[resource_id])
+            .with_context(|| format!("failed to makes hash of {ephemeral_path:?}"))?;
         Ok(self.root()?.join(hash).join(filename))
     }
 
@@ -48,17 +54,27 @@ trait LocalStateRoot {
             .with_context(|| format!("failed to build state path for {link:?}"))?;
         Ok(LinkedFile(StateMapping { path, link }))
     }
-    fn ephemeral_dir(&self, workdir: &Path, filename: &Path) -> Result<EphemeralDir> {
+    fn ephemeral_dir(
+        &self,
+        workdir: &Path,
+        filename: &Path,
+        resource_id: &str,
+    ) -> Result<EphemeralDir> {
         let path = self
-            .for_ephemeral_path(workdir, filename)
+            .for_ephemeral_path(workdir, filename, resource_id)
             .with_context(|| {
                 format!("failed to build path for {workdir:?} directory {filename:?}")
             })?;
         Ok(EphemeralDir(path))
     }
-    fn ephemeral_file(&self, workdir: &Path, filename: &Path) -> Result<EphemeralFile> {
+    fn ephemeral_file(
+        &self,
+        workdir: &Path,
+        filename: &Path,
+        resource_id: &str,
+    ) -> Result<EphemeralFile> {
         let path = self
-            .for_ephemeral_path(workdir, filename)
+            .for_ephemeral_path(workdir, filename, resource_id)
             .with_context(|| format!("failed to build path for {workdir:?} file {filename:?}"))?;
         Ok(EphemeralFile(path))
     }
@@ -87,7 +103,7 @@ impl LocalStateRoot for CacheType {
     }
 }
 
-fn path_hash(path: &Path) -> Result<PathBuf> {
+fn path_hash(path: &Path, other_parts: &[&str]) -> Result<PathBuf> {
     let path_str = path
         // TODO: this is not cross-platform.
         // Maybe use to_string_lossy(), os_str_bytes or OsStrExt.
@@ -96,6 +112,10 @@ fn path_hash(path: &Path) -> Result<PathBuf> {
 
     let mut hasher = Sha256::new();
     hasher.update(path_str.as_bytes());
+    for other_part in other_parts {
+        hasher.update([0u8]); // Separator.
+        hasher.update(other_part.as_bytes());
+    }
     let result = hasher.finalize();
 
     // URL_SAFE is used for compatibility with Python version of pikaconfig.
@@ -201,18 +221,18 @@ pub fn dir_state(link: PathBuf) -> Result<LinkedDir> {
     StateType("dirs").linked_dir(link)
 }
 
-pub fn ephemeral_dir_state(workdir: &Path, filename: &Path) -> Result<EphemeralDir> {
-    StateType("ephemeral_dir").ephemeral_dir(workdir, filename)
+pub fn ephemeral_dir_state(workdir: &Path, resource_id: &str) -> Result<EphemeralDir> {
+    StateType("ephemeral_dir").ephemeral_dir(workdir, Path::new("ephemeral_dir_state"), resource_id)
 }
 
 pub fn file_state(link: PathBuf) -> Result<LinkedFile> {
     StateType("output").linked_file(link)
 }
 
-pub fn dir_cache(workdir: &Path, filename: &Path) -> Result<EphemeralDir> {
-    CacheType("dirs").ephemeral_dir(workdir, filename)
+pub fn dir_cache(workdir: &Path, filename: &Path, resource_id: &str) -> Result<EphemeralDir> {
+    CacheType("dirs").ephemeral_dir(workdir, filename, resource_id)
 }
 
-pub fn file_cache(workdir: &Path, filename: &Path) -> Result<EphemeralFile> {
-    CacheType("files").ephemeral_file(workdir, filename)
+pub fn file_cache(workdir: &Path, filename: &Path, resource_id: &str) -> Result<EphemeralFile> {
+    CacheType("files").ephemeral_file(workdir, filename, resource_id)
 }

@@ -86,7 +86,7 @@ impl engine::Statement for OnceStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         match self.statement.eval(ctx)? {
             Some(module) => {
-                let tags = local_state::ephemeral_dir_state(&self.workdir, Path::new(&self.tag))?;
+                let tags = local_state::ephemeral_dir_state(&self.workdir, &self.tag)?;
                 let pre_install_tag = tags.path().join("pre_install");
                 let install_tag = tags.path().join("install");
                 let post_install_tag = tags.path().join("post_install");
