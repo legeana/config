@@ -25,9 +25,11 @@ absl
 abstractmethod
 abstractproperty
 accum
+ack
 acl
 acls
 addon
+addons
 addr
 addrs
 alacritty
@@ -67,12 +69,15 @@ basename
 basenames
 basestring
 batcat
+bazel
 blackbox
 blackhole
 bool
 bsd
 builtins
 buylist
+canarying
+cd
 cdn
 certtool
 cfg
@@ -105,6 +110,7 @@ contextlib
 contrib
 corp
 cpp
+crashlooping
 creds
 crl
 cronjob
@@ -122,6 +128,7 @@ dataclasses
 datetime
 debian
 debuggability
+decryptor
 dedent
 deepcopy
 defaultdict
@@ -161,6 +168,8 @@ dyn
 ecommerce
 editorconfig
 eg
+enablement
+encryptor
 endblock
 endif
 endswith
@@ -179,6 +188,7 @@ exe
 expanduser
 expr
 extern
+fallthrough
 faq
 faqs
 fatalf
@@ -210,6 +220,7 @@ getattr
 getopt
 getpass
 getvalue
+gflags
 gigasecond
 gitconfig
 github
@@ -268,6 +279,7 @@ ioutil
 ip
 ipc
 irc
+irssi
 iscsi
 isinstance
 issuecomment
@@ -512,6 +524,7 @@ shutil
 signame
 smartstring
 solarized
+spammy
 spanielbot
 spellfile
 spellfiles
@@ -554,6 +567,7 @@ subteam
 sudo
 suspendable
 svim
+swe
 symlink
 sys
 syscalls
@@ -604,6 +618,7 @@ ttl
 tty
 turndown
 txt
+txtpbfmt
 u32
 u8
 udev
@@ -649,6 +664,7 @@ vimdiff
 vimrc
 vimscript
 vlan
+vm
 vscode
 vsync
 vulkan
