@@ -26,7 +26,7 @@ trait LocalStateRoot {
     fn root(&self) -> Result<PathBuf>;
     fn for_linked_path(&self, path: &Path) -> Result<PathBuf> {
         let hash =
-            path_hash(path, &[]).with_context(|| format!("unable to make hash of {path:?}"))?;
+            path_hash(&[path], &[]).with_context(|| format!("unable to make hash of {path:?}"))?;
         Ok(self.root()?.join(hash))
     }
     fn for_ephemeral_path(
@@ -36,7 +36,7 @@ trait LocalStateRoot {
         resource_id: &str,
     ) -> Result<PathBuf> {
         let ephemeral_path = workdir.join(filename);
-        let hash = path_hash(&ephemeral_path, &[resource_id])
+        let hash = path_hash(&[&ephemeral_path], &[resource_id])
             .with_context(|| format!("failed to makes hash of {ephemeral_path:?}"))?;
         Ok(self.root()?.join(hash).join(filename))
     }
@@ -103,18 +103,28 @@ impl LocalStateRoot for CacheType {
     }
 }
 
-fn path_hash(path: &Path, other_parts: &[&str]) -> Result<PathBuf> {
-    let path_str = path
-        // TODO: this is not cross-platform.
-        // Maybe use to_string_lossy(), os_str_bytes or OsStrExt.
-        .to_str()
-        .ok_or_else(|| anyhow!("unable to convert {path:?} path to string"))?;
-
+fn path_hash(path_parts: &[&Path], resource_parts: &[&str]) -> Result<PathBuf> {
     let mut hasher = Sha256::new();
-    hasher.update(path_str.as_bytes());
-    for other_part in other_parts {
-        hasher.update([0u8]); // Separator.
-        hasher.update(other_part.as_bytes());
+    let mut first = true;
+    let mut update = |bytes: &[u8]| {
+        if !first {
+            hasher.update([0u8]);
+        }
+        hasher.update(bytes);
+        first = false;
+    };
+
+    for path in path_parts {
+        let path_str = path
+            // TODO: this is not cross-platform.
+            // Maybe use to_string_lossy(), os_str_bytes or OsStrExt.
+            .to_str()
+            .ok_or_else(|| anyhow!("unable to convert {path:?} path to string"))?;
+        update(path_str.as_bytes());
+    }
+
+    for resource_part in resource_parts {
+        update(resource_part.as_bytes());
     }
     let result = hasher.finalize();
 
