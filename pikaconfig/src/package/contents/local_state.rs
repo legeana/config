@@ -24,9 +24,9 @@ fn state_dir() -> Option<PathBuf> {
 
 trait LocalStateRoot {
     fn root(&self) -> Result<PathBuf>;
-    fn for_linked_path(&self, path: &Path) -> Result<PathBuf> {
-        let hash =
-            path_hash(&[path], &[]).with_context(|| format!("unable to make hash of {path:?}"))?;
+    fn for_linked_path(&self, path: &Path, resource_parts: &[&str]) -> Result<PathBuf> {
+        let hash = path_hash(&[path], resource_parts)
+            .with_context(|| format!("unable to make hash of {path:?}"))?;
         Ok(self.root()?.join(hash))
     }
     fn for_ephemeral_path(
@@ -44,14 +44,22 @@ trait LocalStateRoot {
     // Builders.
     fn linked_dir(&self, link: PathBuf) -> Result<LinkedDir> {
         let path = self
-            .for_linked_path(&link)
+            .for_linked_path(&link, &[])
             .with_context(|| format!("failed to build path for {link:?}"))?;
         Ok(LinkedDir(StateMapping { path, link }))
     }
     fn linked_file(&self, link: PathBuf) -> Result<LinkedFile> {
         let path = self
-            .for_linked_path(&link)
+            .for_linked_path(&link, &[])
             .with_context(|| format!("failed to build state path for {link:?}"))?;
+        Ok(LinkedFile(StateMapping { path, link }))
+    }
+    fn linked_file_cache(&self, link: PathBuf, resource_id: &str) -> Result<LinkedFile> {
+        let path = self
+            .for_linked_path(&link, &[resource_id])
+            .with_context(|| {
+                format!("failed to build state path for {link:?} with {resource_id:?}")
+            })?;
         Ok(LinkedFile(StateMapping { path, link }))
     }
     fn ephemeral_dir(
@@ -245,4 +253,8 @@ pub fn dir_cache(workdir: &Path, filename: &Path, resource_id: &str) -> Result<E
 
 pub fn file_cache(workdir: &Path, filename: &Path, resource_id: &str) -> Result<EphemeralFile> {
     CacheType("files").ephemeral_file(workdir, filename, resource_id)
+}
+
+pub fn linked_file_cache(link: PathBuf, resource_id: &str) -> Result<LinkedFile> {
+    CacheType("linked_files").linked_file_cache(link, resource_id)
 }
