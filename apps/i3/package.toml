@@ -17,11 +17,9 @@ apt = ["x11-xserver-utils"]
 pacman = ["xorg-xsetroot"]
 
 [[system_dependencies]]
-apt = [
-    "xfce4-clipman",
-    "xfce4-screenshooter",
-]
-pacman = [
-    "xfce4-clipman-plugin",
-    "xfce4-screenshooter",
-]
+# Screenshots.
+any = ["maim"]
+
+[[system_dependencies]]
+apt = ["xfce4-clipman"]
+pacman = ["xfce4-clipman-plugin"]

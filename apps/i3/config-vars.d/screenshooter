@@ -1,1 +1,1 @@
-set $screenshooter xfce4-screenshooter --clipboard --region
+set $screenshooter maim --select | xclip -selection clipboard -t image/png
