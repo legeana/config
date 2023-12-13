@@ -263,6 +263,7 @@ hsync
 htop
 ico
 idiv
+ie
 ifttt
 immutabledict
 impl
@@ -317,6 +318,7 @@ linode
 linodes
 linux
 liri
+lisa
 ln
 loadavg
 loc
@@ -365,6 +367,7 @@ namedtuple
 nasm
 ne
 neovim
+nespresso
 netrwhist
 newtype
 nginx
@@ -397,9 +400,12 @@ openssh
 orgmode
 os
 osx
+pacdiff
 packadd
 packpath
 pacman
+pacnew
+pacsave
 param
 params
 paren
