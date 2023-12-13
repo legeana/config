@@ -37,6 +37,7 @@ algo
 alloc
 alnum
 alsologtostderr
+amd
 amd64
 ansible
 apache
@@ -168,6 +169,7 @@ dyn
 ecommerce
 editorconfig
 eg
+emea
 enablement
 encryptor
 endblock
@@ -194,6 +196,7 @@ faqs
 fatalf
 fbdev
 fdpass
+fedex
 filegroup
 filesystem
 filetypes
@@ -230,6 +233,7 @@ gitignore
 gitlab
 gitutils
 globbing
+gmailctl
 gnutls
 googler
 gpg
@@ -262,6 +266,7 @@ href
 hsync
 htop
 ico
+ics
 idiv
 ie
 ifttt
@@ -363,6 +368,7 @@ muppet
 mut
 mypy
 mysql
+myvhi
 namedtuple
 nasm
 ne
@@ -400,6 +406,7 @@ openssh
 orgmode
 os
 osx
+overprovisioned
 pacdiff
 packadd
 packpath
@@ -431,6 +438,7 @@ pkgbuild
 pkgconfig
 pki
 pkill
+pkm
 playbook1
 playbook2
 plugins
@@ -438,6 +446,7 @@ png
 polybar
 popen
 pos
+postexec
 poweroff
 poweron
 powershell
@@ -445,6 +454,7 @@ pprint
 pragma
 precalculated
 precompute
+preexec
 prefill
 presubmit
 printf
@@ -477,6 +487,7 @@ readlink
 readonly
 readwrite
 rebase
+reconstructors
 recv
 reenable
 refactorings
@@ -504,6 +515,8 @@ runtimepath
 rustdoc
 rustification
 rustup
+rw
+rx
 safehtml
 sbin
 scrollback
@@ -611,7 +624,9 @@ tmpdir
 tmpl
 tmux
 tmuxinator
+todo
 tok
+tombstoned
 toml
 toolchain
 tools
@@ -623,6 +638,7 @@ tt
 ttl
 tty
 turndown
+tx
 txt
 txtpbfmt
 u32
