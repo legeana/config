@@ -1,0 +1,15 @@
+#!/usr/bin/env fish
+
+for new in (sudo find /etc -name '*.pacnew')
+    set base (string replace --regex '^(.*)\.pacnew$' '$1' $new)
+    if test -f "$base"
+        verbose-eval sudo vimdiff "$base" "$new"
+        sudo rm -i "$new"
+
+        echo 'Press Ctrl+C to stop...' >&2
+        sleep 1s
+    else
+        echo "$base doesn't exist, remove $new?"
+        sudo rm -i "$new"
+    end
+end
