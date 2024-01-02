@@ -2,6 +2,8 @@
 line-number = "absolute"
 
 [editor.whitespace.render]
+# TODO: trailing whitespace
+# https://github.com/helix-editor/helix/pull/7215
 space = "none"
 tab = "all"
 newline = "none"
