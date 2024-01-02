@@ -10,6 +10,11 @@ newline = "none"
 render = true
 
 [keys.normal]
+# xd should remove empty line
+# https://github.com/helix-editor/helix/discussions/835#discussioncomment-1481068
+x = "extend_to_line_bounds"
+X = "extend_line_below"
+
 "j" = "move_char_left"
 "k" = "move_visual_line_down"
 "l" = "move_visual_line_up"
