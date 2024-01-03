@@ -6,7 +6,7 @@ line-number = "absolute"
 # https://github.com/helix-editor/helix/pull/7215
 space = "none"
 tab = "all"
-newline = "none"
+newline = "all"
 
 [editor.indent-guides]
 render = true
