@@ -16,6 +16,7 @@ src_root() {
 
 ROOT="$(src_root)"
 SRC="${ROOT?}/pikaconfig"
+CACHED_BINARY="$SRC/target/release/pikaconfig"
 
 log() {
     echo "$@" >&2
@@ -44,6 +45,10 @@ get_rust() {
 native_setup() {
     get_rust
     cargo run --manifest-path="${SRC?}/Cargo.toml" --release -- "$@"
+}
+
+cached_setup() {
+    "$CACHED_BINARY" --no-update "$@"
 }
 
 base_docker_setup() {
