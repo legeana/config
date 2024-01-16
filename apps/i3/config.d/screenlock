@@ -1,1 +1,2 @@
+# xss-lock also handles systemd-logind events, such as `loginctl lock-session`.
 exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
