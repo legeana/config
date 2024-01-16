@@ -265,6 +265,7 @@ hpp
 href
 hsync
 htop
+i3lock
 ico
 ics
 idiv
@@ -330,6 +331,8 @@ loc
 localectl
 localhost
 localtime
+loginctl
+logind
 loglevel
 logname
 logtostderr
@@ -586,6 +589,8 @@ subteam
 sudo
 suspendable
 svim
+swayidle
+swaywm
 swe
 symlink
 sys
@@ -716,6 +721,7 @@ xdg
 xorg
 xsrf
 xsrftoken
+xss
 yaml
 yml
 youtube
