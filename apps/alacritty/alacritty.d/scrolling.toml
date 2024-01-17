@@ -1,2 +1,2 @@
-scrolling:
-  history: 10000
+[scrolling]
+history = 10000
