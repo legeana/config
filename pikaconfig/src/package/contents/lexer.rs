@@ -54,7 +54,7 @@ pub enum Token {
     SingleQuotedLiteral(String),
     #[regex(r#""([^"\n\\]|\\[^\n])*""#, |lex| quote::unquote(lex.slice()))]
     DoubleQuotedLiteral(String),
-    #[regex(r#"[^\s'"]+"#, |lex| lex.slice().to_owned())]
+    #[regex(r#"[^\s'"!={}]+"#, |lex| lex.slice().to_owned())]
     UnquotedLiteral(String),
     #[token("if")]
     If,
@@ -333,6 +333,7 @@ mod tests {
             simple command
             another command
             do some/path
+            special!tokens=are{separators}when unquoted
         "#,
         );
         assert_token!(lex.next(), Token::Newline);
@@ -344,6 +345,17 @@ mod tests {
         assert_token!(lex.next(), Token::Newline);
         assert_token!(lex.next(), Token::UnquotedLiteral("do".into()));
         assert_token!(lex.next(), Token::UnquotedLiteral("some/path".into()));
+        assert_token!(lex.next(), Token::Newline);
+        assert_token!(lex.next(), Token::UnquotedLiteral("special".into()));
+        assert_token!(lex.next(), Token::Not);
+        assert_token!(lex.next(), Token::UnquotedLiteral("tokens".into()));
+        assert_token!(lex.next(), Token::Assign);
+        assert_token!(lex.next(), Token::UnquotedLiteral("are".into()));
+        assert_token!(lex.next(), Token::Begin);
+        assert_token!(lex.next(), Token::UnquotedLiteral("separators".into()));
+        assert_token!(lex.next(), Token::End);
+        assert_token!(lex.next(), Token::UnquotedLiteral("when".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("unquoted".into()));
         assert_token!(lex.next(), Token::Newline);
         assert_eoi!(lex);
     }
@@ -627,7 +639,31 @@ mod tests {
         );
         assert_token!(lex.next(), Token::Newline);
         assert_token!(lex.next(), Token::If);
-        assert_token!(lex.next(), Token::UnquotedLiteral("!test".into()));
+        assert_token!(lex.next(), Token::Not);
+        assert_token!(lex.next(), Token::UnquotedLiteral("test".into()));
+        assert_token!(lex.next(), Token::Begin);
+        assert_token!(lex.next(), Token::Newline);
+        assert_token!(lex.next(), Token::UnquotedLiteral("command".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("hello".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("world".into()));
+        assert_token!(lex.next(), Token::Newline);
+        assert_token!(lex.next(), Token::End);
+        assert_token!(lex.next(), Token::Newline);
+        assert_eoi!(lex);
+    }
+
+    #[test]
+    fn test_if_block_where_not_is_a_part_of_the_quoted_command() {
+        let mut lex = TestLexer::new(
+            r#"
+            if "!test" {
+                command hello world
+            }
+            "#,
+        );
+        assert_token!(lex.next(), Token::Newline);
+        assert_token!(lex.next(), Token::If);
+        assert_token!(lex.next(), Token::DoubleQuotedLiteral("!test".into()));
         assert_token!(lex.next(), Token::Begin);
         assert_token!(lex.next(), Token::Newline);
         assert_token!(lex.next(), Token::UnquotedLiteral("command".into()));
