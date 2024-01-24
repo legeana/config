@@ -1,0 +1,10 @@
+[Unit]
+Description = "Tmux Master Session"
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/tmux new-session -s master-session -d
+ExecStop=/usr/bin/tmux kill-session -t master-session
+
+[Install]
+WantedBy=default.target
