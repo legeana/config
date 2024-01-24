@@ -11,6 +11,7 @@ function tm -a session
     _tm_forward $session
     env $env_overrides tmux attach -t $session
     or env $env_overrides tmuxinator start $session
+    or env $env_overrides tmuxp load $session
     or env $env_overrides tmux new-session -s $session -c $HOME
 end
 
