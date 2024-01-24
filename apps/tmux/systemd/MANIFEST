@@ -3,4 +3,4 @@ if !is_linux {
 }
 
 prefix ~/.config/systemd/user
-symlink tmux-session@.service
+symlink tmuxp-session@.service

@@ -4,7 +4,7 @@ Description=Tmux %I session
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/bin/tmux new-session -s %i -d
+ExecStart=/usr/bin/env tmuxp load -d %i
 ExecStop=/usr/bin/tmux kill-session -t %i
 KillMode=none
 
