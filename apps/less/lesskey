@@ -1,7 +1,5 @@
 #command
-j noaction
-J noaction
-k forw-line
-K forw-line-force
-l back-line
-L back-line-force
+j forw-line
+J forw-line-force
+k back-line
+K back-line-force

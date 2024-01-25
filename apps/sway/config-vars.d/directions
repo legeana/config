@@ -1,7 +1,7 @@
-set $left j
-set $down k
-set $up l
-set $right semicolon
+set $left h
+set $down j
+set $up k
+set $right l
 
-set $horizontal h
+set $horizontal b
 set $vertical v
