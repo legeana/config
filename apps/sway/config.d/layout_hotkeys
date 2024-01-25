@@ -2,8 +2,8 @@ bindsym --to-code {
     # You can "split" the current object of your focus with
     # $mod+b or $mod+v, for horizontal and vertical splits
     # respectively.
-    $mod+b splith
-    $mod+v splitv
+    $mod+$horizontal splith
+    $mod+$vertical splitv
 
     # Switch the current container between different layout styles
     $mod+s layout stacking
