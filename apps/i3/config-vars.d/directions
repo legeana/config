@@ -1,0 +1,4 @@
+set $left j
+set $down k
+set $up l
+set $right semicolon
