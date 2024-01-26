@@ -2,6 +2,8 @@ use std::borrow::Cow;
 
 use anyhow::{anyhow, Result};
 
+use crate::shlexfmt;
+
 #[macro_export]
 macro_rules! args {
     (@as_raw $e:expr) => {
@@ -101,7 +103,7 @@ impl std::fmt::Display for Argument {
             Self::OnlyVars(s) => s,
             Self::VarsAndHome(s) => s,
         };
-        write!(f, "{}", shlex::quote(s))
+        write!(f, "{}", shlexfmt::quote(s))
     }
 }
 

@@ -4,6 +4,7 @@ use anyhow::{anyhow, Result};
 
 use super::args::Arguments;
 use super::lexer;
+use crate::shlexfmt;
 
 #[derive(Debug, PartialEq)]
 pub struct Manifest {
@@ -40,7 +41,7 @@ pub struct Invocation {
 
 impl std::fmt::Display for Invocation {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}: {}", self.location, shlex::quote(&self.name))?;
+        write!(f, "{}: {}", self.location, shlexfmt::quote(&self.name))?;
         for arg in &self.args.0 {
             write!(f, " {arg}")?;
         }

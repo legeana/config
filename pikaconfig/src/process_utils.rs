@@ -2,19 +2,21 @@ use std::process::Command;
 
 use anyhow::{anyhow, Context, Result};
 
+use crate::shlexfmt;
+
 fn pretty_args(cmd: &Command) -> String {
     let mut result: Vec<String> = Vec::new();
     result.push(cmd.get_program().to_string_lossy().to_string());
     for arg in cmd.get_args() {
         result.push(arg.to_string_lossy().to_string());
     }
-    shlex::join(result.iter().map(String::as_str))
+    shlexfmt::join(result.iter().map(String::as_str))
 }
 
 fn pretty_print(cmd: &Command) -> String {
     let mut result: Vec<String> = Vec::new();
     if let Some(current_dir) = cmd.get_current_dir() {
-        result.push(shlex::quote(&current_dir.to_string_lossy()).to_string());
+        result.push(shlexfmt::quote(&current_dir.to_string_lossy()).to_string());
     }
     result.push("$".to_owned());
     result.push(pretty_args(cmd));

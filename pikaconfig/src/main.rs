@@ -18,6 +18,7 @@ mod process_utils;
 mod quote;
 mod registry;
 mod repository;
+mod shlexfmt;
 mod symlink_util;
 mod tag_criteria;
 mod tag_util;
