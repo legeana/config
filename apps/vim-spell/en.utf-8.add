@@ -50,6 +50,14 @@ archlinux
 arg
 arg0
 arg1
+arg2
+arg3
+arg4
+arg5
+arg6
+arg7
+arg8
+arg9
 argparse
 args
 argv
@@ -111,6 +119,7 @@ contextlib
 contrib
 corp
 cpp
+cpu
 crashlooping
 creds
 crl
@@ -144,6 +153,7 @@ deregister
 deschedule
 deserialize
 dest
+devnull
 devtools
 dhcp
 dicts
@@ -235,6 +245,7 @@ gitutils
 globbing
 gmailctl
 gnutls
+googleapis
 googler
 gpg
 gpio
@@ -252,6 +263,7 @@ hashlib
 hdd
 healthchecks
 hexsha
+hjkl
 homebrew
 homedir
 hostbased
@@ -341,6 +353,7 @@ lstrip
 lt
 lua
 macos
+mailto
 manpath
 mapreduce
 md
@@ -619,6 +632,7 @@ textwrap
 tgif
 thiserror
 threadpool
+tig
 timeseries
 timespec
 timestamp
@@ -629,6 +643,7 @@ tmpdir
 tmpl
 tmux
 tmuxinator
+tmuxp
 todo
 tok
 tombstoned
@@ -654,6 +669,7 @@ ui
 uname
 unarchiver
 uncommenting
+undrain
 undraining
 unicode
 unittest
@@ -719,6 +735,7 @@ x11
 xargs
 xdg
 xorg
+xrandr
 xsrf
 xsrftoken
 xss
