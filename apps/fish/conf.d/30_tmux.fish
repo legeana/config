@@ -7,7 +7,7 @@ function _tm_env_for_session -a session -a tty -a env
     echo "$_TM_TMP/$USER.$session.$tty.$env"
 end
 
-function _set_up_tmux_environment --on-event fish_prompt
+function _set_up_tmux_environment --on-event fish_preexec
     if ! set -q TMUX
         return
     end
