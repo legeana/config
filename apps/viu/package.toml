@@ -1,0 +1,10 @@
+has_contents = false
+
+[[user_dependencies]]
+requires = ["family=unix"]
+cargo = ["viu"]
+wants = { command = "viu" }
+
+[[system_dependencies]]
+pacman = ["viu"]
+wants = { command = "viu" }
