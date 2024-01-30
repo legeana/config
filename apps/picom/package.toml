@@ -1,0 +1,3 @@
+[[system_dependencies]]
+any = ["picom"]
+wants = { command = "picom" }
