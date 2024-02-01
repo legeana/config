@@ -77,6 +77,7 @@ backends
 basename
 basenames
 basestring
+bashrc
 batcat
 bazel
 blackbox
@@ -436,6 +437,7 @@ parens
 parseable
 passwd
 password
+pastebin
 pathlib
 pathspec
 paxos
