@@ -13,6 +13,10 @@ output_file fish_plugins
 
 prefix ~
 symlink .bashrc
+if is_macos {
+    # MacOS uses zsh instead of bash.
+    symlink_to .zshrc .bashrc
+}
 
 if is_command fish {
     # https://github.com/jorgebucaran/fisher/issues/763
