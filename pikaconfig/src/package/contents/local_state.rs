@@ -12,14 +12,20 @@ use crate::registry::Registry;
 
 use super::file_util;
 
-#[cfg(unix)]
 fn state_dir() -> Option<PathBuf> {
-    dirs::state_dir()
-}
-
-#[cfg(windows)]
-fn state_dir() -> Option<PathBuf> {
-    dirs::data_local_dir()
+    if cfg!(unix) {
+        if cfg!(target_os = "macos") {
+            dirs::data_local_dir()
+        } else {
+            // The default. Usually Linux.
+            dirs::state_dir()
+        }
+    } else if cfg!(windows) {
+        dirs::data_local_dir()
+    } else {
+        // Unknown, needs fixing.
+        None
+    }
 }
 
 trait LocalStateRoot {
