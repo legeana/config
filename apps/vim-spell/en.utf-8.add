@@ -7,6 +7,7 @@ Deserializer
 EOI
 EXE
 Esc
+NIC
 PWD
 PY3
 RO
@@ -211,6 +212,7 @@ fedex
 filegroup
 filesystem
 filetypes
+fishshell
 fixup
 flaskutil
 fmt
@@ -244,6 +246,7 @@ gitignore
 gitlab
 gitutils
 globbing
+glx
 gmailctl
 gnutls
 googleapis
@@ -265,6 +268,8 @@ hdd
 healthchecks
 hexsha
 hjkl
+holdback
+holdbacks
 homebrew
 homedir
 hostbased
@@ -283,6 +288,7 @@ ico
 ics
 idiv
 ie
+iff
 ifttt
 immutabledict
 impl
@@ -445,6 +451,7 @@ pb2
 pbtxt
 pem
 pexpect
+picom
 pid
 pika
 pikaconfig
