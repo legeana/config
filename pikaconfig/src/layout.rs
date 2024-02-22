@@ -114,12 +114,11 @@ fn update_repository(root: &Path) -> Result<bool> {
     Ok(false)
 }
 
-/// Returns true if restart is required.
-pub fn update(root: &Path) -> Result<bool> {
-    // We restart iff the root repository was updated.
-    let updated = update_repository(root)?;
+pub fn update(root: &Path) -> Result<()> {
+    // TODO: run if installed independently from configs
+    // update_repository(root)?;
     for overlay in overlay_dirs(root)? {
         update_repository(&overlay)?;
     }
-    Ok(updated)
+    Ok(())
 }

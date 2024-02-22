@@ -14,12 +14,29 @@ src_root() {
     pwd
 }
 
+has_no_update_flag() {
+    if [[ -n $PIKACONFIG_NO_UPDATE ]]; then
+        return 0
+    fi
+    for arg; do
+        case "$arg" in
+            -d) return 0 ;;
+            --no-update) return 0 ;;
+            --) return 1 ;;
+        esac
+    done
+    return 1
+}
+
 ROOT="$(src_root)"
 SRC="${ROOT?}/pikaconfig"
 CACHED_BINARY="$SRC/target/release/pikaconfig"
 
 # Environment used by pikaconfig binary.
 export PIKACONFIG_CONFIG_ROOT="$ROOT"
+if has_no_update_flag "$@"; then
+    export PIKACONFIG_NO_UPDATE=yes
+fi
 
 log() {
     echo "$@" >&2
@@ -45,8 +62,16 @@ get_rust() {
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 }
 
+update_config_root() {
+    if [[ -n "$PIKACONFIG_NO_UPDATE" ]]; then
+        return
+    fi
+    git -C "${ROOT?}" pull --ff-only
+}
+
 native_setup() {
     get_rust
+    update_config_root
     cargo run --manifest-path="${SRC?}/Cargo.toml" --release -- "$@"
 }
 
@@ -55,8 +80,7 @@ cached_setup() {
 }
 
 base_docker_setup() {
-    # Updating self isn't well supported through docker right now.
-    git -C "${ROOT?}" pull --ff-only
+    update_config_root
     mkdir -p "${SRC?}/target/release"
     log_eval $OPTIONAL_SUDO docker run \
         --pull=always \

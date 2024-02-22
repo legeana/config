@@ -30,7 +30,6 @@ mod xdg;
 mod xdg_or_win;
 
 use std::env;
-use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
 use anyhow::{bail, Context, Result};
@@ -43,7 +42,6 @@ const NO_UPDATE_ENV: &str = "PIKACONFIG_NO_UPDATE";
 const CONFIG_ROOT_ENV: &str = "PIKACONFIG_CONFIG_ROOT";
 const INSTALL_REGISTRY: &str = ".install";
 const STATE_REGISTRY: &str = ".state";
-const SETUP: &str = "setup";
 
 fn config_root() -> Result<PathBuf> {
     let config_root = env::var_os(CONFIG_ROOT_ENV)
@@ -78,17 +76,6 @@ enum Commands {
     ManifestHelp {},
     Tags {},
     List {},
-}
-
-fn reload(setup: impl AsRef<Path>) -> Result<()> {
-    let setup = setup.as_ref();
-    let args: Vec<OsString> = env::args_os().skip(1).collect();
-    log::info!("Restarting: $ {setup:?} {args:?}");
-    process_utils::run(
-        std::process::Command::new(setup)
-            .args(args)
-            .env(NO_UPDATE_ENV, "yes"),
-    )
 }
 
 fn registry(root: &Path) -> file_registry::FileRegistry {
@@ -160,26 +147,17 @@ fn main() -> Result<()> {
         .try_init()?;
     // Main code.
     let root = config_root()?;
-    let setup = root.join(SETUP);
     log::info!("Found user configuration: {root:?}");
-    let check_update = || -> Result<bool> {
+    let check_update = || -> Result<()> {
         let no_update = args.no_update || env::var(NO_UPDATE_ENV).is_ok();
         if !no_update {
-            let need_restart = layout::update(&root)?;
-            if need_restart {
-                // This process is considered replaced.
-                // Don't do anything here.
-                reload(setup)?;
-                return Ok(true);
-            }
+            layout::update(&root)?;
         }
-        Ok(false)
+        Ok(())
     };
     match args.command {
         Commands::Install {} => {
-            if check_update()? {
-                return Ok(());
-            }
+            check_update()?;
             let rules = Rules {
                 force_download: false,
                 keep_going: args.keep_going,
@@ -188,9 +166,7 @@ fn main() -> Result<()> {
             install(&rules, &root).context("failed to install")?;
         }
         Commands::Update {} => {
-            if check_update()? {
-                return Ok(());
-            }
+            check_update()?;
             let rules = Rules {
                 force_download: true,
                 keep_going: args.keep_going,
@@ -199,9 +175,7 @@ fn main() -> Result<()> {
             install(&rules, &root).context("failed to install")?;
         }
         Commands::SystemInstall {} => {
-            if check_update()? {
-                return Ok(());
-            }
+            check_update()?;
             let rules = Rules {
                 keep_going: args.keep_going,
                 ..Rules::default()
