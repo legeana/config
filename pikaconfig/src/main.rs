@@ -33,28 +33,22 @@ use std::env;
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
-use anyhow::{anyhow, bail, Context, Result};
+use anyhow::{bail, Context, Result};
 use clap::{Parser, Subcommand};
 
 use module::{Module, Rules};
 use uninstaller::Uninstaller;
 
 const NO_UPDATE_ENV: &str = "PIKACONFIG_NO_UPDATE";
+const CONFIG_ROOT_ENV: &str = "PIKACONFIG_CONFIG_ROOT";
 const INSTALL_REGISTRY: &str = ".install";
 const STATE_REGISTRY: &str = ".state";
 const SETUP: &str = "setup";
 
-fn config_root(file_in_root: &str) -> Result<PathBuf> {
-    let exe_path = env::current_exe()?;
-    let mut parent = exe_path.parent();
-    while let Some(dir) = parent {
-        let file = dir.join(file_in_root);
-        if file.exists() {
-            return Ok(dir.to_path_buf());
-        }
-        parent = dir.parent();
-    }
-    Err(anyhow!("unable to find {file_in_root:?} in project root"))
+fn config_root() -> Result<PathBuf> {
+    let config_root = env::var_os(CONFIG_ROOT_ENV)
+        .with_context(|| format!("failed to read {CONFIG_ROOT_ENV}, use setup"))?;
+    Ok(config_root.into())
 }
 
 #[derive(Debug, Parser)]
@@ -165,7 +159,7 @@ fn main() -> Result<()> {
         .format_target(false)
         .try_init()?;
     // Main code.
-    let root = config_root(SETUP)?;
+    let root = config_root()?;
     let setup = root.join(SETUP);
     log::info!("Found user configuration: {root:?}");
     let check_update = || -> Result<bool> {

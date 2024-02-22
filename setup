@@ -18,6 +18,9 @@ ROOT="$(src_root)"
 SRC="${ROOT?}/pikaconfig"
 CACHED_BINARY="$SRC/target/release/pikaconfig"
 
+# Environment used by pikaconfig binary.
+export PIKACONFIG_CONFIG_ROOT="$ROOT"
+
 log() {
     echo "$@" >&2
 }
