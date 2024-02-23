@@ -79,7 +79,7 @@ cached_setup() {
     "$CACHED_BINARY" --no-update "$@"
 }
 
-base_docker_setup() {
+docker_setup_base() {
     update_config_root
     mkdir -p "${SRC?}/target/release"
     log_eval $OPTIONAL_SUDO docker run \
@@ -94,12 +94,12 @@ base_docker_setup() {
 }
 
 docker_setup() {
-    base_docker_setup "$@"
+    docker_setup_base "$@"
 }
 
 sudo_docker_setup() {
     OPTIONAL_SUDO=sudo
-    base_docker_setup "$@"
+    docker_setup_base "$@"
 }
 
 dispatch_setup_helper "$@"
