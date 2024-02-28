@@ -1,7 +1,7 @@
 requires = ["os=linux"]
 
 [[dependencies]]
-names = ["wofi"]
+names = ["fuzzel"]
 
 [[system_dependencies]]
 any = ["sway", "swaybg", "swaylock", "swayidle"]

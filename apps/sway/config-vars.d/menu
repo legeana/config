@@ -1,4 +1,4 @@
 # Your preferred application launcher
 # Note: pass the final command to swaymsg so that the resulting window can be opened
 # on the original workspace that the command was run on.
-set $menu $launch wofi | xargs swaymsg exec -- $launch
+set $menu $launch fuzzel --launch-prefix='swaymsg exec -- $launch'
