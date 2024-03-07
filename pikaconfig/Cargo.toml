@@ -34,11 +34,6 @@ which = "4.4.0"
 [dependencies.pikaconfig-bootstrap]
 path = "../bootstrap"
 
-[dependencies.env_logger]
-version = "0.10.0"
-default-features = false
-features = ["auto-color"]
-
 # https://lalrpop.github.io/lalrpop/quick_start_guide.html
 # See also build.rs.
 [dependencies.lalrpop-util]

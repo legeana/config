@@ -839,7 +839,6 @@ dependencies = [
  "anyhow",
  "base64",
  "dirs",
- "env_logger",
  "glob",
  "indoc",
  "lalrpop",
