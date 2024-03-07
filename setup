@@ -29,7 +29,7 @@ has_no_update_flag() {
 }
 
 ROOT="$(src_root)"
-SRC="${ROOT?}/pikaconfig"
+SRC="${ROOT?}"
 CACHED_BINARY="$SRC/target/release/pikaconfig"
 
 # Environment used by pikaconfig binary.
@@ -72,7 +72,11 @@ update_config_root() {
 native_setup() {
     get_rust
     update_config_root
-    cargo run --manifest-path="${SRC?}/Cargo.toml" --release -- "$@"
+    cargo run \
+        --manifest-path="${SRC?}/Cargo.toml" \
+        --package=pikaconfig \
+        --release \
+        -- "$@"
 }
 
 cached_setup() {
