@@ -9,16 +9,13 @@ mod command;
 mod empty_struct;
 mod file_registry;
 mod file_util;
-mod git_utils;
 mod iter_util;
 mod layout;
 mod module;
 mod package;
-mod process_utils;
 mod quote;
 mod registry;
 mod repository;
-mod shlexfmt;
 mod symlink_util;
 mod tag_criteria;
 mod tag_util;
@@ -34,6 +31,9 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{bail, Context, Result};
 use clap::{Parser, Subcommand};
+
+// Pretend these modules are local.
+use pikaconfig_bootstrap::{git_utils, process_utils, shlexfmt};
 
 use module::{Module, Rules};
 use uninstaller::Uninstaller;

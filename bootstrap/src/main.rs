@@ -1,3 +1,3 @@
 fn main() {
-    pikaconfig_bootstrap::hello();
+    println!("Hello, World!");
 }

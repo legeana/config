@@ -849,13 +849,13 @@ dependencies = [
  "log",
  "logos",
  "once_cell",
+ "pikaconfig-bootstrap",
  "pretty_assertions",
  "serde",
  "serde_json",
  "serde_yaml",
  "sha2",
  "shellexpand",
- "shlex",
  "sysinfo",
  "tera",
  "thiserror",
@@ -869,6 +869,13 @@ dependencies = [
 [[package]]
 name = "pikaconfig-bootstrap"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "env_logger",
+ "log",
+ "pretty_assertions",
+ "shlex",
+]
 
 [[package]]
 name = "precomputed-hash"
