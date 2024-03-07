@@ -27,56 +27,18 @@ mod xdg;
 mod xdg_or_win;
 
 use std::env;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use anyhow::{bail, Context, Result};
-use clap::{Parser, Subcommand};
 
 // Pretend these modules are local.
-use pikaconfig_bootstrap::{git_utils, process_utils, shlexfmt};
+use pikaconfig_bootstrap::{cli, git_utils, process_utils, shlexfmt};
 
 use module::{Module, Rules};
 use uninstaller::Uninstaller;
 
-const NO_UPDATE_ENV: &str = "PIKACONFIG_NO_UPDATE";
-const CONFIG_ROOT_ENV: &str = "PIKACONFIG_CONFIG_ROOT";
 const INSTALL_REGISTRY: &str = ".install";
 const STATE_REGISTRY: &str = ".state";
-
-fn config_root() -> Result<PathBuf> {
-    let config_root = env::var_os(CONFIG_ROOT_ENV)
-        .with_context(|| format!("failed to read {CONFIG_ROOT_ENV}, use setup"))?;
-    Ok(config_root.into())
-}
-
-#[derive(Debug, Parser)]
-struct Cli {
-    #[clap(short, long, action = clap::ArgAction::Count)]
-    verbose: u8,
-    #[clap(short = 'd', long)]
-    no_update: bool,
-    #[clap(subcommand)]
-    command: Commands,
-    #[clap(
-        short = 'k',
-        long,
-        help = "Don't interrupt installation process if a package fails"
-    )]
-    keep_going: bool,
-    #[clap(long, help = "Don't install user dependencies")]
-    no_user_deps: bool,
-}
-
-#[derive(Debug, Subcommand)]
-enum Commands {
-    Install {},
-    Update {},
-    SystemInstall {},
-    Uninstall {},
-    ManifestHelp {},
-    Tags {},
-    List {},
-}
 
 fn registry(root: &Path) -> file_registry::FileRegistry {
     let user_files_path = root.join(INSTALL_REGISTRY);
@@ -130,7 +92,7 @@ fn system_install(rules: &Rules, root: &Path) -> Result<()> {
 }
 
 fn main() -> Result<()> {
-    let args = Cli::parse();
+    let args = cli::parse();
     env_logger::Builder::new()
         .filter_level(match args.verbose {
             0 => log::LevelFilter::Off,
@@ -146,17 +108,17 @@ fn main() -> Result<()> {
         .format_target(false)
         .try_init()?;
     // Main code.
-    let root = config_root()?;
+    let root = cli::config_root()?;
     log::info!("Found user configuration: {root:?}");
     let check_update = || -> Result<()> {
-        let no_update = args.no_update || env::var(NO_UPDATE_ENV).is_ok();
+        let no_update = args.no_update || env::var(cli::NO_UPDATE_ENV).is_ok();
         if !no_update {
             layout::update(&root)?;
         }
         Ok(())
     };
     match args.command {
-        Commands::Install {} => {
+        cli::Commands::Install {} => {
             check_update()?;
             let rules = Rules {
                 force_download: false,
@@ -165,7 +127,7 @@ fn main() -> Result<()> {
             };
             install(&rules, &root).context("failed to install")?;
         }
-        Commands::Update {} => {
+        cli::Commands::Update {} => {
             check_update()?;
             let rules = Rules {
                 force_download: true,
@@ -174,7 +136,7 @@ fn main() -> Result<()> {
             };
             install(&rules, &root).context("failed to install")?;
         }
-        Commands::SystemInstall {} => {
+        cli::Commands::SystemInstall {} => {
             check_update()?;
             let rules = Rules {
                 keep_going: args.keep_going,
@@ -182,18 +144,18 @@ fn main() -> Result<()> {
             };
             system_install(&rules, &root).context("failed to system_install")?;
         }
-        Commands::Uninstall {} => {
+        cli::Commands::Uninstall {} => {
             uninstall(&root).context("failed to uninstall")?;
         }
-        Commands::ManifestHelp {} => {
+        cli::Commands::ManifestHelp {} => {
             print!("{}", package::manifest_help());
         }
-        Commands::Tags {} => {
+        cli::Commands::Tags {} => {
             for tag in tag_util::tags().context("failed to get tags")? {
                 println!("{}", tag);
             }
         }
-        Commands::List {} => {
+        cli::Commands::List {} => {
             let repos = layout::repositories(&root)
                 .with_context(|| format!("failed to get repositories from {root:?}"))?;
             for repo in repos.iter() {
