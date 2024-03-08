@@ -2,6 +2,7 @@ use std::ffi::OsStr;
 use std::path::Path;
 
 use crate::dir_layout;
+use crate::git_utils;
 use crate::repository;
 use crate::repository::Repository;
 
@@ -29,7 +30,7 @@ where
                 }
             }
         }
-        if entry.path().file_name() == Some(OsStr::new(".git")) {
+        if entry.path().file_name() == Some(OsStr::new(git_utils::GIT_DIR)) {
             it.skip_current_dir();
             continue;
         }

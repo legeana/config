@@ -7,7 +7,6 @@ use anyhow::{Context, Result};
 
 const APPS: &str = "apps";
 const OVERLAY: &str = "overlay.d";
-const GIT_DIR: &str = ".git";
 const PIKACONFIG_DIR: &str = "pikaconfig";
 
 fn read_dir_sorted(path: &Path) -> Result<Vec<DirEntry>> {
@@ -46,7 +45,7 @@ pub fn repositories_dirs(root: &Path) -> Result<Vec<PathBuf>> {
 
 /// Returns true if restart is required.
 fn update_repository(root: &Path) -> Result<bool> {
-    if root.join(GIT_DIR).is_dir() {
+    if root.join(git_utils::GIT_DIR).is_dir() {
         return git_utils::git_pull(root);
     }
     // Unsupported version control system, if any. Skip.
