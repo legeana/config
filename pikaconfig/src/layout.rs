@@ -1,12 +1,12 @@
 use std::ffi::OsStr;
 use std::path::Path;
 
+use anyhow::{Context, Result};
+
 use crate::dir_layout;
 use crate::git_utils;
 use crate::repository;
 use crate::repository::Repository;
-
-use anyhow::{Context, Result};
 
 fn walk_repositories<F>(root: &Path, mut visit: F) -> Result<()>
 where

@@ -1,9 +1,9 @@
 use std::fs::DirEntry;
 use std::path::{Path, PathBuf};
 
-use crate::git_utils;
-
 use anyhow::{Context, Result};
+
+use crate::git_utils;
 
 const APPS: &str = "apps";
 const OVERLAY: &str = "overlay.d";
