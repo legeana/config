@@ -7,7 +7,6 @@ use anyhow::{Context, Result};
 
 const APPS: &str = "apps";
 const OVERLAY: &str = "overlay.d";
-const PIKACONFIG_DIR: &str = "pikaconfig";
 
 fn read_dir_sorted(path: &Path) -> Result<Vec<DirEntry>> {
     let mut paths = path
@@ -53,13 +52,7 @@ fn update_repository(root: &Path) -> Result<bool> {
 }
 
 pub fn update(root: &Path) -> Result<()> {
-    let pikaconfig_dir = root.join(PIKACONFIG_DIR);
-    let pikaconfig_is_embedded = pikaconfig_dir
-        .try_exists()
-        .with_context(|| format!("failed to check if {:?} exists", pikaconfig_dir))?;
-    if !pikaconfig_is_embedded {
-        update_repository(root)?;
-    }
+    update_repository(root)?;
     for overlay in overlay_dirs(root)? {
         update_repository(&overlay)?;
     }

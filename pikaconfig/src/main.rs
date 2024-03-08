@@ -26,7 +26,6 @@ mod uninstaller;
 mod xdg;
 mod xdg_or_win;
 
-use std::env;
 use std::path::Path;
 
 use anyhow::{Context, Result};
@@ -97,16 +96,8 @@ fn main() -> Result<()> {
     // Main code.
     let root = cli::config_root()?;
     log::info!("Found user configuration: {root:?}");
-    let check_update = || -> Result<()> {
-        let no_update = args.no_update || env::var(cli::NO_UPDATE_ENV).is_ok();
-        if !no_update {
-            dir_layout::update(&root)?;
-        }
-        Ok(())
-    };
     match args.command {
         cli::Commands::Install {} => {
-            check_update()?;
             let rules = Rules {
                 force_download: false,
                 keep_going: args.keep_going,
@@ -115,7 +106,6 @@ fn main() -> Result<()> {
             install(&rules, &root).context("failed to install")?;
         }
         cli::Commands::Update {} => {
-            check_update()?;
             let rules = Rules {
                 force_download: true,
                 keep_going: args.keep_going,
@@ -124,7 +114,6 @@ fn main() -> Result<()> {
             install(&rules, &root).context("failed to install")?;
         }
         cli::Commands::SystemInstall {} => {
-            check_update()?;
             let rules = Rules {
                 keep_going: args.keep_going,
                 ..Rules::default()
