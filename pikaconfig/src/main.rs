@@ -32,7 +32,7 @@ use std::path::Path;
 use anyhow::{Context, Result};
 
 // Pretend these modules are local.
-use pikaconfig_bootstrap::{cli, git_utils, logconfig, process_utils, shlexfmt};
+use pikaconfig_bootstrap::{cli, dir_layout, git_utils, logconfig, process_utils, shlexfmt};
 
 use module::{Module, Rules};
 use uninstaller::Uninstaller;
@@ -100,7 +100,7 @@ fn main() -> Result<()> {
     let check_update = || -> Result<()> {
         let no_update = args.no_update || env::var(cli::NO_UPDATE_ENV).is_ok();
         if !no_update {
-            layout::update(&root)?;
+            dir_layout::update(&root)?;
         }
         Ok(())
     };
