@@ -11,6 +11,7 @@ fn run_pikaconfig() -> Result<()> {
     process_utils::run(
         std::process::Command::new("cargo")
             .arg("run")
+            .arg("--release")
             .arg("--package=pikaconfig")
             .arg("--")
             .args(std::env::args().skip(1)), // Skip arg0.
