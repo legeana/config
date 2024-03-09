@@ -54,7 +54,7 @@ pub enum Token {
     SingleQuotedLiteral(String),
     #[regex(r#""([^"\n\\]|\\[^\n])*""#, |lex| quote::unquote(lex.slice()))]
     DoubleQuotedLiteral(String),
-    #[regex(r#"[^\s'"!={}]+"#, |lex| lex.slice().to_owned())]
+    #[regex(r#"[^\s'"!={}#][^\s'"!={}]*"#, |lex| lex.slice().to_owned())]
     UnquotedLiteral(String),
     #[token("if")]
     If,
