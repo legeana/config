@@ -1,5 +1,3 @@
-use std::env;
-
 use anyhow::Result;
 
 use pikaconfig_bootstrap::cli;
@@ -27,8 +25,7 @@ fn main() -> Result<()> {
         args.command,
         cli::Commands::Install {} | cli::Commands::Update {} | cli::Commands::SystemInstall {}
     );
-    let no_update = args.no_update || env::var(cli::NO_UPDATE_ENV).is_ok();
-    if command_needs_update && !no_update {
+    if command_needs_update && !args.no_update {
         // Bootstrap is stable enough we don't attempt to restart.
         // Might reconsider in the future.
         dir_layout::update(&root)?;

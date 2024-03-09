@@ -4,7 +4,6 @@ use std::path::PathBuf;
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 
-pub const NO_UPDATE_ENV: &str = "PIKACONFIG_NO_UPDATE";
 const CONFIG_ROOT_ENV: &str = "PIKACONFIG_CONFIG_ROOT";
 
 #[derive(Debug, Parser)]
