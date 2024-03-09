@@ -2,7 +2,7 @@ use std::path::Path;
 
 use anyhow::{anyhow, Context, Result};
 use once_cell::sync::Lazy;
-use sysinfo::{System, SystemExt};
+use sysinfo::System;
 
 static SYSINFO: Lazy<SystemInfo> = Lazy::new(SystemInfo::new);
 
@@ -38,15 +38,11 @@ fn has_tag_kv(key: &str, value: &str) -> bool {
     }
 }
 
-struct SystemInfo {
-    system: System,
-}
+struct SystemInfo;
 
 impl SystemInfo {
     fn new() -> Self {
-        Self {
-            system: System::new(),
-        }
+        Self {}
     }
     /// Returns 'windows' or 'unix'.
     fn family(&self) -> &'static str {
@@ -56,7 +52,7 @@ impl SystemInfo {
         want_family == self.family()
     }
     fn hostname(&self) -> Option<String> {
-        self.system.host_name()
+        System::host_name()
     }
     fn match_hostname(&self, want_hostname: &str) -> bool {
         Some(want_hostname.into()) == self.hostname()
@@ -84,7 +80,7 @@ impl SystemInfo {
         if self.is_unraid() {
             return "unraid".to_owned();
         }
-        self.system.distribution_id()
+        System::distribution_id()
     }
     fn match_distro(&self, want_distro: &str) -> bool {
         want_distro == self.distro()
