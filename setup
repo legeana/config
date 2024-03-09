@@ -14,9 +14,12 @@ src_root() {
     pwd
 }
 
+BOOTSTRAP=pikaconfig-bootstrap
+BINARY=pikaconfig
 ROOT="$(src_root)"
 SRC="${ROOT?}"
-CACHED_BINARY="$SRC/target/release/pikaconfig"
+BUILD="$SRC/target/release"
+CACHED_BINARY="$BUILD/$PIKACONFIG"
 
 # Environment used by pikaconfig binary.
 export PIKACONFIG_CONFIG_ROOT="$ROOT"
@@ -48,7 +51,7 @@ get_rust() {
 native_setup() {
     get_rust
     cargo run \
-        --package=pikaconfig-bootstrap \
+        --package="$BOOTSTRAP" \
         --release \
         -- "$@"
 }
@@ -59,7 +62,7 @@ cached_setup() {
 
 docker_setup_base() {
     # TODO: This is now broken.
-    mkdir -p "${SRC?}/target/release"
+    mkdir -p "$BUILD"
     log_eval $OPTIONAL_SUDO docker run \
         --pull=always \
         --volume="${SRC?}/cargo-registry:/usr/local/cargo/registry" \
@@ -68,7 +71,7 @@ docker_setup_base() {
         --workdir=/app \
         rust:latest \
         cargo build --release
-    "${SRC?}/target/release/pikaconfig" --no-update "$@"
+    "$CACHED_BINARY" --no-update "$@"
 }
 
 docker_setup() {
