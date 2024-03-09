@@ -838,9 +838,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "base64",
- "clap",
  "dirs",
- "env_logger",
  "glob",
  "indoc",
  "lalrpop",
@@ -849,13 +847,13 @@ dependencies = [
  "log",
  "logos",
  "once_cell",
+ "pikaconfig-bootstrap",
  "pretty_assertions",
  "serde",
  "serde_json",
  "serde_yaml",
  "sha2",
  "shellexpand",
- "shlex",
  "sysinfo",
  "tera",
  "thiserror",
@@ -864,6 +862,18 @@ dependencies = [
  "url",
  "walkdir",
  "which",
+]
+
+[[package]]
+name = "pikaconfig-bootstrap"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "env_logger",
+ "log",
+ "pretty_assertions",
+ "shlex",
 ]
 
 [[package]]

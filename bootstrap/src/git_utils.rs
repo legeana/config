@@ -8,6 +8,7 @@ use crate::process_utils;
 const ORIGIN: &str = "origin";
 const HEAD: &str = "HEAD";
 const BRANCH_SEP: char = '#';
+pub const GIT_DIR: &str = ".git";
 
 pub struct Remote {
     pub url: String,

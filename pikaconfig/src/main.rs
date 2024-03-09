@@ -9,16 +9,13 @@ mod command;
 mod empty_struct;
 mod file_registry;
 mod file_util;
-mod git_utils;
 mod iter_util;
 mod layout;
 mod module;
 mod package;
-mod process_utils;
 mod quote;
 mod registry;
 mod repository;
-mod shlexfmt;
 mod symlink_util;
 mod tag_criteria;
 mod tag_util;
@@ -29,54 +26,18 @@ mod uninstaller;
 mod xdg;
 mod xdg_or_win;
 
-use std::env;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
-use anyhow::{bail, Context, Result};
-use clap::{Parser, Subcommand};
+use anyhow::{Context, Result};
+
+// Pretend these modules are local.
+use pikaconfig_bootstrap::{cli, dir_layout, git_utils, logconfig, process_utils, shlexfmt};
 
 use module::{Module, Rules};
 use uninstaller::Uninstaller;
 
-const NO_UPDATE_ENV: &str = "PIKACONFIG_NO_UPDATE";
-const CONFIG_ROOT_ENV: &str = "PIKACONFIG_CONFIG_ROOT";
 const INSTALL_REGISTRY: &str = ".install";
 const STATE_REGISTRY: &str = ".state";
-
-fn config_root() -> Result<PathBuf> {
-    let config_root = env::var_os(CONFIG_ROOT_ENV)
-        .with_context(|| format!("failed to read {CONFIG_ROOT_ENV}, use setup"))?;
-    Ok(config_root.into())
-}
-
-#[derive(Debug, Parser)]
-struct Cli {
-    #[clap(short, long, action = clap::ArgAction::Count)]
-    verbose: u8,
-    #[clap(short = 'd', long)]
-    no_update: bool,
-    #[clap(subcommand)]
-    command: Commands,
-    #[clap(
-        short = 'k',
-        long,
-        help = "Don't interrupt installation process if a package fails"
-    )]
-    keep_going: bool,
-    #[clap(long, help = "Don't install user dependencies")]
-    no_user_deps: bool,
-}
-
-#[derive(Debug, Subcommand)]
-enum Commands {
-    Install {},
-    Update {},
-    SystemInstall {},
-    Uninstall {},
-    ManifestHelp {},
-    Tags {},
-    List {},
-}
 
 fn registry(root: &Path) -> file_registry::FileRegistry {
     let user_files_path = root.join(INSTALL_REGISTRY);
@@ -130,34 +91,13 @@ fn system_install(rules: &Rules, root: &Path) -> Result<()> {
 }
 
 fn main() -> Result<()> {
-    let args = Cli::parse();
-    env_logger::Builder::new()
-        .filter_level(match args.verbose {
-            0 => log::LevelFilter::Off,
-            1 => log::LevelFilter::Error,
-            2 => log::LevelFilter::Warn,
-            3 => log::LevelFilter::Info,
-            4 => log::LevelFilter::Debug,
-            5 => log::LevelFilter::Trace,
-            6.. => bail!("invalid log level: {}", args.verbose),
-        })
-        .default_format()
-        .format_timestamp(None)
-        .format_target(false)
-        .try_init()?;
+    let args = cli::parse();
+    logconfig::init(args.verbose)?;
     // Main code.
-    let root = config_root()?;
+    let root = cli::config_root()?;
     log::info!("Found user configuration: {root:?}");
-    let check_update = || -> Result<()> {
-        let no_update = args.no_update || env::var(NO_UPDATE_ENV).is_ok();
-        if !no_update {
-            layout::update(&root)?;
-        }
-        Ok(())
-    };
     match args.command {
-        Commands::Install {} => {
-            check_update()?;
+        cli::Commands::Install {} => {
             let rules = Rules {
                 force_download: false,
                 keep_going: args.keep_going,
@@ -165,8 +105,7 @@ fn main() -> Result<()> {
             };
             install(&rules, &root).context("failed to install")?;
         }
-        Commands::Update {} => {
-            check_update()?;
+        cli::Commands::Update {} => {
             let rules = Rules {
                 force_download: true,
                 keep_going: args.keep_going,
@@ -174,26 +113,25 @@ fn main() -> Result<()> {
             };
             install(&rules, &root).context("failed to install")?;
         }
-        Commands::SystemInstall {} => {
-            check_update()?;
+        cli::Commands::SystemInstall {} => {
             let rules = Rules {
                 keep_going: args.keep_going,
                 ..Rules::default()
             };
             system_install(&rules, &root).context("failed to system_install")?;
         }
-        Commands::Uninstall {} => {
+        cli::Commands::Uninstall {} => {
             uninstall(&root).context("failed to uninstall")?;
         }
-        Commands::ManifestHelp {} => {
+        cli::Commands::ManifestHelp {} => {
             print!("{}", package::manifest_help());
         }
-        Commands::Tags {} => {
+        cli::Commands::Tags {} => {
             for tag in tag_util::tags().context("failed to get tags")? {
                 println!("{}", tag);
             }
         }
-        Commands::List {} => {
+        cli::Commands::List {} => {
             let repos = layout::repositories(&root)
                 .with_context(|| format!("failed to get repositories from {root:?}"))?;
             for repo in repos.iter() {
