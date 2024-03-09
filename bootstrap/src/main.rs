@@ -33,5 +33,9 @@ fn main() -> Result<()> {
         // Might reconsider in the future.
         dir_layout::update(&root)?;
     }
+    if args.no_exec {
+        log::info!("Leaving early due to --no-exec");
+        return Ok(());
+    }
     run_pikaconfig()
 }
