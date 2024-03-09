@@ -62,7 +62,7 @@ native_setup() {
 }
 
 cached_setup() {
-    "$CACHED_BINARY" --no-update "$@"
+    "$CACHED_BINARY" "$@"
 }
 
 docker_build() {
@@ -81,7 +81,7 @@ docker_setup_base() {
     docker_build --package="$BOOTSTRAP" --release
     "$CACHED_BOOTSTRAP" "$@"
     docker_build --package="$BINARY" --release
-    "$CACHED_BINARY" --no-update "$@"
+    "$CACHED_BINARY" "$@"
 }
 
 docker_setup() {
