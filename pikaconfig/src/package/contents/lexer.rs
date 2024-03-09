@@ -554,6 +554,29 @@ mod tests {
     }
 
     #[test]
+    fn test_comment_inside_literal() {
+        let mut lex = TestLexer::new(
+            r#"
+            #comment_1
+            literal#comment_2
+            literal# tail
+        "#,
+        );
+        assert_token!(lex.next(), Token::Newline);
+        // Skipped comment_1.
+        assert_token!(lex.next(), Token::Newline);
+        assert_token!(
+            lex.next(),
+            Token::UnquotedLiteral("literal#comment_2".into())
+        );
+        assert_token!(lex.next(), Token::Newline);
+        assert_token!(lex.next(), Token::UnquotedLiteral("literal#".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("tail".into()));
+        assert_token!(lex.next(), Token::Newline);
+        assert_eoi!(lex);
+    }
+
+    #[test]
     fn test_multiline_string() {
         let mut lex = Token::lexer("\"\n\"");
         assert_eq!(lex.next(), Some(Err(LexerError::InvalidToken)));
