@@ -3,18 +3,6 @@ use anyhow::Result;
 use pikaconfig_bootstrap::cli;
 use pikaconfig_bootstrap::dir_layout;
 use pikaconfig_bootstrap::logconfig;
-use pikaconfig_bootstrap::process_utils;
-
-fn run_pikaconfig() -> Result<()> {
-    process_utils::run(
-        std::process::Command::new("cargo")
-            .arg("run")
-            .arg("--release")
-            .arg("--package=pikaconfig")
-            .arg("--")
-            .args(std::env::args().skip(1)), // Skip arg0.
-    )
-}
 
 fn main() -> Result<()> {
     let args = cli::parse();
@@ -30,9 +18,6 @@ fn main() -> Result<()> {
         // Might reconsider in the future.
         dir_layout::update(&root)?;
     }
-    if args.no_exec {
-        log::info!("Leaving early due to --no-exec");
-        return Ok(());
-    }
-    run_pikaconfig()
+    log::debug!("Bootstrapped successfully");
+    Ok(())
 }

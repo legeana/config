@@ -55,6 +55,10 @@ native_setup() {
         --package="$BOOTSTRAP" \
         --release \
         -- "$@"
+    cargo run \
+        --package="$BINARY" \
+        --release \
+        -- "$@"
 }
 
 cached_setup() {
@@ -75,7 +79,7 @@ docker_build() {
 docker_setup_base() {
     mkdir -p "$BUILD"
     docker_build --package="$BOOTSTRAP" --release
-    "$CACHED_BOOTSTRAP" --no-exec "$@"
+    "$CACHED_BOOTSTRAP" "$@"
     docker_build --package="$BINARY" --release
     "$CACHED_BINARY" --no-update "$@"
 }

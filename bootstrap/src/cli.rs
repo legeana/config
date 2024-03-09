@@ -12,11 +12,6 @@ pub struct Cli {
     pub verbose: u8,
     #[clap(short = 'd', long)]
     pub no_update: bool,
-    #[clap(
-        long,
-        help = "Don't execute the main binary"
-    )]
-    pub no_exec: bool,
     #[clap(subcommand)]
     pub command: Commands,
     #[clap(
