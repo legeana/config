@@ -77,7 +77,6 @@ docker_build() {
 }
 
 docker_setup_base() {
-    mkdir -p "$BUILD"
     docker_build --package="$BOOTSTRAP" --release
     "$CACHED_BOOTSTRAP" "$@"
     docker_build --package="$BINARY" --release
