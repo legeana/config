@@ -532,6 +532,7 @@ mod tests {
             command one
             # comment 2
             command two
+            command three # comment 3
         "#,
         );
         assert_token!(lex.next(), Token::Newline);
@@ -545,6 +546,10 @@ mod tests {
         assert_token!(lex.next(), Token::UnquotedLiteral("command".into()));
         assert_token!(lex.next(), Token::UnquotedLiteral("two".into()));
         assert_token!(lex.next(), Token::Newline);
+        assert_token!(lex.next(), Token::UnquotedLiteral("command".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("three".into()));
+        assert_token!(lex.next(), Token::Newline);
+        // Skipped comment 3.
         assert_eoi!(lex);
     }
 
