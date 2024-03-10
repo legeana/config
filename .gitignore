@@ -1,5 +1,11 @@
+# Installation.
 /.install
 /.state
 /.tags
 
+# Build.
+/cargo-registry
+/target
+
+# Old Python build.
 __pycache__
