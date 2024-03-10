@@ -1,0 +1,9 @@
+# https://nvchad.com/docs/quickstart/install
+# nvim -c 'help xdg'
+
+xdg_or_win_config_local_prefix nvchad
+starter = git https://github.com/NvChad/starter
+symlink_from $starter/init.lua
+output_file lazy-lock.json
+
+symlink_tree lua
