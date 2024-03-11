@@ -52,10 +52,12 @@ get_rust() {
 native_setup() {
     get_rust
     cargo run \
+        --manifest-path="$SRC/Cargo.toml" \
         --package="$BOOTSTRAP" \
         --release \
         -- "$@"
     cargo run \
+        --manifest-path="$SRC/Cargo.toml" \
         --package="$BINARY" \
         --release \
         -- "$@"
