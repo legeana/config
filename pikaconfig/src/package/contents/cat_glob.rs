@@ -15,7 +15,7 @@ use indoc::formatdoc;
 
 struct CatGlobInto {
     globs: Vec<String>,
-    output: local_state::StateMapping,
+    output: local_state::StateBox,
 }
 
 impl Module for CatGlobInto {
@@ -61,12 +61,12 @@ impl engine::Statement for CatGlobIntoStatement {
         let dst = ctx.dst_path(ctx.expand_arg(&self.filename)?);
         let output = local_state::file_state(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
-        let output_mapping = output.mapping();
+        let output_state = output.state();
         Ok(Some(Box::new((
             output,
             CatGlobInto {
                 globs: concatenated_globs,
-                output: output_mapping,
+                output: output_state,
             },
         ))))
     }

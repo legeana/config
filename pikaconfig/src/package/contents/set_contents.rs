@@ -12,7 +12,7 @@ use super::inventory;
 use super::local_state;
 
 struct SetContents {
-    output: local_state::StateMapping,
+    output: local_state::StateBox,
     contents: String,
 }
 
@@ -50,11 +50,11 @@ impl engine::Statement for SetContentsStatement {
         let dst = ctx.dst_path(ctx.expand_arg(&self.filename)?);
         let output = local_state::file_state(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
-        let output_mapping = output.mapping();
+        let output_state = output.state();
         Ok(Some(Box::new((
             output,
             SetContents {
-                output: output_mapping,
+                output: output_state,
                 contents: self.contents.clone(),
             },
         ))))

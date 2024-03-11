@@ -13,7 +13,7 @@ use indoc::formatdoc;
 
 struct Copy {
     src: PathBuf,
-    output: local_state::StateMapping,
+    output: local_state::StateBox,
 }
 
 impl Module for Copy {
@@ -49,12 +49,12 @@ impl engine::Statement for CopyStatement {
         let dst = ctx.dst_path(ctx.expand_arg(&self.dst)?);
         let output = local_state::file_state(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
-        let output_mapping = output.mapping();
+        let output_state = output.state();
         Ok(Some(Box::new((
             output,
             Copy {
                 src,
-                output: output_mapping,
+                output: output_state,
             },
         ))))
     }

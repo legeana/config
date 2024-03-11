@@ -16,7 +16,7 @@ use super::net_util;
 struct FetchInto {
     executable: bool,
     url: String,
-    output: local_state::StateMapping,
+    output: local_state::StateBox,
 }
 
 impl Module for FetchInto {
@@ -60,13 +60,13 @@ impl engine::Statement for FetchIntoStatement {
         let dst = ctx.dst_path(ctx.expand_arg(&self.filename)?);
         let output = local_state::linked_file_cache(dst.clone(), &self.url)
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
-        let output_mapping = output.mapping();
+        let output_state = output.state();
         Ok(Some(Box::new((
             output,
             FetchInto {
                 executable: self.executable,
                 url: self.url.clone(),
-                output: output_mapping,
+                output: output_state,
             },
         ))))
     }

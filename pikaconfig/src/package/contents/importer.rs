@@ -17,7 +17,7 @@ use walkdir::WalkDir;
 struct Importer {
     prefix: PathBuf,
     src: PathBuf,
-    output: local_state::StateMapping,
+    output: local_state::StateBox,
 }
 
 /// Returns true if parser matched.
@@ -107,13 +107,13 @@ impl engine::Statement for ImporterStatement {
             .ok_or_else(|| anyhow!("failed to get parent of {dst:?}"))?;
         let output = local_state::file_state(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
-        let output_mapping = output.mapping();
+        let output_state = output.state();
         Ok(Some(Box::new((
             output,
             Importer {
                 prefix: prefix.to_owned(),
                 src: self.workdir.join(ctx.expand_arg(&self.filename)?),
-                output: output_mapping,
+                output: output_state,
             },
         ))))
     }

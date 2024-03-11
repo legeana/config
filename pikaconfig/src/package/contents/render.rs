@@ -17,7 +17,7 @@ const TEMPLATE_NAME: &str = "template";
 struct Render {
     tera: tera::Tera,
     context: tera::Context,
-    output: local_state::StateMapping,
+    output: local_state::StateBox,
 }
 
 impl Module for Render {
@@ -45,7 +45,7 @@ impl engine::Statement for RenderStatement {
         let dst = ctx.dst_path(ctx.expand_arg(&self.dst)?);
         let output = local_state::file_state(dst.clone())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
-        let output_mapping = output.mapping();
+        let output_state = output.state();
         let mut tera = tera::Tera::default();
         tera.add_template_file(&src, Some(TEMPLATE_NAME))
             .with_context(|| format!("failed to load template from {src:?}"))?;
@@ -61,7 +61,7 @@ impl engine::Statement for RenderStatement {
             Render {
                 tera,
                 context,
-                output: output_mapping,
+                output: output_state,
             },
         ))))
     }

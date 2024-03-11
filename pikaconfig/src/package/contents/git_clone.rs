@@ -14,7 +14,7 @@ use super::local_state;
 
 struct GitClone {
     remote: git_utils::Remote,
-    repo: local_state::StateMapping,
+    repo: local_state::StateBox,
 }
 
 impl GitClone {
@@ -70,7 +70,7 @@ impl engine::Statement for GitCloneStatement {
         let dst = ctx.dst_path(ctx.expand_arg(&self.dst)?);
         let output = local_state::dir_state(dst.clone())
             .with_context(|| format!("failed to create DirectoryState from {dst:?}"))?;
-        let repo = output.mapping();
+        let repo = output.state();
         Ok(Some(Box::new((
             output,
             GitClone {
