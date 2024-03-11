@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use indoc::formatdoc;
@@ -81,6 +81,27 @@ impl engine::Statement for GitCloneStatement {
     }
 }
 
+#[derive(Debug)]
+struct GitExpression {
+    workdir: PathBuf,
+    url: String,
+}
+
+impl engine::Expression for GitExpression {
+    fn eval(&self, _ctx: &mut engine::Context) -> Result<engine::ExpressionOutput> {
+        let output = local_state::dir_cache(&self.workdir, Path::new(""), &self.url)?;
+        let output_state = output.state();
+        let git_clone = GitClone {
+            remote: git_utils::Remote::new(&self.url),
+            repo: output.state(),
+        };
+        Ok(engine::ExpressionOutput {
+            module: Some(Box::new((output, git_clone))),
+            output: output_state.path().to_owned().into_os_string(),
+        })
+    }
+}
+
 #[derive(Clone)]
 struct GitCloneBuilder;
 
@@ -104,6 +125,34 @@ impl engine::CommandBuilder for GitCloneBuilder {
     }
 }
 
+#[derive(Clone)]
+struct GitBuilder;
+
+impl engine::CommandBuilder for GitBuilder {
+    fn name(&self) -> String {
+        "git".to_owned()
+    }
+    fn help(&self) -> String {
+        formatdoc! {"
+            <directory> = {command} <url>[#<branch>]
+                Clones a remote git repository,
+                returns the path to the local clone.
+        ", command=self.name()}
+    }
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::Command> {
+        let url = args
+            .expect_single_arg(self.name())?
+            .expect_raw()
+            .context("url")?
+            .to_owned();
+        Ok(engine::Command::new_expression(GitExpression {
+            workdir: workdir.to_owned(),
+            url,
+        }))
+    }
+}
+
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(GitCloneBuilder {}));
+    registry.register_command(Box::new(GitCloneBuilder));
+    registry.register_command(Box::new(GitBuilder));
 }
