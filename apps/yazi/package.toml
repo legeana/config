@@ -1,5 +1,5 @@
 [[user_dependencies]]
-cargo = { git = "https://github.com/sxyazi/yazi.git" }
+cargo = { crates = ["yazi-fm"], locked = true }
 wants = { command = "yazi" }
 
 [[system_dependencies]]
