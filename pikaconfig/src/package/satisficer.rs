@@ -27,6 +27,7 @@ pub enum DependencySatisficer {
     Command { command: PathBuf },
     AnyCommand { any_command: Vec<PathBuf> },
     AllCommands { all_commands: Vec<PathBuf> },
+    File { file: PathBuf },
 }
 
 impl Satisficer for DependencySatisficer {
@@ -53,6 +54,12 @@ impl Satisficer for DependencySatisficer {
                     }
                 }
                 Ok(true)
+            }
+            DependencySatisficer::File { file } => {
+                let path = shellexpand::path::tilde(file);
+                Ok(path
+                    .try_exists()
+                    .with_context(|| format!("failed to check if {file:?} exists"))?)
             }
         }
     }
