@@ -98,6 +98,7 @@ pub enum CargoDependency {
         tag: Option<String>,
         branch: Option<String>,
         path: Option<PathBuf>,
+        locked: Option<bool>,
     },
 }
 
@@ -293,6 +294,7 @@ mod tests {
                         branch: None,
                         tag: None,
                         path: None,
+                        locked: None,
                     }),
                     ..Default::default()
                 },

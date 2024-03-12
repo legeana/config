@@ -124,6 +124,7 @@ impl Installer for Cargo {
                 branch,
                 tag,
                 path,
+                locked,
             } => {
                 if let Some(git) = git {
                     cmd.arg("--git").arg(git);
@@ -136,6 +137,9 @@ impl Installer for Cargo {
                 }
                 if let Some(path) = path {
                     cmd.arg("--path").arg(path);
+                }
+                if locked.unwrap_or_default() {
+                    cmd.arg("--locked");
                 }
                 // Must be trailing arguments.
                 cmd.arg("--");
