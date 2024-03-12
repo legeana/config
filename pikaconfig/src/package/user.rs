@@ -27,8 +27,10 @@ impl UserDependency {
             return Ok(Self::default());
         }
         let mut installers: Vec<Box<dyn Installer>> = Vec::new();
-        if cfg.brew.is_some() {
-            return Err(anyhow!("brew is not supported yet"));
+        if let Some(brew) = &cfg.brew {
+            installers.push(Box::new(Brew {
+                config: brew.to_config(),
+            }));
         }
         if let Some(cargo) = &cfg.cargo {
             installers.push(Box::new(Cargo {
@@ -54,6 +56,53 @@ impl Module for UserDependency {
             return Ok(());
         }
         self.installers.install()
+    }
+}
+
+struct Brew {
+    config: config::BrewConfig,
+}
+
+impl Brew {
+    fn install_taps(&self) -> Result<()> {
+        let Some(ref taps) = self.config.taps else {
+            return Ok(());
+        };
+        let mut cmd = Command::new("brew");
+        cmd.arg("tap");
+        cmd.arg("--");
+        cmd.args(taps);
+        process_utils::run_verbose(&mut cmd)
+    }
+    fn install_casks(&self) -> Result<()> {
+        let Some(ref casks) = self.config.casks else {
+            return Ok(());
+        };
+        let mut cmd = Command::new("brew");
+        cmd.arg("install");
+        cmd.arg("--cask");
+        cmd.arg("--");
+        cmd.args(casks);
+        process_utils::run_verbose(&mut cmd)
+    }
+    fn install_formulas(&self) -> Result<()> {
+        let Some(ref formulas) = self.config.formulas else {
+            return Ok(());
+        };
+        let mut cmd = Command::new("brew");
+        cmd.arg("install");
+        cmd.arg("--");
+        cmd.args(formulas);
+        process_utils::run_verbose(&mut cmd)
+    }
+}
+
+impl Installer for Brew {
+    fn install(&self) -> Result<()> {
+        self.install_taps()?;
+        self.install_casks()?;
+        self.install_formulas()?;
+        Ok(())
     }
 }
 

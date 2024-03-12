@@ -61,15 +61,31 @@ pub struct SystemDependency {
     pub bash: Option<String>,
 }
 
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct BrewConfig {
+    pub taps: Option<Vec<String>>,
+    pub casks: Option<Vec<String>>,
+    pub formulas: Option<Vec<String>>,
+}
+
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields, untagged)]
 pub enum BrewDependency {
     Formulas(Vec<String>),
-    Config {
-        taps: Option<Vec<String>>,
-        casks: Option<Vec<String>>,
-        formulas: Option<Vec<String>>,
-    },
+    Config(BrewConfig),
+}
+
+impl BrewDependency {
+    pub fn to_config(&self) -> BrewConfig {
+        match self {
+            BrewDependency::Formulas(formulas) => BrewConfig {
+                formulas: Some(formulas.clone()),
+                ..Default::default()
+            },
+            BrewDependency::Config(config) => config.clone(),
+        }
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
@@ -288,11 +304,11 @@ mod tests {
                     ..Default::default()
                 },
                 UserDependency {
-                    brew: Some(BrewDependency::Config {
+                    brew: Some(BrewDependency::Config(BrewConfig {
                         taps: Some(vec!["tap1".to_owned(), "tap2".to_owned()]),
                         casks: Some(vec!["cask1".to_owned(), "cask2".to_owned()]),
                         formulas: Some(vec!["formula1".to_owned(), "formula2".to_owned()]),
-                    }),
+                    })),
                     ..Default::default()
                 },
             ])
