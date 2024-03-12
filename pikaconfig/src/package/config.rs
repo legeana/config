@@ -63,6 +63,17 @@ pub struct SystemDependency {
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields, untagged)]
+pub enum BrewDependency {
+    Formulas(Vec<String>),
+    Config {
+        taps: Option<Vec<String>>,
+        casks: Option<Vec<String>>,
+        formulas: Option<Vec<String>>,
+    },
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
+#[serde(deny_unknown_fields, untagged)]
 pub enum CargoDependency {
     Crates(Vec<String>),
     Config {
@@ -83,7 +94,7 @@ pub struct UserDependency {
     /// Rules::force_download will force this dependency to be updated.
     pub wants: Option<DependencySatisficer>,
     // User-level package managers.
-    pub brew: Option<Vec<String>>,
+    pub brew: Option<BrewDependency>,
     pub cargo: Option<CargoDependency>,
     pub npm: Option<Vec<String>>,
     pub pip_user: Option<Vec<String>>,
@@ -177,6 +188,15 @@ mod tests {
 
             [[user_dependencies]]
             cargo = { git = 'https://github.com/example/project.git' }
+
+            [[user_dependencies]]
+            brew = ['pkg1', 'pkg2']
+
+            [[user_dependencies]]
+            [user_dependencies.brew]
+            taps = ['tap1', 'tap2']
+            casks = ['cask1', 'cask2']
+            formulas = ['formula1', 'formula2']
         ",
         )
         .expect("load_toml_string");
@@ -257,6 +277,21 @@ mod tests {
                         branch: None,
                         tag: None,
                         path: None,
+                    }),
+                    ..Default::default()
+                },
+                UserDependency {
+                    brew: Some(BrewDependency::Formulas(vec![
+                        "pkg1".to_owned(),
+                        "pkg2".to_owned()
+                    ])),
+                    ..Default::default()
+                },
+                UserDependency {
+                    brew: Some(BrewDependency::Config {
+                        taps: Some(vec!["tap1".to_owned(), "tap2".to_owned()]),
+                        casks: Some(vec!["cask1".to_owned(), "cask2".to_owned()]),
+                        formulas: Some(vec!["formula1".to_owned(), "formula2".to_owned()]),
                     }),
                     ..Default::default()
                 },
