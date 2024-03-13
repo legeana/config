@@ -9,3 +9,8 @@ names = [
 
 [[system_dependencies]]
 any = ["fish", "moreutils"]
+
+[[user_dependencies]]
+requires = ["os=macos"]
+wants = { command = "gecho" }
+brew = ["coreutils"]
