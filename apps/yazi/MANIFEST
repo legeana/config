@@ -1,4 +1,12 @@
-prefix ~/.config/yazi
+# https://github.com/sxyazi/yazi/blob/main/yazi-shared/src/xdg.rs
+if is_windows {
+    config_prefix yazi/config
+} else if is_unix {
+    xdg_config_prefix yazi
+} else {
+    return
+}
+
 symlink keymap.toml
 symlink theme.toml
 symlink yazi.toml
