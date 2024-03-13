@@ -1,2 +1,4 @@
 prefix ~/.config/yazi
 symlink keymap.toml
+symlink theme.toml
+symlink yazi.toml
