@@ -7,6 +7,7 @@ if is_windows {
     return
 }
 
+# https://yazi-rs.github.io/docs/configuration/overview
 symlink keymap.toml
 symlink theme.toml
 symlink yazi.toml
