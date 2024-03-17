@@ -1,0 +1,7 @@
+[[system_dependencies]]
+any = ["playerctl"]
+wants = { command = "playerctl" }
+
+[[system_dependencies]]
+any = ["brightnessctl"]
+wants = { command = "brightnessctl" }

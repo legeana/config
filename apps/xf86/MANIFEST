@@ -1,0 +1,5 @@
+xdg_config_prefix i3/config.d
+symlink xf86_keys
+
+xdg_config_prefix sway/config.d
+symlink xf86_keys
