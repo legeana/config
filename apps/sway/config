@@ -1,4 +1,4 @@
 # Read `man 5 sway` for a complete reference.
 
-include ~/.config/sway/config-vars.d/*
-include ~/.config/sway/config.d/*
+include {{xdg_config_prefix()}}/sway/config-vars.d/*
+include {{xdg_config_prefix()}}/sway/config.d/*
