@@ -1,5 +1,8 @@
 local M = {}
 
+-- TODO: Consider using mason-lspconfig.nvim instead.
+-- Example: https://github.com/pynappo/dotfiles/blob/daa6c778be8e3a20f574b5a6f8ea8eda1fdcd6cd/.config/nvim/lua/pynappo/plugins/lsp.lua#L46-L53
+
 -- lsp: https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
 local packages = {
   { lsp = "clangd", mason = "clangd", ts = {"c", "cpp"} },
