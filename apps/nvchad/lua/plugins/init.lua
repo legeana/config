@@ -14,9 +14,16 @@ return {
   },
 
   {
+    "nvim-treesitter/nvim-treesitter",
+    opts = {
+      ensure_installed = require("configs.languages").treesitter,
+    },
+  },
+
+  {
     "williamboman/mason.nvim",
     opts = {
-      ensure_installed = require("configs.lspconfig").MASON,
+      ensure_installed = require("configs.languages").mason,
     },
   },
 
