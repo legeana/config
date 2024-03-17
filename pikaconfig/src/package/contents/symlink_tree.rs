@@ -78,5 +78,5 @@ impl engine::CommandBuilder for SymlinkTreeBuilder {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(SymlinkTreeBuilder {}));
+    registry.register_command(Box::new(SymlinkTreeBuilder));
 }

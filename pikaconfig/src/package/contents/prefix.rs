@@ -41,5 +41,5 @@ impl engine::CommandBuilder for PrefixBuilder {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(PrefixBuilder {}));
+    registry.register_command(Box::new(PrefixBuilder));
 }

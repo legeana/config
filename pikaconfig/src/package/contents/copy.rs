@@ -84,5 +84,5 @@ impl engine::CommandBuilder for CopyBuilder {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(CopyBuilder {}));
+    registry.register_command(Box::new(CopyBuilder));
 }

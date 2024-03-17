@@ -100,5 +100,5 @@ impl engine::CommandBuilder for CatGlobIntoBuilder {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(CatGlobIntoBuilder {}));
+    registry.register_command(Box::new(CatGlobIntoBuilder));
 }

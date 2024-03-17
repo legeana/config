@@ -142,5 +142,5 @@ impl engine::CommandBuilder for ImporteBuilder {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(ImporteBuilder {}));
+    registry.register_command(Box::new(ImporteBuilder));
 }

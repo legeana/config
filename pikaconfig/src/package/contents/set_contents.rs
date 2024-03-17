@@ -84,5 +84,5 @@ impl engine::CommandBuilder for SetContentsBuilder {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(SetContentsBuilder {}));
+    registry.register_command(Box::new(SetContentsBuilder));
 }

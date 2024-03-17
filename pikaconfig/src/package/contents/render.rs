@@ -114,6 +114,6 @@ impl engine::CommandBuilder for RenderToBuilder {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(RenderBuilder {}));
-    registry.register_command(Box::new(RenderToBuilder {}));
+    registry.register_command(Box::new(RenderBuilder));
+    registry.register_command(Box::new(RenderToBuilder));
 }

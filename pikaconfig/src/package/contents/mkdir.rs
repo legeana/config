@@ -58,5 +58,5 @@ impl engine::CommandBuilder for MkDirBuilder {
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_command(Box::new(MkDirBuilder {}));
+    registry.register_command(Box::new(MkDirBuilder));
 }
