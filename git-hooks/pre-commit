@@ -1,8 +1,11 @@
 #!/bin/sh -e
 
+# setup will build everything in --release mode anyway.
+# Running tests in --release will be faster overall.
+BUILD=--release
+
 ./setup -d list
 
-cd pikaconfig
 cargo fmt --check
-cargo clippy -- -Dwarnings  # Treat warnings as errors.
-cargo test
+cargo clippy $BUILD -- -Dwarnings  # Treat warnings as errors.
+cargo test $BUILD
