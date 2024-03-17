@@ -63,6 +63,7 @@ bashrc
 batcat
 bazel
 bincode
+bindsym
 blackbox
 blackhole
 bool
@@ -325,6 +326,7 @@ keepalive
 keybase
 keygrip
 keymap
+keymaps
 konsole
 kubernetes
 kwargs
@@ -421,6 +423,7 @@ nushell
 nvim
 nyc
 oauth
+obsidianmd
 oct
 ok
 omf
@@ -576,6 +579,7 @@ sharded
 sharding
 shellexpand
 shlex
+shlexfmt
 shutil
 sighup
 sigint
@@ -617,6 +621,7 @@ struct
 structs
 stylesheet
 subcmd
+subconf
 subdir
 subdirs
 subl
@@ -624,6 +629,8 @@ submodule
 subpackages
 subpartition
 subprefix
+subroot
+substate
 substr
 subteam
 sudo
