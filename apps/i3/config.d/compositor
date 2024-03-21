@@ -1,1 +1,1 @@
-exec --no-startup-id picom
+exec --no-startup-id xcompmgr

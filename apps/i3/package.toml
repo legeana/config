@@ -23,3 +23,6 @@ any = ["maim"]
 [[system_dependencies]]
 apt = ["xfce4-clipman"]
 pacman = ["xfce4-clipman-plugin"]
+
+[[system_dependencies]]
+any = ["xcompmgr"]
