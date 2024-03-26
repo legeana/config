@@ -26,6 +26,7 @@ apis
 appcontext
 appdata
 appimage
+appname
 archlinux
 arg
 arg0
@@ -56,6 +57,7 @@ automator
 autoplug
 backend
 backends
+base64
 basename
 basenames
 basestring
@@ -213,6 +215,7 @@ filetypes
 fishshell
 fixup
 flaskutil
+fm
 fmt
 fn
 fname
@@ -283,6 +286,7 @@ hpp
 href
 hsync
 htop
+hx
 i3lock
 ibracorp
 ico
@@ -353,6 +357,7 @@ loc
 localectl
 localhost
 localtime
+logconfig
 loginctl
 logind
 loglevel
@@ -420,6 +425,7 @@ nospell
 npm
 num
 nushell
+nvchad
 nvim
 nyc
 oauth
@@ -620,6 +626,7 @@ stringset
 struct
 structs
 stylesheet
+stylua
 subcmd
 subconf
 subdir
