@@ -9,6 +9,7 @@ local packages = {
   -- { lsp = "java_language_server", ts = {"java"} },
   { lsp = "pylsp", ts = {"python"} },
   { lsp = "rust_analyzer", ts = {"rust"} },
+  { lsp = "taplo", ts = {"toml"} },
   { lsp = "tsserver", ts = {"typescript"} },
 }
 
