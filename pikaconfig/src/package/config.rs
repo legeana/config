@@ -102,6 +102,18 @@ pub enum CargoDependency {
     },
 }
 
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct GithubReleaseDependency {
+    owner: String,
+    repo: String,
+    // Latest if not specified.
+    release: Option<String>,
+    asset: String,
+    // Defaults to asset name if not specified.
+    filename: Option<String>,
+}
+
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct UserDependency {
@@ -115,6 +127,9 @@ pub struct UserDependency {
     pub cargo: Option<CargoDependency>,
     pub npm: Option<Vec<String>>,
     pub pip_user: Option<Vec<String>>,
+    // Binary management.
+    pub binary_url: Option<String>,
+    pub github_release: Option<GithubReleaseDependency>,
 }
 
 fn load_toml_string(data: &str) -> Result<Package> {
@@ -314,6 +329,80 @@ mod tests {
                     ..Default::default()
                 },
             ])
+        );
+    }
+
+    #[test]
+    fn load_binary_url_dependency() {
+        let pkg = load_toml_string(
+            "
+            [[user_dependencies]]
+            binary_url = 'https://example.com/file.bin'
+        ",
+        )
+        .expect("load_toml_string");
+        assert_eq!(
+            pkg.user_dependencies,
+            Some(vec![UserDependency {
+                binary_url: Some("https://example.com/file.bin".to_owned()),
+                ..Default::default()
+            }]),
+        );
+    }
+
+    #[test]
+    fn load_github_dependency_minimal() {
+        let pkg = load_toml_string(
+            "
+            [[user_dependencies]]
+            [user_dependencies.github_release]
+            owner = 'owner'
+            repo = 'repo'
+            asset = 'asset'
+        ",
+        )
+        .expect("load_toml_string");
+        assert_eq!(
+            pkg.user_dependencies,
+            Some(vec![UserDependency {
+                github_release: Some(GithubReleaseDependency {
+                    owner: "owner".to_owned(),
+                    repo: "repo".to_owned(),
+                    release: None,
+                    asset: "asset".to_owned(),
+                    filename: None,
+                }),
+                ..Default::default()
+            }]),
+        );
+    }
+
+    #[test]
+    fn load_github_dependency_full() {
+        let pkg = load_toml_string(
+            "
+            [[user_dependencies]]
+            [user_dependencies.github_release]
+            owner = 'owner'
+            repo = 'repo'
+            release = '1.2.3'
+            asset = 'asset'
+            filename = 'filename'
+        ",
+        )
+        .expect("load_toml_string");
+        assert_eq!(
+            pkg.user_dependencies,
+            Some(vec![UserDependency {
+                github_release: Some(GithubReleaseDependency {
+                    owner: "owner".to_owned(),
+                    repo: "repo".to_owned(),
+                    release: Some("1.2.3".to_owned()),
+                    asset: "asset".to_owned(),
+                    filename: Some("filename".to_owned()),
+                }),
+                ..Default::default()
+            }]),
         );
     }
 }

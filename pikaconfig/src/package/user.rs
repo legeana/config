@@ -43,6 +43,12 @@ impl UserDependency {
         if cfg.npm.is_some() {
             return Err(anyhow!("pip_user is not supported yet"));
         }
+        if cfg.binary_url.is_some() {
+            return Err(anyhow!("binary_url is not supported yet"));
+        }
+        if cfg.github_release.is_some() {
+            return Err(anyhow!("github_release is not supported yet"));
+        }
         Ok(Self {
             wants: cfg.wants.clone(),
             installers,
