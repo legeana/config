@@ -40,7 +40,7 @@ impl UserDependency {
         if cfg.npm.is_some() {
             return Err(anyhow!("npm is not supported yet"));
         }
-        if cfg.npm.is_some() {
+        if cfg.pip_user.is_some() {
             return Err(anyhow!("pip_user is not supported yet"));
         }
         if cfg.binary_url.is_some() {
