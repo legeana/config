@@ -1,2 +1,2 @@
 prefix ~/.config/fish/plugins/nvchad/functions
-symlink nvchad.fish
+symlink nv.fish
