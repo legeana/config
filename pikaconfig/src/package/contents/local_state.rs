@@ -167,7 +167,7 @@ struct StateMapping {
 }
 
 impl AnnotatedPath for StateMapping {
-    fn path(&self) -> &Path {
+    fn as_path(&self) -> &Path {
         &self.path
     }
 }

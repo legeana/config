@@ -21,7 +21,7 @@ impl Module for SetContents {
     fn install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
         if self
             .output
-            .path()
+            .as_path()
             .try_exists()
             .with_context(|| format!("unable to check if {:?} exists", self.output))?
         {
@@ -31,7 +31,7 @@ impl Module for SetContents {
             );
             return Ok(());
         }
-        std::fs::write(self.output.path(), &self.contents)
+        std::fs::write(self.output.as_path(), &self.contents)
             .with_context(|| format!("unable to write {:?} to {:?}", self.contents, self.output))?;
         Ok(())
     }

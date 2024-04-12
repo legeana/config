@@ -21,7 +21,7 @@ impl Module for Copy {
     fn install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
         if self
             .output
-            .path()
+            .as_path()
             .try_exists()
             .with_context(|| format!("unable to check if {:?} exists", self.output))?
         {
@@ -31,7 +31,7 @@ impl Module for Copy {
             );
             return Ok(());
         }
-        std::fs::copy(&self.src, self.output.path())
+        std::fs::copy(&self.src, self.output.as_path())
             .with_context(|| format!("unable to copy {:?} to {:?}", self.src, self.output))?;
         Ok(())
     }

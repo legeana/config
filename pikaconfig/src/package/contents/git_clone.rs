@@ -20,25 +20,25 @@ struct GitClone {
 
 impl GitClone {
     fn need_update(&self) -> Result<bool> {
-        let remote_url = git_utils::get_remote_url(self.repo.path())?;
+        let remote_url = git_utils::get_remote_url(self.repo.as_path())?;
         if remote_url != self.remote.url {
             return Ok(true);
         }
         let target_branch = match self.remote.branch {
             Some(ref branch) => branch.clone(),
-            None => git_utils::get_remote_head_ref(self.repo.path())?,
+            None => git_utils::get_remote_head_ref(self.repo.as_path())?,
         };
-        let current_branch = git_utils::get_head_ref(self.repo.path())?;
+        let current_branch = git_utils::get_head_ref(self.repo.as_path())?;
         Ok(target_branch != current_branch)
     }
     fn force_pull(&self) -> Result<()> {
-        git_utils::git_force_shallow_pull(self.repo.path(), &self.remote)
+        git_utils::git_force_shallow_pull(self.repo.as_path(), &self.remote)
     }
     fn clone(&self) -> Result<()> {
-        git_utils::git_shallow_clone(&self.remote, self.repo.path())
+        git_utils::git_shallow_clone(&self.remote, self.repo.as_path())
     }
     fn is_empty(&self) -> Result<bool> {
-        let count = std::fs::read_dir(self.repo.path())
+        let count = std::fs::read_dir(self.repo.as_path())
             .with_context(|| format!("failed to read dir {:?}", self.repo))?
             .count();
         Ok(count == 0)
@@ -98,7 +98,7 @@ impl engine::Expression for GitExpression {
         };
         Ok(engine::ExpressionOutput {
             module: Some(Box::new((output, git_clone))),
-            output: output_state.path().to_owned().into_os_string(),
+            output: output_state.as_path().to_owned().into_os_string(),
         })
     }
 }

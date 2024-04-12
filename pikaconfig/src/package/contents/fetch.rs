@@ -24,7 +24,7 @@ impl Module for FetchInto {
     fn pre_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
         if self
             .output
-            .path()
+            .as_path()
             .try_exists()
             .with_context(|| format!("unable to check if {:?} exists", self.output))?
         {
@@ -33,7 +33,7 @@ impl Module for FetchInto {
                 self.output
             );
             log::info!("Fetch: setting {:?} executable", self.output);
-            file_util::set_path_executable(self.output.path())
+            file_util::set_path_executable(self.output.as_path())
                 .with_context(|| format!("failed to make {:?} executable", self.output))?;
             return Ok(());
         }
@@ -42,7 +42,7 @@ impl Module for FetchInto {
         log::info!("Fetching {:?} -> {:?}", self.url, self.output);
         net_util::fetch(
             &self.url,
-            self.output.path(),
+            self.output.as_path(),
             net_util::FetchOptions::new().executable(self.executable),
         )
         .with_context(|| format!("failed to fetch {:?}", self.url))

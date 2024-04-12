@@ -23,7 +23,7 @@ struct Render {
 
 impl Module for Render {
     fn install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
-        let mut file = std::fs::File::create(self.output.path())
+        let mut file = std::fs::File::create(self.output.as_path())
             .with_context(|| format!("failed to create a file {:?}", self.output))?;
         self.tera
             .render_to(TEMPLATE_NAME, &self.context, &mut file)

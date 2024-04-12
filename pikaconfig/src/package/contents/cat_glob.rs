@@ -21,7 +21,7 @@ struct CatGlobInto {
 
 impl Module for CatGlobInto {
     fn post_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
-        let out_file = std::fs::File::create(self.output.path())
+        let out_file = std::fs::File::create(self.output.as_path())
             .with_context(|| format!("unable to create {:?}", self.output))?;
         let mut out = std::io::BufWriter::new(out_file);
         for glob in self.globs.iter() {
