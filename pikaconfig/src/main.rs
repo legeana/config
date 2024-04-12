@@ -5,6 +5,7 @@
     clippy::enum_variant_names,
 )]
 
+mod annotated_path;
 mod command;
 mod empty_struct;
 mod file_registry;

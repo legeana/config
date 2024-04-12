@@ -1,6 +1,7 @@
 use std::io::Write;
 use std::path::Path;
 
+use crate::annotated_path::AnnotatedPathBox;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
@@ -15,7 +16,7 @@ use indoc::formatdoc;
 
 struct CatGlobInto {
     globs: Vec<String>,
-    output: local_state::StateBox,
+    output: AnnotatedPathBox,
 }
 
 impl Module for CatGlobInto {

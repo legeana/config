@@ -7,6 +7,7 @@ use base64::engine::general_purpose::URL_SAFE;
 use base64::Engine;
 use sha2::{Digest, Sha256};
 
+use crate::annotated_path::{AnnotatedPath, AnnotatedPathBox};
 use crate::module::{Module, Rules};
 use crate::registry::Registry;
 
@@ -157,20 +158,6 @@ fn create_dir(dir: &Path) -> Result<()> {
     std::fs::create_dir_all(dir).with_context(|| format!("failed to create {dir:?}"))
 }
 
-/// State is a representation of a local state file or directory
-/// with associated debug information and pretty printing.
-pub trait State: std::fmt::Debug {
-    fn path(&self) -> &Path;
-}
-
-pub type StateBox = Box<dyn State>;
-
-impl State for PathBuf {
-    fn path(&self) -> &Path {
-        self
-    }
-}
-
 #[derive(Clone, PartialEq)]
 struct StateMapping {
     /// The actual file.
@@ -179,8 +166,7 @@ struct StateMapping {
     link: PathBuf,
 }
 
-impl State for StateMapping {
-    /// The actual file.
+impl AnnotatedPath for StateMapping {
     fn path(&self) -> &Path {
         &self.path
     }
@@ -198,7 +184,7 @@ impl EphemeralDir {
     pub fn path(&self) -> &Path {
         &self.0
     }
-    pub fn state(&self) -> StateBox {
+    pub fn state(&self) -> AnnotatedPathBox {
         Box::new(self.0.clone())
     }
 }
@@ -215,7 +201,7 @@ impl EphemeralFile {
     pub fn path(&self) -> &Path {
         &self.0
     }
-    pub fn state(&self) -> StateBox {
+    pub fn state(&self) -> AnnotatedPathBox {
         Box::new(self.0.clone())
     }
 }
@@ -229,7 +215,7 @@ impl Module for EphemeralFile {
 pub struct LinkedDir(StateMapping);
 
 impl LinkedDir {
-    pub fn state(&self) -> StateBox {
+    pub fn state(&self) -> AnnotatedPathBox {
         Box::new(self.0.clone())
     }
 }
@@ -246,7 +232,7 @@ impl Module for LinkedDir {
 pub struct LinkedFile(StateMapping);
 
 impl LinkedFile {
-    pub fn state(&self) -> StateBox {
+    pub fn state(&self) -> AnnotatedPathBox {
         Box::new(self.0.clone())
     }
 }

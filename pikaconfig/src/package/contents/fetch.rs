@@ -3,6 +3,7 @@ use std::path::Path;
 use anyhow::{Context, Result};
 use indoc::formatdoc;
 
+use crate::annotated_path::AnnotatedPathBox;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
@@ -16,11 +17,11 @@ use super::net_util;
 struct FetchInto {
     executable: bool,
     url: String,
-    output: local_state::StateBox,
+    output: AnnotatedPathBox,
 }
 
 impl Module for FetchInto {
-    fn install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
+    fn pre_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
         if self
             .output
             .path()

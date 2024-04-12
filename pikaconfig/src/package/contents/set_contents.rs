@@ -3,6 +3,7 @@ use std::path::Path;
 use anyhow::{Context, Result};
 use indoc::formatdoc;
 
+use crate::annotated_path::AnnotatedPathBox;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
@@ -12,7 +13,7 @@ use super::inventory;
 use super::local_state;
 
 struct SetContents {
-    output: local_state::StateBox,
+    output: AnnotatedPathBox,
     contents: String,
 }
 

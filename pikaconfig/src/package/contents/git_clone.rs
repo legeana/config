@@ -3,6 +3,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result};
 use indoc::formatdoc;
 
+use crate::annotated_path::AnnotatedPathBox;
 use crate::git_utils;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
@@ -14,7 +15,7 @@ use super::local_state;
 
 struct GitClone {
     remote: git_utils::Remote,
-    repo: local_state::StateBox,
+    repo: AnnotatedPathBox,
 }
 
 impl GitClone {

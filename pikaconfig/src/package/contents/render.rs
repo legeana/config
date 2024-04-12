@@ -3,6 +3,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result};
 use indoc::formatdoc;
 
+use crate::annotated_path::AnnotatedPathBox;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 use crate::tera_helpers;
@@ -17,7 +18,7 @@ const TEMPLATE_NAME: &str = "template";
 struct Render {
     tera: tera::Tera,
     context: tera::Context,
-    output: local_state::StateBox,
+    output: AnnotatedPathBox,
 }
 
 impl Module for Render {

@@ -2,6 +2,7 @@ use std::io::{BufRead, BufReader, BufWriter};
 use std::path::{Path, PathBuf};
 use std::{fs::File, io::Write};
 
+use crate::annotated_path::AnnotatedPathBox;
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
 
@@ -17,7 +18,7 @@ use walkdir::WalkDir;
 struct Importer {
     prefix: PathBuf,
     src: PathBuf,
-    output: local_state::StateBox,
+    output: AnnotatedPathBox,
 }
 
 /// Returns true if parser matched.
