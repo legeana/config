@@ -1,6 +1,6 @@
-use std::path::Path;
-
 use anyhow::{Context, Result};
+
+use crate::annotated_path::AnnotatedPath;
 
 use super::file_util;
 
@@ -19,14 +19,15 @@ impl FetchOptions {
     }
 }
 
-pub fn fetch(url: impl AsRef<str>, dst: impl AsRef<Path>, opts: &FetchOptions) -> Result<()> {
+pub fn fetch(url: impl AsRef<str>, dst: impl AnnotatedPath, opts: &FetchOptions) -> Result<()> {
     let url = url.as_ref();
-    let dst = dst.as_ref();
+    log::info!("Fetch: {url:?} -> {dst:?}");
     let mut reader = ureq::get(url)
         .call()
         .with_context(|| format!("failed to fetch {url:?}"))?
         .into_reader();
-    let output = std::fs::File::create(dst).with_context(|| format!("failed to open {dst:?}"))?;
+    let output =
+        std::fs::File::create(dst.as_path()).with_context(|| format!("failed to open {dst:?}"))?;
     let mut writer = std::io::BufWriter::new(&output);
     std::io::copy(&mut reader, &mut writer).with_context(|| format!("failed to write {dst:?}"))?;
     if opts.executable {

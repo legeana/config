@@ -7,13 +7,25 @@ pub trait AnnotatedPath: std::fmt::Debug {
 
 pub type AnnotatedPathBox = Box<dyn AnnotatedPath>;
 
+impl<T: AnnotatedPath + ?Sized> AnnotatedPath for &T {
+    fn as_path(&self) -> &Path {
+        T::as_path(self)
+    }
+}
+
+impl<T: AnnotatedPath + ?Sized> AnnotatedPath for Box<T> {
+    fn as_path(&self) -> &Path {
+        T::as_path(self)
+    }
+}
+
 impl AnnotatedPath for PathBuf {
     fn as_path(&self) -> &Path {
         self
     }
 }
 
-impl AnnotatedPath for &Path {
+impl AnnotatedPath for Path {
     fn as_path(&self) -> &Path {
         self
     }

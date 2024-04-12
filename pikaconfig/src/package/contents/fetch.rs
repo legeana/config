@@ -37,12 +37,9 @@ impl Module for FetchInto {
                 .with_context(|| format!("failed to make {:?} executable", self.output))?;
             return Ok(());
         }
-        // TODO: maybe move logging into net_util::fetch(), similar to symlink.
-        // The challenge is logging self.output's actual path.
-        log::info!("Fetching {:?} -> {:?}", self.url, self.output);
         net_util::fetch(
             &self.url,
-            self.output.as_path(),
+            &self.output,
             net_util::FetchOptions::new().executable(self.executable),
         )
         .with_context(|| format!("failed to fetch {:?}", self.url))

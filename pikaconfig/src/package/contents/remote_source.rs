@@ -44,7 +44,6 @@ impl RemoteArchive {
             );
             return Ok(false);
         }
-        log::info!("Fetch: {:?} -> {:?}", self.url, self.archive);
         // TODO: Use checksum to verify version/integrity.
         net_util::fetch(&self.url, &self.archive, &net_util::FetchOptions::new())
             .with_context(|| format!("failed to fetch {:?}", self.url))?;
