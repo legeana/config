@@ -13,8 +13,14 @@ impl<T: Installer> Installer for Vec<T> {
     }
 }
 
-impl Installer for Box<dyn Installer> {
+impl<T: Installer + ?Sized> Installer for &T {
     fn install(&self) -> Result<()> {
-        self.as_ref().install()
+        T::install(self)
+    }
+}
+
+impl<T: Installer + ?Sized> Installer for Box<T> {
+    fn install(&self) -> Result<()> {
+        T::install(self)
     }
 }

@@ -119,7 +119,8 @@ macro_rules! impl_for_part {
 }
 
 impl_for_part!((<T: Module>), Vec<T>, self, (self.as_slice()));
-impl_for_part!((), ModuleBox, self, (self.as_ref()));
+impl_for_part!((<T: Module + ?Sized>), Box<T>, self, (self.as_ref()));
+impl_for_part!((<T: Module + ?Sized>), &T, self, (*self));
 impl_for_part!(
     (<T0: Module, T1: Module>), (T0, T1),
     self, (self.0) (self.1)
