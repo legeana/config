@@ -239,6 +239,7 @@ impl LinkedFile {
 
 impl Module for LinkedFile {
     fn pre_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
+        // Make it possible for another Module to simply open the path.
         create_file_dir(&self.0.path)
     }
     fn install(&self, _rules: &Rules, registry: &mut dyn Registry) -> Result<()> {
