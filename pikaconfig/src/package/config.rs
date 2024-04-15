@@ -105,20 +105,20 @@ pub enum CargoDependency {
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct BinaryUrlDependency {
-    url: String,
-    filename: String,
+    pub url: String,
+    pub filename: String,
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct GithubReleaseDependency {
-    owner: String,
-    repo: String,
+    pub owner: String,
+    pub repo: String,
     // Latest if not specified.
-    release: Option<String>,
-    asset: String,
+    pub release: Option<String>,
+    pub asset: String,
     // Defaults to asset name if not specified.
-    filename: Option<String>,
+    pub filename: Option<String>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
