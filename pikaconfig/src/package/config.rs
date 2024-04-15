@@ -104,6 +104,13 @@ pub enum CargoDependency {
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
+pub struct BinaryUrlDependency {
+    url: String,
+    filename: String,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
+#[serde(deny_unknown_fields)]
 pub struct GithubReleaseDependency {
     owner: String,
     repo: String,
@@ -128,7 +135,7 @@ pub struct UserDependency {
     pub npm: Option<Vec<String>>,
     pub pip_user: Option<Vec<String>>,
     // Binary management.
-    pub binary_url: Option<String>,
+    pub binary_url: Option<BinaryUrlDependency>,
     pub github_release: Option<GithubReleaseDependency>,
 }
 
@@ -337,14 +344,19 @@ mod tests {
         let pkg = load_toml_string(
             "
             [[user_dependencies]]
-            binary_url = 'https://example.com/file.bin'
+            [user_dependencies.binary_url]
+            url = 'https://example.com/file.bin'
+            filename = 'file.bin'
         ",
         )
         .expect("load_toml_string");
         assert_eq!(
             pkg.user_dependencies,
             Some(vec![UserDependency {
-                binary_url: Some("https://example.com/file.bin".to_owned()),
+                binary_url: Some(BinaryUrlDependency {
+                    url: "https://example.com/file.bin".to_owned(),
+                    filename: "file.bin".to_owned(),
+                }),
                 ..Default::default()
             }]),
         );
