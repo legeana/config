@@ -1,0 +1,5 @@
+has_contents = false
+
+[[system_dependencies]]
+any = ["pipx"]
+wants = { command = "pipx" }
