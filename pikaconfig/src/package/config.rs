@@ -134,6 +134,7 @@ pub struct UserDependency {
     pub cargo: Option<CargoDependency>,
     pub npm: Option<Vec<String>>,
     pub pip_user: Option<Vec<String>>,
+    pub pipx: Option<Vec<String>>,
     // Binary management.
     pub binary_url: Option<BinaryUrlDependency>,
     pub github_release: Option<GithubReleaseDependency>,
@@ -413,6 +414,24 @@ mod tests {
                     asset: "asset".to_owned(),
                     filename: Some("filename".to_owned()),
                 }),
+                ..Default::default()
+            }]),
+        );
+    }
+
+    #[test]
+    fn load_pipx_dependency() {
+        let pkg = load_toml_string(
+            "
+            [[user_dependencies]]
+            pipx = ['pkg1', 'pkg2']
+        ",
+        )
+        .expect("load_toml_string");
+        assert_eq!(
+            pkg.user_dependencies,
+            Some(vec![UserDependency {
+                pipx: Some(vec!["pkg1".to_owned(), "pkg2".to_owned()]),
                 ..Default::default()
             }]),
         );

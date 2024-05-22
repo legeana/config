@@ -43,6 +43,11 @@ impl UserDependency {
         if cfg.pip_user.is_some() {
             return Err(anyhow!("pip_user is not supported yet"));
         }
+        if let Some(pipx) = &cfg.pipx {
+            installers.push(Box::new(Pipx {
+                packages: pipx.clone(),
+            }));
+        }
         if cfg.binary_url.is_some() {
             return Err(anyhow!("binary_url is not supported yet"));
         }
@@ -154,6 +159,19 @@ impl Installer for Cargo {
                 }
             }
         }
+        process_utils::run_verbose(&mut cmd)
+    }
+}
+
+struct Pipx {
+    packages: Vec<String>,
+}
+
+impl Installer for Pipx {
+    fn install(&self) -> Result<()> {
+        let mut cmd = Command::new("pipx");
+        cmd.arg("install");
+        cmd.args(&self.packages);
         process_utils::run_verbose(&mut cmd)
     }
 }
