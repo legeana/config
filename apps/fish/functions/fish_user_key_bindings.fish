@@ -3,6 +3,10 @@ function fish_user_key_bindings
     # PuTTY
     bind \eOD backward-word
     bind \eOC forward-word
+
+    # Ctrl-Left and Ctrl-W
+    bind \e\[1\;5D backward-word
+    bind \cW backward-kill-word
 end
 
 # Useful resources:
