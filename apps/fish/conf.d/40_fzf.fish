@@ -5,5 +5,5 @@ set -gx FZF_DEFAULT_OPTS (string join ' ' -- \
     --height=90% \
     --preview-window=wrap \
     --marker='"*"' \
-    --bind=ctrl-l:up,ctrl-k:down
+    --bind=ctrl-j:down,ctrl-k:up
 )
