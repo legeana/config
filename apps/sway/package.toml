@@ -7,6 +7,9 @@ names = ["fuzzel"]
 any = ["sway", "swaybg", "swaylock", "swayidle"]
 
 [[system_dependencies]]
+any = ["xdg-desktop-portal-wlr"]
+
+[[system_dependencies]]
 any = ["grim", "slurp", "imagemagick"]
 
 [[system_dependencies]]
