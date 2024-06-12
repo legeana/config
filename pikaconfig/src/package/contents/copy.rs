@@ -84,6 +84,30 @@ impl engine::CommandBuilder for CopyBuilder {
     }
 }
 
+#[derive(Clone)]
+struct CopyToBuilder;
+
+impl engine::CommandBuilder for CopyToBuilder {
+    fn name(&self) -> String {
+        "copy_to".to_owned()
+    }
+    fn help(&self) -> String {
+        formatdoc! {"
+            {command} <destination> <filename>
+                create a copy of a filename in local storage and install a symlink to it
+        ", command=self.name()}
+    }
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::Command> {
+        let (dst, src) = args.expect_double_arg(self.name())?;
+        Ok(engine::Command::new_statement(CopyStatement {
+            workdir: workdir.to_owned(),
+            src: src.clone(),
+            dst: dst.clone(),
+        }))
+    }
+}
+
 pub fn register(registry: &mut dyn inventory::Registry) {
     registry.register_command(Box::new(CopyBuilder));
+    registry.register_command(Box::new(CopyToBuilder));
 }
