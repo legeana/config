@@ -9,7 +9,7 @@ use super::engine;
 use super::inventory;
 use super::local_state;
 
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Context, Result};
 use indoc::formatdoc;
 
 struct Copy {
@@ -61,6 +61,31 @@ impl engine::Statement for CopyStatement {
     }
 }
 
+#[derive(Debug)]
+struct CopyFromStatement {
+    path: Argument,
+}
+
+impl engine::Statement for CopyFromStatement {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+        let src: PathBuf = ctx.expand_arg(&self.path)?.into();
+        let dst = ctx.dst_path(
+            src.file_name()
+                .ok_or_else(|| anyhow!("failed to get basename from {src:?}"))?,
+        );
+        let output = local_state::file_state(dst.clone())
+            .with_context(|| format!("failed to create FileState from {dst:?}"))?;
+        let output_state = output.state();
+        Ok(Some(Box::new((
+            output,
+            Copy {
+                src,
+                output: output_state,
+            },
+        ))))
+    }
+}
+
 #[derive(Clone)]
 struct CopyBuilder;
 
@@ -81,6 +106,25 @@ impl engine::CommandBuilder for CopyBuilder {
             src: filename.clone(),
             dst: filename.clone(),
         }))
+    }
+}
+
+#[derive(Clone)]
+struct CopyFromBuilder;
+
+impl engine::CommandBuilder for CopyFromBuilder {
+    fn name(&self) -> String {
+        "copy_from".to_owned()
+    }
+    fn help(&self) -> String {
+        formatdoc! {"
+            {command} <path>
+                create a copy of <path> to <path.basename> in prefix
+        ", command=self.name()}
+    }
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
+        let path = args.expect_single_arg(self.name())?.clone();
+        Ok(engine::Command::new_statement(CopyFromStatement { path }))
     }
 }
 
@@ -109,5 +153,6 @@ impl engine::CommandBuilder for CopyToBuilder {
 
 pub fn register(registry: &mut dyn inventory::Registry) {
     registry.register_command(Box::new(CopyBuilder));
+    registry.register_command(Box::new(CopyFromBuilder));
     registry.register_command(Box::new(CopyToBuilder));
 }
