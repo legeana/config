@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
-X11_TERMINALS='alacritty gnome-terminal konsole xterm'
-WAYLAND_TERMINALS='alacritty foot gnome-terminal konsole'
+X11_TERMINALS='alacritty kitty gnome-terminal konsole xterm'
+WAYLAND_TERMINALS='alacritty kitty foot gnome-terminal konsole'
 
 try_terminal() {
     if command -v "$1" >/dev/null 2>&1; then
