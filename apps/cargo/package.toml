@@ -1,3 +1,8 @@
+[[system_dependencies]]
+# Required by dependencies below.
+apt = ["pkg-config"]
+wants = { command = "pkg-config" }
+
 [[user_dependencies]]
 cargo = ["cargo-info"]
 wants = { command = "cargo-info" }
