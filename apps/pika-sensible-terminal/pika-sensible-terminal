@@ -5,6 +5,7 @@ WAYLAND_TERMINALS='alacritty kitty foot gnome-terminal konsole'
 
 try_terminal() {
     if command -v "$1" >/dev/null 2>&1; then
+        echo '$' "$@" >&2
         exec "$@"
     fi
 }
