@@ -1,0 +1,3 @@
+xdg_config_prefix environment.d
+symlink 10_cargo_bin.conf
+symlink 10_local_bin.conf
