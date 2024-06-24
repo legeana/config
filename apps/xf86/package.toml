@@ -1,3 +1,5 @@
+requires = ["os=linux"]
+
 [[system_dependencies]]
 any = ["playerctl"]
 wants = { command = "playerctl" }
