@@ -2,17 +2,19 @@ prefix ~/.ssh
 symlink config
 symlink_tree config.d
 
-prefix ~/.config/systemd/user
-symlink ssh-agent.service
+if is_linux {
+    prefix ~/.config/systemd/user
+    symlink ssh-agent.service
 
-prefix ~/.config/fish/plugins/ssh-agent/conf.d
-symlink ssh-agent.fish
+    prefix ~/.config/fish/plugins/ssh-agent/conf.d
+    symlink ssh-agent.fish
 
-prefix ~/.config/sway/config.d
-symlink sway-ssh-agent.conf
+    prefix ~/.config/sway/config.d
+    symlink sway-ssh-agent.conf
 
-prefix ~/.config/i3/config.d
-symlink i3-ssh-agent.conf
+    prefix ~/.config/i3/config.d
+    symlink i3-ssh-agent.conf
 
-prefix ~/.config/plasma-workspace/env
-symlink plasma-env.sh
+    prefix ~/.config/plasma-workspace/env
+    symlink plasma-env.sh
+}
