@@ -2,9 +2,6 @@ prefix ~/.ssh
 symlink config
 symlink_tree config.d
 
-prefix ~/.local/bin
-symlink gpg-agent-fix
-
 prefix ~/.config/systemd/user
 symlink ssh-agent.service
 
