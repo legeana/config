@@ -46,7 +46,7 @@ impl SystemDependency {
 
 impl Module for SystemDependency {
     fn system_install(&self, rules: &Rules) -> Result<()> {
-        if !rules.force_download && self.wants.is_satisfied()? {
+        if !rules.force_update && self.wants.is_satisfied()? {
             return Ok(());
         }
         self.installers.install(rules)

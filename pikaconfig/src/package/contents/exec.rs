@@ -28,7 +28,7 @@ struct PostInstallExec {
 
 impl Module for PostInstallExec {
     fn post_install(&self, rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
-        if self.exec_condition == ExecCondition::UpdateOnly && !rules.force_download {
+        if self.exec_condition == ExecCondition::UpdateOnly && !rules.force_update {
             return Ok(());
         }
         process_utils::run(

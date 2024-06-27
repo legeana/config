@@ -100,7 +100,7 @@ fn main() -> Result<()> {
     match args.command {
         cli::Commands::Install {} => {
             let rules = Rules {
-                force_download: false,
+                force_update: false,
                 force_reinstall: false,
                 keep_going: args.keep_going,
                 user_deps: !args.no_user_deps,
@@ -109,7 +109,7 @@ fn main() -> Result<()> {
         }
         cli::Commands::Update {} => {
             let rules = Rules {
-                force_download: true,
+                force_update: true,
                 force_reinstall: false,
                 keep_going: args.keep_going,
                 user_deps: !args.no_user_deps,
@@ -118,7 +118,7 @@ fn main() -> Result<()> {
         }
         cli::Commands::Reinstall {} => {
             let rules = Rules {
-                force_download: true,
+                force_update: true,
                 force_reinstall: true,
                 keep_going: args.keep_going,
                 user_deps: !args.no_user_deps,

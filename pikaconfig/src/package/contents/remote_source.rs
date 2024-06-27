@@ -31,7 +31,7 @@ fn is_dir_empty(path: &Path) -> Result<bool> {
 impl RemoteArchive {
     fn fetch(&self, rules: &Rules, force: bool) -> Result<bool> {
         if !force
-            && !rules.force_download
+            && !rules.force_update
             && self
                 .archive
                 .try_exists()
@@ -51,7 +51,7 @@ impl RemoteArchive {
     }
     fn unpack(&self, rules: &Rules, force: bool) -> Result<bool> {
         if !force
-            && !rules.force_download
+            && !rules.force_update
             && !is_dir_empty(&self.source)
                 .with_context(|| format!("failed to check if {:?} is empty", self.source))?
         {

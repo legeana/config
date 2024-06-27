@@ -51,7 +51,7 @@ pub struct SystemDependency {
     pub winget: Option<Vec<String>>,
     /// Satisfaction criteria.
     /// Will skip this dependency if met.
-    /// Rules::force_download will force this dependency to be updated.
+    /// Rules::force_update will force this dependency to be updated.
     pub wants: Option<DependencySatisficer>,
     /// Custom multi-line shell script.
     /// Use requires for platform selection.
@@ -127,7 +127,7 @@ pub struct UserDependency {
     pub requires: Option<tag_criteria::TagCriteria>,
     /// Satisfaction criteria.
     /// Will skip this dependency if met.
-    /// Rules::force_download will force this dependency to be updated.
+    /// Rules::force_update will force this dependency to be updated.
     pub wants: Option<DependencySatisficer>,
     // User-level package managers.
     pub brew: Option<BrewDependency>,

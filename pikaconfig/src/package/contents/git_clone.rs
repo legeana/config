@@ -51,7 +51,7 @@ impl Module for GitClone {
             self.clone()
                 .with_context(|| format!("failed to git clone into {:?}", self.repo))
         } else {
-            if !self.need_update()? && !rules.force_download {
+            if !self.need_update()? && !rules.force_update {
                 return Ok(());
             }
             self.force_pull()

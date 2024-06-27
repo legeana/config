@@ -50,7 +50,7 @@ impl Module for Once {
         wrap(
             &self.pre_install_tag,
             |registry| self.module.pre_install(rules, registry),
-            rules.force_download,
+            rules.force_update,
             registry,
         )
     }
@@ -58,7 +58,7 @@ impl Module for Once {
         wrap(
             &self.install_tag,
             |registry| self.module.install(rules, registry),
-            rules.force_download,
+            rules.force_update,
             registry,
         )
     }
@@ -66,7 +66,7 @@ impl Module for Once {
         wrap(
             &self.post_install_tag,
             |registry| self.module.post_install(rules, registry),
-            rules.force_download,
+            rules.force_update,
             registry,
         )
     }

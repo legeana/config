@@ -63,7 +63,7 @@ impl UserDependency {
 
 impl Module for UserDependency {
     fn pre_uninstall(&self, rules: &Rules) -> Result<()> {
-        if !rules.force_download && self.wants.is_satisfied()? {
+        if !rules.force_update && self.wants.is_satisfied()? {
             return Ok(());
         }
         self.installers.install(rules)
