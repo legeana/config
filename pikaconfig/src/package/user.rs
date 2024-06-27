@@ -177,6 +177,7 @@ impl Installer for Pipx {
         if rules.force_reinstall {
             cmd.arg("--force");
         }
+        cmd.arg("--");
         cmd.args(&self.packages);
         process_utils::run_verbose(&mut cmd)
     }
