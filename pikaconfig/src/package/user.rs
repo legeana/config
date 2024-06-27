@@ -66,7 +66,7 @@ impl Module for UserDependency {
         if !rules.force_download && self.wants.is_satisfied()? {
             return Ok(());
         }
-        self.installers.install()
+        self.installers.install(rules)
     }
 }
 
@@ -109,7 +109,7 @@ impl Brew {
 }
 
 impl Installer for Brew {
-    fn install(&self) -> Result<()> {
+    fn install(&self, _rules: &Rules) -> Result<()> {
         self.install_taps()?;
         self.install_casks()?;
         self.install_formulas()?;
@@ -122,9 +122,12 @@ struct Cargo {
 }
 
 impl Installer for Cargo {
-    fn install(&self) -> Result<()> {
+    fn install(&self, rules: &Rules) -> Result<()> {
         let mut cmd = Command::new("cargo");
         cmd.arg("install");
+        if rules.force_reinstall {
+            cmd.arg("--force");
+        }
         match &self.config {
             config::CargoDependency::Crates(packages) => {
                 cmd.arg("--").args(packages);
@@ -168,9 +171,12 @@ struct Pipx {
 }
 
 impl Installer for Pipx {
-    fn install(&self) -> Result<()> {
+    fn install(&self, rules: &Rules) -> Result<()> {
         let mut cmd = Command::new("pipx");
         cmd.arg("install");
+        if rules.force_reinstall {
+            cmd.arg("--force");
+        }
         cmd.args(&self.packages);
         process_utils::run_verbose(&mut cmd)
     }

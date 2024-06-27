@@ -49,7 +49,7 @@ impl Module for SystemDependency {
         if !rules.force_download && self.wants.is_satisfied()? {
             return Ok(());
         }
-        self.installers.install()
+        self.installers.install(rules)
     }
 }
 
@@ -64,7 +64,7 @@ impl Apt {
 }
 
 impl Installer for Apt {
-    fn install(&self) -> Result<()> {
+    fn install(&self, _rules: &Rules) -> Result<()> {
         if !is_command("apt")? {
             return Ok(());
         }
@@ -90,7 +90,7 @@ impl Pacman {
 }
 
 impl Installer for Pacman {
-    fn install(&self) -> Result<()> {
+    fn install(&self, _rules: &Rules) -> Result<()> {
         if !is_command("pacman")? {
             return Ok(());
         }
@@ -117,7 +117,7 @@ impl Winget {
 }
 
 impl Installer for Winget {
-    fn install(&self) -> Result<()> {
+    fn install(&self, _rules: &Rules) -> Result<()> {
         if !is_command("winget")? {
             return Ok(());
         }
@@ -148,7 +148,7 @@ impl Bash {
 }
 
 impl Installer for Bash {
-    fn install(&self) -> Result<()> {
+    fn install(&self, _rules: &Rules) -> Result<()> {
         process_utils::run_verbose(
             std::process::Command::new("bash")
                 .arg("-c")

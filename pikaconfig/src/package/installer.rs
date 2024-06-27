@@ -1,26 +1,28 @@
 use anyhow::Result;
 
+use crate::module::Rules;
+
 pub trait Installer {
-    fn install(&self) -> Result<()>;
+    fn install(&self, rules: &Rules) -> Result<()>;
 }
 
 impl<T: Installer> Installer for Vec<T> {
-    fn install(&self) -> Result<()> {
+    fn install(&self, rules: &Rules) -> Result<()> {
         for installer in self.iter() {
-            installer.install()?;
+            installer.install(rules)?;
         }
         Ok(())
     }
 }
 
 impl<T: Installer + ?Sized> Installer for &T {
-    fn install(&self) -> Result<()> {
-        T::install(self)
+    fn install(&self, rules: &Rules) -> Result<()> {
+        T::install(self, rules)
     }
 }
 
 impl<T: Installer + ?Sized> Installer for Box<T> {
-    fn install(&self) -> Result<()> {
-        T::install(self)
+    fn install(&self, rules: &Rules) -> Result<()> {
+        T::install(self, rules)
     }
 }

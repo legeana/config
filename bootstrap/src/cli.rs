@@ -28,6 +28,7 @@ pub struct Cli {
 pub enum Commands {
     Install {},
     Update {},
+    Reinstall {},
     SystemInstall {},
     Uninstall {},
     ManifestHelp {},

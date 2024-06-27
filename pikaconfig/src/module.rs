@@ -5,6 +5,7 @@ use crate::registry::Registry;
 #[derive(Default)]
 pub struct Rules {
     pub force_download: bool,
+    pub force_reinstall: bool,
     pub keep_going: bool,
     pub user_deps: bool,
 }
