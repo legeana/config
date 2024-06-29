@@ -299,7 +299,6 @@ mod tests {
         let pkg = load_toml_string(
             "
             [[system_dependencies]]
-            any = ['pkg']
             wants = { command = 'pkg' }
             ",
         )
@@ -307,7 +306,6 @@ mod tests {
         assert_eq!(
             pkg.system_dependencies,
             Some(vec![SystemDependency {
-                any: Some(vec!["pkg".to_owned()]),
                 wants: Some(DependencySatisficer::Command {
                     command: "pkg".into()
                 }),
@@ -339,15 +337,13 @@ mod tests {
         let pkg = load_toml_string(
             "
             [[user_dependencies]]
-            pip_user = ['pkg']
-            wants = {command = 'pkg-cmd'}
+            wants = { command = 'pkg-cmd' }
             ",
         )
         .expect("load_toml_string");
         assert_eq!(
             pkg.user_dependencies,
             Some(vec![UserDependency {
-                pip_user: Some(vec!["pkg".to_owned()]),
                 wants: Some(DependencySatisficer::Command {
                     command: "pkg-cmd".into()
                 }),
