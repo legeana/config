@@ -432,7 +432,7 @@ mod tests {
             taps = ['tap1', 'tap2']
             casks = ['cask1', 'cask2']
             formulas = ['formula1', 'formula2']
-        ",
+            ",
         )
         .expect("load_toml_string");
         assert_eq!(
@@ -456,7 +456,7 @@ mod tests {
             [user_dependencies.binary_url]
             url = 'https://example.com/file.bin'
             filename = 'file.bin'
-        ",
+            ",
         )
         .expect("load_toml_string");
         assert_eq!(
@@ -480,7 +480,7 @@ mod tests {
             owner = 'owner'
             repo = 'repo'
             asset = 'asset'
-        ",
+            ",
         )
         .expect("load_toml_string");
         assert_eq!(
@@ -509,7 +509,7 @@ mod tests {
             release = '1.2.3'
             asset = 'asset'
             filename = 'filename'
-        ",
+            ",
         )
         .expect("load_toml_string");
         assert_eq!(
@@ -533,7 +533,7 @@ mod tests {
             "
             [[user_dependencies]]
             pipx = ['pkg1', 'pkg2']
-        ",
+            ",
         )
         .expect("load_toml_string");
         assert_eq!(
