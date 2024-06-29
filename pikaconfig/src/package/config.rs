@@ -215,15 +215,18 @@ mod tests {
             ",
         )
         .expect("load_toml_string");
-        assert_eq!(pkg.name, Some("test".to_owned()));
         assert_eq!(
-            pkg.requires,
-            Some(tag_criteria::TagCriteria::Requires(vec![
-                "r1".to_owned(),
-                "r2".to_owned()
-            ]))
+            pkg,
+            Package {
+                name: Some("test".to_owned()),
+                requires: Some(tag_criteria::TagCriteria::Requires(vec![
+                    "r1".to_owned(),
+                    "r2".to_owned()
+                ])),
+                has_contents: false,
+                ..Default::default()
+            },
         );
-        assert_eq!(pkg.has_contents, false);
     }
 
     #[test]
@@ -239,17 +242,20 @@ mod tests {
         )
         .expect("load_toml_string");
         assert_eq!(
-            pkg.dependencies,
-            Some(vec![
-                Dependency {
-                    names: vec!["pkg1".to_owned(), "pkg2".to_owned()],
-                    ..Default::default()
-                },
-                Dependency {
-                    names: vec!["pkg3".to_owned()],
-                    ..Default::default()
-                }
-            ])
+            pkg,
+            Package {
+                dependencies: Some(vec![
+                    Dependency {
+                        names: vec!["pkg1".to_owned(), "pkg2".to_owned()],
+                        ..Default::default()
+                    },
+                    Dependency {
+                        names: vec!["pkg3".to_owned()],
+                        ..Default::default()
+                    }
+                ]),
+                ..Default::default()
+            },
         );
     }
 
@@ -263,11 +269,14 @@ mod tests {
         )
         .expect("load_toml_string");
         assert_eq!(
-            pkg.system_dependencies,
-            Some(vec![SystemDependency {
-                any: Some(vec!["pkg1".to_owned(), "pkg2".to_owned(),]),
+            pkg,
+            Package {
+                system_dependencies: Some(vec![SystemDependency {
+                    any: Some(vec!["pkg1".to_owned(), "pkg2".to_owned(),]),
+                    ..Default::default()
+                },]),
                 ..Default::default()
-            },]),
+            },
         );
     }
 
@@ -281,11 +290,14 @@ mod tests {
         )
         .expect("load_toml_string");
         assert_eq!(
-            pkg.system_dependencies,
-            Some(vec![SystemDependency {
-                apt: Some(vec!["pkg1-part-deb".to_owned(), "pkg2-part-deb".to_owned(),]),
+            pkg,
+            Package {
+                system_dependencies: Some(vec![SystemDependency {
+                    apt: Some(vec!["pkg1-part-deb".to_owned(), "pkg2-part-deb".to_owned(),]),
+                    ..Default::default()
+                },]),
                 ..Default::default()
-            },]),
+            },
         );
     }
 
@@ -299,14 +311,17 @@ mod tests {
         )
         .expect("load_toml_string");
         assert_eq!(
-            pkg.system_dependencies,
-            Some(vec![SystemDependency {
-                pacman: Some(vec![
-                    "pkg1-part-arch".to_owned(),
-                    "pkg2-part-arch".to_owned()
-                ]),
+            pkg,
+            Package {
+                system_dependencies: Some(vec![SystemDependency {
+                    pacman: Some(vec![
+                        "pkg1-part-arch".to_owned(),
+                        "pkg2-part-arch".to_owned()
+                    ]),
+                    ..Default::default()
+                },]),
                 ..Default::default()
-            },]),
+            },
         );
     }
 
@@ -340,11 +355,14 @@ mod tests {
         )
         .expect("load_toml_string");
         assert_eq!(
-            pkg.user_dependencies,
-            Some(vec![UserDependency {
-                pip_user: Some(vec!["pkg1-pip".to_owned(), "pkg2-pip".to_owned()]),
+            pkg,
+            Package {
+                user_dependencies: Some(vec![UserDependency {
+                    pip_user: Some(vec!["pkg1-pip".to_owned(), "pkg2-pip".to_owned()]),
+                    ..Default::default()
+                },]),
                 ..Default::default()
-            },]),
+            },
         );
     }
 
@@ -358,13 +376,16 @@ mod tests {
         )
         .expect("load_toml_string");
         assert_eq!(
-            pkg.user_dependencies,
-            Some(vec![UserDependency {
-                wants: Some(DependencySatisficer::Command {
-                    command: "pkg-cmd".into()
-                }),
+            pkg,
+            Package {
+                user_dependencies: Some(vec![UserDependency {
+                    wants: Some(DependencySatisficer::Command {
+                        command: "pkg-cmd".into()
+                    }),
+                    ..Default::default()
+                },]),
                 ..Default::default()
-            },]),
+            },
         );
     }
 
@@ -378,14 +399,17 @@ mod tests {
         )
         .expect("load_toml_string");
         assert_eq!(
-            pkg.user_dependencies,
-            Some(vec![UserDependency {
-                cargo: Some(CargoDependency::Crates(vec![
-                    "pkg1".to_owned(),
-                    "pkg2".to_owned()
-                ])),
+            pkg,
+            Package {
+                user_dependencies: Some(vec![UserDependency {
+                    cargo: Some(CargoDependency::Crates(vec![
+                        "pkg1".to_owned(),
+                        "pkg2".to_owned()
+                    ])),
+                    ..Default::default()
+                },]),
                 ..Default::default()
-            },]),
+            },
         );
     }
 
@@ -399,18 +423,21 @@ mod tests {
         )
         .expect("load_toml_string");
         assert_eq!(
-            pkg.user_dependencies,
-            Some(vec![UserDependency {
-                cargo: Some(CargoDependency::Config {
-                    crates: None,
-                    git: Some("https://github.com/example/project.git".to_owned()),
-                    branch: None,
-                    tag: None,
-                    path: None,
-                    locked: None,
-                }),
+            pkg,
+            Package {
+                user_dependencies: Some(vec![UserDependency {
+                    cargo: Some(CargoDependency::Config {
+                        crates: None,
+                        git: Some("https://github.com/example/project.git".to_owned()),
+                        branch: None,
+                        tag: None,
+                        path: None,
+                        locked: None,
+                    }),
+                    ..Default::default()
+                },]),
                 ..Default::default()
-            },]),
+            },
         );
     }
 
@@ -424,14 +451,17 @@ mod tests {
         )
         .expect("load_toml_string");
         assert_eq!(
-            pkg.user_dependencies,
-            Some(vec![UserDependency {
-                brew: Some(BrewDependency::Formulas(vec![
-                    "pkg1".to_owned(),
-                    "pkg2".to_owned()
-                ])),
+            pkg,
+            Package {
+                user_dependencies: Some(vec![UserDependency {
+                    brew: Some(BrewDependency::Formulas(vec![
+                        "pkg1".to_owned(),
+                        "pkg2".to_owned()
+                    ])),
+                    ..Default::default()
+                },]),
                 ..Default::default()
-            },]),
+            },
         );
     }
 
@@ -448,15 +478,18 @@ mod tests {
         )
         .expect("load_toml_string");
         assert_eq!(
-            pkg.user_dependencies,
-            Some(vec![UserDependency {
-                brew: Some(BrewDependency::Config(BrewConfig {
-                    taps: Some(vec!["tap1".to_owned(), "tap2".to_owned()]),
-                    casks: Some(vec!["cask1".to_owned(), "cask2".to_owned()]),
-                    formulas: Some(vec!["formula1".to_owned(), "formula2".to_owned()]),
-                })),
+            pkg,
+            Package {
+                user_dependencies: Some(vec![UserDependency {
+                    brew: Some(BrewDependency::Config(BrewConfig {
+                        taps: Some(vec!["tap1".to_owned(), "tap2".to_owned()]),
+                        casks: Some(vec!["cask1".to_owned(), "cask2".to_owned()]),
+                        formulas: Some(vec!["formula1".to_owned(), "formula2".to_owned()]),
+                    })),
+                    ..Default::default()
+                },]),
                 ..Default::default()
-            },])
+            },
         );
     }
 
@@ -472,14 +505,17 @@ mod tests {
         )
         .expect("load_toml_string");
         assert_eq!(
-            pkg.user_dependencies,
-            Some(vec![UserDependency {
-                binary_url: Some(BinaryUrlDependency {
-                    url: "https://example.com/file.bin".to_owned(),
-                    filename: "file.bin".to_owned(),
-                }),
+            pkg,
+            Package {
+                user_dependencies: Some(vec![UserDependency {
+                    binary_url: Some(BinaryUrlDependency {
+                        url: "https://example.com/file.bin".to_owned(),
+                        filename: "file.bin".to_owned(),
+                    }),
+                    ..Default::default()
+                }]),
                 ..Default::default()
-            }]),
+            },
         );
     }
 
@@ -496,17 +532,20 @@ mod tests {
         )
         .expect("load_toml_string");
         assert_eq!(
-            pkg.user_dependencies,
-            Some(vec![UserDependency {
-                github_release: Some(GithubReleaseDependency {
-                    owner: "owner".to_owned(),
-                    repo: "repo".to_owned(),
-                    release: None,
-                    asset: "asset".to_owned(),
-                    filename: None,
-                }),
+            pkg,
+            Package {
+                user_dependencies: Some(vec![UserDependency {
+                    github_release: Some(GithubReleaseDependency {
+                        owner: "owner".to_owned(),
+                        repo: "repo".to_owned(),
+                        release: None,
+                        asset: "asset".to_owned(),
+                        filename: None,
+                    }),
+                    ..Default::default()
+                }]),
                 ..Default::default()
-            }]),
+            },
         );
     }
 
@@ -525,17 +564,20 @@ mod tests {
         )
         .expect("load_toml_string");
         assert_eq!(
-            pkg.user_dependencies,
-            Some(vec![UserDependency {
-                github_release: Some(GithubReleaseDependency {
-                    owner: "owner".to_owned(),
-                    repo: "repo".to_owned(),
-                    release: Some("1.2.3".to_owned()),
-                    asset: "asset".to_owned(),
-                    filename: Some("filename".to_owned()),
-                }),
+            pkg,
+            Package {
+                user_dependencies: Some(vec![UserDependency {
+                    github_release: Some(GithubReleaseDependency {
+                        owner: "owner".to_owned(),
+                        repo: "repo".to_owned(),
+                        release: Some("1.2.3".to_owned()),
+                        asset: "asset".to_owned(),
+                        filename: Some("filename".to_owned()),
+                    }),
+                    ..Default::default()
+                }]),
                 ..Default::default()
-            }]),
+            },
         );
     }
 
@@ -549,11 +591,14 @@ mod tests {
         )
         .expect("load_toml_string");
         assert_eq!(
-            pkg.user_dependencies,
-            Some(vec![UserDependency {
-                pipx: Some(vec!["pkg1".to_owned(), "pkg2".to_owned()]),
+            pkg,
+            Package {
+                user_dependencies: Some(vec![UserDependency {
+                    pipx: Some(vec!["pkg1".to_owned(), "pkg2".to_owned()]),
+                    ..Default::default()
+                }]),
                 ..Default::default()
-            }]),
+            },
         );
     }
 }
