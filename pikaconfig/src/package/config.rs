@@ -19,7 +19,7 @@ fn default_has_contents() -> bool {
 }
 
 /// package.toml file definition
-#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct Package {
     pub name: Option<String>,
@@ -29,6 +29,20 @@ pub struct Package {
     pub dependencies: Option<Vec<Dependency>>,
     pub system_dependencies: Option<Vec<SystemDependency>>,
     pub user_dependencies: Option<Vec<UserDependency>>,
+}
+
+impl Default for Package {
+    fn default() -> Self {
+        Self {
+            name: Default::default(),
+            requires: Default::default(),
+            // Is there a way to override this inside the struct?
+            has_contents: default_has_contents(),
+            dependencies: Default::default(),
+            system_dependencies: Default::default(),
+            user_dependencies: Default::default(),
+        }
+    }
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
