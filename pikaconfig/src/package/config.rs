@@ -182,11 +182,13 @@ mod tests {
     #[test]
     fn test_load_empty_string() {
         let pkg = load_toml_string("").expect("load_toml_string");
-        assert_eq!(pkg.name, None);
-        assert_eq!(pkg.requires, None);
-        assert_eq!(pkg.has_contents, true);
-        assert_eq!(pkg.dependencies, None);
-        assert_eq!(pkg.system_dependencies, None);
+        assert_eq!(
+            pkg,
+            Package {
+                has_contents: true,
+                ..Default::default()
+            }
+        );
     }
 
     #[test]
