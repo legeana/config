@@ -190,54 +190,13 @@ mod tests {
     }
 
     #[test]
-    fn test_load_example() {
+    fn test_load_header() {
         let pkg = load_toml_string(
             "
             name = 'test'
             requires = ['r1', 'r2']
             has_contents = false
-
-            [[dependencies]]
-            names = ['pkg1', 'pkg2']
-
-            [[dependencies]]
-            names = ['pkg3']
-
-            [[system_dependencies]]
-            any = ['pkg1', 'pkg2']
-
-            [[system_dependencies]]
-            apt = ['pkg1-part-deb', 'pkg2-part-deb']
-
-            [[system_dependencies]]
-            pacman = ['pkg1-part-arch', 'pkg2-part-arch']
-
-            [[system_dependencies]]
-            any = ['pkg']
-            wants = { command = 'pkg' }
-
-            [[user_dependencies]]
-            pip_user = ['pkg1-pip', 'pkg2-pip']
-
-            [[user_dependencies]]
-            pip_user = ['pkg']
-            wants = {command = 'pkg-cmd'}
-
-            [[user_dependencies]]
-            cargo = ['pkg1', 'pkg2']
-
-            [[user_dependencies]]
-            cargo = { git = 'https://github.com/example/project.git' }
-
-            [[user_dependencies]]
-            brew = ['pkg1', 'pkg2']
-
-            [[user_dependencies]]
-            [user_dependencies.brew]
-            taps = ['tap1', 'tap2']
-            casks = ['cask1', 'cask2']
-            formulas = ['formula1', 'formula2']
-        ",
+            ",
         )
         .expect("load_toml_string");
         assert_eq!(pkg.name, Some("test".to_owned()));
@@ -249,6 +208,20 @@ mod tests {
             ]))
         );
         assert_eq!(pkg.has_contents, false);
+    }
+
+    #[test]
+    fn test_load_dependencies() {
+        let pkg = load_toml_string(
+            "
+            [[dependencies]]
+            names = ['pkg1', 'pkg2']
+
+            [[dependencies]]
+            names = ['pkg3']
+            ",
+        )
+        .expect("load_toml_string");
         assert_eq!(
             pkg.dependencies,
             Some(vec![
@@ -262,81 +235,216 @@ mod tests {
                 }
             ])
         );
+    }
+
+    #[test]
+    fn test_load_system_any() {
+        let pkg = load_toml_string(
+            "
+            [[system_dependencies]]
+            any = ['pkg1', 'pkg2']
+            ",
+        )
+        .expect("load_toml_string");
         assert_eq!(
             pkg.system_dependencies,
-            Some(vec![
-                SystemDependency {
-                    any: Some(vec!["pkg1".to_owned(), "pkg2".to_owned(),]),
-                    ..SystemDependency::default()
-                },
-                SystemDependency {
-                    apt: Some(vec!["pkg1-part-deb".to_owned(), "pkg2-part-deb".to_owned(),]),
-                    ..SystemDependency::default()
-                },
-                SystemDependency {
-                    pacman: Some(vec![
-                        "pkg1-part-arch".to_owned(),
-                        "pkg2-part-arch".to_owned()
-                    ]),
-                    ..SystemDependency::default()
-                },
-                SystemDependency {
-                    any: Some(vec!["pkg".to_owned()]),
-                    wants: Some(DependencySatisficer::Command {
-                        command: "pkg".into()
-                    }),
-                    ..SystemDependency::default()
-                },
-            ])
+            Some(vec![SystemDependency {
+                any: Some(vec!["pkg1".to_owned(), "pkg2".to_owned(),]),
+                ..SystemDependency::default()
+            },]),
         );
+    }
+
+    #[test]
+    fn test_load_system_apt() {
+        let pkg = load_toml_string(
+            "
+            [[system_dependencies]]
+            apt = ['pkg1-part-deb', 'pkg2-part-deb']
+            ",
+        )
+        .expect("load_toml_string");
+        assert_eq!(
+            pkg.system_dependencies,
+            Some(vec![SystemDependency {
+                apt: Some(vec!["pkg1-part-deb".to_owned(), "pkg2-part-deb".to_owned(),]),
+                ..SystemDependency::default()
+            },]),
+        );
+    }
+
+    #[test]
+    fn test_load_system_pacman() {
+        let pkg = load_toml_string(
+            "
+            [[system_dependencies]]
+            pacman = ['pkg1-part-arch', 'pkg2-part-arch']
+            ",
+        )
+        .expect("load_toml_string");
+        assert_eq!(
+            pkg.system_dependencies,
+            Some(vec![SystemDependency {
+                pacman: Some(vec![
+                    "pkg1-part-arch".to_owned(),
+                    "pkg2-part-arch".to_owned()
+                ]),
+                ..SystemDependency::default()
+            },]),
+        );
+    }
+
+    #[test]
+    fn test_load_system_wants() {
+        let pkg = load_toml_string(
+            "
+            [[system_dependencies]]
+            any = ['pkg']
+            wants = { command = 'pkg' }
+            ",
+        )
+        .expect("load_toml_string");
+        assert_eq!(
+            pkg.system_dependencies,
+            Some(vec![SystemDependency {
+                any: Some(vec!["pkg".to_owned()]),
+                wants: Some(DependencySatisficer::Command {
+                    command: "pkg".into()
+                }),
+                ..SystemDependency::default()
+            },])
+        );
+    }
+
+    #[test]
+    fn test_load_user_pip_user() {
+        let pkg = load_toml_string(
+            "
+            [[user_dependencies]]
+            pip_user = ['pkg1-pip', 'pkg2-pip']
+            ",
+        )
+        .expect("load_toml_string");
         assert_eq!(
             pkg.user_dependencies,
-            Some(vec![
-                UserDependency {
-                    pip_user: Some(vec!["pkg1-pip".to_owned(), "pkg2-pip".to_owned()]),
-                    ..UserDependency::default()
-                },
-                UserDependency {
-                    pip_user: Some(vec!["pkg".to_owned()]),
-                    wants: Some(DependencySatisficer::Command {
-                        command: "pkg-cmd".into()
-                    }),
-                    ..UserDependency::default()
-                },
-                UserDependency {
-                    cargo: Some(CargoDependency::Crates(vec![
-                        "pkg1".to_owned(),
-                        "pkg2".to_owned()
-                    ])),
-                    ..Default::default()
-                },
-                UserDependency {
-                    cargo: Some(CargoDependency::Config {
-                        crates: None,
-                        git: Some("https://github.com/example/project.git".to_owned()),
-                        branch: None,
-                        tag: None,
-                        path: None,
-                        locked: None,
-                    }),
-                    ..Default::default()
-                },
-                UserDependency {
-                    brew: Some(BrewDependency::Formulas(vec![
-                        "pkg1".to_owned(),
-                        "pkg2".to_owned()
-                    ])),
-                    ..Default::default()
-                },
-                UserDependency {
-                    brew: Some(BrewDependency::Config(BrewConfig {
-                        taps: Some(vec!["tap1".to_owned(), "tap2".to_owned()]),
-                        casks: Some(vec!["cask1".to_owned(), "cask2".to_owned()]),
-                        formulas: Some(vec!["formula1".to_owned(), "formula2".to_owned()]),
-                    })),
-                    ..Default::default()
-                },
-            ])
+            Some(vec![UserDependency {
+                pip_user: Some(vec!["pkg1-pip".to_owned(), "pkg2-pip".to_owned()]),
+                ..UserDependency::default()
+            },]),
+        );
+    }
+
+    #[test]
+    fn test_load_user_wants() {
+        let pkg = load_toml_string(
+            "
+            [[user_dependencies]]
+            pip_user = ['pkg']
+            wants = {command = 'pkg-cmd'}
+            ",
+        )
+        .expect("load_toml_string");
+        assert_eq!(
+            pkg.user_dependencies,
+            Some(vec![UserDependency {
+                pip_user: Some(vec!["pkg".to_owned()]),
+                wants: Some(DependencySatisficer::Command {
+                    command: "pkg-cmd".into()
+                }),
+                ..UserDependency::default()
+            },]),
+        );
+    }
+
+    #[test]
+    fn test_load_user_cargo_crates() {
+        let pkg = load_toml_string(
+            "
+            [[user_dependencies]]
+            cargo = ['pkg1', 'pkg2']
+            ",
+        )
+        .expect("load_toml_string");
+        assert_eq!(
+            pkg.user_dependencies,
+            Some(vec![UserDependency {
+                cargo: Some(CargoDependency::Crates(vec![
+                    "pkg1".to_owned(),
+                    "pkg2".to_owned()
+                ])),
+                ..Default::default()
+            },]),
+        );
+    }
+
+    #[test]
+    fn test_load_user_cargo_git() {
+        let pkg = load_toml_string(
+            "
+            [[user_dependencies]]
+            cargo = { git = 'https://github.com/example/project.git' }
+            ",
+        )
+        .expect("load_toml_string");
+        assert_eq!(
+            pkg.user_dependencies,
+            Some(vec![UserDependency {
+                cargo: Some(CargoDependency::Config {
+                    crates: None,
+                    git: Some("https://github.com/example/project.git".to_owned()),
+                    branch: None,
+                    tag: None,
+                    path: None,
+                    locked: None,
+                }),
+                ..Default::default()
+            },]),
+        );
+    }
+
+    #[test]
+    fn test_load_user_brew_formulas() {
+        let pkg = load_toml_string(
+            "
+            [[user_dependencies]]
+            brew = ['pkg1', 'pkg2']
+            ",
+        )
+        .expect("load_toml_string");
+        assert_eq!(
+            pkg.user_dependencies,
+            Some(vec![UserDependency {
+                brew: Some(BrewDependency::Formulas(vec![
+                    "pkg1".to_owned(),
+                    "pkg2".to_owned()
+                ])),
+                ..Default::default()
+            },]),
+        );
+    }
+
+    #[test]
+    fn test_load_user_brew_config() {
+        let pkg = load_toml_string(
+            "
+            [[user_dependencies]]
+            [user_dependencies.brew]
+            taps = ['tap1', 'tap2']
+            casks = ['cask1', 'cask2']
+            formulas = ['formula1', 'formula2']
+        ",
+        )
+        .expect("load_toml_string");
+        assert_eq!(
+            pkg.user_dependencies,
+            Some(vec![UserDependency {
+                brew: Some(BrewDependency::Config(BrewConfig {
+                    taps: Some(vec!["tap1".to_owned(), "tap2".to_owned()]),
+                    casks: Some(vec!["cask1".to_owned(), "cask2".to_owned()]),
+                    formulas: Some(vec!["formula1".to_owned(), "formula2".to_owned()]),
+                })),
+                ..Default::default()
+            },])
         );
     }
 
