@@ -227,11 +227,11 @@ mod tests {
             Some(vec![
                 Dependency {
                     names: vec!["pkg1".to_owned(), "pkg2".to_owned()],
-                    ..Dependency::default()
+                    ..Default::default()
                 },
                 Dependency {
                     names: vec!["pkg3".to_owned()],
-                    ..Dependency::default()
+                    ..Default::default()
                 }
             ])
         );
@@ -250,7 +250,7 @@ mod tests {
             pkg.system_dependencies,
             Some(vec![SystemDependency {
                 any: Some(vec!["pkg1".to_owned(), "pkg2".to_owned(),]),
-                ..SystemDependency::default()
+                ..Default::default()
             },]),
         );
     }
@@ -268,7 +268,7 @@ mod tests {
             pkg.system_dependencies,
             Some(vec![SystemDependency {
                 apt: Some(vec!["pkg1-part-deb".to_owned(), "pkg2-part-deb".to_owned(),]),
-                ..SystemDependency::default()
+                ..Default::default()
             },]),
         );
     }
@@ -289,7 +289,7 @@ mod tests {
                     "pkg1-part-arch".to_owned(),
                     "pkg2-part-arch".to_owned()
                 ]),
-                ..SystemDependency::default()
+                ..Default::default()
             },]),
         );
     }
@@ -309,7 +309,7 @@ mod tests {
                 wants: Some(DependencySatisficer::Command {
                     command: "pkg".into()
                 }),
-                ..SystemDependency::default()
+                ..Default::default()
             },])
         );
     }
@@ -327,7 +327,7 @@ mod tests {
             pkg.user_dependencies,
             Some(vec![UserDependency {
                 pip_user: Some(vec!["pkg1-pip".to_owned(), "pkg2-pip".to_owned()]),
-                ..UserDependency::default()
+                ..Default::default()
             },]),
         );
     }
@@ -347,7 +347,7 @@ mod tests {
                 wants: Some(DependencySatisficer::Command {
                     command: "pkg-cmd".into()
                 }),
-                ..UserDependency::default()
+                ..Default::default()
             },]),
         );
     }

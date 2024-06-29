@@ -128,7 +128,7 @@ fn main() -> Result<()> {
         cli::Commands::SystemInstall {} => {
             let rules = Rules {
                 keep_going: args.keep_going,
-                ..Rules::default()
+                ..Default::default()
             };
             system_install(&rules, &root).context("failed to system_install")?;
         }
