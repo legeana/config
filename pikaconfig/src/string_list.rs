@@ -8,46 +8,21 @@ pub enum StringList {
 }
 
 impl StringList {
-    pub fn iter(&self) -> StringListIterator<'_> {
+    pub fn as_slice(&self) -> &[String] {
         match self {
-            Self::Single(e) => StringListIterator::Single(std::iter::once(e)),
-            Self::List(v) => StringListIterator::List(v.iter()),
+            Self::Single(e) => std::slice::from_ref(e),
+            Self::List(v) => v,
         }
     }
-    pub fn as_vec(&self) -> Vec<&String> {
-        self.iter().collect()
+    pub fn iter(&self) -> impl Iterator<Item = &String> {
+        self.as_slice().iter()
     }
     pub fn to_vec(&self) -> Vec<String> {
-        self.iter().cloned().collect()
+        self.as_slice().to_vec()
     }
     #[allow(dead_code)]
     pub fn is_empty(&self) -> bool {
-        match self {
-            Self::Single(_) => false,
-            Self::List(v) => v.is_empty(),
-        }
-    }
-}
-
-pub enum StringListIterator<'a> {
-    Single(std::iter::Once<&'a String>),
-    List(std::slice::Iter<'a, String>),
-}
-
-impl<'a> Iterator for StringListIterator<'a> {
-    type Item = &'a String;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        match self {
-            Self::Single(i) => i.next(),
-            Self::List(i) => i.next(),
-        }
-    }
-    fn size_hint(&self) -> (usize, Option<usize>) {
-        match self {
-            Self::Single(i) => i.size_hint(),
-            Self::List(i) => i.size_hint(),
-        }
+        self.as_slice().is_empty()
     }
 }
 
@@ -142,13 +117,13 @@ mod tests {
     #[test]
     fn test_single_as_vec() {
         let s = StringList::Single("test".to_owned());
-        assert_eq!(s.as_vec(), vec!["test"]);
+        assert_eq!(s.as_slice(), &["test"]);
     }
 
     #[test]
     fn test_list_as_vec() {
         let s = StringList::List(vec!["hello".to_owned(), "world".to_owned()]);
-        assert_eq!(s.as_vec(), vec!["hello", "world"]);
+        assert_eq!(s.as_slice(), &["hello", "world"]);
     }
 
     #[test]

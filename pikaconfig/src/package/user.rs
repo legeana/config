@@ -82,7 +82,7 @@ impl Brew {
         let mut cmd = Command::new("brew");
         cmd.arg("tap");
         cmd.arg("--");
-        cmd.args(taps.as_vec());
+        cmd.args(taps.as_slice());
         process_utils::run_verbose(&mut cmd)
     }
     fn install_casks(&self) -> Result<()> {
@@ -93,7 +93,7 @@ impl Brew {
         cmd.arg("install");
         cmd.arg("--cask");
         cmd.arg("--");
-        cmd.args(casks.as_vec());
+        cmd.args(casks.as_slice());
         process_utils::run_verbose(&mut cmd)
     }
     fn install_formulas(&self) -> Result<()> {
@@ -103,7 +103,7 @@ impl Brew {
         let mut cmd = Command::new("brew");
         cmd.arg("install");
         cmd.arg("--");
-        cmd.args(formulas.as_vec());
+        cmd.args(formulas.as_slice());
         process_utils::run_verbose(&mut cmd)
     }
 }
