@@ -1,9 +1,9 @@
 has_contents = false
 
 [[user_dependencies]]
-cargo = ["bacon"]
+cargo = "bacon"
 wants = { command = "bacon" }
 
 [[system_dependencies]]
-pacman = ["bacon"]
+pacman = "bacon"
 wants = { command = "bacon" }

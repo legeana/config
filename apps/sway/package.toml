@@ -1,27 +1,27 @@
-requires = ["os=linux"]
+requires = "os=linux"
 
 [[dependencies]]
-names = ["fuzzel"]
+names = "fuzzel"
 
 [[system_dependencies]]
 any = ["sway", "swaybg", "swaylock", "swayidle"]
 
 [[system_dependencies]]
-any = ["xdg-desktop-portal-wlr"]
+any = "xdg-desktop-portal-wlr"
 
 [[system_dependencies]]
 any = ["grim", "slurp", "imagemagick"]
 
 [[system_dependencies]]
-apt = ["xwayland"]
-pacman = ["xorg-xwayland"]
+apt = "xwayland"
+pacman = "xorg-xwayland"
 
 [[system_dependencies]]
 # pactl
-apt = ["pulseaudio-utils"]
-pacman = ["libpulse"]
+apt = "pulseaudio-utils"
+pacman = "libpulse"
 
 [[system_dependencies]]
 # Mako
-apt = ["mako-notifier"]
-pacman = ["mako"]
+apt = "mako-notifier"
+pacman = "mako"

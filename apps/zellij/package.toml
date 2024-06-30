@@ -1,9 +1,9 @@
-requires = ["family=unix"]
+requires = "family=unix"
 
 [[user_dependencies]]
-cargo = ["zellij"]
+cargo = "zellij"
 wants = { command = "zellij" }
 
 [[system_dependencies]]
-pacman = ["zellij"]
+pacman = "zellij"
 wants = { command = "zellij" }

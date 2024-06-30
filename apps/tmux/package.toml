@@ -1,5 +1,5 @@
-requires = ["family=unix"]
+requires = "family=unix"
 
 [[system_dependencies]]
-any = ["tmux"]
+any = "tmux"
 wants = { command = "tmux" }

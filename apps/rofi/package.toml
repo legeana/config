@@ -1,5 +1,5 @@
-requires = ["family=unix"]
+requires = "family=unix"
 
 [[system_dependencies]]
-any = ["rofi"]
+any = "rofi"
 wants = { command = "rofi" }

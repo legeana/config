@@ -1,5 +1,5 @@
 has_contents = false
 
 [[system_dependencies]]
-any = ["fzf"]
+any = "fzf"
 wants = { command = "fzf" }

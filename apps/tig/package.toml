@@ -1,5 +1,5 @@
-requires = ["os=linux"]
+requires = "os=linux"
 
 [[system_dependencies]]
-any = ["tig"]
+any = "tig"
 wants = { command = "tig" }

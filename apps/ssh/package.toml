@@ -1,7 +1,7 @@
 # Unraid has managed ssh configuration.
-requires = ["distro!=unraid"]
+requires = "distro!=unraid"
 
 [[system_dependencies]]
-apt = ["openssh-client"]
-pacman = ["openssh"]
+apt = "openssh-client"
+pacman = "openssh"
 wants = { command = "ssh" }

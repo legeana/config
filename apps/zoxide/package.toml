@@ -1,9 +1,9 @@
 has_contents = false
 
 [[user_dependencies]]
-cargo = ["zoxide"]
+cargo = "zoxide"
 wants = { command = "zoxide" }
 
 [[system_dependencies]]
-any = ["zoxide"]
+any = "zoxide"
 wants = { command = "zoxide" }

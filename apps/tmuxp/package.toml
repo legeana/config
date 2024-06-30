@@ -1,6 +1,6 @@
-requires = ["os=unix"]
+requires = "os=unix"
 has_contents = false
 
 [[user_dependencies]]
-pipx = ["tmuxp"]
+pipx = "tmuxp"
 wants = { command = "tmuxp" }

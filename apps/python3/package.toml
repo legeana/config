@@ -1,5 +1,5 @@
 has_contents = false
 
 [[system_dependencies]]
-any = ["python3"]
+any = "python3"
 wants = { command = "python3" }

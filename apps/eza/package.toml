@@ -1,10 +1,10 @@
-requires = ["family=unix"]
+requires = "family=unix"
 has_contents = false
 
 [[user_dependencies]]
-cargo = ["eza"]
+cargo = "eza"
 wants = { command = "eza" }
 
 [[system_dependencies]]
-pacman = ["eza"]
+pacman = "eza"
 wants = { command = "eza" }

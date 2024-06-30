@@ -1,7 +1,7 @@
 [[user_dependencies]]
-cargo = { crates = ["yazi-fm"], locked = true }
+cargo = { crates = "yazi-fm", locked = true }
 wants = { command = "yazi" }
 
 [[system_dependencies]]
-pacman = ["yazi"]
+pacman = "yazi"
 wants = { command = "yazi" }

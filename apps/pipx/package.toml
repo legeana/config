@@ -1,6 +1,6 @@
 has_contents = false
 
 [[system_dependencies]]
-any = ["pipx"]
-pacman = ["python-pipx"]
+any = "pipx"
+pacman = "python-pipx"
 wants = { command = "pipx" }

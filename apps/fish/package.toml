@@ -1,4 +1,4 @@
-requires = ["family=unix"]
+requires = "family=unix"
 
 [[dependencies]]
 names = [
@@ -12,6 +12,6 @@ names = [
 any = ["fish", "moreutils"]
 
 [[user_dependencies]]
-requires = ["os=macos"]
+requires = "os=macos"
 wants = { command = "gecho" }
-brew = ["coreutils"]
+brew = "coreutils"

@@ -1,2 +1,2 @@
 [[dependencies]]
-names = ["python3"]
+names = "python3"

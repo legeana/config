@@ -1,6 +1,6 @@
 [[user_dependencies]]
-requires = ["os=macos"]
+requires = "os=macos"
 wants = { file = "~/Library/Fonts/HackNerdFont-Regular.ttf" }
 [user_dependencies.brew]
-taps = ["homebrew/cask-fonts"]
-casks = ["font-hack-nerd-font"]
+taps = "homebrew/cask-fonts"
+casks = "font-hack-nerd-font"

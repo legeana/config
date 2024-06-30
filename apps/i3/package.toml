@@ -1,4 +1,4 @@
-requires = ["os=linux"]
+requires = "os=linux"
 
 [[dependencies]]
 names = ["rofi"]
@@ -13,16 +13,16 @@ names = [
 any = ["i3-wm", "i3status", "i3lock"]
 
 [[system_dependencies]]
-apt = ["x11-xserver-utils"]
-pacman = ["xorg-xsetroot"]
+apt = "x11-xserver-utils"
+pacman = "xorg-xsetroot"
 
 [[system_dependencies]]
 # Screenshots.
-any = ["maim"]
+any = "maim"
 
 [[system_dependencies]]
-apt = ["xfce4-clipman"]
-pacman = ["xfce4-clipman-plugin"]
+apt = "xfce4-clipman"
+pacman = "xfce4-clipman-plugin"
 
 [[system_dependencies]]
-any = ["xcompmgr"]
+any = "xcompmgr"
