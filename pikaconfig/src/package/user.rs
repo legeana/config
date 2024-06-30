@@ -45,7 +45,7 @@ impl UserDependency {
         }
         if let Some(pipx) = &cfg.pipx {
             installers.push(Box::new(Pipx {
-                packages: pipx.clone(),
+                packages: pipx.to_vec(),
             }));
         }
         if cfg.binary_url.is_some() {
@@ -82,7 +82,7 @@ impl Brew {
         let mut cmd = Command::new("brew");
         cmd.arg("tap");
         cmd.arg("--");
-        cmd.args(taps);
+        cmd.args(taps.as_vec());
         process_utils::run_verbose(&mut cmd)
     }
     fn install_casks(&self) -> Result<()> {
@@ -93,7 +93,7 @@ impl Brew {
         cmd.arg("install");
         cmd.arg("--cask");
         cmd.arg("--");
-        cmd.args(casks);
+        cmd.args(casks.as_vec());
         process_utils::run_verbose(&mut cmd)
     }
     fn install_formulas(&self) -> Result<()> {
@@ -103,7 +103,7 @@ impl Brew {
         let mut cmd = Command::new("brew");
         cmd.arg("install");
         cmd.arg("--");
-        cmd.args(formulas);
+        cmd.args(formulas.as_vec());
         process_utils::run_verbose(&mut cmd)
     }
 }
@@ -130,7 +130,7 @@ impl Installer for Cargo {
         }
         match &self.config {
             config::CargoDependency::Crates(packages) => {
-                cmd.arg("--").args(packages);
+                cmd.arg("--").args(packages.to_vec());
             }
             config::CargoDependency::Config {
                 crates,
@@ -158,7 +158,7 @@ impl Installer for Cargo {
                 // Must be trailing arguments.
                 cmd.arg("--");
                 if let Some(crates) = crates {
-                    cmd.args(crates);
+                    cmd.args(crates.to_vec());
                 }
             }
         }

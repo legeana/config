@@ -26,13 +26,13 @@ impl SystemDependency {
             return Ok(Self::default());
         }
         if let Some(apt) = cfg.apt.clone().or_else(|| cfg.any.clone()) {
-            installers.push(Box::new(Apt::new(apt)));
+            installers.push(Box::new(Apt::new(apt.to_vec())));
         }
         if let Some(pacman) = cfg.pacman.clone().or_else(|| cfg.any.clone()) {
-            installers.push(Box::new(Pacman::new(pacman)));
+            installers.push(Box::new(Pacman::new(pacman.to_vec())));
         }
         if let Some(winget) = cfg.winget.clone().or_else(|| cfg.any.clone()) {
-            installers.push(Box::new(Winget::new(winget)));
+            installers.push(Box::new(Winget::new(winget.to_vec())));
         }
         if let Some(bash) = &cfg.bash {
             installers.push(Box::new(Bash::new(bash.clone())));

@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use serde::Deserialize;
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
@@ -22,6 +20,7 @@ impl StringList {
     pub fn to_vec(&self) -> Vec<String> {
         self.iter().cloned().collect()
     }
+    #[allow(dead_code)]
     pub fn is_empty(&self) -> bool {
         match self {
             Self::Single(_) => false,

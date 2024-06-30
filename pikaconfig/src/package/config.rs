@@ -7,6 +7,7 @@ use serde::Deserialize;
 
 use crate::file_util;
 use crate::iter_util;
+use crate::string_list::StringList;
 use crate::tag_criteria;
 
 use super::satisficer::DependencySatisficer;
@@ -49,7 +50,7 @@ impl Default for Package {
 #[serde(deny_unknown_fields)]
 pub struct Dependency {
     pub requires: Option<tag_criteria::TagCriteria>,
-    pub names: Vec<String>,
+    pub names: StringList,
 }
 
 /// SystemDependency doesn't consider missing package manager a failure.
@@ -59,10 +60,10 @@ pub struct SystemDependency {
     pub requires: Option<tag_criteria::TagCriteria>,
     // Package managers.
     // It is expected that only one will be available at any time.
-    pub any: Option<Vec<String>>,
-    pub apt: Option<Vec<String>>,
-    pub pacman: Option<Vec<String>>,
-    pub winget: Option<Vec<String>>,
+    pub any: Option<StringList>,
+    pub apt: Option<StringList>,
+    pub pacman: Option<StringList>,
+    pub winget: Option<StringList>,
     /// Satisfaction criteria.
     /// Will skip this dependency if met.
     /// Rules::force_update will force this dependency to be updated.
@@ -78,15 +79,15 @@ pub struct SystemDependency {
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct BrewConfig {
-    pub taps: Option<Vec<String>>,
-    pub casks: Option<Vec<String>>,
-    pub formulas: Option<Vec<String>>,
+    pub taps: Option<StringList>,
+    pub casks: Option<StringList>,
+    pub formulas: Option<StringList>,
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields, untagged)]
 pub enum BrewDependency {
-    Formulas(Vec<String>),
+    Formulas(StringList),
     Config(BrewConfig),
 }
 
@@ -105,9 +106,9 @@ impl BrewDependency {
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields, untagged)]
 pub enum CargoDependency {
-    Crates(Vec<String>),
+    Crates(StringList),
     Config {
-        crates: Option<Vec<String>>,
+        crates: Option<StringList>,
         git: Option<String>,
         tag: Option<String>,
         branch: Option<String>,
@@ -146,9 +147,9 @@ pub struct UserDependency {
     // User-level package managers.
     pub brew: Option<BrewDependency>,
     pub cargo: Option<CargoDependency>,
-    pub npm: Option<Vec<String>>,
-    pub pip_user: Option<Vec<String>>,
-    pub pipx: Option<Vec<String>>,
+    pub npm: Option<StringList>,
+    pub pip_user: Option<StringList>,
+    pub pipx: Option<StringList>,
     // Binary management.
     pub binary_url: Option<BinaryUrlDependency>,
     pub github_release: Option<GithubReleaseDependency>,
@@ -246,11 +247,11 @@ mod tests {
             Package {
                 dependencies: Some(vec![
                     Dependency {
-                        names: vec!["pkg1".to_owned(), "pkg2".to_owned()],
+                        names: StringList::List(vec!["pkg1".to_owned(), "pkg2".to_owned()]),
                         ..Default::default()
                     },
                     Dependency {
-                        names: vec!["pkg3".to_owned()],
+                        names: StringList::List(vec!["pkg3".to_owned()]),
                         ..Default::default()
                     }
                 ]),
@@ -272,7 +273,9 @@ mod tests {
             pkg,
             Package {
                 system_dependencies: Some(vec![SystemDependency {
-                    any: Some(vec!["pkg1".to_owned(), "pkg2".to_owned(),]),
+                    any: Some(StringList::List(
+                        vec!["pkg1".to_owned(), "pkg2".to_owned(),]
+                    )),
                     ..Default::default()
                 },]),
                 ..Default::default()
@@ -293,7 +296,10 @@ mod tests {
             pkg,
             Package {
                 system_dependencies: Some(vec![SystemDependency {
-                    apt: Some(vec!["pkg1-part-deb".to_owned(), "pkg2-part-deb".to_owned(),]),
+                    apt: Some(StringList::List(vec![
+                        "pkg1-part-deb".to_owned(),
+                        "pkg2-part-deb".to_owned(),
+                    ])),
                     ..Default::default()
                 },]),
                 ..Default::default()
@@ -314,10 +320,10 @@ mod tests {
             pkg,
             Package {
                 system_dependencies: Some(vec![SystemDependency {
-                    pacman: Some(vec![
+                    pacman: Some(StringList::List(vec![
                         "pkg1-part-arch".to_owned(),
                         "pkg2-part-arch".to_owned()
-                    ]),
+                    ])),
                     ..Default::default()
                 },]),
                 ..Default::default()
@@ -358,7 +364,10 @@ mod tests {
             pkg,
             Package {
                 user_dependencies: Some(vec![UserDependency {
-                    pip_user: Some(vec!["pkg1-pip".to_owned(), "pkg2-pip".to_owned()]),
+                    pip_user: Some(StringList::List(vec![
+                        "pkg1-pip".to_owned(),
+                        "pkg2-pip".to_owned(),
+                    ])),
                     ..Default::default()
                 },]),
                 ..Default::default()
@@ -402,10 +411,10 @@ mod tests {
             pkg,
             Package {
                 user_dependencies: Some(vec![UserDependency {
-                    cargo: Some(CargoDependency::Crates(vec![
+                    cargo: Some(CargoDependency::Crates(StringList::List(vec![
                         "pkg1".to_owned(),
-                        "pkg2".to_owned()
-                    ])),
+                        "pkg2".to_owned(),
+                    ]))),
                     ..Default::default()
                 },]),
                 ..Default::default()
@@ -454,10 +463,10 @@ mod tests {
             pkg,
             Package {
                 user_dependencies: Some(vec![UserDependency {
-                    brew: Some(BrewDependency::Formulas(vec![
+                    brew: Some(BrewDependency::Formulas(StringList::List(vec![
                         "pkg1".to_owned(),
-                        "pkg2".to_owned()
-                    ])),
+                        "pkg2".to_owned(),
+                    ]))),
                     ..Default::default()
                 },]),
                 ..Default::default()
@@ -482,9 +491,15 @@ mod tests {
             Package {
                 user_dependencies: Some(vec![UserDependency {
                     brew: Some(BrewDependency::Config(BrewConfig {
-                        taps: Some(vec!["tap1".to_owned(), "tap2".to_owned()]),
-                        casks: Some(vec!["cask1".to_owned(), "cask2".to_owned()]),
-                        formulas: Some(vec!["formula1".to_owned(), "formula2".to_owned()]),
+                        taps: Some(StringList::List(vec!["tap1".to_owned(), "tap2".to_owned()])),
+                        casks: Some(StringList::List(vec![
+                            "cask1".to_owned(),
+                            "cask2".to_owned()
+                        ])),
+                        formulas: Some(StringList::List(vec![
+                            "formula1".to_owned(),
+                            "formula2".to_owned()
+                        ])),
                     })),
                     ..Default::default()
                 },]),
@@ -594,7 +609,7 @@ mod tests {
             pkg,
             Package {
                 user_dependencies: Some(vec![UserDependency {
-                    pipx: Some(vec!["pkg1".to_owned(), "pkg2".to_owned()]),
+                    pipx: Some(StringList::List(vec!["pkg1".to_owned(), "pkg2".to_owned()])),
                     ..Default::default()
                 }]),
                 ..Default::default()
