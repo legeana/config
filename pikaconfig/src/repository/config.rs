@@ -58,6 +58,8 @@ pub fn is_repository_dir(root: &Path) -> Result<bool> {
 
 #[cfg(test)]
 mod tests {
+    use pretty_assertions::assert_eq;
+
     use crate::string_list::StringList;
 
     use super::*;
@@ -69,7 +71,7 @@ mod tests {
     }
 
     #[test]
-    fn test_load_example() {
+    fn test_load_header() {
         let repo = load_toml_string(
             "
             requires = ['r1', 'r2']
@@ -81,7 +83,7 @@ mod tests {
             repo.requires,
             Some(tag_criteria::TagCriteria(StringList::List(vec![
                 "r1".to_owned(),
-                "r2".to_owned()
+                "r2".to_owned(),
             ]))),
         );
     }
