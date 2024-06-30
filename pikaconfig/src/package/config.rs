@@ -220,10 +220,10 @@ mod tests {
             pkg,
             Package {
                 name: Some("test".to_owned()),
-                requires: Some(tag_criteria::TagCriteria(vec![
+                requires: Some(tag_criteria::TagCriteria(StringList::List(vec![
                     "r1".to_owned(),
-                    "r2".to_owned()
-                ])),
+                    "r2".to_owned(),
+                ]))),
                 has_contents: false,
                 ..Default::default()
             },

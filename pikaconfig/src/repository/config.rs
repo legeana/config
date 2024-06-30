@@ -58,6 +58,8 @@ pub fn is_repository_dir(root: &Path) -> Result<bool> {
 
 #[cfg(test)]
 mod tests {
+    use crate::string_list::StringList;
+
     use super::*;
 
     #[test]
@@ -77,10 +79,10 @@ mod tests {
 
         assert_eq!(
             repo.requires,
-            Some(tag_criteria::TagCriteria(vec![
+            Some(tag_criteria::TagCriteria(StringList::List(vec![
                 "r1".to_owned(),
                 "r2".to_owned()
-            ]))
+            ]))),
         );
     }
 }
