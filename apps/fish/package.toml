@@ -9,7 +9,12 @@ names = [
 ]
 
 [[system_dependencies]]
-any = ["fish", "moreutils"]
+any = "fish"
+wants = { command = "fish" }
+
+[[system_dependencies]]
+any = "moreutils"
+wants = { command = "sponge" }
 
 [[user_dependencies]]
 requires = "os=macos"

@@ -10,19 +10,32 @@ names = [
 ]
 
 [[system_dependencies]]
-any = ["i3-wm", "i3status", "i3lock"]
+any = "i3-wm"
+wants = { command = "i3" }
+
+[[system_dependencies]]
+any = "i3status"
+wants = { command = "i3status" }
+
+[[system_dependencies]]
+any = "i3lock"
+wants = { command = "i3lock" }
 
 [[system_dependencies]]
 apt = "x11-xserver-utils"
 pacman = "xorg-xsetroot"
+wants = { command = "xsetroot" }
 
-[[system_dependencies]]
 # Screenshots.
+[[system_dependencies]]
 any = "maim"
+wants = { command = "maim" }
 
 [[system_dependencies]]
 apt = "xfce4-clipman"
 pacman = "xfce4-clipman-plugin"
+wants = { command = "xfce4-clipman" }
 
 [[system_dependencies]]
 any = "xcompmgr"
+wants = { command = "xcompmgr" }

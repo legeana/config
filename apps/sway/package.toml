@@ -4,24 +4,47 @@ requires = "os=linux"
 names = "fuzzel"
 
 [[system_dependencies]]
-any = ["sway", "swaybg", "swaylock", "swayidle"]
+any = "sway"
+wants = { command = "sway" }
+
+[[system_dependencies]]
+any = "swaybg"
+wants = { command = "swaybg" }
+
+[[system_dependencies]]
+any = "swaylock"
+wants = { command = "swaylock" }
+
+[[system_dependencies]]
+any = "swayidle"
+wants = { command = "swayidle" }
 
 [[system_dependencies]]
 any = "xdg-desktop-portal-wlr"
+wants = { file = "/usr/lib/xdg-desktop-portal-wlr" }
 
+# Screenshots.
 [[system_dependencies]]
-any = ["grim", "slurp", "imagemagick"]
+any = "grim"
+wants = { command = "grim" }
+[[system_dependencies]]
+any = "slurp"
+wants = { command = "slurp" }
+[[system_dependencies]]
+any = "imagemagick"
+wants = { command = "convert" }
 
 [[system_dependencies]]
 apt = "xwayland"
 pacman = "xorg-xwayland"
+wants = { command = "Xwayland" }
 
 [[system_dependencies]]
-# pactl
 apt = "pulseaudio-utils"
 pacman = "libpulse"
+wants = { command = "pactl" }
 
 [[system_dependencies]]
-# Mako
 apt = "mako-notifier"
 pacman = "mako"
+wants = { command = "mako" }
