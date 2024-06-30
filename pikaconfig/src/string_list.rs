@@ -19,6 +19,15 @@ impl StringList {
     pub fn as_vec(&self) -> Vec<&String> {
         self.iter().collect()
     }
+    pub fn to_vec(&self) -> Vec<String> {
+        self.iter().cloned().collect()
+    }
+    pub fn is_empty(&self) -> bool {
+        match self {
+            Self::Single(_) => false,
+            Self::List(v) => v.is_empty(),
+        }
+    }
 }
 
 pub enum StringListIterator<'a> {
@@ -141,6 +150,40 @@ mod tests {
     fn test_list_as_vec() {
         let s = StringList::List(vec!["hello".to_owned(), "world".to_owned()]);
         assert_eq!(s.as_vec(), vec!["hello", "world"]);
+    }
+
+    #[test]
+    fn test_single_to_vec() {
+        let s = StringList::Single("test".to_owned());
+        assert_eq!(s.to_vec(), vec!["test".to_owned()]);
+    }
+
+    #[test]
+    fn test_list_to_vec() {
+        let s = StringList::List(vec!["hello".to_owned(), "world".to_owned()]);
+        assert_eq!(s.to_vec(), vec!["hello".to_owned(), "world".to_owned()]);
+    }
+
+    #[test]
+    fn test_single_is_not_empty() {
+        let s = StringList::Single("test".to_owned());
+        assert!(!s.is_empty());
+    }
+
+    #[test]
+    fn test_default_is_empty() {
+        assert!(StringList::default().is_empty());
+    }
+
+    #[test]
+    fn test_list_is_empty() {
+        assert!(StringList::List(Vec::new()).is_empty());
+    }
+
+    #[test]
+    fn test_list_is_not_empty() {
+        let s = StringList::List(vec!["hello".to_owned(), "world".to_owned()]);
+        assert!(!s.is_empty());
     }
 
     #[derive(Debug, Default, Deserialize, PartialEq)]
