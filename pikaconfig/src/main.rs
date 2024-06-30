@@ -17,6 +17,7 @@ mod package;
 mod quote;
 mod registry;
 mod repository;
+mod string_list;
 mod symlink_util;
 mod tag_criteria;
 mod tag_util;
