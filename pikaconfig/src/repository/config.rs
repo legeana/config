@@ -77,7 +77,7 @@ mod tests {
 
         assert_eq!(
             repo.requires,
-            Some(tag_criteria::TagCriteria::Requires(vec![
+            Some(tag_criteria::TagCriteria(vec![
                 "r1".to_owned(),
                 "r2".to_owned()
             ]))

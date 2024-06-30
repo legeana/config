@@ -17,23 +17,18 @@ impl<T: Criteria> Criteria for Option<T> {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
-#[serde(deny_unknown_fields, untagged)]
-pub enum TagCriteria {
-    Requires(Vec<String>),
-}
+#[serde(deny_unknown_fields)]
+pub struct TagCriteria(pub Vec<String>);
 
 impl Criteria for TagCriteria {
     fn is_satisfied(&self) -> Result<bool> {
-        match self {
-            Self::Requires(requires) => {
-                if !tag_util::has_all_tags(requires)
-                    .with_context(|| format!("failed to check tags {requires:?}"))?
-                {
-                    return Ok(false);
-                }
-                Ok(true)
-            }
+        let requires = &self.0;
+        if !tag_util::has_all_tags(requires)
+            .with_context(|| format!("failed to check tags {requires:?}"))?
+        {
+            return Ok(false);
         }
+        Ok(true)
     }
 }
 
@@ -47,7 +42,7 @@ mod tests {
     #[cfg(target_os = "linux")]
     #[test]
     fn test_linux_satisfied() -> Result<()> {
-        let tags = TagCriteria::Requires(vec!["os=linux".to_owned()]);
+        let tags = TagCriteria(vec!["os=linux".to_owned()]);
         assert!(tags.is_satisfied()?);
         Ok(())
     }
@@ -55,7 +50,7 @@ mod tests {
     #[cfg(target_os = "linux")]
     #[test]
     fn test_linux_not_satisfied() -> Result<()> {
-        let tags = TagCriteria::Requires(vec!["os=windows".to_owned()]);
+        let tags = TagCriteria(vec!["os=windows".to_owned()]);
         assert!(!tags.is_satisfied()?);
         Ok(())
     }
@@ -63,7 +58,7 @@ mod tests {
     #[cfg(target_family = "unix")]
     #[test]
     fn test_unix_satisfied() -> Result<()> {
-        let tags = TagCriteria::Requires(vec!["family=unix".to_owned()]);
+        let tags = TagCriteria(vec!["family=unix".to_owned()]);
         assert!(tags.is_satisfied()?);
         Ok(())
     }
