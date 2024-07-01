@@ -53,6 +53,32 @@ pub struct Dependency {
     pub names: StringList,
 }
 
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct WingetConfig {
+    pub packages: StringList,
+    pub source: String,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
+#[serde(deny_unknown_fields, untagged)]
+pub enum WingetDependency {
+    WingetSource(StringList),
+    Config(WingetConfig),
+}
+
+impl WingetDependency {
+    pub fn to_config(&self) -> WingetConfig {
+        match self {
+            WingetDependency::WingetSource(p) => WingetConfig {
+                packages: p.clone(),
+                source: "winget".to_owned(),
+            },
+            WingetDependency::Config(cfg) => cfg.clone(),
+        }
+    }
+}
+
 /// SystemDependency doesn't consider missing package manager a failure.
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
@@ -63,7 +89,7 @@ pub struct SystemDependency {
     pub any: Option<StringList>,
     pub apt: Option<StringList>,
     pub pacman: Option<StringList>,
-    pub winget: Option<StringList>,
+    pub winget: Option<WingetDependency>,
     /// Satisfaction criteria.
     /// Will skip this dependency if met.
     /// Rules::force_update will force this dependency to be updated.
@@ -615,5 +641,76 @@ mod tests {
                 ..Default::default()
             },
         );
+    }
+
+    #[test]
+    fn load_winget_dependency() {
+        let pkg = load_toml_string(
+            "
+            [[system_dependencies]]
+            winget = ['pkg1', 'pkg2']
+            ",
+        )
+        .expect("load_toml_string");
+        assert_eq!(
+            pkg,
+            Package {
+                system_dependencies: Some(vec![SystemDependency {
+                    winget: Some(WingetDependency::WingetSource(StringList::List(vec![
+                        "pkg1".to_owned(),
+                        "pkg2".to_owned()
+                    ]))),
+                    ..Default::default()
+                }]),
+                ..Default::default()
+            },
+        );
+    }
+
+    #[test]
+    fn load_winget_dependency_config() {
+        let pkg = load_toml_string(
+            "
+            [[system_dependencies]]
+            winget = { packages = ['pkg1', 'pkg2'], source = 'msstore' }
+            ",
+        )
+        .expect("load_toml_string");
+        assert_eq!(
+            pkg,
+            Package {
+                system_dependencies: Some(vec![SystemDependency {
+                    winget: Some(WingetDependency::Config(WingetConfig {
+                        packages: StringList::List(vec!["pkg1".to_owned(), "pkg2".to_owned()]),
+                        source: "msstore".to_owned(),
+                    })),
+                    ..Default::default()
+                }]),
+                ..Default::default()
+            },
+        );
+    }
+
+    #[test]
+    fn winget_dependency_source_to_config() {
+        let w = WingetDependency::WingetSource(StringList::Single("pkg".to_owned()));
+        assert_eq!(
+            w.to_config(),
+            WingetConfig {
+                packages: StringList::Single("pkg".to_owned()),
+                source: "winget".to_owned(),
+            },
+        );
+    }
+
+    #[test]
+    fn winget_dependency_config_to_config() {
+        let cfg = WingetConfig {
+            packages: StringList::Single("pkg".to_owned()),
+            source: "winget".to_owned(),
+        };
+        let w = WingetDependency::Config(cfg.clone());
+
+        assert_eq!(w.to_config(), cfg);
     }
 }

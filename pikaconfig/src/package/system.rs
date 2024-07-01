@@ -31,8 +31,15 @@ impl SystemDependency {
         if let Some(pacman) = cfg.pacman.clone().or_else(|| cfg.any.clone()) {
             installers.push(Box::new(Pacman::new(pacman.to_vec())));
         }
-        if let Some(winget) = cfg.winget.clone().or_else(|| cfg.any.clone()) {
-            installers.push(Box::new(Winget::new(winget.to_vec())));
+        //if let Some(winget) = cfg.winget.clone().map_or_else(|dep| dep.to_config(), || )
+        if let Some(winget) = cfg
+            .winget
+            .clone()
+            .or_else(|| cfg.any.clone().map(config::WingetDependency::WingetSource))
+        {
+            installers.push(Box::new(Winget {
+                config: winget.to_config(),
+            }));
         }
         if let Some(bash) = &cfg.bash {
             installers.push(Box::new(Bash::new(bash.clone())));
@@ -107,13 +114,7 @@ impl Installer for Pacman {
 }
 
 struct Winget {
-    packages: Vec<String>,
-}
-
-impl Winget {
-    fn new(packages: Vec<String>) -> Self {
-        Self { packages }
-    }
+    config: config::WingetConfig,
 }
 
 impl Installer for Winget {
@@ -131,8 +132,10 @@ impl Installer for Winget {
                 // code if the package is already installed.
                 .arg("--force")
                 .arg("--exact")
+                .arg("--source")
+                .arg(&self.config.source)
                 .arg("--")
-                .args(&self.packages),
+                .args(self.config.packages.as_slice()),
         )
     }
 }
