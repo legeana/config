@@ -13,6 +13,10 @@ any = "fish"
 wants = { command = "fish" }
 
 [[system_dependencies]]
+any = "curl"
+wants = { command = "curl" }
+
+[[system_dependencies]]
 any = "moreutils"
 wants = { command = "sponge" }
 
