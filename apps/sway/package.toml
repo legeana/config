@@ -21,7 +21,12 @@ wants = { command = "swayidle" }
 
 [[system_dependencies]]
 any = "xdg-desktop-portal-wlr"
-wants = { file = "/usr/lib/xdg-desktop-portal-wlr" }
+# The location of the binary is inconsistent:
+# - /usr/lib/xdg-desktop-portal-wlr on ArchLinux
+# - /usr/libexec/xdg-desktop-portal-wlr on Debian
+# Systemd service file is more reliable.
+# TODO: Come up with a dedicated service file check.
+wants = { file = "/usr/lib/systemd/user/xdg-desktop-portal-wlr.service" }
 
 # Screenshots.
 [[system_dependencies]]
