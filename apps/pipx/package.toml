@@ -3,4 +3,9 @@ has_contents = false
 [[system_dependencies]]
 any = "pipx"
 pacman = "python-pipx"
+winget = []
 wants = { command = "pipx" }
+
+# [[user_dependencies]]
+# requires = "os=windows"
+# pip_user = "pipx"
