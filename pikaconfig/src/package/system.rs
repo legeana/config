@@ -75,6 +75,9 @@ impl Installer for Apt {
         if !is_command("apt")? {
             return Ok(());
         }
+        if self.packages.is_empty() {
+            return Ok(());
+        }
         process_utils::run_verbose(
             std::process::Command::new("sudo")
                 .arg("apt")
@@ -101,6 +104,9 @@ impl Installer for Pacman {
         if !is_command("pacman")? {
             return Ok(());
         }
+        if self.packages.is_empty() {
+            return Ok(());
+        }
         process_utils::run_verbose(
             std::process::Command::new("sudo")
                 .arg("pacman")
@@ -120,6 +126,9 @@ struct Winget {
 impl Installer for Winget {
     fn install(&self, _rules: &Rules) -> Result<()> {
         if !is_command("winget")? {
+            return Ok(());
+        }
+        if self.config.packages.is_empty() {
             return Ok(());
         }
         process_utils::run_verbose(
