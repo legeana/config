@@ -1,4 +1,4 @@
-use crate::registry::{FileType, Registry};
+use crate::registry::{FilePath, FilePathBuf, Registry};
 
 use std::{
     io::{ErrorKind, Write},
@@ -65,20 +65,28 @@ impl FileRegistry {
 }
 
 impl Registry for FileRegistry {
-    fn register_user_file(&mut self, path: &Path, _file_type: FileType) -> Result<()> {
-        self.user_files.push(path)
+    fn register_user_file(&mut self, file: FilePath) -> Result<()> {
+        self.user_files.push(file.path())
     }
-    fn user_files(&self) -> Result<Vec<PathBuf>> {
-        self.user_files.list()
+    fn user_files(&self) -> Result<Vec<FilePathBuf>> {
+        // Not technically correct but we didn't store this information.
+        // Current Uninstaller implementation strips FileType anyway.
+        self.user_files
+            .list()
+            .map(|v| v.into_iter().map(FilePathBuf::Symlink).collect())
     }
     fn clear_user_files(&mut self) -> Result<()> {
         self.user_files.clear()
     }
-    fn register_state_file(&mut self, path: &Path, _file_type: FileType) -> Result<()> {
-        self.state_files.push(path)
+    fn register_state_file(&mut self, file: FilePath) -> Result<()> {
+        self.state_files.push(file.path())
     }
-    fn state_files(&self) -> Result<Vec<PathBuf>> {
-        self.state_files.list()
+    fn state_files(&self) -> Result<Vec<FilePathBuf>> {
+        // Not technically correct but we didn't store this information.
+        // Current Uninstaller implementation strips FileType anyway.
+        self.state_files
+            .list()
+            .map(|v| v.into_iter().map(FilePathBuf::Symlink).collect())
     }
     fn clear_state_files(&mut self) -> Result<()> {
         self.state_files.clear()

@@ -4,7 +4,7 @@ use anyhow::{Context, Result};
 use indoc::formatdoc;
 
 use crate::module::{Module, ModuleBox, Rules};
-use crate::registry::{FileType, Registry};
+use crate::registry::{FilePath, Registry};
 
 use super::args::Arguments;
 use super::engine;
@@ -36,7 +36,7 @@ where
         Err(err) => Err(err).with_context(|| format!("failed to create {tag:?} directory")),
     }?;
     registry
-        .register_state_file(tag, FileType::Directory)
+        .register_state_file(FilePath::Directory(tag))
         .with_context(|| format!("failed to register state file {tag:?}"))
 }
 

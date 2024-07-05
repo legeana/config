@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use crate::module::{Module, ModuleBox, Rules};
-use crate::registry::{FileType, Registry};
+use crate::registry::{FilePath, Registry};
 
 use super::args::{Argument, Arguments};
 use super::engine;
@@ -19,7 +19,7 @@ impl Module for MkDir {
         std::fs::create_dir_all(&self.dst)
             .with_context(|| format!("unable to create {:?}", self.dst))?;
         registry
-            .register_user_file(&self.dst, FileType::Directory)
+            .register_user_file(FilePath::Directory(&self.dst))
             .with_context(|| format!("failed to register directory {:?}", self.dst))?;
         Ok(())
     }

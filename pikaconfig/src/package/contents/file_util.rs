@@ -4,7 +4,7 @@ use std::path::Path;
 use anyhow::{anyhow, Context, Result};
 
 use crate::file_util;
-use crate::registry::{self, Registry};
+use crate::registry::{FilePath, Registry};
 use crate::symlink_util;
 
 #[cfg(unix)]
@@ -35,7 +35,7 @@ pub fn make_symlink(registry: &mut dyn Registry, src: &Path, dst: &Path) -> Resu
     fs::create_dir_all(parent).with_context(|| format!("failed to create {parent:?}"))?;
     symlink(src, dst).with_context(|| format!("failed to create a symlink {src:?} -> {dst:?}"))?;
     registry
-        .register_user_file(dst, registry::FileType::Symlink)
+        .register_user_file(FilePath::Symlink(dst))
         .with_context(|| format!("failed to register symlink {dst:?}"))?;
     log::info!("Symlink {src:?} -> {dst:?}");
     Ok(())

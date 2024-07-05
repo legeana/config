@@ -3,7 +3,7 @@ use std::path::Path;
 use anyhow::{anyhow, Context, Result};
 
 use crate::file_util;
-use crate::registry::Registry;
+use crate::registry::{FileType, Registry};
 use crate::symlink_util;
 
 pub trait Uninstaller {
@@ -28,13 +28,14 @@ where
     }
 }
 
-fn remove_all<P, I>(iter: I) -> Result<()>
+fn remove_all<'a, P, I>(iter: I) -> Result<()>
 where
-    P: AsRef<Path>,
-    I: Iterator<Item = P>,
+    P: 'a + AsRef<Path>,
+    I: Iterator<Item = &'a FileType<P>>,
 {
     for path in iter {
-        let path = path.as_ref();
+        // TODO: Distinguish between Symlink and Directory.
+        let path = path.path().as_ref();
         if let Err(err) = remove(path) {
             log::error!("Failed to remove {path:?}: {err}");
         }
