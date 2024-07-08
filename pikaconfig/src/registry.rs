@@ -23,6 +23,32 @@ where
 pub type FilePath<'a> = FileType<&'a Path>;
 pub type FilePathBuf = FileType<PathBuf>;
 
+#[allow(dead_code)]
+impl<'a> FilePath<'a> {
+    pub fn new_symlink<T>(path: &'a T) -> Self
+    where
+        T: 'a + AsRef<Path> + ?Sized,
+    {
+        Self::Symlink(path.as_ref())
+    }
+    pub fn new_directory<T>(path: &'a T) -> Self
+    where
+        T: 'a + AsRef<Path> + ?Sized,
+    {
+        Self::Directory(path.as_ref())
+    }
+}
+
+#[allow(dead_code)]
+impl FilePathBuf {
+    pub fn new_symlink(path: impl Into<PathBuf>) -> Self {
+        Self::Symlink(path.into())
+    }
+    pub fn new_directory(path: impl Into<PathBuf>) -> Self {
+        Self::Directory(path.into())
+    }
+}
+
 pub trait Registry {
     fn register_user_file(&mut self, file: FilePath) -> Result<()>;
     fn user_files(&self) -> Result<Vec<FilePathBuf>>;
@@ -38,6 +64,39 @@ mod tests {
     use pretty_assertions::assert_eq;
 
     use super::*;
+
+    macro_rules! new_tests {
+        ($test_name:ident, $ctor:ident, $subtype:ident) => {
+            #[test]
+            fn $test_name() {
+                // FilePath
+                assert_eq!(
+                    FilePath::$ctor("test"),
+                    FilePath::$subtype(Path::new("test")),
+                );
+                assert_eq!(
+                    FilePath::$ctor(Path::new("test")),
+                    FilePath::$subtype(Path::new("test")),
+                );
+                // FilePathBuf
+                assert_eq!(
+                    FilePathBuf::$ctor("test"),
+                    FilePathBuf::$subtype("test".into()),
+                );
+                assert_eq!(
+                    FilePathBuf::$ctor(Path::new("test")),
+                    FilePathBuf::$subtype("test".into()),
+                );
+                assert_eq!(
+                    FilePathBuf::$ctor(PathBuf::from("test")),
+                    FilePathBuf::$subtype("test".into()),
+                );
+            }
+        };
+    }
+
+    new_tests!(test_file_type_new_symlink, new_symlink, Symlink);
+    new_tests!(test_file_type_new_directory, new_directory, Directory);
 
     #[test]
     fn test_file_path_debug() {
