@@ -2,6 +2,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum FileType<T> {
     Symlink(T),
     Directory(T),
@@ -30,4 +31,23 @@ pub trait Registry {
     fn register_state_file(&mut self, file: FilePath) -> Result<()>;
     fn state_files(&self) -> Result<Vec<FilePathBuf>>;
     fn clear_state_files(&mut self) -> Result<()>;
+}
+
+#[cfg(test)]
+mod tests {
+    use pretty_assertions::assert_eq;
+
+    use super::*;
+
+    #[test]
+    fn test_file_path_debug() {
+        let f = FilePath::Symlink(Path::new("test"));
+        assert_eq!(format!("{f:?}"), r#"Symlink("test")"#);
+    }
+
+    #[test]
+    fn test_file_path_buf_debug() {
+        let f = FilePathBuf::Symlink(PathBuf::from("test"));
+        assert_eq!(format!("{f:?}"), r#"Symlink("test")"#);
+    }
 }
