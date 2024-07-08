@@ -33,9 +33,9 @@ where
     P: 'a + AsRef<Path>,
     I: Iterator<Item = &'a FileType<P>>,
 {
-    for path in iter {
+    for file in iter {
         // TODO: Distinguish between Symlink and Directory.
-        let path = path.path().as_ref();
+        let path = file.path();
         if let Err(err) = remove(path) {
             log::error!("Failed to remove {path:?}: {err}");
         }

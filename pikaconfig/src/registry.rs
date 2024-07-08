@@ -7,11 +7,14 @@ pub enum FileType<T> {
     Directory(T),
 }
 
-impl<T> FileType<T> {
-    pub fn path(&self) -> &T {
+impl<T> FileType<T>
+where
+    T: AsRef<Path>,
+{
+    pub fn path(&self) -> &Path {
         match self {
-            Self::Symlink(p) => p,
-            Self::Directory(p) => p,
+            Self::Symlink(p) => p.as_ref(),
+            Self::Directory(p) => p.as_ref(),
         }
     }
 }
