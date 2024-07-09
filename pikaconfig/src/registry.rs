@@ -34,6 +34,7 @@ where
 }
 
 impl<T> Eq for FileType<T> where T: Eq {}
+impl<T> Copy for FileType<T> where T: Copy {}
 
 pub type FilePath<'a> = FileType<&'a Path>;
 pub type FilePathBuf = FileType<PathBuf>;
