@@ -2,7 +2,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 
-#[derive(Clone, Debug, Eq)]
+#[derive(Clone, Debug)]
 pub enum FileType<T> {
     Symlink(T),
     Directory(T),
@@ -32,6 +32,8 @@ where
         }
     }
 }
+
+impl<T> Eq for FileType<T> where T: Eq {}
 
 pub type FilePath<'a> = FileType<&'a Path>;
 pub type FilePathBuf = FileType<PathBuf>;
