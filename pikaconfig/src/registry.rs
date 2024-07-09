@@ -2,7 +2,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq)]
 pub enum FileType<T> {
     Symlink(T),
     Directory(T),
@@ -16,6 +16,19 @@ where
         match self {
             Self::Symlink(p) => p.as_ref(),
             Self::Directory(p) => p.as_ref(),
+        }
+    }
+}
+
+impl<T, O> PartialEq<FileType<O>> for FileType<T>
+where
+    T: PartialEq<O>,
+{
+    fn eq(&self, other: &FileType<O>) -> bool {
+        match (self, other) {
+            (FileType::Symlink(s), FileType::Symlink(o)) => s == o,
+            (FileType::Directory(s), FileType::Directory(o)) => s == o,
+            _ => false,
         }
     }
 }
@@ -61,7 +74,7 @@ pub trait Registry {
 
 #[cfg(test)]
 mod tests {
-    use pretty_assertions::assert_eq;
+    use pretty_assertions::{assert_eq, assert_ne};
 
     use super::*;
 
@@ -108,5 +121,45 @@ mod tests {
     fn test_file_path_buf_debug() {
         let f = FilePathBuf::Symlink(PathBuf::from("test"));
         assert_eq!(format!("{f:?}"), r#"Symlink("test")"#);
+    }
+
+    #[test]
+    fn test_file_type_partial_eq() {
+        // FilePath.
+        assert_eq!(FilePath::new_symlink("test"), FilePath::new_symlink("test"));
+        assert_eq!(
+            FilePath::new_directory("test"),
+            FilePath::new_directory("test"),
+        );
+        assert_ne!(
+            FilePath::new_symlink("test"),
+            FilePath::new_directory("test"),
+        );
+        // FilePathBuf.
+        assert_eq!(
+            FilePathBuf::new_symlink("test"),
+            FilePathBuf::new_symlink("test"),
+        );
+        // Mixed types.
+        assert_eq!(
+            FilePath::new_symlink("test"),
+            FilePathBuf::new_symlink("test"),
+        );
+        assert_eq!(
+            FilePath::new_directory("test"),
+            FilePathBuf::new_directory("test"),
+        );
+        assert_eq!(
+            FilePathBuf::new_symlink("test"),
+            FilePath::new_symlink("test"),
+        );
+        assert_eq!(
+            FilePathBuf::new_directory("test"),
+            FilePath::new_directory("test"),
+        );
+        assert_ne!(
+            FilePath::new_symlink("test"),
+            FilePathBuf::new_directory("test"),
+        );
     }
 }
