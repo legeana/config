@@ -109,6 +109,7 @@ impl SqliteRegistry {
             FROM files
             WHERE
                 purpose = :purpose
+            ORDER BY id ASC
             ",
             )
             .context("files statement prepare")?;
@@ -234,5 +235,21 @@ mod tests {
             reg.files(other_purpose).unwrap(),
             vec![FilePathBuf::new_symlink("/other/file")]
         );
+    }
+
+    #[apply(sqlite_registry_test)]
+    fn test_files_order(purpose: FilePurpose, _other_purpose: FilePurpose) {
+        let mut reg = SqliteRegistry::open_in_memory().expect("open_in_memory");
+        let files = vec![
+            FilePath::new_symlink("/test/2/file/1"),
+            FilePath::new_symlink("/test/1/file/2"),
+            FilePath::new_symlink("/test/3/file/3"),
+        ];
+
+        for f in files.iter().copied() {
+            reg.register_file(purpose, f).expect("register_file");
+        }
+
+        assert_eq!(files, reg.files(purpose).unwrap());
     }
 }
