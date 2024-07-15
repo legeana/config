@@ -41,19 +41,34 @@ use uninstaller::Uninstaller;
 
 const INSTALL_REGISTRY: &str = ".install";
 const STATE_REGISTRY: &str = ".state";
+const SQL_REGISTRY: &str = ".install.sqlite";
 
-fn registry(root: &Path) -> file_registry::FileRegistry {
+fn registry(root: &Path) -> Result<sqlite_registry::SqliteRegistry> {
+    let sql_path = root.join(SQL_REGISTRY);
+    sqlite_registry::SqliteRegistry::open(&sql_path)
+        .with_context(|| format!("failed to open SQLite registry {sql_path:?}"))
+}
+
+fn old_uninstallers(root: &Path) -> Result<Vec<Box<dyn Uninstaller>>> {
     let user_files_path = root.join(INSTALL_REGISTRY);
     let state_files_path = root.join(STATE_REGISTRY);
-    file_registry::FileRegistry::new(user_files_path, state_files_path)
+    Ok(vec![Box::new(file_registry::FileRegistry::new(
+        user_files_path,
+        state_files_path,
+    ))])
+}
+
+fn uninstallers(root: &Path) -> Result<Vec<Box<dyn Uninstaller>>> {
+    let mut u = old_uninstallers(root)?;
+    u.push(Box::new(registry(root)?));
+    Ok(u)
 }
 
 fn uninstall(root: &Path) -> Result<()> {
-    let mut registry = registry(root);
-    registry
-        .uninstall()
-        .context("failed to uninstall user files")?;
-    registry.cleanup().context("failed to cleanup state")?;
+    for mut u in uninstallers(root)? {
+        u.uninstall().context("failed to uninstall user files")?;
+        u.cleanup().context("failed to cleanup state")?;
+    }
     Ok(())
 }
 
@@ -65,7 +80,10 @@ fn install(rules: &Rules, root: &Path) -> Result<()> {
         repo.pre_uninstall(rules)
             .with_context(|| format!("failed to pre-uninstall {}", repo.name()))?;
     }
-    let mut registry = registry(root);
+    for mut u in old_uninstallers(root)? {
+        u.uninstall().context("failed to uninstall user files")?;
+    }
+    let mut registry = registry(root)?;
     registry
         .uninstall()
         .context("failed to uninstall before installing")?;
@@ -80,6 +98,10 @@ fn install(rules: &Rules, root: &Path) -> Result<()> {
     for repo in &repos {
         repo.post_install(rules, &mut registry)
             .with_context(|| format!("failed to post-install {}", repo.name()))?;
+    }
+    if let Err((_, err)) = registry.close() {
+        // TODO: Retry?
+        return Err(err.context("failed to close SqliteRegistry"));
     }
     Ok(())
 }
