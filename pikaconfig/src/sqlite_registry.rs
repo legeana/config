@@ -47,17 +47,15 @@ impl SqliteRegistry {
     /// For tests only.
     fn open_in_memory() -> Result<Self> {
         let conn = Connection::open_in_memory().context("failed to open in memory")?;
-        Self::init(&conn).context("failed to initialise")?;
-        Ok(Self { conn })
+        Self::with_connection(conn)
     }
 
     pub fn open(path: &Path) -> Result<Self> {
         let conn = Connection::open(path).with_context(|| format!("failed to open {path:?}"))?;
-        Self::init(&conn).with_context(|| format!("failed to initialise {path:?}"))?;
-        Ok(Self { conn })
+        Self::with_connection(conn).with_context(|| format!("failed to initialise {path:?}"))
     }
 
-    fn init(conn: &Connection) -> Result<()> {
+    fn with_connection(conn: Connection) -> Result<Self> {
         conn.execute_batch(
             "
             CREATE TABLE IF NOT EXISTS files (
@@ -67,8 +65,9 @@ impl SqliteRegistry {
                 path BLOB NOT NULL
             );
             ",
-        )?;
-        Ok(())
+        )
+        .context("failed to initialise")?;
+        Ok(Self { conn })
     }
 
     pub fn close(self) -> Result<(), (SqliteRegistry, Error)> {
