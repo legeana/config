@@ -1,4 +1,6 @@
 ACLs
+BTree
+BTrees
 TODOs
 abc
 absl
@@ -69,8 +71,11 @@ bindsym
 blackbox
 blackhole
 bool
+bools
 brightnessctl
 bsd
+btree
+btrees
 buf
 builtins
 buylist
@@ -108,6 +113,7 @@ configurator
 conn
 consolas
 const
+constexpr
 consts
 contextlib
 contrib
@@ -150,6 +156,7 @@ deschedule
 deserialize
 deserializer
 dest
+devel
 devnull
 devtools
 dhcp
@@ -173,6 +180,7 @@ dryrun
 dsa
 dst
 dstdir
+dtd
 dunder
 dyn
 ecommerce
@@ -211,6 +219,7 @@ fd
 fdpass
 fedex
 filegroup
+filepath
 filesystem
 filetypes
 firefox
@@ -254,12 +263,14 @@ globbing
 glx
 gmailctl
 gnutls
+golang
 googleapis
 googler
 gpg
 gpio
 gpiozero
 gpt
+gunit
 gunzip
 gz
 handoff
@@ -272,7 +283,9 @@ hashlib
 hdd
 healthchecks
 hexsha
+hg
 hjkl
+hoc
 holdback
 holdbacks
 homebrew
@@ -316,6 +329,7 @@ irc
 irssi
 iscsi
 isinstance
+isoformat
 issuecomment
 iter
 iterable
@@ -367,6 +381,7 @@ logname
 logtostderr
 lol
 lsp
+lspconfig
 lstrip
 lt
 lua
@@ -375,6 +390,7 @@ mailto
 manpath
 mapreduce
 md
+memoized
 mesonbuild
 mesondefine
 mesonwrap
@@ -403,6 +419,7 @@ mtproxy
 multiline
 muppet
 mut
+mutex
 mypy
 mysql
 myvhi
@@ -428,6 +445,7 @@ npm
 num
 nushell
 nvchad
+nvchad
 nvim
 nyc
 oauth
@@ -448,6 +466,11 @@ orgmode
 os
 osx
 overprovisioned
+p0
+p1
+p2
+p3
+p4
 pacdiff
 packadd
 packpath
@@ -466,6 +489,7 @@ pastebin
 pathlib
 pathspec
 paxos
+pb
 pb2
 pbtxt
 pem
@@ -476,6 +500,7 @@ pid
 pika
 pikaconfig
 pikaplaylist
+pipx
 pkg1
 pkg2
 pkg3
@@ -498,6 +523,7 @@ poweron
 powershell
 pprint
 pragma
+prebuilt
 precalculated
 precompute
 preexec
@@ -526,10 +552,12 @@ pycache
 pyflags
 pylint
 python3
+qps
 randr
 ratelimit
 rawproto
 rdiv
+re2
 readlink
 readonly
 readwrite
@@ -547,6 +575,7 @@ req
 reqwest
 resizer
 returncode
+rfc
 rhai
 ripgrep
 rlua
@@ -572,6 +601,7 @@ sbin
 scrollback
 sdk
 sed
+selfhost
 selfhosted
 sendline
 sendmsg
@@ -619,11 +649,13 @@ sso
 sstable
 startswith
 staticmethod
+statusor
 stderr
 stderrlog
 stdin
 stdout
 stdpath
+stockout
 str
 strictyaml
 stringset
@@ -644,6 +676,9 @@ subroot
 substate
 substr
 subteam
+subteams
+subtree
+subtrees
 sudo
 surrealdb
 suspendable
@@ -701,6 +736,7 @@ tpm
 tpope
 traceback
 travis
+treesitter
 tt
 ttf
 ttl
@@ -740,6 +776,7 @@ url
 urllib
 usec
 useragent
+userid
 usize
 usr
 utc
@@ -777,8 +814,10 @@ vscode
 vsync
 vulkan
 walkdir
+walltime
 webtoon
 webui
+weechat
 wezterm
 whitelist
 whitelisted
@@ -797,11 +836,13 @@ wrapdb
 wrapfile
 wrapweb
 writeln
+wsgi
 www
 x11
 xargs
 xcompmgr
 xdg
+xhtml
 xorg
 xrandr
 xsrf
