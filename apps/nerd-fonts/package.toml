@@ -1,3 +1,6 @@
+[[dependencies]]
+names = "unzip"
+
 [[user_dependencies]]
 requires = "os=macos"
 wants = { file = "~/Library/Fonts/HackNerdFont-Regular.ttf" }

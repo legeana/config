@@ -1,0 +1,6 @@
+requires = "os=linux"
+has_contents = false
+
+[[system_dependencies]]
+any = "unzip"
+wants = { command = "unzip" }
