@@ -6,5 +6,4 @@ wants = { any_command = ["bat", "batcat"] }
 
 [[system_dependencies]]
 any = "bat"
-apt = "batcat"
 wants = { any_command = ["bat", "batcat"] }
