@@ -3,13 +3,35 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Context, Error, Result};
+use once_cell::sync::OnceCell;
 use os_str_bytes::RawOsString;
 use rusqlite::types::Type;
 use rusqlite::{named_params, Connection};
+use rusqlite_migration::{Migrations, M};
 
 use crate::registry::{FilePath, FilePathBuf, Registry};
 
 const APPLICATION_ID: i32 = 0x12fe0c02;
+
+fn migrations() -> &'static Migrations<'static> {
+    static INSTANCE: OnceCell<Migrations<'static>> = OnceCell::new();
+    INSTANCE.get_or_init(|| {
+        Migrations::new(vec![
+            // Migrations must never change their index.
+            // This Vec is append-only.
+            M::up(
+                "
+                CREATE TABLE IF NOT EXISTS files (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    purpose INTEGER NOT NULL,
+                    file_type INTEGER NOT NULL,
+                    path BLOB NOT NULL
+                )
+                ",
+            ),
+        ])
+    })
+}
 
 #[derive(Debug)]
 pub struct SqliteRegistry {
@@ -78,19 +100,11 @@ impl SqliteRegistry {
         Ok(())
     }
 
-    fn with_connection(conn: Connection) -> Result<Self> {
+    fn with_connection(mut conn: Connection) -> Result<Self> {
         Self::init_app_id(&conn)?;
-        conn.execute_batch(
-            "
-            CREATE TABLE IF NOT EXISTS files (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                purpose INTEGER NOT NULL,
-                file_type INTEGER NOT NULL,
-                path BLOB NOT NULL
-            );
-            ",
-        )
-        .context("failed to initialise")?;
+        migrations()
+            .to_latest(&mut conn)
+            .context("failed to migrate")?;
         Ok(Self { conn })
     }
 
@@ -313,6 +327,28 @@ mod tests {
         assert_eq!(
             err.to_string(),
             "unexpected application_id 7b, want 12fe0c02"
+        );
+    }
+
+    #[test]
+    fn migrations_test() {
+        assert_eq!(migrations().validate(), Ok(()));
+    }
+
+    #[test]
+    fn migrations_database_too_far_ahead() {
+        let conn = Connection::open_in_memory().unwrap();
+        conn.pragma_update(None, "user_version", 1000).unwrap();
+
+        let err = SqliteRegistry::with_connection(conn).unwrap_err();
+
+        assert_eq!(err.to_string(), "failed to migrate");
+        let err = err.downcast::<rusqlite_migration::Error>().unwrap();
+        assert_eq!(
+            err,
+            rusqlite_migration::Error::MigrationDefinition(
+                rusqlite_migration::MigrationDefinitionError::DatabaseTooFarAhead
+            )
         );
     }
 }
