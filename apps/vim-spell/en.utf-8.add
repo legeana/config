@@ -69,6 +69,7 @@ bindsym
 blackbox
 blackhole
 bool
+brightnessctl
 bsd
 buf
 builtins
@@ -212,6 +213,7 @@ fedex
 filegroup
 filesystem
 filetypes
+firefox
 fishshell
 fixup
 flaskutil
@@ -452,6 +454,7 @@ packpath
 pacman
 pacnew
 pacsave
+pactl
 param
 params
 paren
@@ -483,6 +486,7 @@ pkill
 pkm
 playbook1
 playbook2
+playerctl
 plugins
 png
 polybar
@@ -796,6 +800,7 @@ writeln
 www
 x11
 xargs
+xcompmgr
 xdg
 xorg
 xrandr
@@ -808,3 +813,5 @@ yml
 youtube
 zellij
 zoxide
+zsh
+zshrc
