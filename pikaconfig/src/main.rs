@@ -94,7 +94,7 @@ fn system_install(rules: &Rules, root: &Path) -> Result<()> {
 
 fn main() -> Result<()> {
     let args = cli::parse();
-    logconfig::init(args.verbose)?;
+    logconfig::init(args.quiet, args.verbose)?;
     // Main code.
     let root = cli::config_root()?;
     log::info!("Found user configuration: {root:?}");

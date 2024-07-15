@@ -6,7 +6,7 @@ use pikaconfig_bootstrap::logconfig;
 
 fn main() -> Result<()> {
     let args = cli::parse();
-    logconfig::init(args.verbose)?;
+    logconfig::init(args.quiet, args.verbose)?;
     // Main code.
     let root = cli::config_root()?;
     let command_needs_update = matches!(

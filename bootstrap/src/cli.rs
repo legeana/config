@@ -8,6 +8,8 @@ const CONFIG_ROOT_ENV: &str = "PIKACONFIG_CONFIG_ROOT";
 
 #[derive(Debug, Parser)]
 pub struct Cli {
+    #[clap(short, long)]
+    pub quiet: bool,
     #[clap(short, long, action = clap::ArgAction::Count)]
     pub verbose: u8,
     #[clap(short = 'd', long)]
