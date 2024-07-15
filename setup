@@ -39,7 +39,19 @@ fatal() {
     exit 1
 }
 
+load_cargo_env() {
+    if [[ -f ~/.cargo/env ]]; then
+        source ~/.cargo/env
+    fi
+}
+
 get_rust() {
+    if cargo --version >/dev/null 2>&1; then
+        log "Using existing cargo"
+        return
+    fi
+    # Opportunistically try to find existing Cargo installation.
+    load_cargo_env
     if cargo --version >/dev/null 2>&1; then
         log "Using existing cargo"
         return
@@ -48,9 +60,7 @@ get_rust() {
     # rust toolchain.
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s - --no-modify-path
     # Load environment from the newly installed Rust.
-    if [[ -f ~/.cargo/env ]]; then
-        source ~/.cargo/env
-    fi
+    load_cargo_env
 }
 
 native_setup() {
