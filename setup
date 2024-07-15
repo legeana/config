@@ -46,7 +46,11 @@ get_rust() {
     fi
     # Use https://rustup.rs/ as package managers often don't have new enough
     # rust toolchain.
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s - --no-modify-path
+    # Load environment from the newly installed Rust.
+    if [[ -f ~/.cargo/env ]]; then
+        source ~/.cargo/env
+    fi
 }
 
 native_setup() {
