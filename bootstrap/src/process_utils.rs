@@ -1,6 +1,6 @@
 use std::process::Command;
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{anyhow, Context, Error, Result};
 
 use crate::shlexfmt;
 
@@ -23,13 +23,26 @@ fn pretty_print(cmd: &Command) -> String {
     result.join(" ")
 }
 
+fn pretty_err(err: std::io::Error, cmd: &Command) -> Error {
+    let cmd = cmd.get_program();
+    let kind = err.kind();
+    let msg = match kind {
+        std::io::ErrorKind::NotFound => format!("{cmd:?}: not found"),
+        _ => format!("{cmd:?}: {kind}"),
+    };
+    Error::new(err).context(msg)
+}
+
 fn run_ext(cmd: &mut Command, print: bool) -> Result<()> {
     let pp = pretty_print(cmd);
     log::info!("Running {pp}");
     if print {
         println!("{pp}");
     }
-    let status = cmd.status().context(pp.clone())?;
+    let status = cmd
+        .status()
+        .map_err(|err| pretty_err(err, cmd))
+        .context(pp.clone())?;
     if !status.success() {
         return Err(anyhow!(pp));
     }
@@ -47,7 +60,10 @@ pub fn run(cmd: &mut Command) -> Result<()> {
 pub fn output(cmd: &mut Command) -> Result<String> {
     let pp = pretty_print(cmd);
     log::info!("Running {pp}");
-    let output = cmd.output().context(pp.clone())?;
+    let output = cmd
+        .output()
+        .map_err(|err| pretty_err(err, cmd))
+        .context(pp.clone())?;
     let err = String::from_utf8_lossy(&output.stderr);
     if !output.status.success() {
         return Err(anyhow!("{pp}: {err}"));
