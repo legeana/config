@@ -9,6 +9,9 @@ use rusqlite::{named_params, Connection};
 
 use crate::registry::{FilePath, FilePathBuf, Registry};
 
+const APPLICATION_ID: i32 = 0x12fe0c02;
+
+#[derive(Debug)]
 pub struct SqliteRegistry {
     conn: Connection,
 }
@@ -55,7 +58,28 @@ impl SqliteRegistry {
         Self::with_connection(conn).with_context(|| format!("failed to initialise {path:?}"))
     }
 
+    fn query_app_id(conn: &Connection) -> Result<i32> {
+        conn.query_row("PRAGMA application_id", [], |row| row.get(0))
+            .context("PRAGMA application_id")
+    }
+
+    fn init_app_id(conn: &Connection) -> Result<()> {
+        let mut app_id: i32 = Self::query_app_id(conn)?;
+        if app_id == 0 {
+            // Not initialised.
+            conn.pragma_update(None, "application_id", APPLICATION_ID)?;
+            app_id = Self::query_app_id(conn)?;
+        }
+        if app_id != APPLICATION_ID {
+            return Err(anyhow!(
+                "unexpected application_id {app_id:x}, want {APPLICATION_ID:x}"
+            ));
+        }
+        Ok(())
+    }
+
     fn with_connection(conn: Connection) -> Result<Self> {
+        Self::init_app_id(&conn)?;
         conn.execute_batch(
             "
             CREATE TABLE IF NOT EXISTS files (
@@ -250,5 +274,45 @@ mod tests {
         }
 
         assert_eq!(files, reg.files(purpose).unwrap());
+    }
+
+    #[test]
+    fn test_application_id_create() {
+        let reg = SqliteRegistry::open_in_memory().expect("open_in_memory");
+
+        let id: i32 = reg
+            .conn
+            .query_row("PRAGMA application_id", [], |row| row.get(0))
+            .unwrap();
+
+        assert_eq!(id, APPLICATION_ID);
+    }
+
+    #[test]
+    fn test_application_id_matching() {
+        let conn = Connection::open_in_memory().unwrap();
+        conn.pragma_update(None, "application_id", APPLICATION_ID)
+            .unwrap();
+
+        let reg = SqliteRegistry::with_connection(conn).unwrap();
+
+        let id: i32 = reg
+            .conn
+            .query_row("PRAGMA application_id", [], |row| row.get(0))
+            .unwrap();
+        assert_eq!(id, APPLICATION_ID);
+    }
+
+    #[test]
+    fn test_application_id_not_matching() {
+        let conn = Connection::open_in_memory().unwrap();
+        conn.pragma_update(None, "application_id", 123).unwrap();
+
+        let err = SqliteRegistry::with_connection(conn).unwrap_err();
+
+        assert_eq!(
+            err.to_string(),
+            "unexpected application_id 7b, want 12fe0c02"
+        );
     }
 }
