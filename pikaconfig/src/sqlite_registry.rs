@@ -100,8 +100,18 @@ impl SqliteRegistry {
         Ok(())
     }
 
+    fn configure_connection(conn: &Connection) -> Result<()> {
+        // Performance.
+        // https://www.sqlite.org/pragma.html#pragma_synchronous
+        conn.pragma_update(None, "synchronous", "NORMAL")?;
+        // https://www.sqlite.org/pragma.html#pragma_journal_mode
+        conn.pragma_update(None, "journal_mode", "WAL")?;
+        Ok(())
+    }
+
     fn with_connection(mut conn: Connection) -> Result<Self> {
         Self::init_app_id(&conn)?;
+        Self::configure_connection(&conn)?;
         migrations()
             .to_latest(&mut conn)
             .context("failed to migrate")?;
