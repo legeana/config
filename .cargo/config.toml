@@ -1,0 +1,3 @@
+[env]
+# Needed for RawOsString::from_raw_vec().
+OS_STR_BYTES_CHECKED_CONVERSIONS = "1"
