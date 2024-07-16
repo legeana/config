@@ -120,34 +120,36 @@ impl SqliteRegistry {
 
     fn register_file(&mut self, purpose: FilePurpose, file: FilePath) -> Result<()> {
         let (sql_type, path) = file_type_to_sql(file);
-        self.conn
-            .execute(
+        let mut stmt = self
+            .conn
+            .prepare_cached(
                 "
-            INSERT INTO files
-            (purpose, file_type, path)
-            VALUES (:purpose, :file_type, :path)
-            ",
-                named_params![
-                    ":purpose": purpose as isize,
-                    ":file_type": sql_type,
-                    ":path": path_to_sql(path),
-                ],
+                INSERT INTO files
+                (purpose, file_type, path)
+                VALUES (:purpose, :file_type, :path)
+                ",
             )
-            .with_context(|| format!("failed to register {path:?}"))?;
+            .context("failed to prepare statement")?;
+        stmt.execute(named_params![
+            ":purpose": purpose as isize,
+            ":file_type": sql_type,
+            ":path": path_to_sql(path),
+        ])
+        .with_context(|| format!("failed to register {path:?}"))?;
         Ok(())
     }
 
     fn files(&self, purpose: FilePurpose) -> Result<Vec<FilePathBuf>> {
         let mut stmt = self
             .conn
-            .prepare(
+            .prepare_cached(
                 "
-            SELECT file_type, path
-            FROM files
-            WHERE
-                purpose = :purpose
-            ORDER BY id ASC
-            ",
+                SELECT file_type, path
+                FROM files
+                WHERE
+                    purpose = :purpose
+                ORDER BY id ASC
+                ",
             )
             .context("files statement prepare")?;
         let files: Result<Vec<_>, _> = stmt
@@ -170,10 +172,10 @@ impl SqliteRegistry {
         self.conn
             .execute(
                 "
-            DELETE FROM files
-            WHERE
-                purpose = :purpose
-            ",
+                DELETE FROM files
+                WHERE
+                    purpose = :purpose
+                ",
                 named_params![":purpose": purpose as isize],
             )
             .with_context(|| format!("clear {purpose:?} files"))?;
