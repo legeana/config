@@ -21,7 +21,7 @@ fn migrations() -> &'static Migrations<'static> {
             // This Vec is append-only.
             M::up(
                 "
-                CREATE TABLE IF NOT EXISTS files (
+                CREATE TABLE files (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     purpose INTEGER NOT NULL,
                     file_type INTEGER NOT NULL,
