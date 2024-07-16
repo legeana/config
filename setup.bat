@@ -1,6 +1,9 @@
 @echo off
 setlocal
 
+:: Execute from the project root.
+cd /d "%~dp0"
+
 winget install gerardog.gsudo
 
 set BOOTSTRAP=pikaconfig-bootstrap
