@@ -28,7 +28,8 @@ fn migrations() -> &'static Migrations<'static> {
                     path BLOB NOT NULL
                 )
                 ",
-            ),
+            )
+            .down("DROP TABLE files"),
         ])
     })
 }
@@ -345,6 +346,14 @@ mod tests {
     #[test]
     fn test_migrations() {
         assert_eq!(migrations().validate(), Ok(()));
+    }
+
+    #[test]
+    fn test_migrations_downgrade() {
+        let mut conn = Connection::open_in_memory().unwrap();
+        migrations().to_latest(&mut conn).unwrap();
+
+        assert_eq!(migrations().to_version(&mut conn, 0), Ok(()));
     }
 
     #[test]
