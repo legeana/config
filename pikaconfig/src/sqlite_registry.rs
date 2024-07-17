@@ -343,12 +343,12 @@ mod tests {
     }
 
     #[test]
-    fn migrations_test() {
+    fn test_migrations() {
         assert_eq!(migrations().validate(), Ok(()));
     }
 
     #[test]
-    fn migrations_database_too_far_ahead() {
+    fn test_migrations_database_too_far_ahead() {
         let conn = Connection::open_in_memory().unwrap();
         conn.pragma_update(None, "user_version", 1000).unwrap();
 
