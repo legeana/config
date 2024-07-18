@@ -7,3 +7,8 @@ wants = { command = "starship" }
 any = "starship"
 apt = []
 wants = { command = "starship" }
+
+[[system_dependencies]]
+# cmake is required for building starship via cargo.
+apt = "cmake"
+wants = { command = "cmake" }
