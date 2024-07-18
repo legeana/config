@@ -5,4 +5,5 @@ wants = { command = "starship" }
 
 [[system_dependencies]]
 any = "starship"
+apt = []
 wants = { command = "starship" }
