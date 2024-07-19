@@ -1,3 +1,7 @@
 xdg_config_prefix environment.d
-symlink 10_cargo_bin.conf
-symlink 10_local_bin.conf
+
+# Must be at the end of everything to take precedence.
+# systemd-environment-d-generator iterates over all .conf files in
+# lexicographical order with system and user files sorted together.
+symlink 9999_cargo_bin.conf
+symlink 9999_local_bin.conf
