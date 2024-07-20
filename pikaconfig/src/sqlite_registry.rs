@@ -13,12 +13,43 @@ use crate::registry::{FilePath, FilePathBuf, Registry};
 
 const APPLICATION_ID: i32 = 0x12fe0c02;
 
-fn migrations() -> &'static Migrations<'static> {
-    static INSTANCE: OnceCell<Migrations<'static>> = OnceCell::new();
+struct MigrationsConfig {
+    migrations: Migrations<'static>,
+    stable_version: usize,
+    unstable_version: usize,
+}
+
+impl MigrationsConfig {
+    fn to_stable(&self, conn: &mut Connection) -> Result<()> {
+        self.migrations
+            .to_version(conn, self.stable_version)
+            .with_context(|| {
+                format!(
+                    "failed to migrate to stable version {}",
+                    self.stable_version
+                )
+            })
+    }
+    fn to_unstable(&self, conn: &mut Connection) -> Result<()> {
+        self.migrations
+            .to_version(conn, self.unstable_version)
+            .with_context(|| {
+                format!(
+                    "failed to migrate to unstable version {}",
+                    self.unstable_version
+                )
+            })
+    }
+}
+
+fn migrations() -> &'static MigrationsConfig {
+    static INSTANCE: OnceCell<MigrationsConfig> = OnceCell::new();
     INSTANCE.get_or_init(|| {
-        Migrations::new(vec![
-            // Migrations must never change their index.
+        // Migrations must never change their index.
+        // Migrations must end with a semicolon.
+        let stable: Vec<M> = vec![
             // This Vec is append-only.
+            // If there is an issue with a migration add another one.
             M::up(
                 "
                 CREATE TABLE files (
@@ -26,11 +57,21 @@ fn migrations() -> &'static Migrations<'static> {
                     purpose INTEGER NOT NULL,
                     file_type INTEGER NOT NULL,
                     path BLOB NOT NULL
-                )
+                );
                 ",
-            )
-            .down("DROP TABLE files"),
-        ])
+            ),
+        ];
+        let unstable: Vec<M> = vec![
+            // This Vec can be modified.
+            // Used for experimental changes that may be reverted.
+        ];
+        let stable_size = stable.len();
+        let unstable_size = unstable.len();
+        MigrationsConfig {
+            migrations: Migrations::new([stable, unstable].concat()),
+            stable_version: stable_size,
+            unstable_version: stable_size + unstable_size,
+        }
     })
 }
 
@@ -114,7 +155,7 @@ impl SqliteRegistry {
         Self::init_app_id(&conn)?;
         Self::configure_connection(&conn)?;
         migrations()
-            .to_latest(&mut conn)
+            .to_stable(&mut conn)
             .context("failed to migrate")?;
         Ok(Self { conn })
     }
@@ -344,16 +385,33 @@ mod tests {
     }
 
     #[test]
-    fn test_migrations() {
-        assert_eq!(migrations().validate(), Ok(()));
+    fn test_migrations_empty_to_stable() {
+        let mut conn = Connection::open_in_memory().unwrap();
+
+        migrations().to_stable(&mut conn).expect("must be ok");
     }
 
     #[test]
-    fn test_migrations_downgrade() {
+    fn test_migrations_empty_to_unstable() {
         let mut conn = Connection::open_in_memory().unwrap();
-        migrations().to_latest(&mut conn).unwrap();
 
-        assert_eq!(migrations().to_version(&mut conn, 0), Ok(()));
+        migrations().to_unstable(&mut conn).expect("must be ok");
+    }
+
+    #[test]
+    fn test_migrations_stable_to_unstable() {
+        let mut conn = Connection::open_in_memory().unwrap();
+        migrations().to_stable(&mut conn).expect("must be ok");
+
+        migrations().to_unstable(&mut conn).expect("must be ok");
+    }
+
+    #[test]
+    fn test_migrations_unstable_to_stable() {
+        let mut conn = Connection::open_in_memory().unwrap();
+        migrations().to_unstable(&mut conn).expect("must be ok");
+
+        migrations().to_stable(&mut conn).expect("must be ok");
     }
 
     #[test]
