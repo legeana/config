@@ -1,5 +1,3 @@
-#![allow(dead_code)] // TODO: remove when integrated
-
 use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Context, Error, Result};
@@ -16,6 +14,7 @@ const APPLICATION_ID: i32 = 0x12fe0c02;
 struct MigrationsConfig {
     migrations: Migrations<'static>,
     stable_version: usize,
+    #[allow(dead_code)]
     unstable_version: usize,
 }
 
@@ -30,6 +29,7 @@ impl MigrationsConfig {
                 )
             })
     }
+    #[allow(dead_code)]
     fn to_unstable(&self, conn: &mut Connection) -> Result<()> {
         self.migrations
             .to_version(conn, self.unstable_version)
@@ -112,6 +112,7 @@ enum FilePurpose {
 
 impl SqliteRegistry {
     /// For tests only.
+    #[allow(dead_code)]
     fn open_in_memory() -> Result<Self> {
         let conn = Connection::open_in_memory().context("failed to open in memory")?;
         Self::with_connection(conn)
