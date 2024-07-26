@@ -65,13 +65,6 @@ get_rust() {
 
 native_setup() {
     get_rust
-
-    # Build environment.
-    # Keep in sync with .cargo/config.toml.
-    # Required because Cargo doesn't load config.toml unless run from the
-    # project root.
-    export OS_STR_BYTES_CHECKED_CONVERSIONS=1
-
     cargo run \
         --manifest-path="$SRC/Cargo.toml" \
         --package="$BOOTSTRAP" \
