@@ -8,7 +8,15 @@ use anyhow::Result;
 
 #[cfg(any(test, windows))]
 mod windows {
-    use anyhow::{anyhow, Result};
+    use thiserror::Error;
+
+    #[derive(Debug, Error, PartialEq)]
+    pub(super) enum Error {
+        #[error("odd number of bytes, must be even")]
+        OddNumberOfBytes,
+    }
+
+    pub(super) type Result<T> = std::result::Result<T, Error>;
 
     pub(super) fn to_wide(b: [u8; 2]) -> u16 {
         u16::from_le_bytes(b)
@@ -20,12 +28,12 @@ mod windows {
 
     pub(super) fn to_wide_vec(b: Vec<u8>) -> Result<Vec<u16>> {
         if b.len() % 2 != 0 {
-            return Err(anyhow!("must have even size"));
+            return Err(Error::OddNumberOfBytes);
         }
         let mut r = Vec::<u16>::with_capacity(b.len() / 2);
         for c in b.chunks(2) {
             if c.len() != 2 {
-                return Err(anyhow!("uneven number of bytes"));
+                return Err(Error::OddNumberOfBytes);
             }
             r.push(to_wide([c[0], c[1]]));
         }
@@ -111,7 +119,10 @@ mod tests {
 
     #[test]
     fn test_to_wide_vec_odd() {
-        assert!(windows::to_wide_vec(vec![0x00]).is_err());
+        assert_eq!(
+            windows::to_wide_vec(vec![0x00]),
+            Err(windows::Error::OddNumberOfBytes),
+        );
     }
 
     #[test]
