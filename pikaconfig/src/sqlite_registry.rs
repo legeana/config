@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
+use std::sync::OnceLock;
 
 use anyhow::{anyhow, Context, Error, Result};
-use once_cell::sync::OnceCell;
 use rusqlite::types::Type;
 use rusqlite::{named_params, Connection};
 use rusqlite_migration::{Migrations, M};
@@ -42,7 +42,7 @@ impl MigrationsConfig {
 }
 
 fn migrations() -> &'static MigrationsConfig {
-    static INSTANCE: OnceCell<MigrationsConfig> = OnceCell::new();
+    static INSTANCE: OnceLock<MigrationsConfig> = OnceLock::new();
     INSTANCE.get_or_init(|| {
         // Migrations must never change their index.
         // Migrations must end with a semicolon.

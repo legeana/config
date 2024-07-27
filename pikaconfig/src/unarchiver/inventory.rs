@@ -1,8 +1,7 @@
 use std::collections::HashMap;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 use anyhow::{anyhow, Result};
-use once_cell::sync::OnceCell;
 
 use super::{Unarchiver, UnarchiverBox};
 
@@ -34,7 +33,7 @@ impl Registry {
 }
 
 fn registry() -> &'static Registry {
-    static INSTANCE: OnceCell<Registry> = OnceCell::new();
+    static INSTANCE: OnceLock<Registry> = OnceLock::new();
     INSTANCE.get_or_init(|| {
         let mut registry = Registry::default();
         register_all(&mut registry);

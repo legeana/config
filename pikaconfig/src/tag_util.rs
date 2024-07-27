@@ -1,10 +1,10 @@
 use std::path::Path;
+use std::sync::LazyLock;
 
 use anyhow::{anyhow, Context, Result};
-use once_cell::sync::Lazy;
 use sysinfo::System;
 
-static SYSINFO: Lazy<SystemInfo> = Lazy::new(SystemInfo::new);
+static SYSINFO: LazyLock<SystemInfo> = LazyLock::new(SystemInfo::new);
 
 pub fn has_tag(tag: &str) -> Result<bool> {
     if let Some((key, value)) = tag.split_once("!=") {

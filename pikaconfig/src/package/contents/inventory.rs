@@ -1,7 +1,7 @@
 use std::collections::HashMap;
+use std::sync::OnceLock;
 
 use anyhow::{anyhow, Result};
-use once_cell::sync::OnceCell;
 use tera::Tera;
 
 use super::engine;
@@ -92,7 +92,7 @@ fn register_all(registry: &mut dyn Registry) {
 }
 
 fn registry() -> &'static RegistryImpl {
-    static INSTANCE: OnceCell<RegistryImpl> = OnceCell::new();
+    static INSTANCE: OnceLock<RegistryImpl> = OnceLock::new();
     INSTANCE.get_or_init(|| {
         let mut registry = RegistryImpl::default();
         register_all(&mut registry);

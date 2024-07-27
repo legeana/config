@@ -851,7 +851,6 @@ dependencies = [
  "libc",
  "log",
  "logos",
- "once_cell",
  "pikaconfig-bootstrap",
  "pretty_assertions",
  "rstest",
