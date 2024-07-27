@@ -1,0 +1,5 @@
+has_contents = false
+
+[[user_dependencies]]
+cargo = "git-branchless"
+wants = { command = "git-branchless" }
