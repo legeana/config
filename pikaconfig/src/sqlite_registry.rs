@@ -99,7 +99,9 @@ fn path_to_sql(path: &Path) -> Vec<u8> {
 }
 
 fn path_from_sql(path: Vec<u8>) -> Result<PathBuf> {
-    Ok(crate::os_str::from_vec(path)?.into())
+    Ok(crate::os_str::from_vec(path)
+        .context("failed to parse path")?
+        .into())
 }
 
 #[derive(Clone, Copy, Debug)]
