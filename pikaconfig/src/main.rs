@@ -13,6 +13,7 @@ mod file_util;
 mod iter_util;
 mod layout;
 mod module;
+mod os_str;
 mod package;
 mod quote;
 mod registry;

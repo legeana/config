@@ -2,7 +2,6 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Context, Error, Result};
 use once_cell::sync::OnceCell;
-use os_str_bytes::RawOsString;
 use rusqlite::types::Type;
 use rusqlite::{named_params, Connection};
 use rusqlite_migration::{Migrations, M};
@@ -95,13 +94,12 @@ fn file_type_from_sql(file_type: i32, path: PathBuf) -> Result<FilePathBuf> {
     }
 }
 
-fn path_to_sql(path: &Path) -> &[u8] {
-    path.as_os_str().as_encoded_bytes()
+fn path_to_sql(path: &Path) -> Vec<u8> {
+    crate::os_str::to_vec(path.as_os_str().to_os_string())
 }
 
 fn path_from_sql(path: Vec<u8>) -> Result<PathBuf> {
-    let path = RawOsString::from_raw_vec(path)?;
-    Ok(path.into_os_string().into())
+    Ok(crate::os_str::from_vec(path)?.into())
 }
 
 #[derive(Clone, Copy, Debug)]
