@@ -145,8 +145,7 @@ pub struct Location {
 }
 
 impl Location {
-    // Used only in tests.
-    #[allow(dead_code)]
+    #[cfg(test)]
     pub fn new_p_l_c(index: usize, line_number: usize, column: usize) -> Self {
         Self {
             index,
