@@ -116,7 +116,6 @@ fn unquote_impl(text: &str) -> UnquoteState {
     }
 }
 
-#[allow(dead_code)]
 pub fn unquote<S: AsRef<str>>(text: S) -> Result<String, UnquoteError> {
     type S = UnquoteState;
     let text = text.as_ref();
