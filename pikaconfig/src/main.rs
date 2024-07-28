@@ -10,7 +10,6 @@ mod command;
 mod empty_struct;
 mod file_registry;
 mod file_util;
-mod iter_util;
 mod layout;
 mod module;
 mod os_str;

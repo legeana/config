@@ -2,18 +2,15 @@
 
 use std::path::{Path, PathBuf};
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result};
 use serde::Deserialize;
 
-use crate::file_util;
-use crate::iter_util;
 use crate::string_list::StringList;
 use crate::tag_criteria;
 
 use super::satisficer::DependencySatisficer;
 
 const PACKAGE_CONFIG_TOML: &str = "package.toml";
-const PACKAGE_CONFIG_YAML: &str = "package.yaml";
 
 fn default_has_contents() -> bool {
     true
@@ -185,33 +182,14 @@ fn load_toml_string(data: &str) -> Result<Package> {
     toml::from_str(data).context("failed to deserialize Package")
 }
 
-fn load_yaml_string(data: &str) -> Result<Package> {
-    serde_yaml::from_str(data).context("failed to deserialize Package")
-}
-
 fn load_toml_file(config_path: &Path) -> Result<Package> {
     let input = std::fs::read_to_string(config_path)
         .with_context(|| format!("failed to read {config_path:?}"))?;
     load_toml_string(&input).with_context(|| format!("failed to parse {config_path:?}"))
 }
 
-fn load_yaml_file(config_path: &Path) -> Result<Package> {
-    let input = std::fs::read_to_string(config_path)
-        .with_context(|| format!("failed to read {config_path:?}"))?;
-    load_yaml_string(&input).with_context(|| format!("failed to parse {config_path:?}"))
-}
-
 pub fn load_package(root: &Path) -> Result<Package> {
-    let packages: Vec<Package> = [
-        file_util::skip_not_found(load_toml_file(&root.join(PACKAGE_CONFIG_TOML)))?,
-        file_util::skip_not_found(load_yaml_file(&root.join(PACKAGE_CONFIG_YAML)))?,
-    ]
-    .into_iter()
-    .flatten()
-    .collect();
-    iter_util::to_option(packages)
-        .with_context(|| format!("{root:?} has multiple package.* files"))?
-        .ok_or_else(|| anyhow!("{root:?} is not a package"))
+    load_toml_file(&root.join(PACKAGE_CONFIG_TOML))
 }
 
 #[cfg(test)]
