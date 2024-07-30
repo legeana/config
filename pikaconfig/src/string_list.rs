@@ -20,7 +20,6 @@ impl StringList {
     pub fn to_vec(&self) -> Vec<String> {
         self.as_slice().to_vec()
     }
-    #[allow(dead_code)]
     pub fn is_empty(&self) -> bool {
         self.as_slice().is_empty()
     }
