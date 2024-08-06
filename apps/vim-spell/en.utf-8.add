@@ -88,6 +88,7 @@ cd
 cdn
 certtool
 cfg
+cgt
 changelist
 changelists
 chdir
@@ -147,6 +148,7 @@ dedent
 deepcopy
 defaultdict
 defs
+deliveredto
 denylist
 denylisted
 dep
