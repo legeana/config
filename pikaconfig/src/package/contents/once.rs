@@ -87,9 +87,10 @@ impl engine::Statement for OnceStatement {
         match self.statement.eval(ctx)? {
             Some(module) => {
                 let tags = local_state::ephemeral_dir_state(&self.workdir, &self.tag)?;
-                let pre_install_tag = tags.path().join("pre_install");
-                let install_tag = tags.path().join("install");
-                let post_install_tag = tags.path().join("post_install");
+                let tag_dir = tags.state().to_path_buf();
+                let pre_install_tag = tag_dir.join("pre_install");
+                let install_tag = tag_dir.join("install");
+                let post_install_tag = tag_dir.join("post_install");
                 Ok(Some(Box::new((
                     tags,
                     Once {

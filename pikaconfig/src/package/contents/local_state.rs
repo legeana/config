@@ -179,9 +179,6 @@ impl std::fmt::Debug for StateMapping {
 pub struct EphemeralDir(PathBuf);
 
 impl EphemeralDir {
-    pub fn path(&self) -> &Path {
-        &self.0
-    }
     pub fn state(&self) -> AnnotatedPathBox {
         Box::new(self.0.clone())
     }
@@ -196,9 +193,6 @@ impl Module for EphemeralDir {
 pub struct EphemeralFile(PathBuf);
 
 impl EphemeralFile {
-    pub fn path(&self) -> &Path {
-        &self.0
-    }
     pub fn state(&self) -> AnnotatedPathBox {
         Box::new(self.0.clone())
     }

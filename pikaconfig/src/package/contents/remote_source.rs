@@ -3,6 +3,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result};
 use indoc::formatdoc;
 
+use crate::annotated_path::AnnotatedPathBox;
 use crate::module::{Module, Rules};
 use crate::registry::Registry;
 use crate::unarchiver;
@@ -15,8 +16,8 @@ use super::net_util;
 
 struct RemoteArchive {
     url: String,
-    archive: PathBuf,
-    source: PathBuf,
+    archive: AnnotatedPathBox,
+    source: AnnotatedPathBox,
     unarchiver: &'static dyn unarchiver::Unarchiver,
 }
 
@@ -34,6 +35,7 @@ impl RemoteArchive {
             && !rules.force_update
             && self
                 .archive
+                .as_path()
                 .try_exists()
                 .with_context(|| format!("failed to check if {:?} exists", self.archive))?
         {
@@ -52,7 +54,7 @@ impl RemoteArchive {
     fn unpack(&self, rules: &Rules, force: bool) -> Result<bool> {
         if !force
             && !rules.force_update
-            && !is_dir_empty(&self.source)
+            && !is_dir_empty(self.source.as_path())
                 .with_context(|| format!("failed to check if {:?} is empty", self.source))?
         {
             log::info!(
@@ -64,7 +66,7 @@ impl RemoteArchive {
         }
         log::info!("Unpack: {:?} -> {:?}", self.archive, self.source);
         self.unarchiver
-            .unarchive(&self.archive, &self.source)
+            .unarchive(self.archive.as_path(), self.source.as_path())
             .with_context(|| {
                 format!("failed to unpack {:?} into {:?}", self.archive, self.source)
             })?;
@@ -91,12 +93,13 @@ struct RemoteArchiveExpression {
 impl engine::Expression for RemoteArchiveExpression {
     fn eval(&self, _ctx: &mut engine::Context) -> Result<engine::ExpressionOutput> {
         let archive = local_state::file_cache(&self.workdir, Path::new(&self.filename), &self.url)?;
-        let archive_path = archive.path().to_owned();
+        let archive_path = archive.state();
         let source = local_state::dir_cache(&self.workdir, Path::new(&self.filename), &self.url)?;
-        let source_path = source.path().to_owned();
+        let source_path = source.state();
+        let output = source_path.to_path_buf().into_os_string();
         // TODO: consider building this in Builder.
         // This will not evaluate in a false branch of an if statement.
-        let unarchiver = unarchiver::by_filename(&archive_path)
+        let unarchiver = unarchiver::by_filename(archive_path.as_path())
             .with_context(|| format!("failed to find unarchiver for {archive_path:?}"))?;
         Ok(engine::ExpressionOutput {
             module: Some(Box::new((
@@ -105,11 +108,11 @@ impl engine::Expression for RemoteArchiveExpression {
                 RemoteArchive {
                     url: self.url.clone(),
                     archive: archive_path,
-                    source: source_path.clone(),
+                    source: source_path,
                     unarchiver,
                 },
             ))),
-            output: source_path.into_os_string(),
+            output,
         })
     }
 }
