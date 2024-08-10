@@ -1,3 +1,9 @@
 prefix ~
 symlink_to .gitconfig gitconfig
 symlink_to .gitconfig-user gitconfig-user
+
+if is_windows {
+    symlink_to .gitconfig-editor gitconfig-editor-windows
+} else {
+    symlink_to .gitconfig-editor gitconfig-editor-unspecified
+}
