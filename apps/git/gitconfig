@@ -1,3 +1,6 @@
+[core]
+    editor = nvim
+
 [include]
     path = ~/.gitconfig-editor
     path = ~/.gitconfig-user

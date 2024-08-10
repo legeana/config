@@ -41,7 +41,7 @@ mod windows {
     }
 
     pub(super) fn from_wide_iter(w: impl Iterator<Item = u16>) -> Vec<u8> {
-        w.map(from_wide).flatten().collect()
+        w.flat_map(from_wide).collect()
     }
 }
 
