@@ -3,6 +3,9 @@ use std::path::{Path, PathBuf};
 // AnnotatedPath represents a path with a custom debug representation.
 pub trait AnnotatedPath: std::fmt::Debug {
     fn as_path(&self) -> &Path;
+    fn to_path_buf(&self) -> PathBuf {
+        self.as_path().to_path_buf()
+    }
 }
 
 pub type AnnotatedPathBox = Box<dyn AnnotatedPath>;
@@ -11,11 +14,17 @@ impl<T: AnnotatedPath + ?Sized> AnnotatedPath for &T {
     fn as_path(&self) -> &Path {
         T::as_path(self)
     }
+    fn to_path_buf(&self) -> PathBuf {
+        T::to_path_buf(self)
+    }
 }
 
 impl<T: AnnotatedPath + ?Sized> AnnotatedPath for Box<T> {
     fn as_path(&self) -> &Path {
         T::as_path(self)
+    }
+    fn to_path_buf(&self) -> PathBuf {
+        T::to_path_buf(self)
     }
 }
 
@@ -43,6 +52,7 @@ mod tests {
         let ap: AnnotatedPathBox = Box::new(path.to_owned());
         assert_eq!(format!("{ap:?}"), "\"test\"");
         assert_eq!(ap.as_path(), path);
+        assert_eq!(ap.to_path_buf(), path);
     }
 
     #[test]
@@ -51,5 +61,6 @@ mod tests {
         let ap: AnnotatedPathBox = Box::new(path);
         assert_eq!(format!("{ap:?}"), "\"test\"");
         assert_eq!(ap.as_path(), path);
+        assert_eq!(ap.to_path_buf(), path);
     }
 }
