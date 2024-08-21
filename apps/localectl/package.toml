@@ -6,7 +6,9 @@ bash = "sudo localectl set-locale en_GB.UTF-8"
 
 [[system_dependencies]]
 requires = ["os=linux", "distro!=debian"]
-bash = "sudo localectl set-x11-keymap gb,ru pc105 '' grp:alt_space_toggle"
+bash = """
+sudo localectl set-x11-keymap gb,ru pc105 '' caps:escape,grp:alt_space_toggle
+"""
 
 [[system_dependencies]]
 requires = ["os=linux", "distro=debian"]
@@ -16,7 +18,7 @@ bash = """
 sedscript='
 s|^XKBLAYOUT=.*$|XKBLAYOUT="gb,ru"|;
 s|^XKBMODEL=.*$|XKBMODEL="pc105"|;
-s|^XKBOPTIONS=.*$|XKBOPTIONS="grp:alt_space_toggle"|;
+s|^XKBOPTIONS=.*$|XKBOPTIONS="caps:escape,grp:alt_space_toggle"|;
 s|^XKBVARIANT=.*$|XKBVARIANT=""|;
 '
 sudo sed -r "$sedscript" -i /etc/default/keyboard

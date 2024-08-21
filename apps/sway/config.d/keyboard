@@ -1,4 +1,4 @@
 input type:keyboard {
     xkb_layout gb,ru
-    xkb_options grp:alt_space_toggle
+    xkb_options caps:escape,grp:alt_space_toggle
 }
