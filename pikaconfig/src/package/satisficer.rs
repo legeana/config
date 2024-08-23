@@ -1,9 +1,11 @@
 use std::path::PathBuf;
+use std::process::Command;
 
 use anyhow::{Context, Result};
 use serde::Deserialize;
 
 use crate::command;
+use crate::process_utils;
 
 pub trait Satisficer {
     fn is_satisfied(&self) -> Result<bool>;
@@ -28,6 +30,7 @@ pub enum DependencySatisficer {
     AnyCommand { any_command: Vec<PathBuf> },
     AllCommands { all_commands: Vec<PathBuf> },
     File { file: PathBuf },
+    PkgConfig { pkg_config: String },
 }
 
 impl Satisficer for DependencySatisficer {
@@ -60,6 +63,11 @@ impl Satisficer for DependencySatisficer {
                 Ok(path
                     .try_exists()
                     .with_context(|| format!("failed to check if {file:?} exists"))?)
+            }
+            DependencySatisficer::PkgConfig { pkg_config } => {
+                let mut cmd = Command::new("pkg-config");
+                cmd.arg("--").arg(pkg_config);
+                Ok(process_utils::run(&mut cmd).is_ok())
             }
         }
     }
