@@ -11,7 +11,7 @@ wants = { command = "pkg-config" }
 [[system_dependencies]]
 requires = "distro=debian"
 apt = "libfontconfig-dev"
-# TODO: wants = { pkg_config = "fontconfig" }
+wants = { pkg_config = "fontconfig" }
 [[user_dependencies]]
 requires = "distro=debian"
 cargo = "alacritty"
