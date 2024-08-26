@@ -68,6 +68,8 @@ impl UserDependency {
 
 impl Module for UserDependency {
     fn pre_uninstall(&self, rules: &Rules) -> Result<()> {
+        // FIXME: If a package is installed via system_dependencies, then this
+        // will attempt to install package from a user dependency.
         if !rules.force_update && self.wants.is_satisfied()? {
             return Ok(());
         }

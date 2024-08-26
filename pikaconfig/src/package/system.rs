@@ -53,6 +53,8 @@ impl SystemDependency {
 
 impl Module for SystemDependency {
     fn system_install(&self, rules: &Rules) -> Result<()> {
+        // FIXME: If a package is installed via user_dependencies, then this
+        // will attempt to install package from a system dependency.
         if !rules.force_update && self.wants.is_satisfied()? {
             return Ok(());
         }
