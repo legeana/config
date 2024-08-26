@@ -142,6 +142,15 @@ pub enum CargoDependency {
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
+pub struct FlatpakDependency {
+    pub repository: String,
+    pub package: String,
+    pub alias: Option<String>,
+    pub overrides: Option<StringList>,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
+#[serde(deny_unknown_fields)]
 pub struct BinaryUrlDependency {
     pub url: String,
     pub filename: String,
@@ -173,6 +182,7 @@ pub struct UserDependency {
     pub npm: Option<StringList>,
     pub pip_user: Option<StringList>,
     pub pipx: Option<StringList>,
+    pub flatpak: Option<FlatpakDependency>,
     // Binary management.
     pub binary_url: Option<BinaryUrlDependency>,
     pub github_release: Option<GithubReleaseDependency>,
@@ -507,6 +517,36 @@ mod tests {
                     })),
                     ..Default::default()
                 },]),
+                ..Default::default()
+            },
+        );
+    }
+
+    #[test]
+    fn load_flatpak_dependency() {
+        let pkg = load_toml_string(
+            "
+            [[user_dependencies]]
+            [user_dependencies.flatpak]
+            repository = 'flathub'
+            package = 'com.pkg'
+            alias = 'pkg'
+            overrides = ['--env=foo=bar']
+            ",
+        )
+        .expect("load_toml_string");
+        assert_eq!(
+            pkg,
+            Package {
+                user_dependencies: Some(vec![UserDependency {
+                    flatpak: Some(FlatpakDependency {
+                        repository: "flathub".to_owned(),
+                        package: "com.pkg".to_owned(),
+                        alias: Some("pkg".to_owned()),
+                        overrides: Some(StringList::List(vec!["--env=foo=bar".to_owned()])),
+                    }),
+                    ..Default::default()
+                }]),
                 ..Default::default()
             },
         );
