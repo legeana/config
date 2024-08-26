@@ -48,6 +48,11 @@ impl UserDependency {
                 packages: pipx.to_vec(),
             }));
         }
+        if let Some(flatpak) = &cfg.flatpak {
+            installers.push(Box::new(Flatpak {
+                config: flatpak.clone(),
+            }));
+        }
         if cfg.binary_url.is_some() {
             return Err(anyhow!("binary_url is not supported yet"));
         }
@@ -180,5 +185,57 @@ impl Installer for Pipx {
         cmd.arg("--");
         cmd.args(&self.packages);
         process_utils::run_verbose(&mut cmd)
+    }
+}
+
+struct Flatpak {
+    config: config::FlatpakDependency,
+}
+
+impl Flatpak {
+    fn clear_overrides(&self) -> Result<()> {
+        let mut cmd = Command::new("flatpak");
+        cmd.arg("--user");
+        cmd.arg("override");
+        cmd.arg("--reset");
+        cmd.arg("--");
+        cmd.arg(&self.config.package);
+        process_utils::run_verbose(&mut cmd)
+    }
+    fn set_overrides(&self) -> Result<()> {
+        self.clear_overrides()?;
+        let mut cmd = Command::new("flatpak");
+        cmd.arg("--user");
+        cmd.arg("override");
+        if let Some(overrides) = &self.config.overrides {
+            cmd.args(overrides.as_slice());
+        }
+        cmd.arg("--");
+        cmd.arg(&self.config.package);
+        process_utils::run_verbose(&mut cmd)
+    }
+    fn make_alias(&self) -> Result<()> {
+        // TODO: need registry
+        Ok(())
+    }
+}
+
+impl Installer for Flatpak {
+    fn install(&self, rules: &Rules) -> Result<()> {
+        let mut cmd = Command::new("flatpak");
+        cmd.arg("--user");
+        cmd.arg("install");
+        if rules.force_update {
+            cmd.arg("--or-update");
+        }
+        if rules.force_reinstall {
+            cmd.arg("--reinstall");
+        }
+        cmd.arg("--");
+        cmd.arg(&self.config.repository);
+        cmd.arg(&self.config.package);
+        process_utils::run_verbose(&mut cmd)?;
+        self.set_overrides()?;
+        self.make_alias()
     }
 }
