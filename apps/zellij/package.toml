@@ -1,9 +1,0 @@
-requires = "family=unix"
-
-[[user_dependencies]]
-cargo = "zellij"
-wants = { command = "zellij" }
-
-[[system_dependencies]]
-pacman = "zellij"
-wants = { command = "zellij" }
