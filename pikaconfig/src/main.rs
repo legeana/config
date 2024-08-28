@@ -17,7 +17,6 @@ mod package;
 mod quote;
 mod registry;
 mod repository;
-mod sqlite_registry;
 mod string_list;
 mod symlink_util;
 mod tag_criteria;
@@ -43,9 +42,9 @@ const INSTALL_REGISTRY: &str = ".install";
 const STATE_REGISTRY: &str = ".state";
 const SQL_REGISTRY: &str = ".install.sqlite";
 
-fn registry(root: &Path) -> Result<sqlite_registry::SqliteRegistry> {
+fn registry(root: &Path) -> Result<registry::sqlite::SqliteRegistry> {
     let sql_path = root.join(SQL_REGISTRY);
-    sqlite_registry::SqliteRegistry::open(&sql_path)
+    registry::sqlite::SqliteRegistry::open(&sql_path)
         .with_context(|| format!("failed to open SQLite registry {sql_path:?}"))
 }
 
