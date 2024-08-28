@@ -1,4 +1,4 @@
-use crate::registry::{FilePath, FilePathBuf, Registry};
+use crate::registry::{FilePath, FilePathBuf, ImmutableRegistry, Registry};
 
 use std::{
     io::{ErrorKind, Write},
@@ -64,10 +64,7 @@ impl FileRegistry {
     }
 }
 
-impl Registry for FileRegistry {
-    fn register_user_file(&mut self, file: FilePath) -> Result<()> {
-        self.user_files.push(file.path())
-    }
+impl ImmutableRegistry for FileRegistry {
     fn user_files(&self) -> Result<Vec<FilePathBuf>> {
         // Not technically correct but we didn't store this information.
         // Current Uninstaller implementation strips FileType anyway.
@@ -78,9 +75,6 @@ impl Registry for FileRegistry {
     fn clear_user_files(&mut self) -> Result<()> {
         self.user_files.clear()
     }
-    fn register_state_file(&mut self, file: FilePath) -> Result<()> {
-        self.state_files.push(file.path())
-    }
     fn state_files(&self) -> Result<Vec<FilePathBuf>> {
         // Not technically correct but we didn't store this information.
         // Current Uninstaller implementation strips FileType anyway.
@@ -90,5 +84,14 @@ impl Registry for FileRegistry {
     }
     fn clear_state_files(&mut self) -> Result<()> {
         self.state_files.clear()
+    }
+}
+
+impl Registry for FileRegistry {
+    fn register_user_file(&mut self, file: FilePath) -> Result<()> {
+        self.user_files.push(file.path())
+    }
+    fn register_state_file(&mut self, file: FilePath) -> Result<()> {
+        self.state_files.push(file.path())
     }
 }

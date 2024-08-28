@@ -6,7 +6,7 @@ use rusqlite::types::Type;
 use rusqlite::{named_params, Connection};
 use rusqlite_migration::{Migrations, M};
 
-use crate::registry::{FilePath, FilePathBuf, Registry};
+use crate::registry::{FilePath, FilePathBuf, ImmutableRegistry, Registry};
 
 const APPLICATION_ID: i32 = 0x12fe0c02;
 
@@ -236,24 +236,28 @@ impl SqliteRegistry {
     }
 }
 
-impl Registry for SqliteRegistry {
-    fn register_user_file(&mut self, file: FilePath) -> Result<()> {
-        self.register_file(FilePurpose::User, file)
-    }
+impl ImmutableRegistry for SqliteRegistry {
     fn user_files(&self) -> Result<Vec<FilePathBuf>> {
         self.files(FilePurpose::User)
     }
     fn clear_user_files(&mut self) -> Result<()> {
         self.clear_files(FilePurpose::User)
     }
-    fn register_state_file(&mut self, file: FilePath) -> Result<()> {
-        self.register_file(FilePurpose::State, file)
-    }
+
     fn state_files(&self) -> Result<Vec<FilePathBuf>> {
         self.files(FilePurpose::State)
     }
     fn clear_state_files(&mut self) -> Result<()> {
         self.clear_files(FilePurpose::State)
+    }
+}
+
+impl Registry for SqliteRegistry {
+    fn register_user_file(&mut self, file: FilePath) -> Result<()> {
+        self.register_file(FilePurpose::User, file)
+    }
+    fn register_state_file(&mut self, file: FilePath) -> Result<()> {
+        self.register_file(FilePurpose::State, file)
     }
 }
 
