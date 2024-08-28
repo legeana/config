@@ -1,32 +1,13 @@
-use crate::registry::{FilePath, FilePathBuf, ImmutableRegistry, Registry};
+use crate::registry::{FilePathBuf, ImmutableRegistry};
 
-use std::{
-    io::{ErrorKind, Write},
-    path::{Path, PathBuf},
-};
+use std::io::ErrorKind;
+use std::path::PathBuf;
 
 use anyhow::{anyhow, Context, Result};
 
 struct FileList(PathBuf);
 
 impl FileList {
-    fn push(&mut self, path: &Path) -> Result<()> {
-        let mut paths = self.list()?;
-        paths.push(path.to_owned());
-        let db = std::fs::File::create(&self.0)
-            .with_context(|| format!("unable to open {:?}", self.0))?;
-        let mut writer = std::io::BufWriter::new(db);
-        for path in paths {
-            let s = path
-                .to_str()
-                .ok_or_else(|| anyhow!("{path:?} is not a valid unicode"))?;
-            writeln!(&mut writer, "{}", s)
-                .with_context(|| format!("failed to write to {:?}", self.0))?;
-        }
-        writer
-            .flush()
-            .with_context(|| format!("unable to write to {:?}", self.0))
-    }
     fn list(&self) -> Result<Vec<PathBuf>> {
         if !self.0.exists() {
             return Ok(Vec::new());
@@ -84,14 +65,5 @@ impl ImmutableRegistry for FileRegistry {
     }
     fn clear_state_files(&mut self) -> Result<()> {
         self.state_files.clear()
-    }
-}
-
-impl Registry for FileRegistry {
-    fn register_user_file(&mut self, file: FilePath) -> Result<()> {
-        self.user_files.push(file.path())
-    }
-    fn register_state_file(&mut self, file: FilePath) -> Result<()> {
-        self.state_files.push(file.path())
     }
 }
