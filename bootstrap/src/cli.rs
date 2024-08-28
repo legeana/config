@@ -36,6 +36,7 @@ pub enum Commands {
     ManifestHelp,
     Tags,
     List,
+    MigrateRegistry,
 }
 
 pub fn config_root() -> Result<PathBuf> {

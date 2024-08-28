@@ -178,6 +178,9 @@ fn main() -> Result<()> {
                 println!("{} {status}: {}", repo.name(), repo.list().join(", "));
             }
         }
+        cli::Commands::MigrateRegistry => {
+            registry(&root).context("failed to load registry")?;
+        }
     }
     Ok(())
 }
