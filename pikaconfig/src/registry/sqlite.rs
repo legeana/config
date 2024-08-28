@@ -149,6 +149,11 @@ impl SqliteRegistry {
         conn.pragma_update(None, "synchronous", "NORMAL")?;
         // https://www.sqlite.org/pragma.html#pragma_journal_mode
         conn.pragma_update(None, "journal_mode", "WAL")?;
+
+        // Behaviour.
+        // https://www.sqlite.org/pragma.html#pragma_foreign_keys
+        conn.pragma_update(None, "foreign_keys", "TRUE")?;
+
         Ok(())
     }
 
