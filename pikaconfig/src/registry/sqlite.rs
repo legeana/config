@@ -59,6 +59,34 @@ fn migrations() -> &'static MigrationsConfig {
                 );
                 ",
             ),
+            M::up(
+                // ALTER TABLE files STRICT.
+                "
+                ALTER TABLE files RENAME TO files_non_strict;
+                CREATE TABLE files (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    purpose INTEGER NOT NULL,
+                    file_type INTEGER NOT NULL,
+                    path BLOB NOT NULL
+                ) STRICT;
+                INSERT INTO files SELECT * FROM files_non_strict;
+                DROP TABLE files_non_strict;
+                ",
+            )
+            .down(
+                // ALTER TABLE files NO STRICT.
+                "
+                CREATE TABLE files_non_strict (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    purpose INTEGER NOT NULL,
+                    file_type INTEGER NOT NULL,
+                    path BLOB NOT NULL
+                );
+                INSERT INTO files_non_strict SELECT * FROM files;
+                DROP TABLE files;
+                ALTER TABLE files_non_strict RENAME TO files;
+                ",
+            ),
         ];
         let unstable: Vec<M> = vec![
             // This Vec can be modified.
