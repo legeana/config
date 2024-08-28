@@ -28,14 +28,14 @@ pub struct Cli {
 
 #[derive(Debug, Subcommand)]
 pub enum Commands {
-    Install {},
-    Update {},
-    Reinstall {},
-    SystemInstall {},
-    Uninstall {},
-    ManifestHelp {},
-    Tags {},
-    List {},
+    Install,
+    Update,
+    Reinstall,
+    SystemInstall,
+    Uninstall,
+    ManifestHelp,
+    Tags,
+    List,
 }
 
 pub fn config_root() -> Result<PathBuf> {

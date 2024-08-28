@@ -121,7 +121,7 @@ fn main() -> Result<()> {
     let root = cli::config_root()?;
     log::info!("Found user configuration: {root:?}");
     match args.command {
-        cli::Commands::Install {} => {
+        cli::Commands::Install => {
             let rules = Rules {
                 force_update: false,
                 force_reinstall: false,
@@ -130,7 +130,7 @@ fn main() -> Result<()> {
             };
             install(&rules, &root).context("failed to install")?;
         }
-        cli::Commands::Update {} => {
+        cli::Commands::Update => {
             let rules = Rules {
                 force_update: true,
                 force_reinstall: false,
@@ -139,7 +139,7 @@ fn main() -> Result<()> {
             };
             install(&rules, &root).context("failed to install")?;
         }
-        cli::Commands::Reinstall {} => {
+        cli::Commands::Reinstall => {
             let rules = Rules {
                 force_update: true,
                 force_reinstall: true,
@@ -148,25 +148,25 @@ fn main() -> Result<()> {
             };
             install(&rules, &root).context("failed to install")?;
         }
-        cli::Commands::SystemInstall {} => {
+        cli::Commands::SystemInstall => {
             let rules = Rules {
                 keep_going: args.keep_going,
                 ..Default::default()
             };
             system_install(&rules, &root).context("failed to system_install")?;
         }
-        cli::Commands::Uninstall {} => {
+        cli::Commands::Uninstall => {
             uninstall(&root).context("failed to uninstall")?;
         }
-        cli::Commands::ManifestHelp {} => {
+        cli::Commands::ManifestHelp => {
             print!("{}", package::manifest_help());
         }
-        cli::Commands::Tags {} => {
+        cli::Commands::Tags => {
             for tag in tag_util::tags().context("failed to get tags")? {
                 println!("{}", tag);
             }
         }
-        cli::Commands::List {} => {
+        cli::Commands::List => {
             let repos = layout::repositories(&root)
                 .with_context(|| format!("failed to get repositories from {root:?}"))?;
             for repo in repos.iter() {
