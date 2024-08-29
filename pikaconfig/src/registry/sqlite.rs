@@ -45,8 +45,7 @@ enum FilePurpose {
 }
 
 impl SqliteRegistry {
-    /// For tests only.
-    #[allow(dead_code)]
+    #[cfg(test)]
     fn open_in_memory() -> Result<Self> {
         let conn = Connection::open_in_memory().context("failed to open in memory")?;
         Self::with_connection(conn)
