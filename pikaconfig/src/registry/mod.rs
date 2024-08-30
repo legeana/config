@@ -1,6 +1,7 @@
 use anyhow::Result;
 
 mod file_type;
+mod migrations;
 pub mod sqlite;
 
 pub use file_type::{FilePath, FilePathBuf, FileType};
