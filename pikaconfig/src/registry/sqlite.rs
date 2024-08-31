@@ -117,8 +117,8 @@ impl SqliteRegistry {
         let files: Result<Vec<_>, _> = stmt
             .query_map(named_params![":purpose": purpose], |row| {
                 let file_type: file_type::Type = row.get(0)?;
-                let path: SqlPathBuf = row.get(1)?;
-                Ok(file_type.with_path_buf(path.0))
+                let SqlPathBuf(path) = row.get(1)?;
+                Ok(file_type.with_path_buf(path))
             })
             .context("failed to query files")?
             .collect();
