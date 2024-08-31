@@ -8,7 +8,7 @@ pub(super) struct MigrationsConfig {
     migrations: Migrations<'static>,
     stable_version: usize,
     #[allow(dead_code)]
-    unstable_version: usize,
+    rolled_back_version: usize,
 }
 
 impl MigrationsConfig {
@@ -23,13 +23,13 @@ impl MigrationsConfig {
             })
     }
     #[allow(dead_code)]
-    pub fn to_unstable(&self, conn: &mut Connection) -> Result<()> {
+    pub fn to_rolled_back(&self, conn: &mut Connection) -> Result<()> {
         self.migrations
-            .to_version(conn, self.unstable_version)
+            .to_version(conn, self.rolled_back_version)
             .with_context(|| {
                 format!(
-                    "failed to migrate to unstable version {}",
-                    self.unstable_version
+                    "failed to migrate to rolled back version {}",
+                    self.rolled_back_version
                 )
             })
     }
@@ -90,16 +90,18 @@ pub(super) fn config() -> &'static MigrationsConfig {
             )
             .down("DROP TABLE updates;"),
         ];
-        let unstable: Vec<M> = vec![
+        let rolled_back: Vec<M> = vec![
             // This Vec can be modified.
-            // Used for experimental changes that may be reverted.
+            // Move migrations from stable here to roll them back.
+            // Only works reliably on a single machine due to an unknown
+            // distribution propagation, so only practical for development.
         ];
         let stable_size = stable.len();
-        let unstable_size = unstable.len();
+        let rolled_back_size = rolled_back.len();
         MigrationsConfig {
-            migrations: Migrations::new([stable, unstable].concat()),
+            migrations: Migrations::new([stable, rolled_back].concat()),
             stable_version: stable_size,
-            unstable_version: stable_size + unstable_size,
+            rolled_back_version: stable_size + rolled_back_size,
         }
     })
 }
@@ -116,24 +118,24 @@ mod tests {
     }
 
     #[test]
-    fn test_migrations_empty_to_unstable() {
+    fn test_migrations_empty_to_rolled_back() {
         let mut conn = Connection::open_in_memory().unwrap();
 
-        config().to_unstable(&mut conn).expect("must be ok");
+        config().to_rolled_back(&mut conn).expect("must be ok");
     }
 
     #[test]
-    fn test_migrations_stable_to_unstable() {
+    fn test_migrations_stable_to_rolled_back() {
         let mut conn = Connection::open_in_memory().unwrap();
         config().to_stable(&mut conn).expect("must be ok");
 
-        config().to_unstable(&mut conn).expect("must be ok");
+        config().to_rolled_back(&mut conn).expect("must be ok");
     }
 
     #[test]
-    fn test_migrations_unstable_to_stable() {
+    fn test_migrations_rolled_back_to_stable() {
         let mut conn = Connection::open_in_memory().unwrap();
-        config().to_unstable(&mut conn).expect("must be ok");
+        config().to_rolled_back(&mut conn).expect("must be ok");
 
         config().to_stable(&mut conn).expect("must be ok");
     }
