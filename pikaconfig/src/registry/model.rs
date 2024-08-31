@@ -1,6 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Context, Result};
+use rusqlite::types::{ToSql, ToSqlOutput, Value};
 
 use super::{FilePath, FilePathBuf};
 
@@ -8,6 +9,12 @@ use super::{FilePath, FilePathBuf};
 pub(super) enum FilePurpose {
     User = 1,
     State = 2,
+}
+
+impl ToSql for FilePurpose {
+    fn to_sql(&self) -> rusqlite::Result<ToSqlOutput<'_>> {
+        Ok(ToSqlOutput::Owned(Value::Integer(*self as i64)))
+    }
 }
 
 pub(super) fn file_type_to_sql(file: FilePath) -> (i32, &Path) {

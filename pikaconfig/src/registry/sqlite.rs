@@ -92,7 +92,7 @@ impl SqliteRegistry {
             )
             .context("failed to prepare statement")?;
         stmt.execute(named_params![
-            ":purpose": purpose as isize,
+            ":purpose": purpose,
             ":file_type": sql_type,
             ":path": model::path_to_sql(path),
         ])
@@ -114,7 +114,7 @@ impl SqliteRegistry {
             )
             .context("files statement prepare")?;
         let files: Result<Vec<_>, _> = stmt
-            .query_map(named_params![":purpose": purpose as isize], |row| {
+            .query_map(named_params![":purpose": purpose], |row| {
                 let file_type: i32 = row.get(0)?;
                 let path = model::path_from_sql(row.get(1)?).map_err(|e| {
                     rusqlite::Error::FromSqlConversionFailure(1, Type::Blob, e.into())
@@ -137,7 +137,7 @@ impl SqliteRegistry {
                 WHERE
                     purpose = :purpose
                 ",
-                named_params![":purpose": purpose as isize],
+                named_params![":purpose": purpose],
             )
             .with_context(|| format!("clear {purpose:?} files"))?;
         Ok(())
