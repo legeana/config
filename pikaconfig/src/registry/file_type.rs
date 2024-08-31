@@ -34,8 +34,25 @@ where
 impl<T> Eq for FileType<T> where T: Eq {}
 impl<T> Copy for FileType<T> where T: Copy {}
 
+pub(super) type Type = FileType<()>;
 pub type FilePath<'a> = FileType<&'a Path>;
 pub type FilePathBuf = FileType<PathBuf>;
+
+#[allow(dead_code)]
+impl Type {
+    pub fn with_path(self, path: &Path) -> FilePath {
+        match self {
+            Self::Symlink(()) => FilePath::Symlink(path),
+            Self::Directory(()) => FilePath::Directory(path),
+        }
+    }
+    pub fn with_path_buf(self, path: PathBuf) -> FilePathBuf {
+        match self {
+            Self::Symlink(()) => FilePathBuf::Symlink(path),
+            Self::Directory(()) => FilePathBuf::Directory(path),
+        }
+    }
+}
 
 #[allow(dead_code)]
 impl<'a> FilePath<'a> {
@@ -51,15 +68,6 @@ impl<'a> FilePath<'a> {
     {
         Self::Directory(path.as_ref())
     }
-    pub fn replace_path<T>(self, path: &'a T) -> Self
-    where
-        T: 'a + AsRef<Path> + ?Sized,
-    {
-        match self {
-            Self::Symlink(_) => Self::Symlink(path.as_ref()),
-            Self::Directory(_) => Self::Directory(path.as_ref()),
-        }
-    }
 }
 
 #[allow(dead_code)]
@@ -69,12 +77,6 @@ impl FilePathBuf {
     }
     pub fn new_directory(path: impl Into<PathBuf>) -> Self {
         Self::Directory(path.into())
-    }
-    pub fn replace_path(self, path: impl Into<PathBuf>) -> Self {
-        match self {
-            Self::Symlink(_) => Self::Symlink(path.into()),
-            Self::Directory(_) => Self::Directory(path.into()),
-        }
     }
 }
 
@@ -114,40 +116,32 @@ mod tests {
         };
     }
 
-    macro_rules! replace_tests {
-        ($test_name:ident, $ctor:ident, $subtype:ident) => {
-            #[test]
-            fn $test_name() {
-                // FilePath
-                assert_eq!(
-                    FilePath::$ctor("bad").replace_path("test"),
-                    FilePath::$subtype(Path::new("test")),
-                );
-                assert_eq!(
-                    FilePath::$ctor("bad").replace_path(Path::new("test")),
-                    FilePath::$subtype(Path::new("test")),
-                );
-                // FilePathBuf
-                assert_eq!(
-                    FilePathBuf::$ctor("bad").replace_path("test"),
-                    FilePathBuf::$subtype("test".into()),
-                );
-                assert_eq!(
-                    FilePathBuf::$ctor("bad").replace_path(Path::new("test")),
-                    FilePathBuf::$subtype("test".into()),
-                );
-                assert_eq!(
-                    FilePathBuf::$ctor("bad").replace_path(PathBuf::from("test")),
-                    FilePathBuf::$subtype("test".into()),
-                );
-            }
-        };
-    }
-
     new_tests!(test_file_type_new_symlink, new_symlink, Symlink);
     new_tests!(test_file_type_new_directory, new_directory, Directory);
-    replace_tests!(test_file_type_symlink_replace, new_symlink, Symlink);
-    replace_tests!(test_file_type_directory_replace, new_directory, Directory);
+
+    #[test]
+    fn test_type_with_path() {
+        assert_eq!(
+            Type::Symlink(()).with_path(Path::new("test")),
+            FilePath::Symlink(Path::new("test")),
+        );
+        assert_eq!(
+            Type::Directory(()).with_path(Path::new("test")),
+            FilePath::Directory(Path::new("test")),
+        );
+    }
+
+    #[test]
+    fn test_type_with_path_buf() {
+        assert_eq!(
+            Type::Symlink(()).with_path_buf(PathBuf::from("test")),
+            FilePathBuf::Symlink(PathBuf::from("test")),
+        );
+        assert_eq!(
+            Type::Directory(()).with_path_buf(PathBuf::from("test")),
+            FilePathBuf::Directory(PathBuf::from("test")),
+        );
+    }
 
     #[test]
     fn test_file_path_debug() {
