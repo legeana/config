@@ -7,6 +7,8 @@ use rusqlite::{named_params, Connection};
 use crate::registry::model::{self, FilePurpose};
 use crate::registry::{FilePath, FilePathBuf, ImmutableRegistry, Registry};
 
+use super::model::SqlPathBuf;
+
 const APPLICATION_ID: i32 = 0x12fe0c02;
 
 #[derive(Debug)]
@@ -94,7 +96,7 @@ impl SqliteRegistry {
         stmt.execute(named_params![
             ":purpose": purpose,
             ":file_type": sql_type,
-            ":path": model::path_to_sql(path),
+            ":path": path,
         ])
         .with_context(|| format!("failed to register {path:?}"))?;
         Ok(())
@@ -116,9 +118,7 @@ impl SqliteRegistry {
         let files: Result<Vec<_>, _> = stmt
             .query_map(named_params![":purpose": purpose], |row| {
                 let file_type: i32 = row.get(0)?;
-                let path = model::path_from_sql(row.get(1)?).map_err(|e| {
-                    rusqlite::Error::FromSqlConversionFailure(1, Type::Blob, e.into())
-                })?;
+                let path: SqlPathBuf = row.get(1)?;
                 let file = model::file_type_from_sql(file_type, path).map_err(|e| {
                     rusqlite::Error::FromSqlConversionFailure(0, Type::Integer, e.into())
                 })?;
