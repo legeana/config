@@ -1,9 +1,10 @@
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use anyhow::{anyhow, Context, Error, Result};
 use rusqlite::types::Type;
 use rusqlite::{named_params, Connection};
 
+use crate::registry::model::{self, FilePurpose};
 use crate::registry::{FilePath, FilePathBuf, ImmutableRegistry, Registry};
 
 const APPLICATION_ID: i32 = 0x12fe0c02;
@@ -11,37 +12,6 @@ const APPLICATION_ID: i32 = 0x12fe0c02;
 #[derive(Debug)]
 pub struct SqliteRegistry {
     conn: Connection,
-}
-
-fn file_type_to_sql(file: FilePath) -> (i32, &Path) {
-    match file {
-        FilePath::Symlink(p) => (1, p),
-        FilePath::Directory(p) => (2, p),
-    }
-}
-
-fn file_type_from_sql(file_type: i32, path: PathBuf) -> Result<FilePathBuf> {
-    match file_type {
-        1 => Ok(FilePathBuf::Symlink(path)),
-        2 => Ok(FilePathBuf::Directory(path)),
-        _ => Err(anyhow!("unknown FileType {file_type}")),
-    }
-}
-
-fn path_to_sql(path: &Path) -> Vec<u8> {
-    crate::os_str::to_vec(path.as_os_str().to_os_string())
-}
-
-fn path_from_sql(path: Vec<u8>) -> Result<PathBuf> {
-    Ok(crate::os_str::from_vec(path)
-        .context("failed to parse path")?
-        .into())
-}
-
-#[derive(Clone, Copy, Debug)]
-enum FilePurpose {
-    User = 1,
-    State = 2,
 }
 
 impl SqliteRegistry {
@@ -110,7 +80,7 @@ impl SqliteRegistry {
     }
 
     fn register_file(&mut self, purpose: FilePurpose, file: FilePath) -> Result<()> {
-        let (sql_type, path) = file_type_to_sql(file);
+        let (sql_type, path) = model::file_type_to_sql(file);
         let mut stmt = self
             .conn
             .prepare_cached(
@@ -124,7 +94,7 @@ impl SqliteRegistry {
         stmt.execute(named_params![
             ":purpose": purpose as isize,
             ":file_type": sql_type,
-            ":path": path_to_sql(path),
+            ":path": model::path_to_sql(path),
         ])
         .with_context(|| format!("failed to register {path:?}"))?;
         Ok(())
@@ -146,10 +116,10 @@ impl SqliteRegistry {
         let files: Result<Vec<_>, _> = stmt
             .query_map(named_params![":purpose": purpose as isize], |row| {
                 let file_type: i32 = row.get(0)?;
-                let path = path_from_sql(row.get(1)?).map_err(|e| {
+                let path = model::path_from_sql(row.get(1)?).map_err(|e| {
                     rusqlite::Error::FromSqlConversionFailure(1, Type::Blob, e.into())
                 })?;
-                let file = file_type_from_sql(file_type, path).map_err(|e| {
+                let file = model::file_type_from_sql(file_type, path).map_err(|e| {
                     rusqlite::Error::FromSqlConversionFailure(0, Type::Integer, e.into())
                 })?;
                 Ok(file)
