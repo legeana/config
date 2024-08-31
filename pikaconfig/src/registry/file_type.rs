@@ -16,6 +16,13 @@ where
             Self::Directory(p) => p.as_ref(),
         }
     }
+    #[allow(dead_code)]
+    pub fn file_type(&self) -> Type {
+        match self {
+            Self::Symlink(_) => Type::Symlink(()),
+            Self::Directory(_) => Type::Directory(()),
+        }
+    }
 }
 
 impl<T, O> PartialEq<FileType<O>> for FileType<T>
@@ -118,6 +125,15 @@ mod tests {
 
     new_tests!(test_file_type_new_symlink, new_symlink, Symlink);
     new_tests!(test_file_type_new_directory, new_directory, Directory);
+
+    #[test]
+    fn file_type_file_type() {
+        assert_eq!(FilePath::new_symlink("test").file_type(), Type::Symlink(()));
+        assert_eq!(
+            FilePath::new_directory("test").file_type(),
+            Type::Directory(()),
+        );
+    }
 
     #[test]
     fn test_type_with_path() {
