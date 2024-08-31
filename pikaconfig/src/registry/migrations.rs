@@ -81,6 +81,14 @@ pub(super) fn config() -> &'static MigrationsConfig {
                 ALTER TABLE files_non_strict RENAME TO files;
                 ",
             ),
+            M::up(
+                "
+                CREATE TABLE updates (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT
+                ) STRICT;
+                ",
+            )
+            .down("DROP TABLE updates;"),
         ];
         let unstable: Vec<M> = vec![
             // This Vec can be modified.
