@@ -16,7 +16,6 @@ where
             Self::Directory(p) => p.as_ref(),
         }
     }
-    #[allow(dead_code)]
     pub fn file_type(&self) -> Type {
         match self {
             Self::Symlink(_) => Type::Symlink(()),

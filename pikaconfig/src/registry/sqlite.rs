@@ -1,13 +1,11 @@
 use std::path::Path;
 
 use anyhow::{anyhow, Context, Error, Result};
-use rusqlite::types::Type;
 use rusqlite::{named_params, Connection};
 
-use crate::registry::model::{self, FilePurpose};
-use crate::registry::{FilePath, FilePathBuf, ImmutableRegistry, Registry};
-
-use super::model::SqlPathBuf;
+use super::file_type;
+use super::model::{FilePurpose, SqlPath, SqlPathBuf};
+use super::{FilePath, FilePathBuf, ImmutableRegistry, Registry};
 
 const APPLICATION_ID: i32 = 0x12fe0c02;
 
@@ -82,7 +80,8 @@ impl SqliteRegistry {
     }
 
     fn register_file(&mut self, purpose: FilePurpose, file: FilePath) -> Result<()> {
-        let (sql_type, path) = model::file_type_to_sql(file);
+        let file_type = file.file_type();
+        let path = SqlPath(file.path());
         let mut stmt = self
             .conn
             .prepare_cached(
@@ -95,7 +94,7 @@ impl SqliteRegistry {
             .context("failed to prepare statement")?;
         stmt.execute(named_params![
             ":purpose": purpose,
-            ":file_type": sql_type,
+            ":file_type": file_type,
             ":path": path,
         ])
         .with_context(|| format!("failed to register {path:?}"))?;
@@ -117,12 +116,9 @@ impl SqliteRegistry {
             .context("files statement prepare")?;
         let files: Result<Vec<_>, _> = stmt
             .query_map(named_params![":purpose": purpose], |row| {
-                let file_type: i32 = row.get(0)?;
+                let file_type: file_type::Type = row.get(0)?;
                 let path: SqlPathBuf = row.get(1)?;
-                let file = model::file_type_from_sql(file_type, path).map_err(|e| {
-                    rusqlite::Error::FromSqlConversionFailure(0, Type::Integer, e.into())
-                })?;
-                Ok(file)
+                Ok(file_type.with_path_buf(path.0))
             })
             .context("failed to query files")?
             .collect();

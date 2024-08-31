@@ -1,9 +1,9 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::Context;
 use rusqlite::types::{FromSql, FromSqlError, FromSqlResult, ToSql, ToSqlOutput, Value, ValueRef};
 
-use super::{FilePath, FilePathBuf};
+use super::file_type;
 
 #[derive(Clone, Copy, Debug)]
 pub(super) enum FilePurpose {
@@ -12,7 +12,7 @@ pub(super) enum FilePurpose {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub(super) struct SqlPath<'a>(&'a Path);
+pub(super) struct SqlPath<'a>(pub &'a Path);
 
 impl<'a> ToSql for SqlPath<'a> {
     fn to_sql(&self) -> rusqlite::Result<ToSqlOutput<'_>> {
@@ -22,7 +22,7 @@ impl<'a> ToSql for SqlPath<'a> {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub(super) struct SqlPathBuf(PathBuf);
+pub(super) struct SqlPathBuf(pub PathBuf);
 
 impl ToSql for SqlPathBuf {
     fn to_sql(&self) -> rusqlite::Result<ToSqlOutput<'_>> {
@@ -49,17 +49,25 @@ impl ToSql for FilePurpose {
     }
 }
 
-pub(super) fn file_type_to_sql(file: FilePath) -> (i32, SqlPath) {
-    match file {
-        FilePath::Symlink(p) => (1, SqlPath(p)),
-        FilePath::Directory(p) => (2, SqlPath(p)),
+impl ToSql for file_type::Type {
+    fn to_sql(&self) -> rusqlite::Result<ToSqlOutput<'_>> {
+        let value: i64 = match self {
+            Self::Symlink(()) => 1,
+            Self::Directory(()) => 2,
+        };
+        Ok(ToSqlOutput::Owned(Value::Integer(value)))
     }
 }
 
-pub(super) fn file_type_from_sql(file_type: i32, path: SqlPathBuf) -> Result<FilePathBuf> {
-    match file_type {
-        1 => Ok(FilePathBuf::Symlink(path.0)),
-        2 => Ok(FilePathBuf::Directory(path.0)),
-        _ => Err(anyhow!("unknown FileType {file_type}")),
+impl FromSql for file_type::Type {
+    fn column_result(value: ValueRef<'_>) -> FromSqlResult<Self> {
+        let Ok(value) = value.as_i64() else {
+            return Err(FromSqlError::InvalidType);
+        };
+        match value {
+            1 => Ok(file_type::Type::Symlink(())),
+            2 => Ok(file_type::Type::Directory(())),
+            unknown => Err(FromSqlError::OutOfRange(unknown)),
+        }
     }
 }
