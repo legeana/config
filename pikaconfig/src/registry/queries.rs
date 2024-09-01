@@ -160,6 +160,21 @@ mod tests {
     }
 
     #[apply(sqlite_registry_test)]
+    fn test_files_order(conn: AppConnection, purpose: FilePurpose, _other_purpose: FilePurpose) {
+        let files = vec![
+            FilePath::new_symlink("/test/2/file/1"),
+            FilePath::new_symlink("/test/1/file/2"),
+            FilePath::new_symlink("/test/3/file/3"),
+        ];
+
+        for f in files.iter().copied() {
+            conn.register_file(purpose, f).expect("register_file");
+        }
+
+        assert_eq!(files, conn.files(purpose).unwrap());
+    }
+
+    #[apply(sqlite_registry_test)]
     fn test_clear_files(conn: AppConnection, purpose: FilePurpose, _other_purpose: FilePurpose) {
         conn.register_file(purpose, FilePath::new_symlink("/test/file"))
             .expect("register_file");
@@ -201,21 +216,6 @@ mod tests {
                 file: FilePathBuf::new_symlink("/other/file"),
             }],
         );
-    }
-
-    #[apply(sqlite_registry_test)]
-    fn test_files_order(conn: AppConnection, purpose: FilePurpose, _other_purpose: FilePurpose) {
-        let files = vec![
-            FilePath::new_symlink("/test/2/file/1"),
-            FilePath::new_symlink("/test/1/file/2"),
-            FilePath::new_symlink("/test/3/file/3"),
-        ];
-
-        for f in files.iter().copied() {
-            conn.register_file(purpose, f).expect("register_file");
-        }
-
-        assert_eq!(files, conn.files(purpose).unwrap());
     }
 
     #[rstest]
