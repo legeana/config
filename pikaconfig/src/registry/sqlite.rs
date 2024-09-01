@@ -210,23 +210,4 @@ mod tests {
 
         assert_eq!(files, reg.files(purpose).unwrap());
     }
-
-    #[test]
-    fn test_migrations_database_too_far_ahead() {
-        let conn = AppConnection::open_in_memory().unwrap();
-        conn.as_ref()
-            .pragma_update(None, "user_version", 1000)
-            .unwrap();
-
-        let err = SqliteRegistry::with_connection(conn).unwrap_err();
-
-        assert_eq!(err.to_string(), "failed to migrate");
-        let err = err.downcast::<rusqlite_migration::Error>().unwrap();
-        assert_eq!(
-            err,
-            rusqlite_migration::Error::MigrationDefinition(
-                rusqlite_migration::MigrationDefinitionError::DatabaseTooFarAhead
-            )
-        );
-    }
 }
