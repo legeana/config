@@ -5,6 +5,8 @@ mod file_type;
 mod migrations;
 mod model;
 mod queries;
+#[cfg(test)]
+mod row_queries;
 pub mod sqlite;
 
 pub use file_type::{FilePath, FilePathBuf, FileType};

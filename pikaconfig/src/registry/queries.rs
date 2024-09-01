@@ -40,26 +40,6 @@ where
         Ok(())
     }
 
-    #[cfg(test)]
-    fn updates(&self) -> Result<Vec<UpdateId>> {
-        let mut stmt = self
-            .as_ref()
-            .prepare_cached(
-                "
-                SELECT id FROM updates
-                ",
-            )
-            .context("failed to prepare statement")?;
-        let updates: Result<Vec<_>, _> = stmt
-            .query_map([], |row| {
-                let update_id: UpdateId = row.get("id")?;
-                Ok(update_id)
-            })
-            .context("failed to query updates")?
-            .collect();
-        updates.context("query updates")
-    }
-
     fn register_file(&self, purpose: FilePurpose, file: FilePath) -> Result<()> {
         let file_type = file.file_type();
         let path = SqlPath(file.path());
@@ -128,6 +108,8 @@ mod tests {
     use pretty_assertions::assert_eq;
     use rstest::{fixture, rstest};
     use rstest_reuse::{apply, template};
+
+    use crate::registry::row_queries::{RowQueries, UpdateRow};
 
     use super::*;
 
@@ -226,18 +208,21 @@ mod tests {
     fn test_create_update(conn: AppConnection) {
         let update = conn.create_update().expect("create_update");
 
-        let updates = conn.updates().expect("updates");
-        assert_eq!(updates, vec![update]);
+        let updates = conn.update_rows().expect("updates");
+        assert_eq!(updates, vec![UpdateRow { id: update }]);
     }
 
     #[rstest]
     fn test_delete_other_updates(conn: AppConnection) {
         let update = conn.create_update().expect("create_update");
         let other_update = conn.create_update().expect("create_update");
-        assert_eq!(conn.updates().unwrap(), vec![update, other_update]);
+        assert_eq!(
+            conn.update_rows().unwrap(),
+            vec![UpdateRow { id: update }, UpdateRow { id: other_update }]
+        );
 
         conn.delete_other_updates(update).expect("delete_update");
 
-        assert_eq!(conn.updates().unwrap(), vec![update]);
+        assert_eq!(conn.update_rows().unwrap(), vec![UpdateRow { id: update }]);
     }
 }
