@@ -20,9 +20,7 @@ where
                 ",
             )
             .context("failed to prepare statement")?;
-        let row_id = stmt
-            .insert(named_params![])
-            .context("failed to create new update")?;
+        let row_id = stmt.insert([]).context("failed to create new update")?;
         Ok(UpdateId(Some(row_id)))
     }
 
@@ -53,7 +51,7 @@ where
             )
             .context("failed to prepare statement")?;
         let updates: Result<Vec<_>, _> = stmt
-            .query_map(named_params![], |row| {
+            .query_map([], |row| {
                 let update_id: UpdateId = row.get("id")?;
                 Ok(update_id)
             })
