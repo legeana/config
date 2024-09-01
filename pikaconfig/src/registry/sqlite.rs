@@ -3,7 +3,7 @@ use std::path::Path;
 use anyhow::{Context, Result};
 
 use super::connection::AppConnection;
-use super::model::FilePurpose;
+use super::model::{FilePurpose, UpdateId};
 use super::queries::AppQueries;
 use super::{FilePath, FilePathBuf, ImmutableRegistry, Registry};
 
@@ -52,10 +52,12 @@ impl ImmutableRegistry for SqliteRegistry {
 
 impl Registry for SqliteRegistry {
     fn register_user_file(&mut self, file: FilePath) -> Result<()> {
-        self.conn.register_file(FilePurpose::User, file)
+        self.conn
+            .register_file(UpdateId(None), FilePurpose::User, file)
     }
     fn register_state_file(&mut self, file: FilePath) -> Result<()> {
-        self.conn.register_file(FilePurpose::State, file)
+        self.conn
+            .register_file(UpdateId(None), FilePurpose::State, file)
     }
 }
 

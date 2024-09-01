@@ -40,7 +40,7 @@ where
         Ok(())
     }
 
-    fn register_file(&self, purpose: FilePurpose, file: FilePath) -> Result<()> {
+    fn register_file(&self, update: UpdateId, purpose: FilePurpose, file: FilePath) -> Result<()> {
         let file_type = file.file_type();
         let path = SqlPath(file.path());
         let mut stmt = self
@@ -48,12 +48,13 @@ where
             .prepare_cached(
                 "
                 INSERT INTO files
-                (purpose, file_type, path)
-                VALUES (:purpose, :file_type, :path)
+                (update_id, purpose, file_type, path)
+                VALUES (:update, :purpose, :file_type, :path)
                 ",
             )
             .context("failed to prepare statement")?;
         stmt.execute(named_params![
+            ":update": update,
             ":purpose": purpose,
             ":file_type": file_type,
             ":path": path,
@@ -130,7 +131,7 @@ mod tests {
 
     #[apply(sqlite_registry_test)]
     fn test_register_file(conn: AppConnection, purpose: FilePurpose, _other_purpose: FilePurpose) {
-        conn.register_file(purpose, FilePath::new_symlink("/test/file"))
+        conn.register_file(UpdateId(None), purpose, FilePath::new_symlink("/test/file"))
             .expect("register_file");
 
         assert_eq!(
@@ -145,10 +146,14 @@ mod tests {
 
     #[apply(sqlite_registry_test)]
     fn test_files(conn: AppConnection, purpose: FilePurpose, other_purpose: FilePurpose) {
-        conn.register_file(purpose, FilePath::new_symlink("/test/file"))
+        conn.register_file(UpdateId(None), purpose, FilePath::new_symlink("/test/file"))
             .expect("register_file");
-        conn.register_file(other_purpose, FilePath::new_symlink("/test/other/file"))
-            .expect("register_file");
+        conn.register_file(
+            UpdateId(None),
+            other_purpose,
+            FilePath::new_symlink("/test/other/file"),
+        )
+        .expect("register_file");
 
         let files = conn.files(purpose).unwrap();
         let other_files = conn.files(other_purpose).unwrap();
@@ -168,7 +173,8 @@ mod tests {
             FilePath::new_symlink("/test/3/file/3"),
         ];
         for f in files.iter().copied() {
-            conn.register_file(purpose, f).expect("register_file");
+            conn.register_file(UpdateId(None), purpose, f)
+                .expect("register_file");
         }
 
         assert_eq!(files, conn.files(purpose).unwrap());
@@ -176,7 +182,7 @@ mod tests {
 
     #[apply(sqlite_registry_test)]
     fn test_clear_files(conn: AppConnection, purpose: FilePurpose, _other_purpose: FilePurpose) {
-        conn.register_file(purpose, FilePath::new_symlink("/test/file"))
+        conn.register_file(UpdateId(None), purpose, FilePath::new_symlink("/test/file"))
             .expect("register_file");
         assert_eq!(
             conn.files(purpose).unwrap(),
@@ -194,14 +200,18 @@ mod tests {
         purpose: FilePurpose,
         other_purpose: FilePurpose,
     ) {
-        conn.register_file(purpose, FilePath::new_symlink("/test/file"))
+        conn.register_file(UpdateId(None), purpose, FilePath::new_symlink("/test/file"))
             .expect("register_file");
         assert_eq!(
             conn.files(purpose).unwrap(),
             vec![FilePathBuf::new_symlink("/test/file")]
         );
-        conn.register_file(other_purpose, FilePath::new_symlink("/other/file"))
-            .expect("register_file");
+        conn.register_file(
+            UpdateId(None),
+            other_purpose,
+            FilePath::new_symlink("/other/file"),
+        )
+        .expect("register_file");
         assert_eq!(
             conn.files(other_purpose).unwrap(),
             vec![FilePathBuf::new_symlink("/other/file")]
@@ -239,5 +249,35 @@ mod tests {
         conn.delete_other_updates(update).expect("delete_update");
 
         assert_eq!(conn.update_rows().unwrap(), vec![UpdateRow { id: update }]);
+    }
+
+    #[rstest]
+    fn test_delete_files_via_update(conn: AppConnection) {
+        let update = conn.create_update().expect("create_update");
+        let other_update = conn.create_update().expect("create_update");
+        conn.register_file(
+            update,
+            FilePurpose::User,
+            FilePath::new_symlink("test-update"),
+        )
+        .expect("register_file");
+        conn.register_file(
+            other_update,
+            FilePurpose::User,
+            FilePath::new_symlink("test-other-update"),
+        )
+        .expect("register_file");
+
+        conn.delete_other_updates(update)
+            .expect("delete_other_updates");
+
+        assert_eq!(
+            conn.file_rows().expect("file_rows"),
+            vec![FileRow {
+                update_id: update,
+                purpose: FilePurpose::User,
+                file: FilePathBuf::new_symlink("test-update"),
+            }],
+        );
     }
 }
