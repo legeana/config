@@ -26,6 +26,22 @@ where
         Ok(UpdateId(Some(row_id)))
     }
 
+    #[allow(dead_code)]
+    fn delete_other_updates(&self, update: UpdateId) -> Result<()> {
+        let mut stmt = self
+            .as_ref()
+            .prepare_cached(
+                "
+                DELETE FROM updates
+                WHERE id != :id
+                ",
+            )
+            .context("failed to prepare statement")?;
+        stmt.execute(named_params![":id": update])
+            .with_context(|| format!("failed to delete other {update:?}"))?;
+        Ok(())
+    }
+
     #[cfg(test)]
     fn updates(&self) -> Result<Vec<UpdateId>> {
         let mut stmt = self
@@ -214,5 +230,16 @@ mod tests {
 
         let updates = conn.updates().expect("updates");
         assert_eq!(updates, vec![update]);
+    }
+
+    #[rstest]
+    fn test_delete_other_updates(conn: AppConnection) {
+        let update = conn.create_update().expect("create_update");
+        let other_update = conn.create_update().expect("create_update");
+        assert_eq!(conn.updates().unwrap(), vec![update, other_update]);
+
+        conn.delete_other_updates(update).expect("delete_update");
+
+        assert_eq!(conn.updates().unwrap(), vec![update]);
     }
 }
