@@ -38,6 +38,19 @@ impl ToSql for FilePurpose {
     }
 }
 
+impl FromSql for FilePurpose {
+    fn column_result(value: ValueRef<'_>) -> FromSqlResult<Self> {
+        let Ok(value) = value.as_i64() else {
+            return Err(FromSqlError::InvalidType);
+        };
+        match value {
+            v if v == FilePurpose::User as i64 => Ok(FilePurpose::User),
+            v if v == FilePurpose::State as i64 => Ok(FilePurpose::State),
+            unknown => Err(FromSqlError::OutOfRange(unknown)),
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub(super) struct SqlPath<'a>(pub &'a Path);
 
