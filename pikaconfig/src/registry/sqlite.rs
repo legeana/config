@@ -1,82 +1,37 @@
 use std::path::Path;
 
-use anyhow::{anyhow, Context, Error, Result};
-use rusqlite::{named_params, Connection};
+use anyhow::{Context, Result};
+use rusqlite::named_params;
 
+use super::connection::AppConnection;
 use super::file_type;
 use super::model::{FilePurpose, SqlPath, SqlPathBuf};
 use super::{FilePath, FilePathBuf, ImmutableRegistry, Registry};
 
-const APPLICATION_ID: i32 = 0x12fe0c02;
-
 #[derive(Debug)]
 pub struct SqliteRegistry {
-    conn: Connection,
+    conn: AppConnection,
 }
 
 impl SqliteRegistry {
     #[cfg(test)]
     fn open_in_memory() -> Result<Self> {
-        let conn = Connection::open_in_memory().context("failed to open in memory")?;
-        Self::with_connection(conn)
+        Self::with_connection(AppConnection::open_in_memory()?)
     }
 
     pub fn open(path: &Path) -> Result<Self> {
-        let conn = Connection::open(path).with_context(|| format!("failed to open {path:?}"))?;
-        Self::with_connection(conn).with_context(|| format!("failed to initialise {path:?}"))
+        Self::with_connection(AppConnection::open(path)?)
     }
 
-    fn query_app_id(conn: &Connection) -> Result<i32> {
-        conn.query_row("PRAGMA application_id", [], |row| row.get(0))
-            .context("PRAGMA application_id")
-    }
-
-    fn init_app_id(conn: &Connection) -> Result<()> {
-        let mut app_id: i32 = Self::query_app_id(conn)?;
-        if app_id == 0 {
-            // Not initialised.
-            conn.pragma_update(None, "application_id", APPLICATION_ID)?;
-            app_id = Self::query_app_id(conn)?;
-        }
-        if app_id != APPLICATION_ID {
-            return Err(anyhow!(
-                "unexpected application_id {app_id:x}, want {APPLICATION_ID:x}"
-            ));
-        }
-        Ok(())
-    }
-
-    fn configure_connection(conn: &Connection) -> Result<()> {
-        // Performance.
-        // https://www.sqlite.org/pragma.html#pragma_synchronous
-        conn.pragma_update(None, "synchronous", "NORMAL")?;
-        // https://www.sqlite.org/pragma.html#pragma_journal_mode
-        conn.pragma_update(None, "journal_mode", "WAL")?;
-
-        // Behaviour.
-        // https://www.sqlite.org/pragma.html#pragma_foreign_keys
-        conn.pragma_update(None, "foreign_keys", "TRUE")?;
-
-        Ok(())
-    }
-
-    fn with_connection(mut conn: Connection) -> Result<Self> {
-        Self::init_app_id(&conn)?;
-        Self::configure_connection(&conn)?;
+    fn with_connection(mut conn: AppConnection) -> Result<Self> {
         super::migrations::config()
             .to_stable(&mut conn)
             .context("failed to migrate")?;
         Ok(Self { conn })
     }
 
-    pub fn close(self) -> Result<(), (SqliteRegistry, Error)> {
-        match self.conn.close() {
-            Ok(()) => Ok(()),
-            Err((conn, err)) => Err((
-                Self { conn },
-                Error::new(err).context("failed to close connection"),
-            )),
-        }
+    pub fn close(self) -> Result<()> {
+        self.conn.close()
     }
 
     fn register_file(&mut self, purpose: FilePurpose, file: FilePath) -> Result<()> {
@@ -84,6 +39,7 @@ impl SqliteRegistry {
         let path = SqlPath(file.path());
         let mut stmt = self
             .conn
+            .as_ref()
             .prepare_cached(
                 "
                 INSERT INTO files
@@ -104,6 +60,7 @@ impl SqliteRegistry {
     fn files(&self, purpose: FilePurpose) -> Result<Vec<FilePathBuf>> {
         let mut stmt = self
             .conn
+            .as_ref()
             .prepare_cached(
                 "
                 SELECT file_type, path
@@ -127,6 +84,7 @@ impl SqliteRegistry {
 
     fn clear_files(&self, purpose: FilePurpose) -> Result<()> {
         self.conn
+            .as_ref()
             .execute(
                 "
                 DELETE FROM files
@@ -254,49 +212,11 @@ mod tests {
     }
 
     #[test]
-    fn test_application_id_create() {
-        let reg = SqliteRegistry::open_in_memory().expect("open_in_memory");
-
-        let id: i32 = reg
-            .conn
-            .query_row("PRAGMA application_id", [], |row| row.get(0))
-            .unwrap();
-
-        assert_eq!(id, APPLICATION_ID);
-    }
-
-    #[test]
-    fn test_application_id_matching() {
-        let conn = Connection::open_in_memory().unwrap();
-        conn.pragma_update(None, "application_id", APPLICATION_ID)
-            .unwrap();
-
-        let reg = SqliteRegistry::with_connection(conn).unwrap();
-
-        let id: i32 = reg
-            .conn
-            .query_row("PRAGMA application_id", [], |row| row.get(0))
-            .unwrap();
-        assert_eq!(id, APPLICATION_ID);
-    }
-
-    #[test]
-    fn test_application_id_not_matching() {
-        let conn = Connection::open_in_memory().unwrap();
-        conn.pragma_update(None, "application_id", 123).unwrap();
-
-        let err = SqliteRegistry::with_connection(conn).unwrap_err();
-
-        assert_eq!(
-            err.to_string(),
-            "unexpected application_id 7b, want 12fe0c02"
-        );
-    }
-
-    #[test]
     fn test_migrations_database_too_far_ahead() {
-        let conn = Connection::open_in_memory().unwrap();
-        conn.pragma_update(None, "user_version", 1000).unwrap();
+        let conn = AppConnection::open_in_memory().unwrap();
+        conn.as_ref()
+            .pragma_update(None, "user_version", 1000)
+            .unwrap();
 
         let err = SqliteRegistry::with_connection(conn).unwrap_err();
 

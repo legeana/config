@@ -1,5 +1,6 @@
 use anyhow::Result;
 
+mod connection;
 mod file_type;
 mod migrations;
 mod model;

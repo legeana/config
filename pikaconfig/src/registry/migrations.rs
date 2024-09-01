@@ -1,8 +1,9 @@
 use std::sync::OnceLock;
 
 use anyhow::{Context, Result};
-use rusqlite::Connection;
 use rusqlite_migration::{Migrations, M};
+
+use super::connection::AppConnection;
 
 pub(super) struct MigrationsConfig {
     migrations: Migrations<'static>,
@@ -12,9 +13,9 @@ pub(super) struct MigrationsConfig {
 }
 
 impl MigrationsConfig {
-    pub fn to_stable(&self, conn: &mut Connection) -> Result<()> {
+    pub fn to_stable(&self, conn: &mut AppConnection) -> Result<()> {
         self.migrations
-            .to_version(conn, self.stable_version)
+            .to_version(conn.as_mut(), self.stable_version)
             .with_context(|| {
                 format!(
                     "failed to migrate to stable version {}",
@@ -23,9 +24,9 @@ impl MigrationsConfig {
             })
     }
     #[allow(dead_code)]
-    pub fn to_rolled_back(&self, conn: &mut Connection) -> Result<()> {
+    pub fn to_rolled_back(&self, conn: &mut AppConnection) -> Result<()> {
         self.migrations
-            .to_version(conn, self.rolled_back_version)
+            .to_version(conn.as_mut(), self.rolled_back_version)
             .with_context(|| {
                 format!(
                     "failed to migrate to rolled back version {}",
@@ -112,21 +113,21 @@ mod tests {
 
     #[test]
     fn test_migrations_empty_to_stable() {
-        let mut conn = Connection::open_in_memory().unwrap();
+        let mut conn = AppConnection::open_in_memory().unwrap();
 
         config().to_stable(&mut conn).expect("must be ok");
     }
 
     #[test]
     fn test_migrations_empty_to_rolled_back() {
-        let mut conn = Connection::open_in_memory().unwrap();
+        let mut conn = AppConnection::open_in_memory().unwrap();
 
         config().to_rolled_back(&mut conn).expect("must be ok");
     }
 
     #[test]
     fn test_migrations_stable_to_rolled_back() {
-        let mut conn = Connection::open_in_memory().unwrap();
+        let mut conn = AppConnection::open_in_memory().unwrap();
         config().to_stable(&mut conn).expect("must be ok");
 
         config().to_rolled_back(&mut conn).expect("must be ok");
@@ -134,7 +135,7 @@ mod tests {
 
     #[test]
     fn test_migrations_rolled_back_to_stable() {
-        let mut conn = Connection::open_in_memory().unwrap();
+        let mut conn = AppConnection::open_in_memory().unwrap();
         config().to_rolled_back(&mut conn).expect("must be ok");
 
         config().to_stable(&mut conn).expect("must be ok");

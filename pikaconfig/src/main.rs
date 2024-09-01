@@ -98,11 +98,7 @@ fn install(rules: &Rules, root: &Path) -> Result<()> {
         repo.post_install(rules, &mut registry)
             .with_context(|| format!("failed to post-install {}", repo.name()))?;
     }
-    if let Err((_, err)) = registry.close() {
-        // TODO: Retry?
-        return Err(err.context("failed to close SqliteRegistry"));
-    }
-    Ok(())
+    registry.close().context("failed to close SqliteRegistry")
 }
 
 fn system_install(rules: &Rules, root: &Path) -> Result<()> {
