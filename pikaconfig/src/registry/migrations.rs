@@ -8,7 +8,7 @@ use super::connection::AppConnection;
 pub(super) struct MigrationsConfig {
     migrations: Migrations<'static>,
     stable_version: usize,
-    #[allow(dead_code)]
+    #[cfg(test)]
     rolled_back_version: usize,
 }
 
@@ -23,7 +23,7 @@ impl MigrationsConfig {
                 )
             })
     }
-    #[allow(dead_code)]
+    #[cfg(test)]
     pub fn to_rolled_back(&self, conn: &mut AppConnection) -> Result<()> {
         self.migrations
             .to_version(conn.as_mut(), self.rolled_back_version)
@@ -98,10 +98,12 @@ pub(super) fn config() -> &'static MigrationsConfig {
             // distribution propagation, so only practical for development.
         ];
         let stable_size = stable.len();
+        #[cfg(test)]
         let rolled_back_size = rolled_back.len();
         MigrationsConfig {
             migrations: Migrations::new([stable, rolled_back].concat()),
             stable_version: stable_size,
+            #[cfg(test)]
             rolled_back_version: stable_size + rolled_back_size,
         }
     })
