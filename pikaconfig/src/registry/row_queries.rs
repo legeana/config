@@ -19,6 +19,7 @@ where
             .prepare_cached(
                 "
                 SELECT id FROM updates
+                ORDER BY id ASC
                 ",
             )
             .context("failed to prepare statement")?;
