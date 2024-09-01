@@ -12,6 +12,7 @@ pub(super) struct UpdateRow {
 
 #[derive(Clone, Debug, PartialEq)]
 pub(super) struct FileRow {
+    pub update_id: UpdateId,
     pub purpose: FilePurpose,
     pub file: FilePathBuf,
 }
@@ -42,7 +43,7 @@ where
             .as_ref()
             .prepare_cached(
                 "
-                SELECT purpose, file_type, path
+                SELECT update_id, purpose, file_type, path
                 FROM files
                 ORDER BY id ASC
                 ",
@@ -53,6 +54,7 @@ where
                 let file_type: file_type::Type = row.get("file_type")?;
                 let SqlPathBuf(path) = row.get("path")?;
                 Ok(FileRow {
+                    update_id: row.get("update_id")?,
                     purpose: row.get("purpose")?,
                     file: file_type.with_path_buf(path),
                 })

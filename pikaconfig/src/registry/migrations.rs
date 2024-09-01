@@ -90,6 +90,21 @@ pub(super) fn config() -> &'static MigrationsConfig {
                 ",
             )
             .down("DROP TABLE updates;"),
+            M::up(
+                "
+                ALTER TABLE files
+                ADD COLUMN update_id INTEGER
+                    DEFAULT (NULL)
+                    REFERENCES updates (id)
+                    ON DELETE CASCADE
+                ",
+            )
+            .down(
+                "
+                ALTER TABLE files
+                DROP COLUMN update_id;
+                ",
+            ),
         ];
         let rolled_back: Vec<M> = vec![
             // This Vec can be modified.

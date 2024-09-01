@@ -136,6 +136,7 @@ mod tests {
         assert_eq!(
             conn.file_rows().unwrap(),
             vec![FileRow {
+                update_id: UpdateId(None),
                 purpose,
                 file: FilePathBuf::new_symlink("/test/file"),
             }],
@@ -211,6 +212,7 @@ mod tests {
         assert_eq!(
             conn.file_rows().unwrap(),
             vec![FileRow {
+                update_id: UpdateId(None),
                 purpose: other_purpose,
                 file: FilePathBuf::new_symlink("/other/file"),
             }],
