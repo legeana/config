@@ -32,6 +32,12 @@ pub(super) enum FilePurpose {
     State = 2,
 }
 
+impl ToSql for FilePurpose {
+    fn to_sql(&self) -> rusqlite::Result<ToSqlOutput<'_>> {
+        Ok(ToSqlOutput::Owned(Value::Integer(*self as i64)))
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub(super) struct SqlPath<'a>(pub &'a Path);
 
@@ -61,12 +67,6 @@ impl FromSql for SqlPathBuf {
             .context("failed to parse path")
             .map_err(|e| FromSqlError::Other(e.into()))?;
         Ok(SqlPathBuf(decoded.into()))
-    }
-}
-
-impl ToSql for FilePurpose {
-    fn to_sql(&self) -> rusqlite::Result<ToSqlOutput<'_>> {
-        Ok(ToSqlOutput::Owned(Value::Integer(*self as i64)))
     }
 }
 
