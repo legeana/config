@@ -3,12 +3,49 @@ use rusqlite::{named_params, Connection};
 
 use super::connection::AppConnection;
 use super::file_type::{self, FilePath, FilePathBuf};
-use super::model::{FilePurpose, SqlPath, SqlPathBuf};
+use super::model::{FilePurpose, SqlPath, SqlPathBuf, UpdateId};
 
 pub(super) trait AppQueries
 where
     Self: AsRef<Connection>,
 {
+    #[allow(dead_code)]
+    fn create_update(&self) -> Result<UpdateId> {
+        let mut stmt = self
+            .as_ref()
+            .prepare_cached(
+                "
+                INSERT INTO updates
+                DEFAULT VALUES
+                ",
+            )
+            .context("failed to prepare statement")?;
+        let row_id = stmt
+            .insert(named_params![])
+            .context("failed to create new update")?;
+        Ok(UpdateId(Some(row_id)))
+    }
+
+    #[cfg(test)]
+    fn updates(&self) -> Result<Vec<UpdateId>> {
+        let mut stmt = self
+            .as_ref()
+            .prepare_cached(
+                "
+                SELECT id FROM updates
+                ",
+            )
+            .context("failed to prepare statement")?;
+        let updates: Result<Vec<_>, _> = stmt
+            .query_map(named_params![], |row| {
+                let update_id: UpdateId = row.get("id")?;
+                Ok(update_id)
+            })
+            .context("failed to query updates")?
+            .collect();
+        updates.context("query updates")
+    }
+
     fn register_file(&self, purpose: FilePurpose, file: FilePath) -> Result<()> {
         let file_type = file.file_type();
         let path = SqlPath(file.path());
@@ -169,5 +206,13 @@ mod tests {
         }
 
         assert_eq!(files, conn.files(purpose).unwrap());
+    }
+
+    #[rstest]
+    fn test_create_update(conn: AppConnection) {
+        let update = conn.create_update().expect("create_update");
+
+        let updates = conn.updates().expect("updates");
+        assert_eq!(updates, vec![update]);
     }
 }
