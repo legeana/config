@@ -6,6 +6,27 @@ use rusqlite::types::{FromSql, FromSqlError, FromSqlResult, ToSql, ToSqlOutput, 
 use super::file_type;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
+pub(super) struct UpdateId(pub(super) Option<i64>);
+
+impl ToSql for UpdateId {
+    fn to_sql(&self) -> rusqlite::Result<ToSqlOutput<'_>> {
+        match self.0 {
+            Some(v) => Ok(ToSqlOutput::Owned(Value::Integer(v))),
+            None => Ok(ToSqlOutput::Owned(Value::Null)),
+        }
+    }
+}
+
+impl FromSql for UpdateId {
+    fn column_result(value: ValueRef<'_>) -> FromSqlResult<Self> {
+        let Ok(value) = value.as_i64_or_null() else {
+            return Err(FromSqlError::InvalidType);
+        };
+        Ok(Self(value))
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub(super) enum FilePurpose {
     User = 1,
     State = 2,
