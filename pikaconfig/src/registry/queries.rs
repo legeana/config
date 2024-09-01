@@ -166,7 +166,6 @@ mod tests {
             FilePath::new_symlink("/test/1/file/2"),
             FilePath::new_symlink("/test/3/file/3"),
         ];
-
         for f in files.iter().copied() {
             conn.register_file(purpose, f).expect("register_file");
         }
