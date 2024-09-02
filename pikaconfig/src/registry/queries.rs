@@ -78,8 +78,8 @@ where
             .context("files statement prepare")?;
         let files: Result<Vec<_>, _> = stmt
             .query_map(named_params![":purpose": purpose], |row| {
-                let file_type: file_type::Type = row.get(0)?;
-                let SqlPathBuf(path) = row.get(1)?;
+                let file_type: file_type::Type = row.get("file_type")?;
+                let SqlPathBuf(path) = row.get("path")?;
                 Ok(file_type.with_path_buf(path))
             })
             .context("failed to query files")?
