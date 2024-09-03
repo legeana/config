@@ -87,6 +87,39 @@ where
         files.context("query files")
     }
 
+    #[allow(dead_code)]
+    fn files_from_other_updates(
+        &self,
+        update: UpdateId,
+        purpose: FilePurpose,
+    ) -> Result<Vec<FilePathBuf>> {
+        let mut stmt = self
+            .as_ref()
+            .prepare_cached(
+                "
+                SELECT file_type, path
+                FROM files
+                WHERE
+                    update_id != :update AND
+                    purpose = :purpose
+                ORDER BY id ASC
+                ",
+            )
+            .context("files statement prepare")?;
+        let files: Result<Vec<_>, _> = stmt
+            .query_map(
+                named_params![":update": update, ":purpose": purpose],
+                |row| {
+                    let file_type: file_type::Type = row.get("file_type")?;
+                    let SqlPathBuf(path) = row.get("path")?;
+                    Ok(file_type.with_path_buf(path))
+                },
+            )
+            .context("failed to query files")?
+            .collect();
+        files.context("query files")
+    }
+
     fn clear_files(&self, purpose: FilePurpose) -> Result<()> {
         self.as_ref()
             .execute(
@@ -178,6 +211,55 @@ mod tests {
         }
 
         assert_eq!(files, conn.files(purpose).unwrap());
+    }
+
+    #[apply(sqlite_registry_test)]
+    fn test_files_from_other_updates(
+        conn: AppConnection,
+        purpose: FilePurpose,
+        _other_purpose: FilePurpose,
+    ) {
+        let update = conn.create_update().expect("create_update");
+        let other_update = conn.create_update().expect("create_update");
+        conn.register_file(update, purpose, FilePath::new_symlink("/this/update"))
+            .expect("register_file");
+        conn.register_file(
+            other_update,
+            purpose,
+            FilePath::new_symlink("/other/update"),
+        )
+        .expect("register_file");
+
+        let files = conn
+            .files_from_other_updates(update, purpose)
+            .expect("files_from_other_updates");
+
+        assert_eq!(files, vec![FilePathBuf::new_symlink("/other/update")]);
+    }
+
+    #[apply(sqlite_registry_test)]
+    fn test_files_from_other_updates_order(
+        conn: AppConnection,
+        purpose: FilePurpose,
+        _other_purpose: FilePurpose,
+    ) {
+        let want_files = vec![
+            FilePath::new_symlink("/test/2/file/1"),
+            FilePath::new_symlink("/test/1/file/2"),
+            FilePath::new_symlink("/test/3/file/3"),
+        ];
+        let update = conn.create_update().expect("create_update");
+        let other_update = conn.create_update().expect("create_update");
+        for f in want_files.iter().copied() {
+            conn.register_file(other_update, purpose, f)
+                .expect("register_file");
+        }
+
+        let got_files = conn
+            .files_from_other_updates(update, purpose)
+            .expect("files_from_other_updates");
+
+        assert_eq!(got_files, want_files);
     }
 
     #[apply(sqlite_registry_test)]
