@@ -92,6 +92,7 @@ cgt
 changelist
 changelists
 chdir
+chmod
 ci
 classmethod
 cli
@@ -121,6 +122,7 @@ constexpr
 consts
 contextlib
 contrib
+coreutils
 corp
 cpp
 cpu
@@ -200,6 +202,7 @@ endswith
 enquote
 entrypoint
 enum
+enums
 env
 eof
 eoi
@@ -231,11 +234,14 @@ firefox
 fishshell
 fixup
 flaskutil
+flathub
+flatpak
 fm
 fmt
 fn
 fname
 fnameescape
+fontconfig
 foreach
 frontend
 frozenset
@@ -287,6 +293,7 @@ hashbang
 hashlib
 hdd
 healthchecks
+heredoc
 hexsha
 hg
 hjkl
@@ -600,6 +607,7 @@ runtimepath
 rusqlite
 rustdoc
 rustification
+rustls
 rustup
 rw
 rx
@@ -726,6 +734,7 @@ timeseries
 timespec
 timestamp
 timestep
+tls
 tm
 tmp
 tmpdir
@@ -785,6 +794,8 @@ urllib
 usec
 useragent
 userid
+userland
+userlands
 usize
 usr
 utc
@@ -821,12 +832,14 @@ vm
 vscode
 vsync
 vulkan
+wal
 walkdir
 walltime
 webtoon
 webui
 weechat
 wezterm
+wget
 whitelist
 whitelisted
 whitespace
@@ -863,4 +876,5 @@ youtube
 zellij
 zoxide
 zsh
+zshenv
 zshrc
