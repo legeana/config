@@ -181,6 +181,7 @@ pub struct UserDependency {
     pub cargo: Option<CargoDependency>,
     pub npm: Option<StringList>,
     pub pipx: Option<StringList>,
+    pub pipx_bootstrap: Option<StringList>,
     pub flatpak: Option<FlatpakDependency>,
     // Binary management.
     pub binary_url: Option<BinaryUrlDependency>,
@@ -637,6 +638,30 @@ mod tests {
     }
 
     #[test]
+    fn load_pipx_bootstrap_dependency() {
+        let pkg = load_toml_string(
+            "
+            [[user_dependencies]]
+            pipx_bootstrap = ['pkg1', 'pkg2']
+            ",
+        )
+        .expect("load_toml_string");
+        assert_eq!(
+            pkg,
+            Package {
+                user_dependencies: Some(vec![UserDependency {
+                    pipx_bootstrap: Some(StringList::List(vec![
+                        "pkg1".to_owned(),
+                        "pkg2".to_owned()
+                    ])),
+                    ..Default::default()
+                }]),
+                ..Default::default()
+            },
+        );
+    }
+
+    #[test]
     fn load_winget_dependency() {
         let pkg = load_toml_string(
             "
@@ -651,7 +676,7 @@ mod tests {
                 system_dependencies: Some(vec![SystemDependency {
                     winget: Some(WingetDependency::WingetSource(StringList::List(vec![
                         "pkg1".to_owned(),
-                        "pkg2".to_owned()
+                        "pkg2".to_owned(),
                     ]))),
                     ..Default::default()
                 }]),
