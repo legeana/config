@@ -40,9 +40,6 @@ impl UserDependency {
         if cfg.npm.is_some() {
             return Err(anyhow!("npm is not supported yet"));
         }
-        if cfg.pip_user.is_some() {
-            return Err(anyhow!("pip_user is not supported yet"));
-        }
         if let Some(pipx) = &cfg.pipx {
             installers.push(Box::new(Pipx {
                 packages: pipx.to_vec(),

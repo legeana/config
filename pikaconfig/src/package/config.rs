@@ -180,7 +180,6 @@ pub struct UserDependency {
     pub brew: Option<BrewDependency>,
     pub cargo: Option<CargoDependency>,
     pub npm: Option<StringList>,
-    pub pip_user: Option<StringList>,
     pub pipx: Option<StringList>,
     pub flatpak: Option<FlatpakDependency>,
     // Binary management.
@@ -362,30 +361,6 @@ mod tests {
                 }),
                 ..Default::default()
             },])
-        );
-    }
-
-    #[test]
-    fn test_load_user_pip_user() {
-        let pkg = load_toml_string(
-            "
-            [[user_dependencies]]
-            pip_user = ['pkg1-pip', 'pkg2-pip']
-            ",
-        )
-        .expect("load_toml_string");
-        assert_eq!(
-            pkg,
-            Package {
-                user_dependencies: Some(vec![UserDependency {
-                    pip_user: Some(StringList::List(vec![
-                        "pkg1-pip".to_owned(),
-                        "pkg2-pip".to_owned(),
-                    ])),
-                    ..Default::default()
-                },]),
-                ..Default::default()
-            },
         );
     }
 
