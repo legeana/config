@@ -1,2 +1,2 @@
-prefix ~/.local/opt/chrome-launcher
+xdg_executable_prefix .
 symlink chrome-launcher
