@@ -181,6 +181,10 @@ pub fn register(registry: &mut dyn inventory::Registry) {
             base_dir: xdg::data_dir(),
         },
         DirsPrefixBuilder {
+            command: "xdg_executable_prefix",
+            base_dir: xdg::executable_dir(),
+        },
+        DirsPrefixBuilder {
             command: "xdg_state_prefix",
             base_dir: xdg::state_dir(),
         },
