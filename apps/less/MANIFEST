@@ -1,5 +1,5 @@
 if is_unix {
-    xdg_config_prefix .
+    xdg_config_prefix
     symlink lesskey
 
     # Workaround for certain versions of less that don't try to read

@@ -1,2 +1,2 @@
-xdg_executable_prefix .
+xdg_executable_prefix
 symlink pika-xinput

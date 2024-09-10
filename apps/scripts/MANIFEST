@@ -1,4 +1,4 @@
-xdg_executable_prefix .
+xdg_executable_prefix
 
 symlink debug-env
 symlink discord-emojification

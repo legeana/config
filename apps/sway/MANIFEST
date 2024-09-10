@@ -3,7 +3,7 @@ render config
 symlink_tree config-vars.d
 symlink_tree config.d
 
-xdg_executable_prefix .
+xdg_executable_prefix
 symlink start-sway
 symlink sway-screenshot
 
