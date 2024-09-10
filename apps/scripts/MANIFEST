@@ -1,4 +1,4 @@
-prefix ~/.local/bin
+xdg_executable_prefix .
 
 symlink debug-env
 symlink discord-emojification

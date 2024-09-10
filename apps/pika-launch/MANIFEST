@@ -1,2 +1,2 @@
-prefix ~/.local/bin
+xdg_executable_prefix .
 symlink pika-launch
