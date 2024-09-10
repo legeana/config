@@ -9,6 +9,7 @@ use crate::tera_helper;
 use crate::xdg;
 use crate::xdg_or_win;
 
+use super::args::Argument;
 use super::args::Arguments;
 use super::engine;
 use super::inventory;
@@ -17,7 +18,7 @@ use super::inventory;
 struct DirsPrefixStatement {
     command: &'static str,
     base_dir: Option<PathBuf>,
-    subdir: String,
+    subdir: Option<String>,
 }
 
 impl engine::Statement for DirsPrefixStatement {
@@ -26,7 +27,10 @@ impl engine::Statement for DirsPrefixStatement {
             .base_dir
             .as_ref()
             .ok_or_else(|| anyhow!("{} is not supported", self.command))?;
-        ctx.prefix = base_dir.join(&self.subdir);
+        ctx.prefix = match &self.subdir {
+            Some(s) => base_dir.join(s),
+            None => base_dir.clone(),
+        };
         Ok(None)
     }
 }
@@ -54,16 +58,17 @@ impl engine::CommandBuilder for DirsPrefixBuilder {
             .map(|base| base.join("<directory>"))
             .unwrap_or("<unavailable>".into());
         formatdoc! {"
-            {command} <directory>
+            {command} [<directory>]
                 set current installation prefix to {prefix:?}
         ", command=self.name(), prefix=prefix}
     }
     fn build(&self, _workdir: &std::path::Path, args: &Arguments) -> Result<engine::Command> {
         let subdir = args
-            .expect_single_arg(self.name())?
-            .expect_raw()
+            .expect_optional_arg(self.name())?
+            .map(Argument::expect_raw)
+            .transpose()
             .context("subdir")?
-            .to_owned();
+            .map(ToOwned::to_owned);
         Ok(engine::Command::new_statement(DirsPrefixStatement {
             command: self.command,
             base_dir: self.base_dir.clone(),

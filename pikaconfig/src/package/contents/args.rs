@@ -129,6 +129,20 @@ impl Arguments {
         Ok(args)
     }
 
+    pub fn expect_optional_arg(&self, command: impl AsRef<str>) -> Result<Option<&Argument>> {
+        let command = command.as_ref();
+        let (_, args) = self.expect_variadic_args(command, 0)?;
+        match args.len() {
+            0 => Ok(None),
+            1 => Ok(Some(&args[0])),
+            len => Err(anyhow!(
+                "{command} builder: want an optional argument, got {}: {:?}",
+                len,
+                args,
+            )),
+        }
+    }
+
     pub fn expect_single_arg(&self, command: impl AsRef<str>) -> Result<&Argument> {
         Ok(&self.expect_fixed_args(command, 1)?[0])
     }
