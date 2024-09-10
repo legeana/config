@@ -1,2 +1,2 @@
-prefix ~/.local/opt/pika-autostart
+xdg_executable_prefix
 symlink pika-autostart
