@@ -1,2 +1,2 @@
-prefix ~/.local/opt/pacdiff-merge
+xdg_executable_prefix
 symlink pacdiff-merge
