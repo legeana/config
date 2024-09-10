@@ -8,5 +8,5 @@ symlink start-sway
 symlink sway-screenshot
 
 # chrome-launcher configuration
-prefix ~/.config/chrome-flags.d
+xdg_config_prefix chrome-flags.d
 symlink chrome-ozone.conf

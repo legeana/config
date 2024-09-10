@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-CFG_D="$HOME/.config/chrome-flags.d"
+CFG_D="${XDG_CONFIG_HOME:-$HOME/.config}/chrome-flags.d"
 IFS=$'\n'
 
 if [ -d "$CFG_D" ]; then
