@@ -1,0 +1,5 @@
+has_contents = false
+
+[[system_dependencies]]
+apt = "pkg-config"
+wants = { command = "pkg-config" }

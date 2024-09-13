@@ -1,0 +1,9 @@
+has_contents = false
+
+[[system_dependencies]]
+apt = "libssl-dev"
+wants = { pkg_config = "libssl" }
+
+[[user_dependencies]]
+cargo = "cargo-update"
+wants = { command = "cargo-install-update" }
