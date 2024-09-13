@@ -6,10 +6,6 @@ wants = { command = "alacritty" }
 
 [[system_dependencies]]
 requires = "distro=debian"
-apt = "pkg-config"
-wants = { command = "pkg-config" }
-[[system_dependencies]]
-requires = "distro=debian"
 apt = "libfontconfig-dev"
 wants = { pkg_config = "fontconfig" }
 [[user_dependencies]]
