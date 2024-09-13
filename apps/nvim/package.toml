@@ -1,3 +1,7 @@
 [[system_dependencies]]
 any = "neovim"
 wants = { command = "nvim" }
+
+[[system_dependencies]]
+any = "npm"
+wants = { command = "npm" }
