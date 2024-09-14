@@ -30,6 +30,8 @@ pub enum DependencySatisficer {
     AnyCommand { any_command: Vec<PathBuf> },
     AllCommands { all_commands: Vec<PathBuf> },
     File { file: PathBuf },
+    AnyFile { any_file: Vec<PathBuf> },
+    AllFiles { all_files: Vec<PathBuf> },
     PkgConfig { pkg_config: String },
 }
 
@@ -63,6 +65,28 @@ impl Satisficer for DependencySatisficer {
                 Ok(path
                     .try_exists()
                     .with_context(|| format!("failed to check if {file:?} exists"))?)
+            }
+            DependencySatisficer::AnyFile { any_file } => {
+                for path in any_file {
+                    if path
+                        .try_exists()
+                        .with_context(|| format!("failed to check if {path:?} exists"))?
+                    {
+                        return Ok(true);
+                    }
+                }
+                Ok(false)
+            }
+            DependencySatisficer::AllFiles { all_files } => {
+                for path in all_files {
+                    if !path
+                        .try_exists()
+                        .with_context(|| format!("failed to check if {path:?} exists"))?
+                    {
+                        return Ok(false);
+                    }
+                }
+                Ok(true)
             }
             DependencySatisficer::PkgConfig { pkg_config } => {
                 let mut cmd = Command::new("pkg-config");
