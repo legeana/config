@@ -261,6 +261,7 @@ func
 funcs
 functools
 fuzzel
+fxn
 fzf
 gc
 gcc
@@ -291,6 +292,7 @@ gpg
 gpio
 gpiozero
 gpt
+gui
 gunit
 gunzip
 gz
@@ -733,6 +735,7 @@ tcp
 teardown
 tempfile
 tera
+termguicolors
 terminfo
 testdata
 tetris
