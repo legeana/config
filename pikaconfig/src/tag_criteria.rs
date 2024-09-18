@@ -18,18 +18,39 @@ impl<T: Criteria> Criteria for Option<T> {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
-#[serde(deny_unknown_fields)]
-pub struct TagCriteria(pub StringList);
+#[serde(deny_unknown_fields, untagged)]
+pub enum TagCriterion {
+    // TODO: negatives
+    Distro { distro: String },
+    Family { family: String },
+    Hostname { hostname: String },
+    Os { os: String },
+    Uid { uid: String },
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
+#[serde(deny_unknown_fields, untagged)]
+pub enum TagCriteria {
+    Untyped(StringList),
+    Typed(Vec<TagCriterion>),
+}
 
 impl Criteria for TagCriteria {
     fn is_satisfied(&self) -> Result<bool> {
-        let requires = self.0.as_slice();
-        if !tag_util::has_all_tags(requires)
-            .with_context(|| format!("failed to check tags {requires:?}"))?
-        {
-            return Ok(false);
+        match self {
+            Self::Untyped(list) => {
+                let requires = list.as_slice();
+                if !tag_util::has_all_tags(requires)
+                    .with_context(|| format!("failed to check tags {requires:?}"))?
+                {
+                    return Ok(false);
+                }
+                Ok(true)
+            }
+            Self::Typed(_list) => {
+                unimplemented!()
+            }
         }
-        Ok(true)
     }
 }
 
@@ -43,7 +64,7 @@ mod tests {
     #[cfg(target_os = "linux")]
     #[test]
     fn test_linux_satisfied() -> Result<()> {
-        let tags = TagCriteria(StringList::List(vec!["os=linux".to_owned()]));
+        let tags = TagCriteria::Untyped(StringList::List(vec!["os=linux".to_owned()]));
         assert!(tags.is_satisfied()?);
         Ok(())
     }
@@ -51,7 +72,7 @@ mod tests {
     #[cfg(target_os = "linux")]
     #[test]
     fn test_linux_not_satisfied() -> Result<()> {
-        let tags = TagCriteria(StringList::List(vec!["os=windows".to_owned()]));
+        let tags = TagCriteria::Untyped(StringList::List(vec!["os=windows".to_owned()]));
         assert!(!tags.is_satisfied()?);
         Ok(())
     }
@@ -59,7 +80,7 @@ mod tests {
     #[cfg(target_family = "unix")]
     #[test]
     fn test_unix_satisfied() -> Result<()> {
-        let tags = TagCriteria(StringList::List(vec!["family=unix".to_owned()]));
+        let tags = TagCriteria::Untyped(StringList::List(vec!["family=unix".to_owned()]));
         assert!(tags.is_satisfied()?);
         Ok(())
     }
