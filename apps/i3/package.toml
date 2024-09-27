@@ -22,6 +22,10 @@ any = "i3lock"
 wants = { command = "i3lock" }
 
 [[system_dependencies]]
+any = "pasystray"
+wants = { command = "pasystray" }
+
+[[system_dependencies]]
 apt = "x11-xserver-utils"
 pacman = "xorg-xsetroot"
 wants = { command = "xsetroot" }
