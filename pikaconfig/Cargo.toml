@@ -22,7 +22,6 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.97"
 sha2 = "0.10.6"
 shellexpand = { version = "3.1", features = ["path"] }
-sysinfo = { version = "0.30.7", default-features = false }
 tera = { version = "1.19.0", default-features = false }
 thiserror = "2.0"
 toml = "0.8.10"
@@ -44,6 +43,11 @@ features = ["lexer", "unicode"]
 version = "0.22.0"
 default-features = false
 features = ["lexer", "unicode"]
+
+[dependencies.sysinfo]
+version = "0.32.0"
+default-features = false
+features = ["system"]
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"
