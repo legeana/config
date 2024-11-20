@@ -1,0 +1,9 @@
+has_contents = false
+
+[[user_dependencies]]
+cargo = "tealdeer"
+wants = { command = "tealdeer" }
+
+[[system_dependencies]]
+any = "tealdeer"
+wants = { command = "tealdeer" }
