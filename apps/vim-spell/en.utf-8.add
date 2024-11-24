@@ -61,6 +61,7 @@ autoload
 automake
 automator
 autoplug
+autosale
 autotools
 backend
 backends
@@ -359,6 +360,7 @@ iter
 iterable
 itertools
 javascript
+jdbc
 jinja
 js
 json
@@ -413,6 +415,7 @@ macos
 mailto
 manpath
 mapreduce
+mariadb
 md
 memoized
 mesonbuild
@@ -732,6 +735,7 @@ taskrc
 taskserver
 taskwarrior
 tcp
+tealdeer
 teardown
 tempfile
 tera
