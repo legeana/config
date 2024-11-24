@@ -14,6 +14,6 @@ local packages = {
 }
 
 M.lsp = vim.tbl_map(function(e) return e.lsp end, packages)
-M.treesitter = vim.tbl_flatten(vim.tbl_map(function(e) return e.ts end, packages))
+M.treesitter = vim.iter(vim.tbl_map(function(e) return e.ts end, packages)):flatten()
 
 return M
