@@ -110,6 +110,7 @@ cmakedefine
 cmd
 cmdline
 cmp
+coc
 codelab
 colorscheme
 commandline
@@ -251,6 +252,7 @@ fname
 fnameescape
 fontconfig
 foreach
+freebsd
 frontend
 frozenset
 fsck
@@ -289,6 +291,7 @@ gnutls
 golang
 googleapis
 googler
+goto
 gpg
 gpio
 gpiozero
@@ -384,6 +387,7 @@ lesskey
 letsencrypt
 lgtm
 lib
+libfuse
 libinput
 libsonnet
 lifecycle
@@ -427,6 +431,7 @@ microsoft
 milli
 mimetype
 minecraft
+mingw
 mit
 mitm
 mixin
@@ -440,11 +445,14 @@ moshtm
 mplayer
 mprocs
 mro
+msrv
+msvc
 mtime
 mtproto
 mtproxy
 multiline
 muppet
+musl
 mut
 mutex
 mypy
@@ -546,6 +554,7 @@ png
 polybar
 popen
 pos
+posix
 postexec
 poweroff
 poweron
@@ -680,6 +689,7 @@ sshargs
 sshtm
 sso
 sstable
+stackoverflow
 startswith
 staticmethod
 statusor
