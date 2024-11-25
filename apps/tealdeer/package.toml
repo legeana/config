@@ -2,8 +2,8 @@ has_contents = false
 
 [[user_dependencies]]
 cargo = "tealdeer"
-wants = { command = "tealdeer" }
+wants = { command = "tldr" }
 
 [[system_dependencies]]
 any = "tealdeer"
-wants = { command = "tealdeer" }
+wants = { command = "tldr" }
