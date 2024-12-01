@@ -15,7 +15,7 @@ local packages = {
   { lsp = "pylsp", ts = {"python"} },
   { lsp = "rust_analyzer", ts = {"rust"} },
   { lsp = "taplo", ts = {"toml"} },
-  { lsp = "tsserver", ts = {"typescript"} },
+  { lsp = "ts_ls", ts = {"typescript"} },
 }
 
 M.lsp = vim.tbl_map(function(e) return e.lsp end, packages)
