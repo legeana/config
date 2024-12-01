@@ -1,6 +1,11 @@
 local M = {}
 
--- lsp: https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
+-- ## LSP
+-- https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md
+-- :help lspconfig-all
+--
+-- ## Treesitter
+-- https://github.com/nvim-treesitter/nvim-treesitter/blob/master/README.md#supported-languages
 local packages = {
   { lsp = "clangd", ts = {"c", "cpp"} },
   { lsp = "cssls", ts = {"css"} },
