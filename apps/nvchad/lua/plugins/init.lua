@@ -20,21 +20,6 @@ return {
   },
 
   {
-    "williamboman/mason.nvim",
-    --opts = {
-    --  ensure_installed = require("configs.languages").mason,
-    --},
-  },
-
-  {
-    "williamboman/mason-lspconfig.nvim",
-    opts = {
-      ensure_installed = require("configs.languages").lsp,
-    },
-    -- lazy = false,
-  },
-
-  {
     "neovim/nvim-lspconfig",
     config = function()
       require "configs.lspconfig"
