@@ -7,15 +7,20 @@ local M = {}
 -- ## Treesitter
 -- https://github.com/nvim-treesitter/nvim-treesitter/blob/master/README.md#supported-languages
 local packages = {
+  { lsp = "bashls", ts = {"bash"} },
   { lsp = "clangd", ts = {"c", "cpp"} },
   { lsp = "cssls", ts = {"css"} },
+  { lsp = "fish_lsp", ts = {"fish"} },
   { lsp = "gopls", ts = {"go"} },
   { lsp = "html", ts = {"html"} },
   -- { lsp = "java_language_server", ts = {"java"} },
+  { lsp = "lua_ls", ts = {"lua"} },
   { lsp = "pylsp", ts = {"python"} },
   { lsp = "rust_analyzer", ts = {"rust"} },
   { lsp = "taplo", ts = {"toml"} },
   { lsp = "ts_ls", ts = {"typescript"} },
+  { lsp = "vimls", ts = {"vim"} },
+  { lsp = "yamlls", ts = {"yaml"} },
 }
 
 M.lsp = vim.tbl_map(function(e) return e.lsp end, packages)
