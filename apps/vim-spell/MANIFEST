@@ -4,8 +4,10 @@ symlink plugin
 prefix ~/.vim/pack/spell_config/start/spell_config
 symlink plugin
 
+xdg_or_win_config_local_prefix nvchad/pack/spell_config/start/spell_config
+symlink plugin
 xdg_or_win_config_local_prefix nvchad/lua/plugins
-render vim-spell.lua
+symlink vim-spell.lua
 
 xdg_or_win_config_local_prefix vim-spell/draft
 set_contents en.utf-8.add ""
