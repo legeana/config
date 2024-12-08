@@ -3,6 +3,7 @@
 
 [include]
     path = ~/.gitconfig-editor
+    path = ~/.gitconfig-town
     path = ~/.gitconfig-user
 
 [merge]
