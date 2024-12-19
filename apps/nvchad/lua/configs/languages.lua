@@ -7,6 +7,7 @@ local M = {}
 -- ## Treesitter
 -- https://github.com/nvim-treesitter/nvim-treesitter/blob/master/README.md#supported-languages
 local packages = {
+  -- Nvchad comes with a preconfigured lua_ls and treesitter configs.
   { lsp = "bashls", ts = {"bash"} },
   { lsp = "clangd", ts = {"c", "cpp"} },
   { lsp = "cssls", ts = {"css"} },
@@ -14,7 +15,6 @@ local packages = {
   { lsp = "gopls", ts = {"go"} },
   { lsp = "html", ts = {"html"} },
   -- { lsp = "java_language_server", ts = {"java"} },
-  { lsp = "lua_ls", ts = {"lua"} },
   { lsp = "pylsp", ts = {"python"} },
   { lsp = "rust_analyzer", ts = {"rust"} },
   { lsp = "taplo", ts = {"toml"} },
