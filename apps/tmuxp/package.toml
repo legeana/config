@@ -1,5 +1,4 @@
 requires = "family=unix"
-has_contents = false
 
 [[user_dependencies]]
 pipx = "tmuxp"

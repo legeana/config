@@ -1,0 +1,7 @@
+session_name: config
+windows:
+- layout: even-horizontal
+  start_directory: ~/config
+  panes:
+  - focus: true
+  - focus: false
