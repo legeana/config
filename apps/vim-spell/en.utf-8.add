@@ -275,6 +275,7 @@ getopt
 getpass
 getvalue
 gflags
+ghcr
 gid
 gigasecond
 gitconfig
@@ -385,6 +386,7 @@ legeana
 len
 lesskey
 letsencrypt
+lfs
 lgtm
 lib
 libfuse
@@ -412,6 +414,7 @@ logtostderr
 lol
 lsp
 lspconfig
+lsps
 lstrip
 lt
 lua
@@ -437,6 +440,7 @@ mitm
 mixin
 mkdir
 mkmap
+mlua
 mnt
 modeline
 modeset
@@ -591,6 +595,7 @@ pycache
 pyflags
 pylint
 python3
+qall
 qps
 randr
 ratelimit
@@ -673,6 +678,7 @@ spammy
 spanielbot
 spellfile
 spellfiles
+spl
 spotify
 spotipy
 sql
@@ -714,6 +720,7 @@ subl
 submodule
 subpackages
 subpartition
+subpath
 subprefix
 subroot
 substate
@@ -744,6 +751,7 @@ taskless
 taskrc
 taskserver
 taskwarrior
+tbl
 tcp
 tealdeer
 teardown
