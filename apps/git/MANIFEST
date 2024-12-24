@@ -1,5 +1,6 @@
 prefix ~
 symlink_to .gitconfig gitconfig
+symlink_to .gitconfig-hubs gitconfig-hubs
 symlink_to .gitconfig-town gitconfig-town
 symlink_to .gitconfig-user gitconfig-user
 

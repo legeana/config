@@ -1,0 +1,4 @@
+[alias]
+    show-commit-title = show --no-patch --format=%s
+    show-commit-body = show --no-patch --format=%b
+    push-gh-message = !gh pr edit --title=\"$(git show-commit-title)\" --body=\"$(git show-commit-body)\"
