@@ -1,2 +1,7 @@
 #!/bin/sh -e
-env >"/tmp/env-`date +%s`"
+now="$(date +%s)"
+env >"/tmp/env-$now"
+
+for arg; do
+    echo "[$arg]"
+done >"/tmp/arg-$now"
