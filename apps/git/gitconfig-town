@@ -14,3 +14,6 @@
     set-parent = town set-parent
     ship = town ship
     sync = town sync
+
+[git-town]
+    sync-feature-strategy = rebase
