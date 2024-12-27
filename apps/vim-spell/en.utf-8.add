@@ -275,6 +275,7 @@ getopt
 getpass
 getvalue
 gflags
+gh
 ghcr
 gid
 gigasecond
@@ -285,6 +286,7 @@ githubusercontent
 gitignore
 gitlab
 gitutils
+glab
 globbing
 glx
 gmailctl
@@ -320,6 +322,8 @@ holdbacks
 homebrew
 homedir
 hostbased
+hoster
+hosters
 hostinfo
 hostname
 hostnames
@@ -335,6 +339,7 @@ i3lock
 ibracorp
 ico
 ics
+ident
 idiv
 ie
 iff
@@ -396,6 +401,8 @@ lifecycle
 lineno
 linode
 linodes
+linter
+linters
 linux
 liri
 lisa
@@ -448,6 +455,7 @@ moreutils
 moshtm
 mplayer
 mprocs
+mr
 mro
 msrv
 msvc
@@ -474,6 +482,7 @@ nic
 nixpkgs
 noconfirm
 nodryrun
+nolint
 nonblocking
 noninteractive
 nonprod
@@ -482,6 +491,7 @@ noparent
 noreply
 nospell
 npm
+ns
 num
 nushell
 nvchad
@@ -583,6 +593,8 @@ protobuf
 protoc
 protos
 prototext
+ptr
+ptrs
 pubkey
 puid
 punct
@@ -606,6 +618,7 @@ readlink
 readonly
 readwrite
 rebase
+rebasing
 reconstructors
 recv
 redis
@@ -666,6 +679,7 @@ sharding
 shellexpand
 shlex
 shlexfmt
+shoutout
 shutil
 sighup
 sigint
@@ -710,6 +724,7 @@ strictyaml
 stringset
 struct
 structs
+styleguide
 stylesheet
 stylua
 subcmd
@@ -723,10 +738,13 @@ subpartition
 subpath
 subprefix
 subroot
+subshell
+subshells
 substate
 substr
 subteam
 subteams
+subtests
 subtree
 subtrees
 sudo
@@ -816,15 +834,19 @@ undrain
 undraining
 unicode
 unittest
+unittests
 unix
 unmarshal
 unmarshalling
+unmarshals
+unmerged
 unparseable
 unpause
 unraid
 unregister
 unregistering
 unregistration
+unstashed
 unterminated
 upsert
 ureq
@@ -884,6 +906,7 @@ whitelist
 whitelisted
 whitespace
 whitespaces
+wikipedia
 wildcard
 wildcards
 win32
@@ -893,6 +916,7 @@ wofi
 workdir
 workdirs
 workerpool
+worktree
 wrapdb
 wrapfile
 wrapweb
