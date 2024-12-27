@@ -33,4 +33,11 @@ config.window_padding = {
     bottom = 0,
 }
 
+config.hyperlink_rules = wezterm.default_hyperlink_rules()
+-- Markdown links.
+table.insert(config.hyperlink_rules, {
+    regex = '\\[[^]]+\\]\\(([^)]+)\\)',
+    format = '$1',
+})
+
 return config
