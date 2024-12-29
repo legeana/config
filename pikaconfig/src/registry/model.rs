@@ -54,7 +54,7 @@ impl FromSql for FilePurpose {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub(super) struct SqlPath<'a>(pub &'a Path);
 
-impl<'a> ToSql for SqlPath<'a> {
+impl ToSql for SqlPath<'_> {
     fn to_sql(&self) -> rusqlite::Result<ToSqlOutput<'_>> {
         let encoded = crate::os_str::to_vec(self.0.as_os_str().to_os_string());
         Ok(ToSqlOutput::Owned(Value::Blob(encoded)))

@@ -249,7 +249,7 @@ impl<'input> LalrpopLexer<'input> {
     }
 }
 
-impl<'input> Iterator for LalrpopLexer<'input> {
+impl Iterator for LalrpopLexer<'_> {
     type Item = Spanned<Token, Location, LocationError>;
 
     fn next(&mut self) -> Option<Self::Item> {
