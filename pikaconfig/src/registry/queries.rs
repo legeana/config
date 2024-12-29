@@ -140,14 +140,12 @@ impl AppQueries for AppConnection {}
 #[cfg(test)]
 mod tests {
     use pretty_assertions::assert_eq;
-    use rstest::{fixture, rstest};
-    use rstest_reuse::{apply, template};
+    use test_case::test_case;
 
     use crate::registry::row_queries::{FileRow, RowQueries, UpdateRow};
 
     use super::*;
 
-    #[fixture]
     fn conn() -> AppConnection {
         let mut conn = AppConnection::open_in_memory().expect("open_in_memory");
         crate::registry::migrations::config()
@@ -156,14 +154,10 @@ mod tests {
         conn
     }
 
-    #[template]
-    #[rstest]
-    #[case(FilePurpose::User, FilePurpose::State)]
-    #[case(FilePurpose::State, FilePurpose::User)]
-    fn sqlite_registry_test(#[case] purpose: FilePurpose, #[case] other_purpose: FilePurpose) {}
-
-    #[apply(sqlite_registry_test)]
-    fn test_register_file(conn: AppConnection, purpose: FilePurpose, _other_purpose: FilePurpose) {
+    #[test_case(FilePurpose::User)]
+    #[test_case(FilePurpose::State)]
+    fn test_register_file(purpose: FilePurpose) {
+        let conn = conn();
         conn.register_file(UpdateId(None), purpose, FilePath::new_symlink("/test/file"))
             .expect("register_file");
 
@@ -177,8 +171,10 @@ mod tests {
         );
     }
 
-    #[apply(sqlite_registry_test)]
-    fn test_files(conn: AppConnection, purpose: FilePurpose, other_purpose: FilePurpose) {
+    #[test_case(FilePurpose::User, FilePurpose::State)]
+    #[test_case(FilePurpose::State, FilePurpose::User)]
+    fn test_files(purpose: FilePurpose, other_purpose: FilePurpose) {
+        let conn = conn();
         conn.register_file(UpdateId(None), purpose, FilePath::new_symlink("/test/file"))
             .expect("register_file");
         conn.register_file(
@@ -198,8 +194,10 @@ mod tests {
         );
     }
 
-    #[apply(sqlite_registry_test)]
-    fn test_files_order(conn: AppConnection, purpose: FilePurpose, _other_purpose: FilePurpose) {
+    #[test_case(FilePurpose::User)]
+    #[test_case(FilePurpose::State)]
+    fn test_files_order(purpose: FilePurpose) {
+        let conn = conn();
         let files = vec![
             FilePath::new_symlink("/test/2/file/1"),
             FilePath::new_symlink("/test/1/file/2"),
@@ -213,12 +211,10 @@ mod tests {
         assert_eq!(files, conn.files(purpose).unwrap());
     }
 
-    #[apply(sqlite_registry_test)]
-    fn test_files_from_other_updates(
-        conn: AppConnection,
-        purpose: FilePurpose,
-        _other_purpose: FilePurpose,
-    ) {
+    #[test_case(FilePurpose::User)]
+    #[test_case(FilePurpose::State)]
+    fn test_files_from_other_updates(purpose: FilePurpose) {
+        let conn = conn();
         let update = conn.create_update().expect("create_update");
         let other_update = conn.create_update().expect("create_update");
         conn.register_file(update, purpose, FilePath::new_symlink("/this/update"))
@@ -237,12 +233,10 @@ mod tests {
         assert_eq!(files, vec![FilePathBuf::new_symlink("/other/update")]);
     }
 
-    #[apply(sqlite_registry_test)]
-    fn test_files_from_other_updates_order(
-        conn: AppConnection,
-        purpose: FilePurpose,
-        _other_purpose: FilePurpose,
-    ) {
+    #[test_case(FilePurpose::User)]
+    #[test_case(FilePurpose::State)]
+    fn test_files_from_other_updates_order(purpose: FilePurpose) {
+        let conn = conn();
         let want_files = vec![
             FilePath::new_symlink("/test/2/file/1"),
             FilePath::new_symlink("/test/1/file/2"),
@@ -262,8 +256,10 @@ mod tests {
         assert_eq!(got_files, want_files);
     }
 
-    #[apply(sqlite_registry_test)]
-    fn test_clear_files(conn: AppConnection, purpose: FilePurpose, _other_purpose: FilePurpose) {
+    #[test_case(FilePurpose::User)]
+    #[test_case(FilePurpose::State)]
+    fn test_clear_files(purpose: FilePurpose) {
+        let conn = conn();
         conn.register_file(UpdateId(None), purpose, FilePath::new_symlink("/test/file"))
             .expect("register_file");
         assert_eq!(
@@ -276,12 +272,13 @@ mod tests {
         assert_eq!(conn.file_rows().unwrap(), vec![]);
     }
 
-    #[apply(sqlite_registry_test)]
+    #[test_case(FilePurpose::User, FilePurpose::State)]
+    #[test_case(FilePurpose::State, FilePurpose::User)]
     fn test_clear_files_does_not_delete_other_files(
-        conn: AppConnection,
         purpose: FilePurpose,
         other_purpose: FilePurpose,
     ) {
+        let conn = conn();
         conn.register_file(UpdateId(None), purpose, FilePath::new_symlink("/test/file"))
             .expect("register_file");
         assert_eq!(
@@ -311,16 +308,18 @@ mod tests {
         );
     }
 
-    #[rstest]
-    fn test_create_update(conn: AppConnection) {
+    #[test]
+    fn test_create_update() {
+        let conn = conn();
         let update = conn.create_update().expect("create_update");
 
         let updates = conn.update_rows().expect("updates");
         assert_eq!(updates, vec![UpdateRow { id: update }]);
     }
 
-    #[rstest]
-    fn test_delete_other_updates(conn: AppConnection) {
+    #[test]
+    fn test_delete_other_updates() {
+        let conn = conn();
         let update = conn.create_update().expect("create_update");
         let other_update = conn.create_update().expect("create_update");
         assert_eq!(
@@ -333,8 +332,9 @@ mod tests {
         assert_eq!(conn.update_rows().unwrap(), vec![UpdateRow { id: update }]);
     }
 
-    #[rstest]
-    fn test_delete_files_via_update(conn: AppConnection) {
+    #[test]
+    fn test_delete_files_via_update() {
+        let conn = conn();
         let update = conn.create_update().expect("create_update");
         let other_update = conn.create_update().expect("create_update");
         conn.register_file(

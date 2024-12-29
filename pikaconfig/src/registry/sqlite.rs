@@ -64,17 +64,17 @@ impl Registry for SqliteRegistry {
 #[cfg(test)]
 mod tests {
     use pretty_assertions::assert_eq;
-    use rstest::{fixture, rstest};
 
     use super::*;
 
-    #[fixture]
     fn reg() -> SqliteRegistry {
         SqliteRegistry::open_in_memory().expect("open_in_memory")
     }
 
-    #[rstest]
-    fn test_user_files_register(mut reg: SqliteRegistry) {
+    #[test]
+    fn test_user_files_register() {
+        let mut reg = reg();
+
         reg.register_user_file(FilePath::new_symlink("test"))
             .expect("register_user_file");
 
@@ -84,8 +84,9 @@ mod tests {
         );
     }
 
-    #[rstest]
-    fn test_user_files_clear(mut reg: SqliteRegistry) {
+    #[test]
+    fn test_user_files_clear() {
+        let mut reg = reg();
         reg.register_user_file(FilePath::new_symlink("test"))
             .expect("register_user_file");
 
@@ -94,8 +95,9 @@ mod tests {
         assert_eq!(reg.user_files().unwrap(), Vec::<FilePathBuf>::new());
     }
 
-    #[rstest]
-    fn test_state_files_register(mut reg: SqliteRegistry) {
+    #[test]
+    fn test_state_files_register() {
+        let mut reg = reg();
         reg.register_state_file(FilePath::new_symlink("test"))
             .expect("register_state_file");
 
@@ -105,8 +107,9 @@ mod tests {
         );
     }
 
-    #[rstest]
-    fn test_state_files_clear(mut reg: SqliteRegistry) {
+    #[test]
+    fn test_state_files_clear() {
+        let mut reg = reg();
         reg.register_state_file(FilePath::new_symlink("test"))
             .expect("register_state_file");
 

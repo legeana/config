@@ -51,5 +51,4 @@ features = ["system"]
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"
-rstest_reuse = "0.7.0"
-rstest = { version = "0.23.0", default-features = false }
+test-case = { version = "3.3.1" }
