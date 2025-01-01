@@ -149,6 +149,10 @@ window_rules:
   - commands: ['move --workspace 3']
     match:
       - window_process: { equals: 'Telegram' }
+  - commands: ['move --workspace 2']
+    match:
+      - window_process: { equals: 'brave' }
+        window_title: { regex: '- YouTube -' }
 
 binding_modes:
   # When enabled, the focused window can be resized via arrow keys or HJKL.
