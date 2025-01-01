@@ -1,11 +1,11 @@
-xdg_or_win_config_local_prefix nvim/pack/spell_config/start/spell_config
-symlink plugin
+xdg_or_win_config_local_prefix nvim/pack/spell_config/start/spell_config/plugin
+symlink spell.vim
 
-prefix ~/.vim/pack/spell_config/start/spell_config
-symlink plugin
+prefix ~/.vim/pack/spell_config/start/spell_config/plugin
+symlink spell.vim
 
-xdg_or_win_config_local_prefix nvchad/pack/spell_config/start/spell_config
-symlink plugin
+xdg_or_win_config_local_prefix nvchad/pack/spell_config/start/spell_config/plugin
+symlink spell.vim
 xdg_or_win_config_local_prefix nvchad/lua/plugins
 symlink vim-spell.lua
 
