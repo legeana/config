@@ -287,6 +287,7 @@ gitignore
 gitlab
 gitutils
 glab
+glazewm
 globbing
 glx
 gmailctl
@@ -600,6 +601,7 @@ puid
 punct
 pusheen
 pwd
+px
 py
 py3
 py3status
@@ -765,6 +767,7 @@ tablename
 tagless
 taskd
 taskdctl
+taskkill
 taskless
 taskrc
 taskserver
@@ -912,6 +915,7 @@ wildcards
 win32
 winapi
 winget
+wm
 wofi
 workdir
 workdirs
@@ -940,6 +944,7 @@ yaml
 yazi
 yml
 youtube
+zebar
 zellij
 zoxide
 zsh
