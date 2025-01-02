@@ -1,7 +1,11 @@
 prefix ~
+# This path is hardcoded in `komorebi/komorebic/src/main.rs`.
+output_file applications.json
 symlink komorebi.json
 symlink komorebi.bar.json
+
 prefix ~/.config
 symlink whkdrc
 
+# Writes to ~/applications.json.
 post_install_exec komorebic fetch-asc
