@@ -76,6 +76,6 @@ alt + shift + 7         : komorebic move-to-workspace 6
 alt + shift + 8         : komorebic move-to-workspace 7
 
 # Applications
-alt + return            : wezterm
+alt + return            : Start-Process wezterm-gui
 alt + g                 : Start-Process "$Env:ProgramFiles\BraveSoftware\Brave-Browser\Application\brave.exe"
 alt + shift + g         : Start-Process "$Env:ProgramFiles\Mozilla Firefox\firefox.exe"
