@@ -1,0 +1,7 @@
+prefix ~
+symlink komorebi.json
+symlink komorebi.bar.json
+prefix ~/.config
+symlink whkdrc
+
+post_install_exec komorebic fetch-asc
