@@ -383,6 +383,8 @@ keybase
 keygrip
 keymap
 keymaps
+komorebi
+komorebic
 konsole
 kubernetes
 kwargs
@@ -502,6 +504,7 @@ nyc
 oauth
 obsidianmd
 oct
+oem
 ok
 omf
 omg
@@ -601,6 +604,7 @@ puid
 punct
 pusheen
 pwd
+pwsh
 px
 py
 py3
@@ -909,6 +913,7 @@ whitelist
 whitelisted
 whitespace
 whitespaces
+whkd
 wikipedia
 wildcard
 wildcards
@@ -926,6 +931,7 @@ wrapfile
 wrapweb
 writeln
 wsgi
+wshell
 www
 x11
 xargs
