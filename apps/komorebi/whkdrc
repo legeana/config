@@ -1,9 +1,15 @@
 .shell powershell
 
 # Reload whkd configuration
-# alt + o                 : taskkill /f /im whkd.exe && start /b whkd # if shell is cmd
-alt + o                 : taskkill /f /im whkd.exe; Start-Process whkd -WindowStyle hidden # if shell is pwsh / powershell
-alt + shift + o         : komorebic reload-configuration
+# if shell is cmd
+# alt + o                 : taskkill /f /im whkd.exe && start /b whkd
+# if shell is pwsh / powershell
+alt + o                 : taskkill /f /im whkd.exe; Start-Process whkd -WindowStyle hidden
+
+# Komorebi start/stop
+alt + shift + c         : komorebic reload-configuration
+alt + shift + r         : komorebic stop ; komorebic start
+alt + shift + e         : komorebic stop --whkd --bar
 
 # App shortcuts - these require shell to be pwsh / powershell
 # The apps will be focused if open, or launched if not open
