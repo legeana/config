@@ -1,2 +1,2 @@
-xdg_config_prefix helix
+xdg_or_win_config_prefix helix
 symlink config.toml
