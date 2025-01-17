@@ -1,2 +1,3 @@
 xdg_or_win_config_prefix helix
 symlink config.toml
+symlink languages.toml

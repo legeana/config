@@ -1,0 +1,6 @@
+[language-server.vale-ls]
+command = "vale-ls"
+
+[[language]]
+name = "toml"
+language-servers = ["taplo", "vale-ls"]
