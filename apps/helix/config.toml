@@ -16,6 +16,7 @@ newline = "all"
 render = true
 
 [keys.normal]
+G = "goto_file_end"
 V = ["extend_to_line_bounds", "select_mode"]
 # xd should remove empty line
 # https://github.com/helix-editor/helix/discussions/835#discussioncomment-1481068
