@@ -1,4 +1,9 @@
 requires = "os=windows"
 
 [[system_dependencies]]
-winget = ["LGUG2Z.komorebi", "LGUG2Z.whkd"]
+winget = "LGUG2Z.komorebi"
+wants = { command = "komorebi" }
+
+[[system_dependencies]]
+winget = "LGUG2Z.whkd"
+wants = { command = "whkd" }
