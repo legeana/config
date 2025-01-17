@@ -1,6 +1,7 @@
 theme = "dracula"
 
 [editor]
+color-modes = true
 line-number = "absolute"
 true-color = true
 
