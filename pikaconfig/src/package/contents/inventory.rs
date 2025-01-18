@@ -80,6 +80,7 @@ fn register_all(registry: &mut dyn Registry) {
     super::remote_source::register(registry);
     // Exec.
     super::exec::register(registry);
+    super::which::register(registry);
     // Control.
     super::file_tests::register(registry);
     super::literal::register(registry);

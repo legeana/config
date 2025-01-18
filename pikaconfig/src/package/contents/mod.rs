@@ -31,6 +31,7 @@ mod subdir;
 mod symlink;
 mod symlink_tree;
 mod tags;
+mod which;
 
 use std::path::{Path, PathBuf};
 
