@@ -25,7 +25,7 @@ function _tm_cleanup
         if ! test -e $f
             rm -f $f
         end
-        if test "$(readlink -- $f)" = $_TM_PLACEHOLDER
+        if test "$(path resolve -- $f)" = $_TM_PLACEHOLDER
             rm -f $f
         end
     end
