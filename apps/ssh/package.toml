@@ -5,3 +5,8 @@ requires = "distro!=unraid"
 apt = "openssh-client"
 pacman = "openssh"
 wants = { command = "ssh" }
+
+[[system_dependencies]]
+requires = "os=linux"
+any = "socat"
+wants = { command = "socat" }
