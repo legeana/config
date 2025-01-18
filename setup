@@ -42,7 +42,7 @@ fatal() {
 load_cargo_env() {
     CARGO_ENV="${CARGO_HOME:-$HOME/.cargo}/env"
     if [ -f "$CARGO_ENV" ]; then
-        source "$CARGO_ENV"
+        . "$CARGO_ENV"
     fi
 }
 
