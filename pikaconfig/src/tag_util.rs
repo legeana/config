@@ -29,6 +29,7 @@ pub fn has_all_tags<T: AsRef<str>>(tags: &[T]) -> Result<bool> {
 
 fn has_tag_kv(key: &str, value: &str) -> bool {
     match key {
+        "feature" => SYSINFO.match_feature(value),
         "distro" => SYSINFO.match_distro(value),
         "family" => SYSINFO.match_family(value),
         "hostname" => SYSINFO.match_hostname(value),
@@ -43,6 +44,15 @@ struct SystemInfo;
 impl SystemInfo {
     fn new() -> Self {
         Self {}
+    }
+    fn is_wsl(&self) -> bool {
+        std::env::var("WSL_DISTRO_NAME").is_ok()
+    }
+    fn match_feature(&self, want_feature: &str) -> bool {
+        match want_feature {
+            "wsl" => self.is_wsl(),
+            _ => false,
+        }
     }
     /// Returns 'windows' or 'unix'.
     fn family(&self) -> &'static str {
@@ -98,7 +108,8 @@ impl SystemInfo {
 
 /// Returns system tags.
 pub fn tags() -> Result<Vec<String>> {
-    Ok(vec![
+    // Always present.
+    let mut tags = vec![
         format!("distro={}", SYSINFO.distro()),
         format!(
             "hostname={}",
@@ -106,7 +117,16 @@ pub fn tags() -> Result<Vec<String>> {
         ),
         format!("family={}", SYSINFO.family()),
         format!("os={}", SYSINFO.os()),
-    ])
+    ];
+    // Multiple features can be present at the same time.
+    for feature in ["wsl"] {
+        if SYSINFO.match_feature(feature) {
+            tags.push(format!("feature={feature}"));
+        }
+    }
+    // Return sorted tags.
+    tags.sort();
+    Ok(tags)
 }
 
 #[cfg(test)]
