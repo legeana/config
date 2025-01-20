@@ -520,6 +520,7 @@ nic
 nixpkgs
 noconfirm
 nodryrun
+nofork
 nolint
 nonblocking
 noninteractive
@@ -528,6 +529,7 @@ noop
 noparent
 noreply
 nospell
+npiperelay
 npm
 ns
 nullopt
@@ -739,6 +741,7 @@ sigquit
 sigterm
 skippable
 smartstring
+socat
 solarized
 spammy
 spanielbot
@@ -998,6 +1001,7 @@ wrapweb
 writeln
 wsgi
 wshell
+wsl
 www
 x11
 xargs
