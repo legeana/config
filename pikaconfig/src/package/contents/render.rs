@@ -19,6 +19,7 @@ struct Render {
     tera: tera::Tera,
     context: tera::Context,
     output: AnnotatedPathBox,
+    permissions: std::fs::Permissions,
 }
 
 impl Module for Render {
@@ -29,7 +30,9 @@ impl Module for Render {
             .render_to(TEMPLATE_NAME, &self.context, &mut file)
             .with_context(|| format!("failed to render to file {:?}", self.output))?;
         file.sync_all()
-            .with_context(|| format!("failed to flush {:?}", self.output))
+            .with_context(|| format!("failed to flush {:?}", self.output))?;
+        file.set_permissions(self.permissions.clone())
+            .with_context(|| format!("failed to set permissions to file {:?}", self.output))
     }
 }
 
@@ -50,6 +53,9 @@ impl engine::Statement for RenderStatement {
         let mut tera = tera::Tera::default();
         tera.add_template_file(&src, Some(TEMPLATE_NAME))
             .with_context(|| format!("failed to load template from {src:?}"))?;
+        let permissions = std::fs::metadata(&src)
+            .with_context(|| format!("failed to load {src:?} metadata"))?
+            .permissions();
         inventory::register_render_helpers(&mut tera);
         tera_helpers::register(&mut tera);
         let mut context = tera::Context::new();
@@ -63,6 +69,7 @@ impl engine::Statement for RenderStatement {
                 tera,
                 context,
                 output: output_state,
+                permissions,
             },
         ))))
     }
