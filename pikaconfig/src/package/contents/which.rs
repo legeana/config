@@ -1,8 +1,30 @@
+use std::path::Path;
+
+use anyhow::{Context, Result};
+use indoc::formatdoc;
 use serde::Deserialize;
 
 use crate::tera_helper;
 
+use super::args::{Argument, Arguments};
+use super::engine;
+use super::engine::CommandBuilder;
 use super::inventory;
+
+#[derive(Debug)]
+struct WhichExpression {
+    binary: Argument,
+}
+
+impl engine::Expression for WhichExpression {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<engine::ExpressionOutput> {
+        let binary = ctx.expand_arg(&self.binary).context("binary")?;
+        Ok(engine::ExpressionOutput {
+            module: None,
+            output: which::which(&binary)?.into_os_string(),
+        })
+    }
+}
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -11,17 +33,36 @@ struct WhichParams {
 }
 
 #[derive(Clone)]
-struct WhichFn;
+struct WhichBuilder;
 
-impl inventory::RenderHelper for WhichFn {
+impl engine::CommandBuilder for WhichBuilder {
+    fn name(&self) -> String {
+        "which".to_owned()
+    }
+    fn help(&self) -> String {
+        formatdoc! {"
+            <path> = {command} <binary>
+                Returns a full path to a binary in $PATH
+        ", command=self.name()}
+    }
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
+        let binary = args.expect_single_arg(self.name())?;
+        Ok(engine::Command::new_expression(WhichExpression {
+            binary: binary.clone(),
+        }))
+    }
+}
+
+impl inventory::RenderHelper for WhichBuilder {
     fn register_render_helper(&self, tera: &mut tera::Tera) {
         tera.register_function(
-            "which",
+            &self.name(),
             tera_helper::wrap_fn(move |args: &WhichParams| Ok(which::which(&args.binary)?)),
         );
     }
 }
 
 pub fn register(registry: &mut dyn inventory::Registry) {
-    registry.register_render_helper(Box::new(WhichFn));
+    registry.register_command(Box::new(WhichBuilder));
+    registry.register_render_helper(Box::new(WhichBuilder));
 }
