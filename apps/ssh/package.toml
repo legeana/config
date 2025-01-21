@@ -10,3 +10,10 @@ wants = { command = "ssh" }
 requires = "os=linux"
 any = "socat"
 wants = { command = "socat" }
+
+# Used by the WSL counterpart.
+# See ssh-agent-wsl.service.
+[[system_dependencies]]
+requires = "os=windows"
+winget = "albertony.npiperelay"
+wants = { command = "npiperelay" }
