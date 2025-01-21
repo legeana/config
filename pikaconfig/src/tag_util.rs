@@ -39,6 +39,16 @@ fn has_tag_kv(key: &str, value: &str) -> bool {
     }
 }
 
+#[cfg(unix)]
+fn getuid() -> Option<u32> {
+    Some(unsafe { libc::getuid() })
+}
+
+#[cfg(windows)]
+fn getuid() -> Option<u32> {
+    None
+}
+
 struct SystemInfo;
 
 impl SystemInfo {
@@ -95,14 +105,11 @@ impl SystemInfo {
     fn match_distro(&self, want_distro: &str) -> bool {
         want_distro == self.distro()
     }
-    #[cfg(unix)]
     fn match_uid(&self, want_uid: &str) -> bool {
-        let uid = unsafe { libc::getuid() };
-        uid.to_string() == want_uid
-    }
-    #[cfg(windows)]
-    fn match_uid(&self, _want_uid: &str) -> bool {
-        false
+        match getuid() {
+            Some(uid) => uid.to_string() == want_uid,
+            None => false,
+        }
     }
 }
 
@@ -123,6 +130,10 @@ pub fn tags() -> Result<Vec<String>> {
         if SYSINFO.match_feature(feature) {
             tags.push(format!("feature={feature}"));
         }
+    }
+    // Miscellaneous.
+    if let Some(uid) = getuid() {
+        tags.push(format!("uid={uid}"));
     }
     // Return sorted tags.
     tags.sort();
