@@ -92,7 +92,9 @@ Assignment: ast::Assignment = {
     <start:@L>
     <var:UnquotedLiteral>
     Assign
-    <command:Invocation> => ast::Assignment {
+    SubstitutionBegin
+    <command:Invocation>
+    SubstitutionEnd => ast::Assignment {
         location: start,
         var,
         command,

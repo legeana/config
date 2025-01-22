@@ -1,5 +1,5 @@
 if is_linux {
-    src = remote_archive Hack.zip 'https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/Hack.zip'
+    src = $(remote_archive Hack.zip 'https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/Hack.zip')
 
     prefix ~/.local/share/fonts
     symlink_from $src/HackNerdFont-BoldItalic.ttf

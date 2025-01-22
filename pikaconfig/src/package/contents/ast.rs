@@ -585,7 +585,7 @@ mod tests {
             Manifest::parse(
                 "",
                 r#"
-                my_var = command arg
+                my_var = $(command arg)
             "#
             )
             .unwrap(),
@@ -595,7 +595,7 @@ mod tests {
                     location: lexer::Location::new_p_l_c(17, 2, 17),
                     var: "my_var".into(),
                     command: Invocation {
-                        location: lexer::Location::new_p_l_c(26, 2, 26),
+                        location: lexer::Location::new_p_l_c(28, 2, 28),
                         name: "command".into(),
                         args: args![~"arg"],
                     }

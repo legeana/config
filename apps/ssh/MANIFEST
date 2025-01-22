@@ -5,7 +5,7 @@ symlink_tree config.d
 if is_linux {
     if tags 'feature=wsl' {
         xdg_executable_prefix .
-        npiperelay_exe = which npiperelay.exe
+        npiperelay_exe = $(which npiperelay.exe)
         symlink_to npiperelay-wsl $npiperelay_exe
         prefix ~/.config/systemd/user
         symlink_to ssh-agent.service ssh-agent-wsl.service
