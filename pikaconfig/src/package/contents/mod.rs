@@ -15,7 +15,6 @@ mod inventory;
 mod is_command;
 mod is_os;
 mod lexer;
-mod literal;
 mod local_state;
 mod mkdir;
 mod net_util;

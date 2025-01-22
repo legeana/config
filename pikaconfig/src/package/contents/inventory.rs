@@ -83,7 +83,6 @@ fn register_all(registry: &mut dyn Registry) {
     super::which::register(registry);
     // Control.
     super::file_tests::register(registry);
-    super::literal::register(registry);
     super::is_command::register(registry);
     super::is_os::register(registry);
     super::once::register(registry);
