@@ -91,14 +91,14 @@ impl engine::Statement for IfStatement {
 }
 
 #[derive(Debug)]
-struct AssignmentStatement {
+struct CommandAssignmentStatement {
     manifest_path: PathBuf,
     line: String,
     var_name: String,
     expression: engine::ExpressionBox,
 }
 
-impl engine::Statement for AssignmentStatement {
+impl engine::Statement for CommandAssignmentStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         let engine::ExpressionOutput { module, output } = self.expression.eval(ctx)?;
         ctx.set_var(self.var_name.clone(), output)
@@ -134,8 +134,8 @@ pub fn parse_statements<'a>(
                 ast::Statement::IfStatement(if_st) => {
                     parse_if_statement(workdir, manifest_path, if_st)
                 }
-                ast::Statement::Assignment(assignment) => {
-                    parse_assignment(workdir, manifest_path, assignment)
+                ast::Statement::CommandAssignment(assignment) => {
+                    parse_command_assignment(workdir, manifest_path, assignment)
                 }
                 ast::Statement::WithStatement(with_st) => {
                     parse_with_statement(workdir, manifest_path, with_st)
@@ -166,10 +166,10 @@ fn parse_command(
     }))
 }
 
-fn parse_assignment(
+fn parse_command_assignment(
     workdir: &Path,
     manifest_path: &Path,
-    assignment: &ast::Assignment,
+    assignment: &ast::CommandAssignment,
 ) -> Result<engine::StatementBox> {
     let cmd = &assignment.command;
     let line = cmd.to_string();
@@ -182,7 +182,7 @@ fn parse_assignment(
             var = assignment.var
         );
     };
-    Ok(Box::new(AssignmentStatement {
+    Ok(Box::new(CommandAssignmentStatement {
         manifest_path: manifest_path.to_owned(),
         line,
         var_name: assignment.var.clone(),

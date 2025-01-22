@@ -31,7 +31,7 @@ EmptyLine = {
 Statement: ast::Statement = {
     <Invocation> LineTerminator => ast::Statement::Command(<>),
     <IfStatement> LineTerminator => ast::Statement::IfStatement(<>),
-    <Assignment> LineTerminator => ast::Statement::Assignment(<>),
+    <CommandAssignment> LineTerminator => ast::Statement::CommandAssignment(<>),
     <WithStatement> LineTerminator => ast::Statement::WithStatement(<>),
 };
 
@@ -88,13 +88,13 @@ Block = {
     End
 };
 
-Assignment: ast::Assignment = {
+CommandAssignment: ast::CommandAssignment = {
     <start:@L>
     <var:UnquotedLiteral>
     Assign
     SubstitutionBegin
     <command:Invocation>
-    SubstitutionEnd => ast::Assignment {
+    SubstitutionEnd => ast::CommandAssignment {
         location: start,
         var,
         command,

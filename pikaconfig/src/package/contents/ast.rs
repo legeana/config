@@ -28,7 +28,7 @@ impl Manifest {
 pub enum Statement {
     Command(Invocation),
     IfStatement(IfStatement),
-    Assignment(Assignment),
+    CommandAssignment(CommandAssignment),
     WithStatement(WithStatement),
 }
 
@@ -71,7 +71,7 @@ pub struct IfStatement {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct Assignment {
+pub struct CommandAssignment {
     pub location: lexer::Location,
     pub var: String,
     pub command: Invocation,
@@ -580,7 +580,7 @@ mod tests {
     }
 
     #[test]
-    fn test_assignment() {
+    fn test_command_assignment() {
         assert_eq!(
             Manifest::parse(
                 "",
@@ -591,7 +591,7 @@ mod tests {
             .unwrap(),
             Manifest {
                 location: "".into(),
-                statements: vec![Statement::Assignment(Assignment {
+                statements: vec![Statement::CommandAssignment(CommandAssignment {
                     location: lexer::Location::new_p_l_c(17, 2, 17),
                     var: "my_var".into(),
                     command: Invocation {
