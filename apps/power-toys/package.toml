@@ -3,3 +3,4 @@ has_contents = false
 
 [[system_dependencies]]
 winget = "Microsoft.PowerToys"
+wants = { file = "~/AppData/Local/PowerToys/PowerToys.exe" }
