@@ -126,7 +126,7 @@ impl engine::CommandBuilder for RemoteArchiveBuilder {
     }
     fn help(&self) -> String {
         formatdoc! {"
-            <directory> = {command} <filename> <url>
+            <directory> = $({command} <filename> <url>)
                 Downloads and unpacks remote archive,
                 returns a path to unpacked directory.
         ", command=self.name()}

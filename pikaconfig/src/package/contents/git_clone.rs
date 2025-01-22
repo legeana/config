@@ -135,7 +135,7 @@ impl engine::CommandBuilder for GitBuilder {
     }
     fn help(&self) -> String {
         formatdoc! {"
-            <directory> = {command} <url>[#<branch>]
+            <directory> = $({command} <url>[#<branch>])
                 Clones a remote git repository,
                 returns the path to the local clone.
         ", command=self.name()}

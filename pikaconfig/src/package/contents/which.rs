@@ -41,7 +41,7 @@ impl engine::CommandBuilder for WhichBuilder {
     }
     fn help(&self) -> String {
         formatdoc! {"
-            <path> = {command} <binary>
+            <path> = $({command} <binary>)
                 Returns a full path to a binary in $PATH
         ", command=self.name()}
     }
