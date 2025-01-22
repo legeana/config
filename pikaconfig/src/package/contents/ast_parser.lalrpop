@@ -139,6 +139,8 @@ extern {
         Else => lexer::Token::Else,
         Begin => lexer::Token::Begin,
         End => lexer::Token::End,
+        SubstitutionBegin => lexer::Token::SubstitutionBegin,
+        SubstitutionEnd => lexer::Token::SubstitutionEnd,
         Assign => lexer::Token::Assign,
         Not => lexer::Token::Not,
         With => lexer::Token::With,

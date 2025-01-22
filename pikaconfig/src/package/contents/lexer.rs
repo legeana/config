@@ -54,7 +54,7 @@ pub enum Token {
     SingleQuotedLiteral(String),
     #[regex(r#""([^"\n\\]|\\[^\n])*""#, |lex| quote::unquote(lex.slice()))]
     DoubleQuotedLiteral(String),
-    #[regex(r#"[^\s'"!={}#][^\s'"!={}]*"#, |lex| lex.slice().to_owned())]
+    #[regex(r#"[^\s'"!={}()#][^\s'"!={}()]*"#, |lex| lex.slice().to_owned())]
     UnquotedLiteral(String),
     #[token("if")]
     If,
@@ -64,6 +64,10 @@ pub enum Token {
     Begin,
     #[token("}")]
     End,
+    #[token("$(")]
+    SubstitutionBegin,
+    #[token(")")]
+    SubstitutionEnd,
     #[token("=")]
     Assign,
     #[token("!")]
@@ -85,6 +89,8 @@ impl std::fmt::Display for Token {
             Token::Else => write!(f, "Token::Else"),
             Token::Begin => write!(f, "Token::Begin"),
             Token::End => write!(f, "Token::End"),
+            Token::SubstitutionBegin => write!(f, "Token::SubstitutionBegin"),
+            Token::SubstitutionEnd => write!(f, "Token::SubstitutionEnd"),
             Token::Assign => write!(f, "Token::Assign"),
             Token::Not => write!(f, "Token::Not"),
             Token::With => write!(f, "Token::With"),
@@ -740,6 +746,50 @@ mod tests {
         assert_token!(lex.next(), Token::UnquotedLiteral("two".into()));
         assert_token!(lex.next(), Token::Newline);
         assert_token!(lex.next(), Token::End);
+        assert_token!(lex.next(), Token::Newline);
+        assert_eoi!(lex);
+    }
+
+    #[test]
+    fn test_substitution() {
+        let mut lex = TestLexer::new(
+            r#"
+            arg1 $(arg2 arg3) arg4
+            "#,
+        );
+        assert_token!(lex.next(), Token::Newline);
+        assert_token!(lex.next(), Token::UnquotedLiteral("arg1".into()));
+        assert_token!(lex.next(), Token::SubstitutionBegin);
+        assert_token!(lex.next(), Token::UnquotedLiteral("arg2".into()));
+        assert_token!(lex.next(), Token::UnquotedLiteral("arg3".into()));
+        assert_token!(lex.next(), Token::SubstitutionEnd);
+        assert_token!(lex.next(), Token::UnquotedLiteral("arg4".into()));
+        assert_token!(lex.next(), Token::Newline);
+        assert_eoi!(lex);
+    }
+
+    #[test]
+    fn test_substitution_in_single_quoted() {
+        let mut lex = TestLexer::new(
+            r#"
+            '$(arg)'
+            "#,
+        );
+        assert_token!(lex.next(), Token::Newline);
+        assert_token!(lex.next(), Token::SingleQuotedLiteral("$(arg)".into()));
+        assert_token!(lex.next(), Token::Newline);
+        assert_eoi!(lex);
+    }
+
+    #[test]
+    fn test_substitution_in_double_quoted() {
+        let mut lex = TestLexer::new(
+            r#"
+            "$(arg)"
+            "#,
+        );
+        assert_token!(lex.next(), Token::Newline);
+        assert_token!(lex.next(), Token::DoubleQuotedLiteral("$(arg)".into()));
         assert_token!(lex.next(), Token::Newline);
         assert_eoi!(lex);
     }
