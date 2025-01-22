@@ -32,6 +32,7 @@ Statement: ast::Statement = {
     <Invocation> LineTerminator => ast::Statement::Command(<>),
     <IfStatement> LineTerminator => ast::Statement::IfStatement(<>),
     <CommandAssignment> LineTerminator => ast::Statement::CommandAssignment(<>),
+    <ValueAssignment> LineTerminator => ast::Statement::ValueAssignment(<>),
     <WithStatement> LineTerminator => ast::Statement::WithStatement(<>),
 };
 
@@ -98,6 +99,17 @@ CommandAssignment: ast::CommandAssignment = {
         location: start,
         var,
         command,
+    },
+};
+
+ValueAssignment: ast::ValueAssignment = {
+    <start:@L>
+    <var:UnquotedLiteral>
+    Assign
+    <value:Argument> => ast::ValueAssignment {
+        location: start,
+        var,
+        value,
     },
 };
 

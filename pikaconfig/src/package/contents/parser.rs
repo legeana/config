@@ -4,6 +4,7 @@ use anyhow::{bail, Context, Result};
 
 use crate::module::ModuleBox;
 
+use super::args::Argument;
 use super::ast;
 use super::engine;
 use super::engine::Statement;
@@ -114,6 +115,35 @@ impl engine::Statement for CommandAssignmentStatement {
     }
 }
 
+#[derive(Debug)]
+struct ValueAssignmentStatement {
+    manifest_path: PathBuf,
+    var_name: String,
+    value: Argument,
+}
+
+impl engine::Statement for ValueAssignmentStatement {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+        let value = ctx.expand_arg(&self.value).with_context(|| {
+            format!(
+                "failed to expand assignment {var} value {value:?} in {manifest_path:?}",
+                var = self.var_name,
+                manifest_path = self.manifest_path,
+                value = self.value,
+            )
+        })?;
+        ctx.set_var(self.var_name.clone(), value).with_context(|| {
+            format!(
+                "failed to set variable {var} {manifest_path:?}: {value:?}",
+                var = self.var_name,
+                manifest_path = self.manifest_path,
+                value = self.value,
+            )
+        })?;
+        Ok(None)
+    }
+}
+
 pub fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<engine::StatementBox>> {
     let manifest = std::fs::read_to_string(manifest_path)
         .with_context(|| format!("failed to read {manifest_path:?}"))?;
@@ -136,6 +166,9 @@ pub fn parse_statements<'a>(
                 }
                 ast::Statement::CommandAssignment(assignment) => {
                     parse_command_assignment(workdir, manifest_path, assignment)
+                }
+                ast::Statement::ValueAssignment(assignment) => {
+                    parse_value_assignment(workdir, manifest_path, assignment)
                 }
                 ast::Statement::WithStatement(with_st) => {
                     parse_with_statement(workdir, manifest_path, with_st)
@@ -187,6 +220,18 @@ fn parse_command_assignment(
         line,
         var_name: assignment.var.clone(),
         expression,
+    }))
+}
+
+fn parse_value_assignment(
+    _workdir: &Path,
+    manifest_path: &Path,
+    assignment: &ast::ValueAssignment,
+) -> Result<engine::StatementBox> {
+    Ok(Box::new(ValueAssignmentStatement {
+        manifest_path: manifest_path.to_owned(),
+        var_name: assignment.var.clone(),
+        value: assignment.value.clone(),
     }))
 }
 

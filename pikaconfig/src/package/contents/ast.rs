@@ -2,7 +2,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Result};
 
-use super::args::Arguments;
+use super::args::{Argument, Arguments};
 use super::lexer;
 use crate::shlexfmt;
 
@@ -29,6 +29,7 @@ pub enum Statement {
     Command(Invocation),
     IfStatement(IfStatement),
     CommandAssignment(CommandAssignment),
+    ValueAssignment(ValueAssignment),
     WithStatement(WithStatement),
 }
 
@@ -75,6 +76,13 @@ pub struct CommandAssignment {
     pub location: lexer::Location,
     pub var: String,
     pub command: Invocation,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct ValueAssignment {
+    pub location: lexer::Location,
+    pub var: String,
+    pub value: Argument,
 }
 
 #[derive(Debug, PartialEq)]
@@ -599,6 +607,27 @@ mod tests {
                         name: "command".into(),
                         args: args![~"arg"],
                     }
+                })],
+            }
+        );
+    }
+
+    #[test]
+    fn test_value_assignment() {
+        assert_eq!(
+            Manifest::parse(
+                "",
+                r#"
+                my_var = value
+            "#
+            )
+            .unwrap(),
+            Manifest {
+                location: "".into(),
+                statements: vec![Statement::ValueAssignment(ValueAssignment {
+                    location: lexer::Location::new_p_l_c(17, 2, 17),
+                    var: "my_var".into(),
+                    value: Argument::VarsAndHome("value".to_owned()),
                 })],
             }
         );
