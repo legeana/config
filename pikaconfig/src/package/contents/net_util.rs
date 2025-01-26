@@ -25,6 +25,7 @@ pub fn fetch(url: impl AsRef<str>, dst: impl AnnotatedPath, opts: &FetchOptions)
     let mut reader = ureq::get(url)
         .call()
         .with_context(|| format!("failed to fetch {url:?}"))?
+        .into_body()
         .into_reader();
     let output =
         std::fs::File::create(dst.as_path()).with_context(|| format!("failed to open {dst:?}"))?;
