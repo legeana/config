@@ -31,6 +31,7 @@ fn has_tag_kv(key: &str, value: &str) -> bool {
     match key {
         "feature" => SYSINFO.match_feature(value),
         "distro" => SYSINFO.match_distro(value),
+        "distro_like" => SYSINFO.match_distro_like(value),
         "family" => SYSINFO.match_family(value),
         "hostname" => SYSINFO.match_hostname(value),
         "os" => SYSINFO.match_os(value),
@@ -105,6 +106,17 @@ impl SystemInfo {
     fn match_distro(&self, want_distro: &str) -> bool {
         want_distro == self.distro()
     }
+    fn distro_like(&self) -> Vec<String> {
+        // TODO: https://github.com/GuillaumeGomez/sysinfo/pull/1460
+        // Return [self.distro] + System::distribution_id_like().
+        match self.distro().as_str() {
+            "ubuntu" => vec!["ubuntu".to_string(), "debian".to_string()],
+            other => vec![other.to_string()],
+        }
+    }
+    fn match_distro_like(&self, want_distro: &str) -> bool {
+        self.distro_like().contains(&want_distro.to_string())
+    }
     fn match_uid(&self, want_uid: &str) -> bool {
         match getuid() {
             Some(uid) => uid.to_string() == want_uid,
@@ -125,6 +137,10 @@ pub fn tags() -> Result<Vec<String>> {
         format!("family={}", SYSINFO.family()),
         format!("os={}", SYSINFO.os()),
     ];
+    // Multiple distro_like can be present at the same time.
+    for distro_like in SYSINFO.distro_like() {
+        tags.push(format!("distro_like={distro_like}"));
+    }
     // Multiple features can be present at the same time.
     for feature in ["wsl"] {
         if SYSINFO.match_feature(feature) {
