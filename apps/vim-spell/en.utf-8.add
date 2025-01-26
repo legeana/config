@@ -104,6 +104,8 @@ cd
 cdn
 certtool
 cfg
+cgroup
+cgroups
 cgt
 changelist
 changelists
@@ -152,6 +154,7 @@ cpp
 cpu
 crashlooping
 creds
+crit
 crl
 cronjob
 css
@@ -198,6 +201,7 @@ dir
 dircolors
 dirname
 dirs
+distrib
 dists
 django
 dlv
@@ -245,6 +249,7 @@ expanduser
 expr
 extern
 eza
+f32
 fallthrough
 faq
 faqs
@@ -273,6 +278,7 @@ fnameescape
 fontconfig
 foreach
 freebsd
+freedesktop
 frontend
 frozenset
 frozensets
@@ -359,7 +365,9 @@ hpp
 href
 hsync
 htop
+hwmon
 hx
+i32
 i3lock
 ibracorp
 ico
@@ -455,6 +463,7 @@ logname
 logtostderr
 lol
 loopback
+lsb
 lsp
 lspconfig
 lsps
@@ -463,12 +472,15 @@ lt
 lua
 macos
 mailto
+manpage
+manpages
 manpath
 mappingproxy
 mapreduce
 mariadb
 md
 mem
+meminfo
 memoized
 mesonbuild
 mesondefine
@@ -684,6 +696,7 @@ resizer
 returncode
 rfc
 rhai
+rhel
 ripgrep
 rlua
 ro
@@ -695,6 +708,7 @@ rpcs
 rsa
 rsfp
 rsplit
+rss
 rstrip
 runfiles
 runtimepath
@@ -821,6 +835,7 @@ swe
 symlink
 sys
 syscalls
+sysfs
 sysinfo
 systemctl
 systemd
@@ -894,6 +909,7 @@ udp
 ui
 uid
 ulimit
+ulong
 uname
 unanchored
 unarchiver
