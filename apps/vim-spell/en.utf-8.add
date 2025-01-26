@@ -133,7 +133,6 @@ commandline
 compat
 cond
 conf
-confgen
 config
 configparser
 configs
