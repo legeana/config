@@ -5,13 +5,13 @@ requires = "os=linux"
 bash = "sudo localectl set-locale en_GB.UTF-8"
 
 [[system_dependencies]]
-requires = ["os=linux", "distro!=debian"]
+requires = ["os=linux", "distro_like!=debian"]
 bash = """
 sudo localectl set-x11-keymap gb,ru pc105 '' caps:escape,grp:alt_space_toggle
 """
 
 [[system_dependencies]]
-requires = ["os=linux", "distro=debian"]
+requires = ["os=linux", "distro_like=debian"]
 # https://bugs.launchpad.net/ubuntu/+source/cloud-init/+bug/2030788
 # https://manpages.ubuntu.com/manpages/lunar/en/man5/keyboard.5.html
 bash = """
