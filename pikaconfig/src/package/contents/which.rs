@@ -24,6 +24,8 @@ impl engine::Expression for WhichExpression {
             .into_os_string();
         Ok(engine::ExpressionOutput {
             module: None,
+            // TODO: The output is evaluated eagerly during the MANIFEST parsing
+            // and will only pick up binaries already available in the path.
             output,
         })
     }
