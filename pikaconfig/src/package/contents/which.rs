@@ -19,9 +19,12 @@ struct WhichExpression {
 impl engine::Expression for WhichExpression {
     fn eval(&self, ctx: &mut engine::Context) -> Result<engine::ExpressionOutput> {
         let binary = ctx.expand_arg(&self.binary).context("binary")?;
+        let output = which::which(&binary)
+            .with_context(|| format!("failed to find {binary:?} path"))?
+            .into_os_string();
         Ok(engine::ExpressionOutput {
             module: None,
-            output: which::which(&binary)?.into_os_string(),
+            output,
         })
     }
 }
