@@ -60,7 +60,10 @@ impl inventory::RenderHelper for WhichBuilder {
     fn register_render_helper(&self, tera: &mut tera::Tera) {
         tera.register_function(
             &self.name(),
-            tera_helper::wrap_fn(move |args: &WhichParams| Ok(which::which(&args.binary)?)),
+            tera_helper::wrap_fn(move |args: &WhichParams| {
+                which::which(&args.binary)
+                    .with_context(|| format!("failed to find {:?} path", &args.binary))
+            }),
         );
     }
 }
