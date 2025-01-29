@@ -58,8 +58,8 @@ alt + shift + r         : komorebic retile
 alt + p                 : komorebic toggle-pause
 
 # Layouts
-alt + x                 : komorebic flip-layout horizontal
-alt + y                 : komorebic flip-layout vertical
+alt + b                 : komorebic flip-layout horizontal
+alt + v                 : komorebic flip-layout vertical
 
 # Workspaces
 alt + 1                 : komorebic focus-workspace 0
