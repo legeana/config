@@ -30,6 +30,9 @@ url = "2.4.0"
 walkdir = "2"
 which = "7.0.0"
 
+[build-dependencies]
+embed-resource = "3.0.1"
+
 [dependencies.pikaconfig-bootstrap]
 path = "../bootstrap"
 
