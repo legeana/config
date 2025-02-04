@@ -1,8 +1,10 @@
 # Installation.
-/.install
 /.install.sqlite
-/.state
 /.tags
+
+# Legacy installation.
+/.install
+/.state
 
 # Build.
 /cargo-registry

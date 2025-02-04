@@ -8,7 +8,6 @@
 mod annotated_path;
 mod command;
 mod empty_struct;
-mod file_registry;
 mod file_util;
 mod layout;
 mod module;
@@ -38,8 +37,6 @@ use pikaconfig_bootstrap::{cli, dir_layout, git_utils, logconfig, process_utils,
 use module::{Module, Rules};
 use uninstaller::Uninstaller;
 
-const INSTALL_REGISTRY: &str = ".install";
-const STATE_REGISTRY: &str = ".state";
 const SQL_REGISTRY: &str = ".install.sqlite";
 
 fn registry(root: &Path) -> Result<registry::sqlite::SqliteRegistry> {
@@ -48,26 +45,10 @@ fn registry(root: &Path) -> Result<registry::sqlite::SqliteRegistry> {
         .with_context(|| format!("failed to open SQLite registry {sql_path:?}"))
 }
 
-fn old_uninstallers(root: &Path) -> Result<Vec<Box<dyn Uninstaller>>> {
-    let user_files_path = root.join(INSTALL_REGISTRY);
-    let state_files_path = root.join(STATE_REGISTRY);
-    Ok(vec![Box::new(file_registry::FileRegistry::new(
-        user_files_path,
-        state_files_path,
-    ))])
-}
-
-fn uninstallers(root: &Path) -> Result<Vec<Box<dyn Uninstaller>>> {
-    let mut u = old_uninstallers(root)?;
-    u.push(Box::new(registry(root)?));
-    Ok(u)
-}
-
 fn uninstall(root: &Path) -> Result<()> {
-    for mut u in uninstallers(root)? {
-        u.uninstall().context("failed to uninstall user files")?;
-        u.cleanup().context("failed to cleanup state")?;
-    }
+    let mut u = registry(root)?;
+    u.uninstall().context("failed to uninstall user files")?;
+    u.cleanup().context("failed to cleanup state")?;
     Ok(())
 }
 
@@ -78,9 +59,6 @@ fn install(rules: &Rules, root: &Path) -> Result<()> {
     for repo in &repos {
         repo.pre_uninstall(rules)
             .with_context(|| format!("failed to pre-uninstall {}", repo.name()))?;
-    }
-    for mut u in old_uninstallers(root)? {
-        u.uninstall().context("failed to uninstall user files")?;
     }
     let mut registry = registry(root)?;
     registry
