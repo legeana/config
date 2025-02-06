@@ -297,6 +297,7 @@ gcc
 gdb
 ge
 getattr
+gethostname
 getitem
 getopt
 getpass
@@ -323,6 +324,7 @@ gnutls
 golang
 googleapis
 googler
+googlesource
 goto
 gpg
 gpio
@@ -368,6 +370,7 @@ hwmon
 hx
 i32
 i3lock
+i8
 ibracorp
 ico
 ics
