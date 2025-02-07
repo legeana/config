@@ -1,13 +1,5 @@
 #!/bin/sh -e
-
-# Supports methods such as native or docker.
-# See <setup>_setup helpers.
-USE_SETUP="${PIKACONFIG_SETUP:-native}"
-
-dispatch_setup_helper() {
-    log Using "${USE_SETUP?}" setup
-    "${USE_SETUP?}_setup" "$@"
-}
+USE_SETUP="${native}"
 
 src_root() {
     cd "$(dirname "$0")"
@@ -109,4 +101,15 @@ sudo_docker_setup() {
     docker_setup_base "$@"
 }
 
-dispatch_setup_helper "$@"
+# Supports methods such as native or docker.
+# See <setup>_setup helpers.
+USE_SETUP=native
+case "$1" in
+    cached|docker|sudo_docker)
+        USE_SETUP="$1"
+        shift
+        ;;
+esac
+
+log Using "${USE_SETUP?}" setup
+"${USE_SETUP?}_setup" "$@"
