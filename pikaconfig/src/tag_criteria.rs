@@ -39,28 +39,19 @@ mod tests {
 
     use anyhow::Result;
 
-    // TODO: Make more generic tests.
-    #[cfg(target_os = "linux")]
     #[test]
-    fn test_linux_satisfied() -> Result<()> {
-        let tags = TagCriteria(StringList::List(vec!["os=linux".to_owned()]));
+    fn test_satisfied() -> Result<()> {
+        let os_tag = format!("os={}", std::env::consts::OS);
+        let tags = TagCriteria(StringList::List(vec![os_tag]));
         assert!(tags.is_satisfied()?);
         Ok(())
     }
 
-    #[cfg(target_os = "linux")]
     #[test]
-    fn test_linux_not_satisfied() -> Result<()> {
-        let tags = TagCriteria(StringList::List(vec!["os=windows".to_owned()]));
+    fn test_not_satisfied() -> Result<()> {
+        let os_tag = format!("os=not-{}", std::env::consts::OS);
+        let tags = TagCriteria(StringList::List(vec![os_tag]));
         assert!(!tags.is_satisfied()?);
-        Ok(())
-    }
-
-    #[cfg(target_family = "unix")]
-    #[test]
-    fn test_unix_satisfied() -> Result<()> {
-        let tags = TagCriteria(StringList::List(vec!["family=unix".to_owned()]));
-        assert!(tags.is_satisfied()?);
         Ok(())
     }
 }
