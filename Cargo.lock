@@ -215,6 +215,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f46ad14479a25103f283c0f10005961cf086d8dc42205bb44c46ac563475dca6"
 
 [[package]]
+name = "cli"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "clap",
+]
+
+[[package]]
 name = "colorchoice"
 version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1088,10 +1096,11 @@ dependencies = [
 
 [[package]]
 name = "pikaconfig"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "anyhow",
  "base64",
+ "cli",
  "dirs 6.0.0",
  "glob",
  "indoc",
@@ -1121,10 +1130,10 @@ dependencies = [
 
 [[package]]
 name = "pikaconfig-bootstrap"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "anyhow",
- "clap",
+ "cli",
  "env_logger",
  "log",
  "pretty_assertions",

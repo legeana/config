@@ -32,7 +32,7 @@ use std::path::Path;
 use anyhow::{Context, Result};
 
 // Pretend these modules are local.
-use pikaconfig_bootstrap::{cli, dir_layout, git_utils, logconfig, process_utils, shlexfmt};
+use pikaconfig_bootstrap::{dir_layout, git_utils, logconfig, process_utils, shlexfmt};
 
 use module::{Module, Rules};
 use uninstaller::Uninstaller;

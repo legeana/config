@@ -1,6 +1,5 @@
 use anyhow::Result;
 
-use pikaconfig_bootstrap::cli;
 use pikaconfig_bootstrap::dir_layout;
 use pikaconfig_bootstrap::logconfig;
 

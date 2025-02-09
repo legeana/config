@@ -10,6 +10,7 @@ rust-version.workspace = true
 [dependencies]
 anyhow = "1.0"
 base64 = "0.22.0"
+cli = { path = "../cli" }
 dirs = "6.0"
 glob = "0.3.1"
 indoc = "2.0.1"

@@ -6,7 +6,7 @@ rust-version.workspace = true
 
 [dependencies]
 anyhow = "1.0"
-clap = { version = "4.2", features = ["derive"] }
+cli = { path = "../cli" }
 log = "0.4"
 shlex = "1.1.0"
 
