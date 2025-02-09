@@ -3,7 +3,6 @@ use std::path::{Path, PathBuf};
 use std::process;
 
 use crate::module::{Module, ModuleBox, Rules};
-use crate::process_utils;
 use crate::registry::Registry;
 
 use super::args::{Argument, Arguments};

@@ -1111,6 +1111,7 @@ dependencies = [
  "logos",
  "pikaconfig-bootstrap",
  "pretty_assertions",
+ "process_utils",
  "rusqlite",
  "rusqlite_migration",
  "serde",
@@ -1138,7 +1139,7 @@ dependencies = [
  "env_logger",
  "log",
  "pretty_assertions",
- "shlexfmt",
+ "process_utils",
 ]
 
 [[package]]
@@ -1176,6 +1177,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "60946a68e5f9d28b0dc1c21bb8a97ee7d018a8b322fa57838ba31cc878e22d99"
 dependencies = [
  "unicode-ident",
+]
+
+[[package]]
+name = "process_utils"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "log",
+ "shlexfmt",
 ]
 
 [[package]]

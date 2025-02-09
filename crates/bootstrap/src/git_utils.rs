@@ -3,8 +3,6 @@ use std::process::Command;
 
 use anyhow::{anyhow, Result};
 
-use crate::process_utils;
-
 const ORIGIN: &str = "origin";
 const HEAD: &str = "HEAD";
 const BRANCH_SEP: char = '#';

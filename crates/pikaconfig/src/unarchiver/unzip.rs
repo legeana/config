@@ -2,8 +2,6 @@ use std::path::Path;
 
 use anyhow::Result;
 
-use crate::process_utils;
-
 struct Unzip;
 
 impl super::Unarchiver for Unzip {

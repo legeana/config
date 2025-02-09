@@ -1,0 +1,10 @@
+[package]
+name = "process_utils"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+anyhow = "1.0"
+log = "0.4"
+shlexfmt = { path = "../shlexfmt" }

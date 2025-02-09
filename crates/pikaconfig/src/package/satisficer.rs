@@ -5,7 +5,6 @@ use anyhow::{Context, Result};
 use serde::Deserialize;
 
 use crate::command;
-use crate::process_utils;
 
 pub trait Satisficer {
     fn is_satisfied(&self) -> Result<bool>;

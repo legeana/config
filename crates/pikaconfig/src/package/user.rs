@@ -5,8 +5,6 @@ use anyhow::{anyhow, Context, Result};
 use crate::module::{Module, Rules};
 use crate::tag_criteria::Criteria;
 
-use crate::process_utils;
-
 use super::config;
 use super::satisficer::{DependencySatisficer, Satisficer};
 use super::Installer;

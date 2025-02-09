@@ -2,7 +2,6 @@ use anyhow::{Context, Result};
 
 use crate::command::is_command;
 use crate::module::{Module, Rules};
-use crate::process_utils;
 use crate::tag_criteria::Criteria;
 
 use super::config;
