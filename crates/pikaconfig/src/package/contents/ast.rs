@@ -4,7 +4,6 @@ use anyhow::{anyhow, Result};
 
 use super::args::{Argument, Arguments};
 use super::lexer;
-use crate::shlexfmt;
 
 #[derive(Debug, PartialEq)]
 pub struct Manifest {

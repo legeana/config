@@ -2,8 +2,6 @@ use std::process::Command;
 
 use anyhow::{anyhow, Context, Error, Result};
 
-use crate::shlexfmt;
-
 fn pretty_args(cmd: &Command) -> String {
     let mut result: Vec<String> = Vec::new();
     result.push(cmd.get_program().to_string_lossy().to_string());
