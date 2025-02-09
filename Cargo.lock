@@ -1203,6 +1203,7 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "log",
+ "pretty_assertions",
  "shlexfmt",
 ]
 

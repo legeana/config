@@ -8,3 +8,6 @@ rust-version.workspace = true
 anyhow = "1.0"
 log = "0.4"
 shlexfmt = { path = "../shlexfmt" }
+
+[dev-dependencies]
+pretty_assertions = "1.4.0"
