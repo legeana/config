@@ -3,7 +3,6 @@ use std::path::Path;
 
 use anyhow::{Context, Result};
 
-use crate::dir_layout;
 use crate::repository;
 use crate::repository::Repository;
 

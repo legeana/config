@@ -31,9 +31,6 @@ use std::path::Path;
 
 use anyhow::{Context, Result};
 
-// Pretend these modules are local.
-use pikaconfig_bootstrap::dir_layout;
-
 use module::{Module, Rules};
 use uninstaller::Uninstaller;
 

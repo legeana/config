@@ -7,7 +7,7 @@ rust-version.workspace = true
 [dependencies]
 anyhow = "1.0"
 cli = { path = "../cli" }
-git_utils = { path = "../git_utils" }
+dir_layout = { path = "../dir_layout" }
 log = "0.4"
 
 [dev-dependencies]

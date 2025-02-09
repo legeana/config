@@ -11,6 +11,7 @@ rust-version.workspace = true
 anyhow = "1.0"
 base64 = "0.22.0"
 cli = { path = "../cli" }
+dir_layout = { path = "../dir_layout" }
 dirs = "6.0"
 git_utils = { path = "../git_utils" }
 glob = "0.3.1"
@@ -33,9 +34,6 @@ ureq = "3.0.0"
 url = "2.4.0"
 walkdir = "2"
 which = "7.0.0"
-
-[dependencies.pikaconfig-bootstrap]
-path = "../bootstrap"
 
 # https://lalrpop.github.io/lalrpop/quick_start_guide.html
 # See also build.rs.

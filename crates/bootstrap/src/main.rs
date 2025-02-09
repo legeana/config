@@ -1,7 +1,5 @@
 use anyhow::Result;
 
-use pikaconfig_bootstrap::dir_layout;
-
 fn main() -> Result<()> {
     let args = cli::parse();
     cli::logconfig::init(args.quiet, args.verbose)?;

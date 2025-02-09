@@ -1,0 +1,9 @@
+[package]
+name = "dir_layout"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+anyhow = "1.0"
+git_utils = { path = "../git_utils" }
