@@ -1,3 +1,4 @@
+mod command;
 mod env;
 mod process_utils;
 

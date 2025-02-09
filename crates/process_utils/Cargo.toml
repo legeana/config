@@ -11,3 +11,4 @@ shlexfmt = { path = "../shlexfmt" }
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"
+test-case = "3.3.1"
