@@ -1,6 +1,8 @@
+#![allow(dead_code)]
 use std::process::Command;
 
 use anyhow::{anyhow, Context, Error, Result};
+use xshell::{Cmd, Shell};
 
 use crate::shlexfmt;
 
@@ -20,6 +22,17 @@ fn pretty_print(cmd: &Command) -> String {
     }
     result.push("$".to_owned());
     result.push(pretty_args(cmd));
+    result.join(" ")
+}
+
+fn pretty_print_xs(sh: &Shell, cmd: &Cmd) -> String {
+    let current_dir = std::env::current_dir().ok();
+    let mut result: Vec<String> = Vec::new();
+    if Some(sh.current_dir()) != current_dir {
+        result.push(shlexfmt::quote(&sh.current_dir().to_string_lossy()).to_string());
+    }
+    result.push("$".to_owned());
+    result.push(cmd.to_string());
     result.join(" ")
 }
 
@@ -72,4 +85,40 @@ pub fn output(cmd: &mut Command) -> Result<String> {
     let out = String::from_utf8(stdout.clone())
         .with_context(|| format!("failed to parse {pp} output {stdout:?} as utf8"))?;
     Ok(out)
+}
+
+#[cfg(test)]
+mod tests {
+    use pretty_assertions::assert_eq;
+
+    use super::*;
+
+    fn shell() -> xshell::Shell {
+        xshell::Shell::new().expect("Shell::new")
+    }
+
+    #[test]
+    fn test_xs_to_string() {
+        let sh = shell();
+        let cmd = xshell::cmd!(sh, "hello world");
+
+        assert_eq!(cmd.to_string(), "hello world");
+    }
+
+    #[test]
+    fn test_pretty_print_xs() {
+        let sh = shell();
+        let cmd = xshell::cmd!(sh, "hello world");
+
+        assert_eq!(pretty_print_xs(&sh, &cmd), "$ hello world");
+    }
+
+    #[test]
+    fn test_pretty_print_xs_with_dir() {
+        let sh = shell();
+        sh.change_dir("/some/dir");
+        let cmd = xshell::cmd!(sh, "hello world");
+
+        assert_eq!(pretty_print_xs(&sh, &cmd), "/some/dir $ hello world");
+    }
 }
