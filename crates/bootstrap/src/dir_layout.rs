@@ -3,8 +3,6 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 
-use crate::git_utils;
-
 const APPS: &str = "apps";
 const OVERLAY: &str = "overlay.d";
 

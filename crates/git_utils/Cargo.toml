@@ -1,0 +1,9 @@
+[package]
+name = "git_utils"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+anyhow = "1.0"
+process_utils = { path = "../process_utils" }

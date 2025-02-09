@@ -4,7 +4,6 @@ use std::path::Path;
 use anyhow::{Context, Result};
 
 use crate::dir_layout;
-use crate::git_utils;
 use crate::repository;
 use crate::repository::Repository;
 

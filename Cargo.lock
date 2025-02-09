@@ -526,6 +526,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "git_utils"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "process_utils",
+]
+
+[[package]]
 name = "glob"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1102,6 +1110,7 @@ dependencies = [
  "base64",
  "cli",
  "dirs 6.0.0",
+ "git_utils",
  "glob",
  "indoc",
  "lalrpop",
@@ -1137,9 +1146,9 @@ dependencies = [
  "anyhow",
  "cli",
  "env_logger",
+ "git_utils",
  "log",
  "pretty_assertions",
- "process_utils",
 ]
 
 [[package]]

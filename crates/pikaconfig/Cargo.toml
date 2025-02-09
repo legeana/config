@@ -12,6 +12,7 @@ anyhow = "1.0"
 base64 = "0.22.0"
 cli = { path = "../cli" }
 dirs = "6.0"
+git_utils = { path = "../git_utils" }
 glob = "0.3.1"
 indoc = "2.0.1"
 libc = "0.2.147"

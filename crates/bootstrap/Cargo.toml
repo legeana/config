@@ -7,8 +7,8 @@ rust-version.workspace = true
 [dependencies]
 anyhow = "1.0"
 cli = { path = "../cli" }
+git_utils = { path = "../git_utils" }
 log = "0.4"
-process_utils = { path = "../process_utils" }
 
 [dependencies.env_logger]
 version = "0.11.3"
