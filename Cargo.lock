@@ -220,6 +220,8 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "clap",
+ "env_logger",
+ "log",
 ]
 
 [[package]]
@@ -1145,7 +1147,6 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "cli",
- "env_logger",
  "git_utils",
  "log",
  "pretty_assertions",

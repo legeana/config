@@ -10,10 +10,5 @@ cli = { path = "../cli" }
 git_utils = { path = "../git_utils" }
 log = "0.4"
 
-[dependencies.env_logger]
-version = "0.11.3"
-default-features = false
-features = ["auto-color"]
-
 [dev-dependencies]
 pretty_assertions = "1.4.0"

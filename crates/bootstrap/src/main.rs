@@ -1,11 +1,10 @@
 use anyhow::Result;
 
 use pikaconfig_bootstrap::dir_layout;
-use pikaconfig_bootstrap::logconfig;
 
 fn main() -> Result<()> {
     let args = cli::parse();
-    logconfig::init(args.quiet, args.verbose)?;
+    cli::logconfig::init(args.quiet, args.verbose)?;
     // Main code.
     let root = cli::config_root()?;
     let command_needs_update = matches!(
