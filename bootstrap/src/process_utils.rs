@@ -87,6 +87,15 @@ pub fn output(cmd: &mut Command) -> Result<String> {
     Ok(out)
 }
 
+pub fn output_xs(sh: &Shell, cmd: &Cmd) -> Result<String> {
+    let pp = pretty_print_xs(sh, cmd);
+    // FIXME: log::info!()
+    let stdout = cmd.output()?.stdout;
+    let out = String::from_utf8(stdout.clone())
+        .with_context(|| format!("failed to parse {pp} output {stdout:?} as utf8"))?;
+    Ok(out)
+}
+
 #[cfg(test)]
 mod tests {
     use pretty_assertions::assert_eq;
@@ -120,5 +129,14 @@ mod tests {
         let cmd = xshell::cmd!(sh, "hello world");
 
         assert_eq!(pretty_print_xs(&sh, &cmd), "/some/dir $ hello world");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_output_xs() {
+        let sh = shell();
+        let cmd = xshell::cmd!(sh, "echo hello");
+
+        assert_eq!(output_xs(&sh, &cmd).expect("output_xs").trim(), "hello");
     }
 }
