@@ -4,6 +4,6 @@ members = ["crates/*"]
 
 # https://doc.rust-lang.org/cargo/reference/workspaces.html#the-package-table
 [workspace.package]
-version = "0.1.0"
+version = "0.0.0"
 edition = "2021"
 rust-version = "1.84.0"
