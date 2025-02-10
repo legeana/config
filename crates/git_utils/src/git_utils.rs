@@ -1,7 +1,7 @@
 use std::path::Path;
-use std::process::Command;
 
 use anyhow::{anyhow, Result};
+use process_utils::{cmd, Shell};
 
 const ORIGIN: &str = "origin";
 const HEAD: &str = "HEAD";
@@ -31,83 +31,49 @@ impl Remote {
 /// Returns whether pull changed HEAD.
 pub fn git_pull(root: &Path) -> Result<bool> {
     let old_head = get_head(root)?;
-    process_utils::run(
-        Command::new("git")
-            .args(["pull", "--ff-only"])
-            .current_dir(root),
-    )?;
+    cmd!(["git", "pull", "--ff-only"]).current_dir(root).run()?;
     let new_head = get_head(root)?;
     Ok(old_head != new_head)
 }
 
 pub fn git_force_shallow_pull(root: &Path, remote: &Remote) -> Result<()> {
-    process_utils::run(
-        Command::new("git")
-            .arg("remote")
-            .arg("rm")
-            .arg(ORIGIN)
-            .current_dir(root),
-    )?;
-    process_utils::run(
-        Command::new("git")
-            .arg("remote")
-            .arg("add")
-            .arg(ORIGIN)
-            .arg(&remote.url)
-            .current_dir(root),
-    )?;
-    process_utils::run(
-        Command::new("git")
-            .arg("fetch")
-            .arg("--depth=1")
-            .arg(ORIGIN)
-            .current_dir(root),
-    )?;
-    process_utils::run(
-        Command::new("git")
-            .arg("remote")
-            .arg("set-head")
-            .arg("--auto")
-            .arg(ORIGIN)
-            .current_dir(root),
-    )?;
+    let mut sh = Shell::new();
+    sh.current_dir(root);
+    sh.run(cmd!(["git", "remote", "rm", ORIGIN]))?;
+    sh.run(cmd!(["git", "remote", "add", ORIGIN, &remote.url]))?;
+    sh.run(cmd!(["git", "fetch", "--depth=1", ORIGIN]))?;
+    sh.run(cmd!(["git", "remote", "set-head", "--auto", ORIGIN]))?;
     let branch = match &remote.branch {
         Some(branch) => branch.clone(),
         None => get_remote_head_ref(root)?,
     };
-    process_utils::run(
-        Command::new("git")
-            .arg("checkout")
-            .arg("--force")
-            .arg(&branch)
-            .current_dir(root),
-    )?;
-    process_utils::run(
-        Command::new("git")
-            .args(["reset", "--hard"])
-            .arg(format!("{ORIGIN}/{branch}"))
-            .current_dir(root),
-    )?;
+    sh.run(cmd!(["git", "checkout", "--force", &branch]))?;
+    sh.run(cmd!([
+        "git",
+        "reset",
+        "--hard",
+        format!("{ORIGIN}/{branch}")
+    ]))?;
     Ok(())
 }
 
 pub fn git_shallow_clone(remote: &Remote, root: &Path) -> Result<()> {
-    let mut cmd = Command::new("git");
-    cmd.arg("clone");
-    cmd.arg("--depth=1");
-    if let Some(branch) = &remote.branch {
-        cmd.arg(format!("--branch={branch}"));
-    }
-    cmd.arg("--").arg(&remote.url).arg(root);
-    process_utils::run(&mut cmd)
+    let branch = remote
+        .branch
+        .as_ref()
+        .map(|branch| format!("--branch={branch}"));
+    cmd!(
+        ["git", "clone", "--depth=1"],
+        branch,
+        ["--", &remote.url, root],
+    )
+    .run()
 }
 
 fn get_head(root: &Path) -> Result<String> {
-    let rev_parse = process_utils::output(
-        Command::new("git")
-            .args(["rev-parse", HEAD])
-            .current_dir(root),
-    )?;
+    let rev_parse = cmd!(["git", "rev-parse", HEAD])
+        .current_dir(root)
+        .output()?;
     Ok(rev_parse.trim().to_string())
 }
 
@@ -130,24 +96,16 @@ pub fn get_remote_head_ref(root: &Path) -> Result<String> {
 }
 
 fn get_symbolic_ref(root: &Path, name: impl AsRef<str>) -> Result<String> {
-    let output = process_utils::output(
-        Command::new("git")
-            .arg("symbolic-ref")
-            .arg("--")
-            .arg(name.as_ref())
-            .current_dir(root),
-    )?;
+    let output = cmd!(["git", "symbolic-ref", "--", name.as_ref()])
+        .current_dir(root)
+        .output()?;
     Ok(output.trim().to_owned())
 }
 
 pub fn get_remote_url(root: &Path) -> Result<String> {
-    let url_raw = process_utils::output(
-        Command::new("git")
-            .arg("remote")
-            .arg("get-url")
-            .arg(ORIGIN)
-            .current_dir(root),
-    )?;
+    let url_raw = cmd!(["git", "remote", "get-url", ORIGIN])
+        .current_dir(root)
+        .output()?;
     Ok(url_raw.trim().to_owned())
 }
 
