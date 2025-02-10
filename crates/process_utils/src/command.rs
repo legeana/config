@@ -76,6 +76,17 @@ impl Command {
     }
 }
 
+#[macro_export]
+macro_rules! cmd {
+    (!, $program:expr) => { $crate::Command::new($program) };
+    (@, $cmd:expr) => { $expr };
+    (@, $cmd:expr, $arg:expr) => { $cmd.arg($arg) };
+    (@, $cmd:expr, $arg:expr,) => { cmd!(@, $cmd, $arg) };
+    (@, $cmd:expr, $arg:expr, $($tail:tt)*) => { cmd!(@, $cmd.arg($arg), $($tail)*) };
+    ($program:expr) => { cmd!(!, $program) };
+    ($program:expr, $($tail:tt)*) => { cmd!(@, cmd!(!, $program), $($tail)*) }
+}
+
 #[cfg(test)]
 mod tests {
     use pretty_assertions::assert_eq;
@@ -166,6 +177,57 @@ mod tests {
                 (OsStr::new("env-1"), Some(OsStr::new("value-1"))),
                 (OsStr::new("env-2"), Some(OsStr::new("value-2"))),
             ],
+        );
+    }
+
+    #[test]
+    fn test_cmd_empty() {
+        let cmd = cmd!("program");
+
+        let std_cmd = cmd.finalise(None::<&Path>, &EnvOverlay::new());
+        assert_eq!(std_cmd.get_program(), "program");
+        assert_eq!(std_cmd.get_args().collect::<Vec<_>>(), &[] as &[&str]);
+    }
+
+    #[test]
+    fn test_cmd_single_arg() {
+        let cmd = cmd!("program", "arg-1");
+
+        let std_cmd = cmd.finalise(None::<&Path>, &EnvOverlay::new());
+        assert_eq!(std_cmd.get_program(), "program");
+        assert_eq!(std_cmd.get_args().collect::<Vec<_>>(), &["arg-1"]);
+    }
+
+    #[test]
+    fn test_cmd_single_arg_trailing_comma() {
+        let cmd = cmd!("program", "arg-1",);
+
+        let std_cmd = cmd.finalise(None::<&Path>, &EnvOverlay::new());
+        assert_eq!(std_cmd.get_program(), "program");
+        assert_eq!(std_cmd.get_args().collect::<Vec<_>>(), &["arg-1"]);
+    }
+
+    #[test]
+    fn test_cmd_multiple_args() {
+        let cmd = cmd!("program", "arg-1", "arg-2", "arg-3");
+
+        let std_cmd = cmd.finalise(None::<&Path>, &EnvOverlay::new());
+        assert_eq!(std_cmd.get_program(), "program");
+        assert_eq!(
+            std_cmd.get_args().collect::<Vec<_>>(),
+            &["arg-1", "arg-2", "arg-3"],
+        );
+    }
+
+    #[test]
+    fn test_cmd_multiple_args_trailing_comma() {
+        let cmd = cmd!("program", "arg-1", "arg-2", "arg-3",);
+
+        let std_cmd = cmd.finalise(None::<&Path>, &EnvOverlay::new());
+        assert_eq!(std_cmd.get_program(), "program");
+        assert_eq!(
+            std_cmd.get_args().collect::<Vec<_>>(),
+            &["arg-1", "arg-2", "arg-3"],
         );
     }
 }
