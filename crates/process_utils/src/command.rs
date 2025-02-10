@@ -76,13 +76,114 @@ impl Command {
 
 #[macro_export]
 macro_rules! cmd {
-    (!, $program:expr) => { $crate::Command::new($program) };
-    (@, $cmd:expr) => { $expr };
-    (@, $cmd:expr, $arg:expr) => { $cmd.arg($arg) };
-    (@, $cmd:expr, $arg:expr,) => { cmd!(@, $cmd, $arg) };
-    (@, $cmd:expr, $arg:expr, $($tail:tt)*) => { cmd!(@, $cmd.arg($arg), $($tail)*) };
-    ($program:expr) => { cmd!(!, $program) };
-    ($program:expr, $($tail:tt)*) => { cmd!(@, cmd!(!, $program), $($tail)*) }
+    [@new $program:expr] => { $crate::Command::new($program) };
+
+    [@parsing_call $type:tt () -> $call:tt -> ($($calls:tt)*) -> $program:tt] => {
+        cmd![
+            @parsing_reversed
+            ()
+            ->
+            (.$type $call $($calls)*)
+            ->
+            $program
+        ]
+    };
+    [@parsing_call $type:tt (, $($tail:tt)*) -> $call:tt -> ($($calls:tt)*) -> $program:tt] => {
+        cmd![
+            @parsing_reversed
+            ($($tail)*)
+            ->
+            (.$type $call $($calls)*)
+            ->
+            $program
+        ]
+    };
+    [@parsing_call $type:tt ($head:tt $($tail:tt)*) -> ($($call:tt)*) -> $calls:tt -> $program:tt] => {
+        cmd![
+            @parsing_call
+            $type
+            ($($tail)*)
+            ->
+            ($head $($call)*)
+            ->
+            $calls
+            ->
+            $program
+        ]
+    };
+
+    [@parsing_reversed () -> ($($calls:tt)*) -> ($($program:tt)*)] => {
+        $($program)*$($calls)*
+    };
+    [@parsing_reversed (... $($tail:tt)*) -> $calls:tt -> $program:tt] => {
+        cmd![
+            @parsing_call
+            args
+            ($($tail)*)
+            ->
+            ()
+            ->
+            $calls
+            ->
+            $program
+        ]
+    };
+    [@parsing_reversed (, $($tail:tt)*) -> $calls:tt -> $program:tt] => {
+        cmd![
+            @parsing_reversed
+            ($($tail)*)
+            ->
+            $calls
+            ->
+            $program
+        ]
+    };
+    [@parsing_reversed ($($tail:tt)*) -> $calls:tt -> $program:tt] => {
+        cmd![
+            @parsing_call
+            arg
+            ($($tail)*)
+            ->
+            ()
+            ->
+            $calls
+            ->
+            $program
+        ]
+    };
+
+    [@reversing () -> $reversed:tt -> $program:tt] => {
+        cmd![
+            @parsing_reversed
+            $reversed
+            ->
+            ()
+            ->
+            $program
+        ]
+    };
+    [@reversing ($head:tt $($tail:tt)*) -> ($($reversed:tt)*) -> $program:tt] => {
+        cmd![
+            @reversing
+            ($($tail)*)
+            ->
+            ($head $($reversed)*)
+            ->
+            $program
+        ]
+    };
+
+    ($program:expr) => { cmd![@new $program] };
+    ($program:expr, $($tail:tt)*) => {
+        cmd![
+            @reversing
+            ($($tail)*)
+            ->
+            ()
+            ->
+            (cmd![@new $program])
+        ]
+    };
 }
 
 #[cfg(test)]
@@ -220,6 +321,48 @@ mod tests {
     #[test]
     fn test_cmd_multiple_args_trailing_comma() {
         let cmd = cmd!("program", "arg-1", "arg-2", "arg-3",);
+
+        let std_cmd = cmd.finalise(None::<&Path>, &EnvOverlay::new());
+        assert_eq!(std_cmd.get_program(), "program");
+        assert_eq!(
+            std_cmd.get_args().collect::<Vec<_>>(),
+            &["arg-1", "arg-2", "arg-3"],
+        );
+    }
+
+    #[test]
+    fn test_cmd_args() {
+        let cmd = cmd!("program", ["arg-1", "arg-2"]...);
+
+        let std_cmd = cmd.finalise(None::<&Path>, &EnvOverlay::new());
+        assert_eq!(std_cmd.get_program(), "program");
+        assert_eq!(std_cmd.get_args().collect::<Vec<_>>(), &["arg-1", "arg-2"]);
+    }
+
+    #[test]
+    fn test_cmd_args_trailing_comma() {
+        let cmd = cmd!("program", ["arg-1", "arg-2"]...,);
+
+        let std_cmd = cmd.finalise(None::<&Path>, &EnvOverlay::new());
+        assert_eq!(std_cmd.get_program(), "program");
+        assert_eq!(std_cmd.get_args().collect::<Vec<_>>(), &["arg-1", "arg-2"]);
+    }
+
+    #[test]
+    fn test_cmd_args_before_arg() {
+        let cmd = cmd!("program", ["arg-1", "arg-2"]..., "arg-3");
+
+        let std_cmd = cmd.finalise(None::<&Path>, &EnvOverlay::new());
+        assert_eq!(std_cmd.get_program(), "program");
+        assert_eq!(
+            std_cmd.get_args().collect::<Vec<_>>(),
+            &["arg-1", "arg-2", "arg-3"],
+        );
+    }
+
+    #[test]
+    fn test_cmd_args_after_arg() {
+        let cmd = cmd!("program", "arg-1", ["arg-2", "arg-3"]...);
 
         let std_cmd = cmd.finalise(None::<&Path>, &EnvOverlay::new());
         assert_eq!(std_cmd.get_program(), "program");
