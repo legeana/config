@@ -29,7 +29,7 @@ while [ -z "$(swaymsg -t get_tree | grep imv)" ]; do
 done
 
 get_crop() {
-    slurp -d | sed -r 's|([[:digit:]]+),([[:digit:]]+) (.+)|\3+\1+\2|'
+    slurp -d -f '%wx%h+%x+%y'
 }
 
 # A more efficient way would be to reuse the "$screenshot", but unfortunately
@@ -37,7 +37,7 @@ get_crop() {
 # resolution. They don't match if scaling is enabled. As a workaround we can
 # just take another screenshot and let grim cut it for us on the spot.
 # convert -crop "$(get_crop)" "$screenshot" "$dst_format:-" | wl-copy -t "image/$dst_format"
-slurp | grim -g - - | wl-copy -t "image/$dst_format"
+slurp | grim -t "$dst_format" -g - - | wl-copy -t "image/$dst_format"
 
 kill -s KILL "$imv_pid"
 rm "$screenshot"
