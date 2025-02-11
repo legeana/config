@@ -44,6 +44,9 @@ wants = { command = "imv-wayland" }
 [[system_dependencies]]
 any = "jq"
 wants = { command = "jq" }
+[[system_dependencies]]
+any = "wl-clipboard"
+wants = { command = "wl-copy" }
 
 [[system_dependencies]]
 apt = "xwayland"
