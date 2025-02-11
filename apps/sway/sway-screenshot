@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 
 # PNG is much faster to load than PPM, using PNG allows for more seamless
 # transition between the actual workspace and the captured image.
@@ -15,12 +15,30 @@ if pidof -o %PPID -x "$0"; then
     exit 0
 fi
 
-get_focused_output() {
-    swaymsg -t get_outputs | jq -r '.[] | select(.focused) | .name'
+get_focused_output_info() {
+    swaymsg -t get_outputs | jq -r '.[] | select(.focused) | {name, scale, rect}'
+}
+
+focused_output_info="$(get_focused_output_info)"
+
+get_focused_output_name() {
+    echo "$focused_output_info" | jq -r '.name'
+}
+
+get_focused_output_scale() {
+    echo "$focused_output_info" | jq -r '.scale'
+}
+
+get_focused_output_x_offset() {
+    echo "$focused_output_info" | jq -r '.rect.x'
+}
+
+get_focused_output_y_offset() {
+    echo "$focused_output_info" | jq -r '.rect.y'
 }
 
 screenshot="$(mktemp --suffix "$filename_prefix.$src_format")"
-grim -o "$(get_focused_output)" -t "$src_format" "$screenshot"
+grim -o "$(get_focused_output_name)" -t "$src_format" "$screenshot"
 imv-wayland "$screenshot" &
 imv_pid=$!
 
@@ -29,15 +47,20 @@ while [ -z "$(swaymsg -t get_tree | grep imv)" ]; do
 done
 
 get_crop() {
-    slurp -d -f '%wx%h+%x+%y'
+    selection="$(slurp -d -f '{ "w": "%w", "h": "%h", "x": "%x", "y": "%y" }')"
+    awk "BEGIN {
+        w = $(echo "$selection" | jq -r '.w')
+        h = $(echo "$selection" | jq -r '.h')
+        x = $(echo "$selection" | jq -r '.x')
+        y = $(echo "$selection" | jq -r '.y')
+        x_offset = $(get_focused_output_x_offset)
+        y_offset = $(get_focused_output_y_offset)
+        scale = $(get_focused_output_scale);
+        print w*scale \"x\" h*scale \"+\" (x-x_offset)*scale \"+\" (y-y_offset)*scale
+    }"
 }
 
-# A more efficient way would be to reuse the "$screenshot", but unfortunately
-# the $screenshot has full physical resolution, and slurp returns relative
-# resolution. They don't match if scaling is enabled. As a workaround we can
-# just take another screenshot and let grim cut it for us on the spot.
-# convert -crop "$(get_crop)" "$screenshot" "$dst_format:-" | wl-copy -t "image/$dst_format"
-slurp | grim -t "$dst_format" -g - - | wl-copy -t "image/$dst_format"
+convert -crop "$(get_crop)" "$screenshot" "$dst_format:-" | wl-copy -t "image/$dst_format"
 
 kill -s KILL "$imv_pid"
 rm "$screenshot"
