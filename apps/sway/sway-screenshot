@@ -47,12 +47,8 @@ while [ -z "$(swaymsg -t get_tree | grep imv)" ]; do
 done
 
 get_crop() {
-    selection="$(slurp -d -f '{ "w": "%w", "h": "%h", "x": "%x", "y": "%y" }')"
     awk "BEGIN {
-        w = $(echo "$selection" | jq -r '.w')
-        h = $(echo "$selection" | jq -r '.h')
-        x = $(echo "$selection" | jq -r '.x')
-        y = $(echo "$selection" | jq -r '.y')
+        $(slurp -d -f 'w = %w; h = %h; x = %x; y = %y;')
         x_offset = $(get_focused_output_x_offset)
         y_offset = $(get_focused_output_y_offset)
         scale = $(get_focused_output_scale);
