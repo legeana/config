@@ -41,6 +41,9 @@ wants = { command = "convert" }
 [[system_dependencies]]
 any = "imv"
 wants = { command = "imv-wayland" }
+[[system_dependencies]]
+any = "jq"
+wants = { command = "jq" }
 
 [[system_dependencies]]
 apt = "xwayland"
