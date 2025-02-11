@@ -38,6 +38,9 @@ wants = { command = "slurp" }
 [[system_dependencies]]
 any = "imagemagick"
 wants = { command = "convert" }
+[[system_dependencies]]
+any = "imv"
+wants = { command = "imv-wayland" }
 
 [[system_dependencies]]
 apt = "xwayland"
