@@ -21,6 +21,8 @@ ai
 alacritty
 algo
 alloc
+allowlist
+allowlists
 alnum
 alsologtostderr
 amd
@@ -68,6 +70,7 @@ automake
 automator
 autoplug
 autosale
+autospec
 autotools
 awaitable
 backend
@@ -115,6 +118,7 @@ chmod
 chromebook
 chrono
 ci
+ciphertext
 classmethod
 classmethods
 cli
@@ -145,6 +149,8 @@ consts
 contextlib
 contravariant
 contrib
+coredump
+coredumps
 coreutils
 corp
 counterintuitive
@@ -152,6 +158,7 @@ cp
 cpp
 cpu
 crashlooping
+crc
 creds
 crit
 crl
@@ -348,6 +355,7 @@ heredoc
 hexsha
 hg
 hjkl
+hmac
 hoc
 holdback
 holdbacks
@@ -362,6 +370,8 @@ hostnames
 hostport
 hotspotting
 hotswap
+howto
+howtos
 hpp
 href
 hsync
@@ -546,6 +556,8 @@ nospell
 npiperelay
 npm
 ns
+nsec
+nsecs
 nullopt
 nullptr
 num
@@ -883,6 +895,7 @@ tmpl
 tmux
 tmuxinator
 tmuxp
+toc
 todo
 tok
 tokio
@@ -996,6 +1009,7 @@ webui
 weechat
 wezterm
 wget
+whereis
 whitelist
 whitelisted
 whitespace
