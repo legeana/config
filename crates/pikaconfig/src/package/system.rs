@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use process_utils::cmd;
 
 use crate::command::is_command;
 use crate::module::{Module, Rules};
@@ -79,14 +80,7 @@ impl Installer for Apt {
         if self.packages.is_empty() {
             return Ok(());
         }
-        process_utils::run_verbose(
-            std::process::Command::new("sudo")
-                .arg("apt")
-                .arg("install")
-                .arg("--yes")
-                .arg("--")
-                .args(&self.packages),
-        )
+        cmd!(["sudo", "apt", "install", "--yes", "--"], &self.packages).run_verbose()
     }
 }
 
@@ -108,15 +102,11 @@ impl Installer for Pacman {
         if self.packages.is_empty() {
             return Ok(());
         }
-        process_utils::run_verbose(
-            std::process::Command::new("sudo")
-                .arg("pacman")
-                .arg("-S")
-                .arg("--needed")
-                .arg("--noconfirm")
-                .arg("--")
-                .args(&self.packages),
+        cmd!(
+            ["sudo", "pacman", "-S", "--needed", "--noconfirm", "--"],
+            &self.packages
         )
+        .run_verbose()
     }
 }
 
@@ -132,21 +122,24 @@ impl Installer for Winget {
         if self.config.packages.is_empty() {
             return Ok(());
         }
-        process_utils::run_verbose(
-            std::process::Command::new("winget")
-                .arg("install")
-                .arg("--accept-package-agreements")
-                .arg("--accept-source-agreements")
-                .arg("--disable-interactivity")
+        cmd!(
+            [
+                "winget",
+                "install",
+                "--accept-package-agreements",
+                "--accept-source-agreements",
+                "--disable-interactivity",
                 // Force reinstall. This is the only way to achieve success
                 // code if the package is already installed.
-                .arg("--force")
-                .arg("--exact")
-                .arg("--source")
-                .arg(&self.config.source)
-                .arg("--")
-                .args(self.config.packages.as_slice()),
+                "--force",
+                "--exact",
+                "--source",
+                &self.config.source,
+                "--",
+            ],
+            self.config.packages.as_slice()
         )
+        .run_verbose()
     }
 }
 
@@ -162,10 +155,6 @@ impl Bash {
 
 impl Installer for Bash {
     fn install(&self, _rules: &Rules) -> Result<()> {
-        process_utils::run_verbose(
-            std::process::Command::new("bash")
-                .arg("-c")
-                .arg(&self.script),
-        )
+        cmd!(["bash", "-c", &self.script]).run_verbose()
     }
 }
