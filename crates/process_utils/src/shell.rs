@@ -54,7 +54,7 @@ impl Shell {
         self.env.clear();
     }
     fn finalise(&self, cmd: Command) -> StdCommand {
-        cmd.finalise(self.current_dir.as_ref(), &self.env)
+        cmd.finalise_with(self.current_dir.as_ref(), &self.env)
     }
     pub fn run(&self, cmd: Command) -> Result<()> {
         process_utils::run(&mut self.finalise(cmd))

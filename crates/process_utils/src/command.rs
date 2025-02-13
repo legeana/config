@@ -2,7 +2,10 @@ use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use std::process::Command as StdCommand;
 
+use anyhow::Result;
+
 use crate::env::EnvOverlay;
+use crate::process_utils;
 
 #[derive(Debug)]
 pub struct Command {
@@ -58,19 +61,35 @@ impl Command {
         self.env.clear();
         self
     }
-    pub(crate) fn finalise<P>(mut self, base_dir: Option<P>, base_env: &EnvOverlay) -> StdCommand
+    fn finalise(mut self) -> StdCommand {
+        if let Some(dir) = self.current_dir {
+            self.inner.current_dir(dir);
+        }
+        self.env.apply(&mut self.inner);
+        self.inner
+    }
+    pub(crate) fn finalise_with<P>(
+        mut self,
+        base_dir: Option<P>,
+        base_env: &EnvOverlay,
+    ) -> StdCommand
     where
         P: AsRef<Path>,
     {
         if let Some(dir) = base_dir {
             self.inner.current_dir(dir);
         }
-        if let Some(dir) = self.current_dir {
-            self.inner.current_dir(dir);
-        }
         base_env.apply(&mut self.inner);
-        self.env.apply(&mut self.inner);
-        self.inner
+        self.finalise()
+    }
+    pub fn run(self) -> Result<()> {
+        process_utils::run(&mut self.finalise())
+    }
+    pub fn run_verbose(self) -> Result<()> {
+        process_utils::run_verbose(&mut self.finalise())
+    }
+    pub fn output(self) -> Result<String> {
+        process_utils::output(&mut self.finalise())
     }
 }
 
@@ -92,20 +111,53 @@ mod tests {
 
     use super::*;
 
-    #[test]
-    fn test_finalise_program() {
+    type FinaliseFn = fn(Command) -> StdCommand;
+
+    fn finalise(cmd: Command) -> StdCommand {
+        cmd.finalise()
+    }
+
+    fn finalise_with_default(cmd: Command) -> StdCommand {
+        cmd.finalise_with(None::<&Path>, &EnvOverlay::new())
+    }
+
+    #[test_case(finalise)]
+    #[test_case(finalise_with_default)]
+    fn test_finalise_program(finalise: FinaliseFn) {
         let cmd = Command::new("test");
 
-        let std_cmd = cmd.finalise(None::<&Path>, &EnvOverlay::new());
+        let std_cmd = finalise(cmd);
 
         assert_eq!(std_cmd.get_program(), "test");
+    }
+
+    #[test]
+    fn test_finalise_with_program() {
+        let cmd = Command::new("test");
+
+        let std_cmd = cmd.finalise_with(None::<&Path>, &EnvOverlay::new());
+
+        assert_eq!(std_cmd.get_program(), "test");
+    }
+
+    #[test_case(None, None)]
+    #[test_case(Some("/root"), Some("/root"))]
+    fn test_finalise_current_dir(current_dir: Option<&str>, want: Option<&str>) {
+        let mut cmd = Command::new("");
+        if let Some(dir) = current_dir {
+            cmd = cmd.current_dir(dir);
+        }
+
+        let std_cmd = cmd.finalise();
+
+        assert_eq!(std_cmd.get_current_dir(), want.map(Path::new));
     }
 
     #[test_case(None, None, None)]
     #[test_case(Some("/root"), None, Some("/root"))]
     #[test_case(None, Some("/root"), Some("/root"))]
     #[test_case(Some("/usr"), Some("/root"), Some("/root"))]
-    fn test_finalise_current_dir(
+    fn test_finalise_with_current_dir(
         base: Option<&str>,
         current_dir: Option<&str>,
         want: Option<&str>,
@@ -115,16 +167,17 @@ mod tests {
             cmd = cmd.current_dir(dir);
         }
 
-        let std_cmd = cmd.finalise(base, &EnvOverlay::new());
+        let std_cmd = cmd.finalise_with(base, &EnvOverlay::new());
 
         assert_eq!(std_cmd.get_current_dir(), want.map(Path::new));
     }
 
-    #[test]
-    fn test_finalise_args() {
+    #[test_case(finalise)]
+    #[test_case(finalise_with_default)]
+    fn test_finalise_args(finalise: FinaliseFn) {
         let cmd = Command::new("").arg("arg-1").args(&["arg-2", "arg-3"]);
 
-        let std_cmd = cmd.finalise(None::<&Path>, &EnvOverlay::new());
+        let std_cmd = finalise(cmd);
 
         assert_eq!(
             std_cmd.get_args().collect::<Vec<_>>(),
@@ -133,12 +186,12 @@ mod tests {
     }
 
     #[test]
-    fn test_finalise_env_combines() {
+    fn test_finalise_with_env_combines() {
         let cmd = Command::new("").env("env-1", "value-1");
         let mut base_env = EnvOverlay::new();
         base_env.insert("env-2", "base-2");
 
-        let std_cmd = cmd.finalise(None::<&Path>, &base_env);
+        let std_cmd = cmd.finalise_with(None::<&Path>, &base_env);
 
         assert_eq!(
             std_cmd.get_envs().collect::<Vec<_>>(),
@@ -150,12 +203,12 @@ mod tests {
     }
 
     #[test]
-    fn test_finalise_env_overrides() {
+    fn test_finalise_with_env_overrides() {
         let cmd = Command::new("").env("env-1", "value-1");
         let mut base_env = EnvOverlay::new();
         base_env.insert("env-1", "base-1");
 
-        let std_cmd = cmd.finalise(None::<&Path>, &base_env);
+        let std_cmd = cmd.finalise_with(None::<&Path>, &base_env);
 
         assert_eq!(
             std_cmd.get_envs().collect::<Vec<_>>(),
@@ -163,11 +216,12 @@ mod tests {
         );
     }
 
-    #[test]
-    fn test_finalise_envs() {
+    #[test_case(finalise)]
+    #[test_case(finalise_with_default)]
+    fn test_finalise_envs(finalise: FinaliseFn) {
         let cmd = Command::new("").envs([("env-1", "value-1"), ("env-2", "value-2")]);
 
-        let std_cmd = cmd.finalise(None::<&Path>, &EnvOverlay::new());
+        let std_cmd = finalise(cmd);
 
         assert_eq!(
             std_cmd.get_envs().collect::<Vec<_>>(),
@@ -182,7 +236,7 @@ mod tests {
     fn test_cmd_empty() {
         let cmd = cmd!("program");
 
-        let std_cmd = cmd.finalise(None::<&Path>, &EnvOverlay::new());
+        let std_cmd = cmd.finalise();
         assert_eq!(std_cmd.get_program(), "program");
         assert_eq!(std_cmd.get_args().collect::<Vec<_>>(), &[] as &[&str]);
     }
@@ -191,7 +245,7 @@ mod tests {
     fn test_cmd_single_arg() {
         let cmd = cmd!("program", "arg-1");
 
-        let std_cmd = cmd.finalise(None::<&Path>, &EnvOverlay::new());
+        let std_cmd = cmd.finalise();
         assert_eq!(std_cmd.get_program(), "program");
         assert_eq!(std_cmd.get_args().collect::<Vec<_>>(), &["arg-1"]);
     }
@@ -200,7 +254,7 @@ mod tests {
     fn test_cmd_single_arg_trailing_comma() {
         let cmd = cmd!("program", "arg-1",);
 
-        let std_cmd = cmd.finalise(None::<&Path>, &EnvOverlay::new());
+        let std_cmd = cmd.finalise();
         assert_eq!(std_cmd.get_program(), "program");
         assert_eq!(std_cmd.get_args().collect::<Vec<_>>(), &["arg-1"]);
     }
@@ -209,7 +263,7 @@ mod tests {
     fn test_cmd_multiple_args() {
         let cmd = cmd!("program", "arg-1", "arg-2", "arg-3");
 
-        let std_cmd = cmd.finalise(None::<&Path>, &EnvOverlay::new());
+        let std_cmd = cmd.finalise();
         assert_eq!(std_cmd.get_program(), "program");
         assert_eq!(
             std_cmd.get_args().collect::<Vec<_>>(),
@@ -221,7 +275,7 @@ mod tests {
     fn test_cmd_multiple_args_trailing_comma() {
         let cmd = cmd!("program", "arg-1", "arg-2", "arg-3",);
 
-        let std_cmd = cmd.finalise(None::<&Path>, &EnvOverlay::new());
+        let std_cmd = cmd.finalise();
         assert_eq!(std_cmd.get_program(), "program");
         assert_eq!(
             std_cmd.get_args().collect::<Vec<_>>(),
