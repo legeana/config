@@ -1,6 +1,7 @@
 use std::path::Path;
 
 use anyhow::Result;
+use process_utils::cmd;
 
 struct Unzip;
 
@@ -12,14 +13,7 @@ impl super::Unarchiver for Unzip {
         vec!["zip".to_owned()]
     }
     fn unarchive(&self, src: &Path, dst: &Path) -> Result<()> {
-        process_utils::run_verbose(
-            std::process::Command::new("unzip")
-                .arg("-o")
-                .arg("-q")
-                .arg(src)
-                .arg("-d")
-                .arg(dst),
-        )
+        cmd!(["unzip", "-o", "-q", src, "-d", dst]).run_verbose()
     }
 }
 
