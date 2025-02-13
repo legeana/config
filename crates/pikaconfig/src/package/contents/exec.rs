@@ -1,6 +1,9 @@
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
-use std::process;
+
+use anyhow::Result;
+use indoc::formatdoc;
+use process_utils::Command;
 
 use crate::module::{Module, ModuleBox, Rules};
 use crate::registry::Registry;
@@ -8,9 +11,6 @@ use crate::registry::Registry;
 use super::args::{Argument, Arguments};
 use super::engine;
 use super::inventory;
-
-use anyhow::Result;
-use indoc::formatdoc;
 
 #[derive(Debug, Clone, PartialEq)]
 enum ExecCondition {
@@ -30,11 +30,10 @@ impl Module for PostInstallExec {
         if self.exec_condition == ExecCondition::UpdateOnly && !rules.force_update {
             return Ok(());
         }
-        process_utils::run(
-            process::Command::new(&self.cmd)
-                .args(&self.args)
-                .current_dir(&self.current_dir),
-        )
+        Command::new(&self.cmd)
+            .args(&self.args)
+            .current_dir(&self.current_dir)
+            .run()
     }
 }
 
