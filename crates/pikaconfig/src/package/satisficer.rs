@@ -1,7 +1,7 @@
 use std::path::PathBuf;
-use std::process::Command;
 
 use anyhow::{Context, Result};
+use process_utils::cmd;
 use serde::Deserialize;
 
 use crate::command;
@@ -88,9 +88,7 @@ impl Satisficer for DependencySatisficer {
                 Ok(true)
             }
             DependencySatisficer::PkgConfig { pkg_config } => {
-                let mut cmd = Command::new("pkg-config");
-                cmd.arg("--").arg(pkg_config);
-                Ok(process_utils::run(&mut cmd).is_ok())
+                Ok(cmd!(["pkg-config", "--", pkg_config]).run().is_ok())
             }
         }
     }
