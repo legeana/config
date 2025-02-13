@@ -5,7 +5,7 @@ use std::process::Command as StdCommand;
 use anyhow::Result;
 
 use crate::env::EnvOverlay;
-use crate::process_utils;
+use crate::{process_utils, Shell};
 
 #[derive(Debug)]
 pub struct Command {
@@ -82,6 +82,7 @@ impl Command {
         base_env.apply(&mut self.inner);
         self.finalise()
     }
+    // Direct run helpers.
     pub fn run(self) -> Result<()> {
         process_utils::run(&mut self.finalise())
     }
@@ -90,6 +91,16 @@ impl Command {
     }
     pub fn output(self) -> Result<String> {
         process_utils::output(&mut self.finalise())
+    }
+    // Run helpers chained with Shell.
+    pub fn run_in(self, sh: &Shell) -> Result<()> {
+        sh.run(self)
+    }
+    pub fn run_verbose_in(self, sh: &Shell) -> Result<()> {
+        sh.run_verbose(self)
+    }
+    pub fn output_in(self, sh: &Shell) -> Result<String> {
+        sh.output(self)
     }
 }
 

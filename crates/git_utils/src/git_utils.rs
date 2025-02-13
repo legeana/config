@@ -39,21 +39,16 @@ pub fn git_pull(root: &Path) -> Result<bool> {
 pub fn git_force_shallow_pull(root: &Path, remote: &Remote) -> Result<()> {
     let mut sh = Shell::new();
     sh.current_dir(root);
-    sh.run(cmd!(["git", "remote", "rm", ORIGIN]))?;
-    sh.run(cmd!(["git", "remote", "add", ORIGIN, &remote.url]))?;
-    sh.run(cmd!(["git", "fetch", "--depth=1", ORIGIN]))?;
-    sh.run(cmd!(["git", "remote", "set-head", "--auto", ORIGIN]))?;
+    cmd!(["git", "remote", "rm", ORIGIN]).run_in(&sh)?;
+    cmd!(["git", "remote", "add", ORIGIN, &remote.url]).run_in(&sh)?;
+    cmd!(["git", "fetch", "--depth=1", ORIGIN]).run_in(&sh)?;
+    cmd!(["git", "remote", "set-head", "--auto", ORIGIN]).run_in(&sh)?;
     let branch = match &remote.branch {
         Some(branch) => branch.clone(),
         None => get_remote_head_ref(root)?,
     };
-    sh.run(cmd!(["git", "checkout", "--force", &branch]))?;
-    sh.run(cmd!([
-        "git",
-        "reset",
-        "--hard",
-        format!("{ORIGIN}/{branch}")
-    ]))?;
+    cmd!(["git", "checkout", "--force", &branch]).run_in(&sh)?;
+    cmd!(["git", "reset", "--hard", format!("{ORIGIN}/{branch}")]).run_in(&sh)?;
     Ok(())
 }
 
