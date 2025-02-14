@@ -126,18 +126,44 @@ impl BrewDependency {
     }
 }
 
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct CargoConfig {
+    pub crates: Option<StringList>,
+    pub git: Option<String>,
+    pub tag: Option<String>,
+    pub branch: Option<String>,
+    pub path: Option<PathBuf>,
+    pub locked: Option<bool>,
+}
+
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields, untagged)]
 pub enum CargoDependency {
     Crates(StringList),
-    Config {
-        crates: Option<StringList>,
-        git: Option<String>,
-        tag: Option<String>,
-        branch: Option<String>,
-        path: Option<PathBuf>,
-        locked: Option<bool>,
-    },
+    Config(CargoConfig),
+}
+
+impl CargoDependency {
+    pub fn to_cargo_config(&self) -> CargoConfig {
+        match self {
+            Self::Crates(crates) => CargoConfig {
+                crates: Some(crates.clone()),
+                ..Default::default()
+            },
+            Self::Config(config) => config.clone(),
+        }
+    }
+    #[allow(dead_code)]
+    pub fn into_cargo_config(self) -> CargoConfig {
+        match self {
+            Self::Crates(crates) => CargoConfig {
+                crates: Some(crates),
+                ..Default::default()
+            },
+            Self::Config(config) => config,
+        }
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
@@ -425,14 +451,14 @@ mod tests {
             pkg,
             Package {
                 user_dependencies: Some(vec![UserDependency {
-                    cargo: Some(CargoDependency::Config {
+                    cargo: Some(CargoDependency::Config(CargoConfig {
                         crates: None,
                         git: Some("https://github.com/example/project.git".to_owned()),
                         branch: None,
                         tag: None,
                         path: None,
                         locked: None,
-                    }),
+                    })),
                     ..Default::default()
                 },]),
                 ..Default::default()
@@ -730,5 +756,32 @@ mod tests {
         let w = WingetDependency::Config(cfg.clone());
 
         assert_eq!(w.to_config(), cfg);
+    }
+
+    #[test]
+    fn cargo_dependency_crates_to_cargo_config() {
+        let c = CargoDependency::Crates(StringList::Single("pkg".to_owned()));
+        assert_eq!(
+            c.to_cargo_config(),
+            CargoConfig {
+                crates: Some(StringList::Single("pkg".to_owned())),
+                ..Default::default()
+            },
+        );
+    }
+
+    #[test]
+    fn cargo_dependency_config_to_cargo_config() {
+        let cfg = CargoConfig {
+            crates: Some(StringList::List(vec![
+                "crate-1".to_owned(),
+                "crate-2".to_owned(),
+            ])),
+            git: Some("https://example.com/some.git".to_owned()),
+            ..Default::default()
+        };
+        let c = CargoDependency::Config(cfg.clone());
+
+        assert_eq!(c.to_cargo_config(), cfg);
     }
 }

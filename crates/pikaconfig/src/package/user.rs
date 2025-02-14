@@ -32,7 +32,7 @@ impl UserDependency {
         }
         if let Some(cargo) = &cfg.cargo {
             installers.push(Box::new(Cargo {
-                config: cargo.clone(),
+                config: cargo.to_cargo_config(),
             }));
         }
         if cfg.npm.is_some() {
@@ -120,7 +120,7 @@ impl Installer for Brew {
 }
 
 struct Cargo {
-    config: config::CargoDependency,
+    config: config::CargoConfig,
 }
 
 impl Installer for Cargo {
@@ -130,39 +130,25 @@ impl Installer for Cargo {
         if rules.force_reinstall {
             cmd.arg("--force");
         }
-        match &self.config {
-            config::CargoDependency::Crates(packages) => {
-                cmd.arg("--").args(packages.to_vec());
-            }
-            config::CargoDependency::Config {
-                crates,
-                git,
-                branch,
-                tag,
-                path,
-                locked,
-            } => {
-                if let Some(git) = git {
-                    cmd.arg("--git").arg(git);
-                }
-                if let Some(branch) = branch {
-                    cmd.arg("--branch").arg(branch);
-                }
-                if let Some(tag) = tag {
-                    cmd.arg("--tag").arg(tag);
-                }
-                if let Some(path) = path {
-                    cmd.arg("--path").arg(path);
-                }
-                if locked.unwrap_or_default() {
-                    cmd.arg("--locked");
-                }
-                // Must be trailing arguments.
-                cmd.arg("--");
-                if let Some(crates) = crates {
-                    cmd.args(crates.to_vec());
-                }
-            }
+        if let Some(git) = &self.config.git {
+            cmd.arg("--git").arg(git);
+        }
+        if let Some(branch) = &self.config.branch {
+            cmd.arg("--branch").arg(branch);
+        }
+        if let Some(tag) = &self.config.tag {
+            cmd.arg("--tag").arg(tag);
+        }
+        if let Some(path) = &self.config.path {
+            cmd.arg("--path").arg(path);
+        }
+        if self.config.locked.unwrap_or_default() {
+            cmd.arg("--locked");
+        }
+        // Must be trailing arguments.
+        cmd.arg("--");
+        if let Some(crates) = &self.config.crates {
+            cmd.args(crates.to_vec());
         }
         process_utils::run_verbose(&mut cmd)
     }
