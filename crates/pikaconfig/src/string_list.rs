@@ -31,6 +31,15 @@ impl Default for StringList {
     }
 }
 
+impl<'a> IntoIterator for &'a StringList {
+    type Item = &'a String;
+    type IntoIter = std::slice::Iter<'a, String>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
 impl IntoIterator for StringList {
     type Item = String;
     type IntoIter = IntoIter;
@@ -139,6 +148,15 @@ mod tests {
 
         let v: Vec<_> = s.iter().collect();
         assert_eq!(v, vec!["hello", "world"]);
+    }
+
+    #[test]
+    fn test_ref_into_iter() {
+        let s = StringList::Single("test".to_owned());
+        let r = &s;
+
+        let v: Vec<&String> = r.into_iter().collect();
+        assert_eq!(v, vec!["test"]);
     }
 
     #[test]
