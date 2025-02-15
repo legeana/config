@@ -31,6 +31,34 @@ impl Default for StringList {
     }
 }
 
+impl IntoIterator for StringList {
+    type Item = String;
+    type IntoIter = IntoIter;
+
+    fn into_iter(self) -> Self::IntoIter {
+        match self {
+            Self::Single(s) => Self::IntoIter::Single(Some(s)),
+            Self::List(v) => Self::IntoIter::List(v.into_iter()),
+        }
+    }
+}
+
+pub enum IntoIter {
+    Single(Option<String>),
+    List(std::vec::IntoIter<String>),
+}
+
+impl Iterator for IntoIter {
+    type Item = String;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self {
+            Self::Single(opt) => opt.take(),
+            Self::List(v) => v.next(),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use pretty_assertions::assert_eq;
@@ -114,6 +142,22 @@ mod tests {
     }
 
     #[test]
+    fn test_single_into_iter() {
+        let s = StringList::Single("test".to_owned());
+
+        let v: Vec<String> = s.into_iter().collect();
+        assert_eq!(v, vec!["test".to_owned()]);
+    }
+
+    #[test]
+    fn test_list_into_iter() {
+        let s = StringList::List(vec!["hello".to_owned(), "world".to_owned()]);
+
+        let v: Vec<String> = s.into_iter().collect();
+        assert_eq!(v, vec!["hello".to_owned(), "world".to_owned()]);
+    }
+
+    #[test]
     fn test_single_as_slice() {
         let s = StringList::Single("test".to_owned());
         assert_eq!(s.as_slice(), &["test"]);
@@ -135,6 +179,18 @@ mod tests {
     fn test_list_to_vec() {
         let s = StringList::List(vec!["hello".to_owned(), "world".to_owned()]);
         assert_eq!(s.to_vec(), vec!["hello".to_owned(), "world".to_owned()]);
+    }
+
+    #[test]
+    fn test_for_loop() {
+        let s = StringList::Single("test".to_owned());
+        let mut v: Vec<String> = Vec::new();
+
+        for i in s {
+            v.push(i);
+        }
+
+        assert_eq!(v, vec!["test".to_owned()]);
     }
 
     #[test]
