@@ -114,13 +114,13 @@ mod tests {
     }
 
     #[test]
-    fn test_single_as_vec() {
+    fn test_single_as_slice() {
         let s = StringList::Single("test".to_owned());
         assert_eq!(s.as_slice(), &["test"]);
     }
 
     #[test]
-    fn test_list_as_vec() {
+    fn test_list_as_slice() {
         let s = StringList::List(vec!["hello".to_owned(), "world".to_owned()]);
         assert_eq!(s.as_slice(), &["hello", "world"]);
     }
