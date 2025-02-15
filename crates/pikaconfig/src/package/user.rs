@@ -1,6 +1,7 @@
 use std::process::Command;
 
 use anyhow::{anyhow, Context, Result};
+use process_utils::cmd;
 
 use crate::module::{Module, Rules};
 use crate::tag_criteria::Criteria;
@@ -81,32 +82,19 @@ impl Brew {
         let Some(ref taps) = self.config.taps else {
             return Ok(());
         };
-        let mut cmd = Command::new("brew");
-        cmd.arg("tap");
-        cmd.arg("--");
-        cmd.args(taps.as_slice());
-        process_utils::run_verbose(&mut cmd)
+        cmd!(["brew", "tap", "--"], taps.as_slice()).run_verbose()
     }
     fn install_casks(&self) -> Result<()> {
         let Some(ref casks) = self.config.casks else {
             return Ok(());
         };
-        let mut cmd = Command::new("brew");
-        cmd.arg("install");
-        cmd.arg("--cask");
-        cmd.arg("--");
-        cmd.args(casks.as_slice());
-        process_utils::run_verbose(&mut cmd)
+        cmd!(["brew", "install", "--cask", "--"], casks.as_slice()).run_verbose()
     }
     fn install_formulas(&self) -> Result<()> {
         let Some(ref formulas) = self.config.formulas else {
             return Ok(());
         };
-        let mut cmd = Command::new("brew");
-        cmd.arg("install");
-        cmd.arg("--");
-        cmd.args(formulas.as_slice());
-        process_utils::run_verbose(&mut cmd)
+        cmd!(["brew", "install", "--"], formulas.as_slice()).run_verbose()
     }
 }
 
@@ -160,14 +148,13 @@ struct Pipx {
 
 impl Installer for Pipx {
     fn install(&self, rules: &Rules) -> Result<()> {
-        let mut cmd = Command::new("pipx");
-        cmd.arg("install");
-        if rules.force_reinstall {
-            cmd.arg("--force");
-        }
-        cmd.arg("--");
-        cmd.args(&self.packages);
-        process_utils::run_verbose(&mut cmd)
+        cmd!(
+            ["pipx", "install",],
+            rules.force_reinstall.then_some("--force"),
+            ["--"],
+            &self.packages
+        )
+        .run_verbose()
     }
 }
 
@@ -177,25 +164,28 @@ struct Flatpak {
 
 impl Flatpak {
     fn clear_overrides(&self) -> Result<()> {
-        let mut cmd = Command::new("flatpak");
-        cmd.arg("--user");
-        cmd.arg("override");
-        cmd.arg("--reset");
-        cmd.arg("--");
-        cmd.arg(&self.config.package);
-        process_utils::run_verbose(&mut cmd)
+        cmd!([
+            "flatpak",
+            "--user",
+            "override",
+            "--reset",
+            "--",
+            &self.config.package
+        ])
+        .run_verbose()
     }
     fn set_overrides(&self) -> Result<()> {
         self.clear_overrides()?;
-        let mut cmd = Command::new("flatpak");
-        cmd.arg("--user");
-        cmd.arg("override");
-        if let Some(overrides) = &self.config.overrides {
-            cmd.args(overrides.as_slice());
-        }
-        cmd.arg("--");
-        cmd.arg(&self.config.package);
-        process_utils::run_verbose(&mut cmd)
+        let overrides = match &self.config.overrides {
+            Some(o) => o.as_slice(),
+            None => &[],
+        };
+        cmd!(
+            ["flatpak", "--user", "override"],
+            overrides,
+            ["--", &self.config.package]
+        )
+        .run_verbose()
     }
     fn make_alias(&self) -> Result<()> {
         // TODO: need registry
@@ -205,19 +195,13 @@ impl Flatpak {
 
 impl Installer for Flatpak {
     fn install(&self, rules: &Rules) -> Result<()> {
-        let mut cmd = Command::new("flatpak");
-        cmd.arg("--user");
-        cmd.arg("install");
-        if rules.force_update {
-            cmd.arg("--or-update");
-        }
-        if rules.force_reinstall {
-            cmd.arg("--reinstall");
-        }
-        cmd.arg("--");
-        cmd.arg(&self.config.repository);
-        cmd.arg(&self.config.package);
-        process_utils::run_verbose(&mut cmd)?;
+        cmd!(
+            ["flatpak", "--user", "install"],
+            rules.force_update.then_some("--or-update"),
+            rules.force_reinstall.then_some("--reinstall"),
+            ["--", &self.config.repository, &self.config.package]
+        )
+        .run_verbose()?;
         self.set_overrides()?;
         self.make_alias()
     }
