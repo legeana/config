@@ -1,9 +1,8 @@
-use std::process::Command;
-
 use anyhow::{anyhow, Context, Result};
-use process_utils::cmd;
+use process_utils::{cmd, opt_flag};
 
 use crate::module::{Module, Rules};
+use crate::string_list::StringList;
 use crate::tag_criteria::Criteria;
 
 use super::config;
@@ -113,32 +112,22 @@ struct Cargo {
 
 impl Installer for Cargo {
     fn install(&self, rules: &Rules) -> Result<()> {
-        let mut cmd = Command::new("cargo");
-        cmd.arg("install");
-        if rules.force_reinstall {
-            cmd.arg("--force");
-        }
-        if let Some(git) = &self.config.git {
-            cmd.arg("--git").arg(git);
-        }
-        if let Some(branch) = &self.config.branch {
-            cmd.arg("--branch").arg(branch);
-        }
-        if let Some(tag) = &self.config.tag {
-            cmd.arg("--tag").arg(tag);
-        }
-        if let Some(path) = &self.config.path {
-            cmd.arg("--path").arg(path);
-        }
-        if self.config.locked.unwrap_or_default() {
-            cmd.arg("--locked");
-        }
-        // Must be trailing arguments.
-        cmd.arg("--");
-        if let Some(crates) = &self.config.crates {
-            cmd.args(crates.to_vec());
-        }
-        process_utils::run_verbose(&mut cmd)
+        cmd!(
+            ["cargo", "install"],
+            rules.force_reinstall.then_some("--force"),
+            opt_flag("--git", self.config.git.as_ref()),
+            opt_flag("--branch", self.config.branch.as_ref()),
+            opt_flag("--tag", self.config.tag.as_ref()),
+            opt_flag("--path", self.config.path.as_ref()),
+            self.config.locked.unwrap_or_default().then_some("--locked"),
+            // Must be trailing arguments.
+            ["--"],
+            self.config
+                .crates
+                .as_ref()
+                .unwrap_or(&StringList::default()),
+        )
+        .run_verbose()
     }
 }
 
