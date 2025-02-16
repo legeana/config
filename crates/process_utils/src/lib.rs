@@ -7,5 +7,4 @@ mod shell;
 
 pub use command::*;
 pub use flag::*;
-pub use process_utils::*;
 pub use shell::*;

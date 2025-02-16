@@ -47,15 +47,15 @@ fn run_ext(cmd: &mut Command, print: bool) -> Result<()> {
     Ok(())
 }
 
-pub fn run_verbose(cmd: &mut Command) -> Result<()> {
+pub(crate) fn run_verbose(cmd: &mut Command) -> Result<()> {
     run_ext(cmd, true)
 }
 
-pub fn run(cmd: &mut Command) -> Result<()> {
+pub(crate) fn run(cmd: &mut Command) -> Result<()> {
     run_ext(cmd, false)
 }
 
-pub fn output(cmd: &mut Command) -> Result<String> {
+pub(crate) fn output(cmd: &mut Command) -> Result<String> {
     let pp = pretty_print(cmd);
     log::info!("Running {pp}");
     let output = cmd
