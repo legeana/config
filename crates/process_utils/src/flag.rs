@@ -49,42 +49,34 @@ impl<I> IntoIterator for Flag<I> {
 
     fn into_iter(self) -> Self::IntoIter {
         let Some(value) = self.value else {
-            return Self::IntoIter {
-                state: IterState::End,
-            };
+            return Self::IntoIter::End;
         };
-        Self::IntoIter {
-            state: IterState::Name(self.name, value),
-        }
+        Self::IntoIter::Name(self.name, value)
     }
 }
 
 // Each state is (next, tail*).
-enum IterState<I> {
+pub enum IntoIter<I> {
     Name(I, I),
     Value(I),
     End,
-}
-
-pub struct IntoIter<I> {
-    state: IterState<I>,
 }
 
 impl<I> Iterator for IntoIter<I> {
     type Item = I;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let state = std::mem::replace(&mut self.state, IterState::End);
+        let state = std::mem::replace(self, Self::End);
         match state {
-            IterState::Name(name, value) => {
-                self.state = IterState::Value(value);
+            Self::Name(name, value) => {
+                *self = Self::Value(value);
                 Some(name)
             }
-            IterState::Value(value) => {
-                self.state = IterState::End;
+            Self::Value(value) => {
+                *self = Self::End;
                 Some(value)
             }
-            IterState::End => None,
+            Self::End => None,
         }
     }
 }
