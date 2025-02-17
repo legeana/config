@@ -25,7 +25,7 @@ pub fn state_dir() -> Option<PathBuf> {
     get("XDG_STATE_HOME").or_else(def)
 }
 
-/// Returns "$HOME/.local.dir".
+/// Returns "$HOME/.local/bin".
 /// See https://specifications.freedesktop.org/basedir-spec/latest/#variables
 pub fn executable_dir() -> Option<PathBuf> {
     dirs::home_dir().map(|home| home.join(".local").join("bin"))
