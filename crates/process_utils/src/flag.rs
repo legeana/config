@@ -92,44 +92,28 @@ pub fn opt_flag<N, V>(name: N, value: Option<V>) -> Flag<FlagArg<N, V>> {
 #[cfg(test)]
 mod tests {
     use pretty_assertions::assert_eq;
+    use test_case::test_case;
 
     use super::*;
 
-    #[test]
-    fn test_some_as_ref() {
-        let args = opt_flag("--test", Some("value"));
+    #[test_case("--test", None, vec![])]
+    #[test_case("--test", Some("value"), vec!["--test", "value"])]
+    fn test_as_ref(name: &str, value: Option<&str>, want: Vec<&str>) {
+        let args = opt_flag(name, value);
 
         let result: Vec<_> = args
             .into_iter()
             .map(|v| v.as_ref().to_os_string())
             .collect();
-        assert_eq!(result, vec!["--test", "value"]);
+        assert_eq!(result, want);
     }
 
-    #[test]
-    fn test_none_as_ref() {
-        let args = opt_flag("--test", None::<&OsStr>);
-
-        let result: Vec<_> = args
-            .into_iter()
-            .map(|v| v.as_ref().to_os_string())
-            .collect();
-        assert_eq!(result, Vec::<&OsStr>::new());
-    }
-
-    #[test]
-    fn test_some_into() {
-        let args = opt_flag("--test", Some("value"));
+    #[test_case("--test", None, vec![])]
+    #[test_case("--test", Some("value"), vec!["--test", "value"])]
+    fn test_into(name: &str, value: Option<&str>, want: Vec<&str>) {
+        let args = opt_flag(name, value);
 
         let result: Vec<_> = args.into_iter().map(OsString::from).collect();
-        assert_eq!(result, vec!["--test", "value"]);
-    }
-
-    #[test]
-    fn test_none_into() {
-        let args = opt_flag("--test", None::<&OsStr>);
-
-        let result: Vec<_> = args.into_iter().map(OsString::from).collect();
-        assert_eq!(result, Vec::<&OsStr>::new());
+        assert_eq!(result, want);
     }
 }
