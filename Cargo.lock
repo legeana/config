@@ -1202,6 +1202,7 @@ name = "process_utils"
 version = "0.0.0"
 dependencies = [
  "anyhow",
+ "either",
  "log",
  "pretty_assertions",
  "shlexfmt",

@@ -6,6 +6,7 @@ rust-version.workspace = true
 
 [dependencies]
 anyhow = "1.0"
+either = "1.13.0"
 log = "0.4"
 shlexfmt = { path = "../shlexfmt" }
 
