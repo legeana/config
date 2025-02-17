@@ -1011,6 +1011,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "04744f49eae99ab78e0d5c0b603ab218f515ea8cfe5a456d7629ad883a3b6e7d"
 
 [[package]]
+name = "os_str"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "pretty_assertions",
+ "thiserror 2.0.11",
+]
+
+[[package]]
 name = "os_str_bytes"
 version = "6.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1129,6 +1138,7 @@ dependencies = [
  "libc",
  "log",
  "logos",
+ "os_str",
  "pretty_assertions",
  "process_utils",
  "rusqlite",

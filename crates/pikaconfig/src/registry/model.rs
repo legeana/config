@@ -56,7 +56,7 @@ pub(super) struct SqlPath<'a>(pub &'a Path);
 
 impl ToSql for SqlPath<'_> {
     fn to_sql(&self) -> rusqlite::Result<ToSqlOutput<'_>> {
-        let encoded = crate::os_str::to_vec(self.0.as_os_str().to_os_string());
+        let encoded = os_str::to_vec(self.0.as_os_str().to_os_string());
         Ok(ToSqlOutput::Owned(Value::Blob(encoded)))
     }
 }
@@ -66,7 +66,7 @@ pub(super) struct SqlPathBuf(pub PathBuf);
 
 impl ToSql for SqlPathBuf {
     fn to_sql(&self) -> rusqlite::Result<ToSqlOutput<'_>> {
-        let encoded = crate::os_str::to_vec(self.0.as_os_str().to_os_string());
+        let encoded = os_str::to_vec(self.0.as_os_str().to_os_string());
         Ok(ToSqlOutput::Owned(Value::Blob(encoded)))
     }
 }
@@ -76,7 +76,7 @@ impl FromSql for SqlPathBuf {
         let Ok(blob) = value.as_blob() else {
             return Err(FromSqlError::InvalidType);
         };
-        let decoded = crate::os_str::from_vec(blob.to_vec())
+        let decoded = os_str::from_vec(blob.to_vec())
             .context("failed to parse path")
             .map_err(|e| FromSqlError::Other(e.into()))?;
         Ok(SqlPathBuf(decoded.into()))

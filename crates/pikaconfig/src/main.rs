@@ -11,7 +11,6 @@ mod empty_struct;
 mod file_util;
 mod layout;
 mod module;
-mod os_str;
 mod package;
 mod quote;
 mod registry;
