@@ -142,13 +142,13 @@ mod tests {
     use pretty_assertions::assert_eq;
     use test_case::test_case;
 
-    use crate::registry::row_queries::{FileRow, RowQueries, UpdateRow};
+    use crate::row_queries::{FileRow, RowQueries, UpdateRow};
 
     use super::*;
 
     fn conn() -> AppConnection {
         let mut conn = AppConnection::open_in_memory().expect("open_in_memory");
-        crate::registry::migrations::config()
+        crate::migrations::config()
             .to_stable(&mut conn)
             .expect("migrate to_stable");
         conn

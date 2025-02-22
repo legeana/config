@@ -3,11 +3,11 @@ use std::path::{Path, PathBuf};
 use anyhow::{anyhow, Context, Result};
 use base64::engine::general_purpose::URL_SAFE;
 use base64::Engine;
+use registry::Registry;
 use sha2::{Digest, Sha256};
 
 use crate::annotated_path::{AnnotatedPath, AnnotatedPathBox};
 use crate::module::{Module, Rules};
-use crate::registry::Registry;
 
 use super::file_util;
 

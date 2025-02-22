@@ -3,7 +3,6 @@ use std::path::Path;
 
 use crate::annotated_path::AnnotatedPathBox;
 use crate::module::{Module, ModuleBox, Rules};
-use crate::registry::Registry;
 
 use super::args::{Argument, Arguments};
 use super::engine;
@@ -13,6 +12,7 @@ use super::local_state;
 use anyhow::{anyhow, Context, Result};
 use glob::glob as glob_iter;
 use indoc::formatdoc;
+use registry::Registry;
 
 struct CatGlobInto {
     globs: Vec<String>,

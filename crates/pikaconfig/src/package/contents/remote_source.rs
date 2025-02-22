@@ -2,10 +2,10 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use indoc::formatdoc;
+use registry::Registry;
 
 use crate::annotated_path::AnnotatedPathBox;
 use crate::module::{Module, Rules};
-use crate::registry::Registry;
 use crate::unarchiver;
 
 use super::args::Arguments;

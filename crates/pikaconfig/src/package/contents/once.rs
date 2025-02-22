@@ -2,9 +2,9 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use indoc::formatdoc;
+use registry::{FilePath, Registry};
 
 use crate::module::{Module, ModuleBox, Rules};
-use crate::registry::{FilePath, Registry};
 
 use super::args::Arguments;
 use super::engine;

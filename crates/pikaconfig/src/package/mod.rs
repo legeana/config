@@ -8,10 +8,10 @@ mod user;
 use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Context, Result};
+use registry::Registry;
 
 use crate::module::{self, Module, ModuleBox, Rules};
 use crate::package::installer::Installer;
-use crate::registry::Registry;
 use crate::tag_criteria::{self, Criteria};
 
 pub use contents::help as manifest_help;

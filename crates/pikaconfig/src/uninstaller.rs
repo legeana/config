@@ -1,9 +1,9 @@
 use std::path::Path;
 
 use anyhow::{anyhow, Context, Result};
+use registry::{FileType, ImmutableRegistry};
 
 use crate::file_util;
-use crate::registry::{FileType, ImmutableRegistry};
 use crate::symlink_util;
 
 pub trait Uninstaller {

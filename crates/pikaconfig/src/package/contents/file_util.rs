@@ -2,9 +2,9 @@ use std::fs;
 use std::path::Path;
 
 use anyhow::{anyhow, Context, Result};
+use registry::{FilePath, Registry};
 
 use crate::file_util;
-use crate::registry::{FilePath, Registry};
 use crate::symlink_util;
 
 #[cfg(unix)]

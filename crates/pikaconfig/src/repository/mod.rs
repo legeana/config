@@ -4,10 +4,10 @@ use std::ffi::OsStr;
 use std::path::PathBuf;
 
 use anyhow::{anyhow, Context, Result};
+use registry::Registry;
 
 use crate::module::{Module, Rules};
 use crate::package::Package;
-use crate::registry::Registry;
 use crate::tag_criteria::Criteria;
 
 pub use config::is_repository_dir;

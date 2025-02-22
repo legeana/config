@@ -1,7 +1,6 @@
 use std::path::{Path, PathBuf};
 
 use crate::module::{Module, ModuleBox, Rules};
-use crate::registry::Registry;
 
 use super::args::Arguments;
 use super::engine;
@@ -10,6 +9,7 @@ use super::inventory;
 
 use anyhow::{Context, Result};
 use indoc::formatdoc;
+use registry::Registry;
 use walkdir::WalkDir;
 
 struct SymlinkTree {

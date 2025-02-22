@@ -4,9 +4,9 @@ use std::path::{Path, PathBuf};
 use anyhow::Result;
 use indoc::formatdoc;
 use process_utils::Command;
+use registry::Registry;
 
 use crate::module::{Module, ModuleBox, Rules};
-use crate::registry::Registry;
 
 use super::args::{Argument, Arguments};
 use super::engine;

@@ -4,7 +4,6 @@ use std::{fs::File, io::Write};
 
 use crate::annotated_path::AnnotatedPathBox;
 use crate::module::{Module, ModuleBox, Rules};
-use crate::registry::Registry;
 
 use super::args::{Argument, Arguments};
 use super::engine;
@@ -13,6 +12,7 @@ use super::local_state;
 
 use anyhow::{anyhow, Context, Result};
 use indoc::formatdoc;
+use registry::Registry;
 use walkdir::WalkDir;
 
 struct Importer {

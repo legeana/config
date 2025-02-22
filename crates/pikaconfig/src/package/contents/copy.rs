@@ -2,7 +2,6 @@ use std::path::{Path, PathBuf};
 
 use crate::annotated_path::AnnotatedPathBox;
 use crate::module::{Module, ModuleBox, Rules};
-use crate::registry::Registry;
 
 use super::args::{Argument, Arguments};
 use super::engine;
@@ -11,6 +10,7 @@ use super::local_state;
 
 use anyhow::{anyhow, Context, Result};
 use indoc::formatdoc;
+use registry::Registry;
 
 struct Copy {
     src: PathBuf,

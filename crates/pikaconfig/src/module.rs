@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 
-use crate::registry::Registry;
+use registry::Registry;
 
 #[derive(Default)]
 pub struct Rules {

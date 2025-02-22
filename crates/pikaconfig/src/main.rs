@@ -13,7 +13,6 @@ mod layout;
 mod module;
 mod package;
 mod quote;
-mod registry;
 mod repository;
 mod string_list;
 mod symlink_util;
