@@ -6,7 +6,7 @@ use rusqlite::Connection;
 const APPLICATION_ID: i32 = 0x12fe0c02;
 
 #[derive(Debug)]
-pub(super) struct AppConnection(Connection);
+pub(crate) struct AppConnection(Connection);
 
 impl AsRef<Connection> for AppConnection {
     fn as_ref(&self) -> &Connection {
@@ -22,12 +22,12 @@ impl AsMut<Connection> for AppConnection {
 
 impl AppConnection {
     #[cfg(test)]
-    pub(super) fn open_in_memory() -> Result<Self> {
+    pub(crate) fn open_in_memory() -> Result<Self> {
         let conn = Connection::open_in_memory().context("failed to open in memory")?;
         Self::with_raw(conn)
     }
 
-    pub(super) fn open(path: &Path) -> Result<Self> {
+    pub(crate) fn open(path: &Path) -> Result<Self> {
         let conn = Connection::open(path).with_context(|| format!("failed to open {path:?}"))?;
         Self::with_raw(conn).with_context(|| format!("failed to initialise {path:?}"))
     }
@@ -38,7 +38,7 @@ impl AppConnection {
         Ok(Self(conn))
     }
 
-    pub(super) fn close(self) -> Result<()> {
+    pub(crate) fn close(self) -> Result<()> {
         self.0
             .close()
             .map_err(|(_conn, err)| Error::new(err).context("failed to close connection"))

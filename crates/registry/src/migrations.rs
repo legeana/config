@@ -5,7 +5,7 @@ use rusqlite_migration::{Migrations, M};
 
 use super::connection::AppConnection;
 
-pub(super) struct MigrationsConfig {
+pub(crate) struct MigrationsConfig {
     migrations: Migrations<'static>,
     stable_version: usize,
     #[cfg(test)]
@@ -36,7 +36,7 @@ impl MigrationsConfig {
     }
 }
 
-pub(super) fn config() -> &'static MigrationsConfig {
+pub(crate) fn config() -> &'static MigrationsConfig {
     static INSTANCE: OnceLock<MigrationsConfig> = OnceLock::new();
     INSTANCE.get_or_init(|| {
         // Migrations must never change their index.

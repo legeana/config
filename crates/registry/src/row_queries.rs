@@ -6,18 +6,18 @@ use super::file_type::{self, FilePathBuf};
 use super::model::{FilePurpose, SqlPathBuf, UpdateId};
 
 #[derive(Clone, Debug, PartialEq)]
-pub(super) struct UpdateRow {
+pub(crate) struct UpdateRow {
     pub id: UpdateId,
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub(super) struct FileRow {
+pub(crate) struct FileRow {
     pub update_id: UpdateId,
     pub purpose: FilePurpose,
     pub file: FilePathBuf,
 }
 
-pub(super) trait RowQueries
+pub(crate) trait RowQueries
 where
     Self: AsRef<Connection>,
 {

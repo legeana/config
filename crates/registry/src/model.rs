@@ -6,7 +6,7 @@ use rusqlite::types::{FromSql, FromSqlError, FromSqlResult, ToSql, ToSqlOutput, 
 use super::file_type;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub(super) struct UpdateId(pub(super) Option<i64>);
+pub(crate) struct UpdateId(pub(crate) Option<i64>);
 
 impl ToSql for UpdateId {
     fn to_sql(&self) -> rusqlite::Result<ToSqlOutput<'_>> {
@@ -27,7 +27,7 @@ impl FromSql for UpdateId {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub(super) enum FilePurpose {
+pub(crate) enum FilePurpose {
     User = 1,
     State = 2,
 }
@@ -52,7 +52,7 @@ impl FromSql for FilePurpose {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub(super) struct SqlPath<'a>(pub &'a Path);
+pub(crate) struct SqlPath<'a>(pub &'a Path);
 
 impl ToSql for SqlPath<'_> {
     fn to_sql(&self) -> rusqlite::Result<ToSqlOutput<'_>> {
@@ -62,7 +62,7 @@ impl ToSql for SqlPath<'_> {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub(super) struct SqlPathBuf(pub PathBuf);
+pub(crate) struct SqlPathBuf(pub PathBuf);
 
 impl ToSql for SqlPathBuf {
     fn to_sql(&self) -> rusqlite::Result<ToSqlOutput<'_>> {

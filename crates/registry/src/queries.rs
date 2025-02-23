@@ -5,7 +5,7 @@ use super::connection::AppConnection;
 use super::file_type::{self, FilePath, FilePathBuf};
 use super::model::{FilePurpose, SqlPath, SqlPathBuf, UpdateId};
 
-pub(super) trait AppQueries
+pub(crate) trait AppQueries
 where
     Self: AsRef<Connection>,
 {
