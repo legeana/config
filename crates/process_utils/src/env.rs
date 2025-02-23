@@ -16,26 +16,26 @@ impl Default for EnvOverlay {
 }
 
 impl EnvOverlay {
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self {
             clear: false,
             overrides: HashMap::new(),
         }
     }
-    pub fn clear(&mut self) {
+    pub(crate) fn clear(&mut self) {
         self.clear = true;
         self.overrides.clear();
     }
-    pub fn insert(&mut self, key: impl AsRef<OsStr>, value: impl AsRef<OsStr>) {
+    pub(crate) fn insert(&mut self, key: impl AsRef<OsStr>, value: impl AsRef<OsStr>) {
         self.overrides.insert(
             key.as_ref().to_os_string(),
             Some(value.as_ref().to_os_string()),
         );
     }
-    pub fn remove(&mut self, key: impl AsRef<OsStr>) {
+    pub(crate) fn remove(&mut self, key: impl AsRef<OsStr>) {
         self.overrides.insert(key.as_ref().to_os_string(), None);
     }
-    pub fn apply(&self, cmd: &mut StdCommand) {
+    pub(crate) fn apply(&self, cmd: &mut StdCommand) {
         if self.clear {
             cmd.env_clear();
         }

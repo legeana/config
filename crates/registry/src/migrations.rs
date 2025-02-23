@@ -13,7 +13,7 @@ pub(crate) struct MigrationsConfig {
 }
 
 impl MigrationsConfig {
-    pub fn to_stable(&self, conn: &mut AppConnection) -> Result<()> {
+    pub(crate) fn to_stable(&self, conn: &mut AppConnection) -> Result<()> {
         self.migrations
             .to_version(conn.as_mut(), self.stable_version)
             .with_context(|| {
@@ -24,7 +24,7 @@ impl MigrationsConfig {
             })
     }
     #[cfg(test)]
-    pub fn to_rolled_back(&self, conn: &mut AppConnection) -> Result<()> {
+    pub(crate) fn to_rolled_back(&self, conn: &mut AppConnection) -> Result<()> {
         self.migrations
             .to_version(conn.as_mut(), self.rolled_back_version)
             .with_context(|| {
