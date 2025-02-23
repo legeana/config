@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result, anyhow};
 use registry::{FileType, ImmutableRegistry};
 
 use crate::file_util;

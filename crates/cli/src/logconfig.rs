@@ -1,4 +1,4 @@
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 
 pub fn init(quiet: bool, verbosity: u8) -> Result<()> {
     env_logger::Builder::new()

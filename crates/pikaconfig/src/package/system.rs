@@ -5,9 +5,9 @@ use crate::command::is_command;
 use crate::module::{Module, Rules};
 use crate::tag_criteria::Criteria;
 
+use super::Installer;
 use super::config;
 use super::satisficer::{DependencySatisficer, Satisficer};
-use super::Installer;
 
 #[derive(Default)]
 pub struct SystemDependency {

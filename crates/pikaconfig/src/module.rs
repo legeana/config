@@ -227,11 +227,7 @@ impl<T: Module> WrappedUserDeps<T> {
     where
         F: FnOnce() -> Result<()>,
     {
-        if rules.user_deps {
-            f()
-        } else {
-            Ok(())
-        }
+        if rules.user_deps { f() } else { Ok(()) }
     }
 }
 

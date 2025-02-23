@@ -1,7 +1,7 @@
 use std::path::Path;
 
-use anyhow::{anyhow, Result};
-use process_utils::{cmd, Shell};
+use anyhow::{Result, anyhow};
+use process_utils::{Shell, cmd};
 
 const ORIGIN: &str = "origin";
 const HEAD: &str = "HEAD";

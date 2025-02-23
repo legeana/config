@@ -1,6 +1,6 @@
 use std::ffi::{OsStr, OsString};
 
-use either::{for_both, Either, Left, Right};
+use either::{Either, Left, Right, for_both};
 
 /// Either the name of a flag or its value.
 #[derive(Debug, PartialEq)]

@@ -1,5 +1,5 @@
-use serde::de::{Error, Visitor};
 use serde::Deserialize;
+use serde::de::{Error, Visitor};
 
 pub struct EmptyStruct;
 

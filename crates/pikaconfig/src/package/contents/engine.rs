@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
-use anyhow::{anyhow, bail, Result};
+use anyhow::{Result, anyhow, bail};
 
 use crate::module::ModuleBox;
 
@@ -264,12 +264,13 @@ mod tests {
     #[test]
     fn test_context_expand_arg_unset_var() {
         let ctx = Context::new();
-        assert!(ctx
-            .expand_arg(&Argument::OnlyVars("$hello".into()))
-            .err()
-            .unwrap()
-            .to_string()
-            .contains("hello"));
+        assert!(
+            ctx.expand_arg(&Argument::OnlyVars("$hello".into()))
+                .err()
+                .unwrap()
+                .to_string()
+                .contains("hello")
+        );
     }
 
     #[test]

@@ -10,7 +10,7 @@ use super::engine;
 use super::inventory;
 use super::local_state;
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result, anyhow};
 use indoc::formatdoc;
 use registry::Registry;
 use walkdir::WalkDir;

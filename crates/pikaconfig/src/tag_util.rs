@@ -1,7 +1,7 @@
 use std::path::Path;
 use std::sync::LazyLock;
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result, anyhow};
 use sysinfo::System;
 
 static SYSINFO: LazyLock<SystemInfo> = LazyLock::new(SystemInfo::new);

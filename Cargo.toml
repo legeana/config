@@ -5,7 +5,7 @@ members = ["crates/*"]
 # https://doc.rust-lang.org/cargo/reference/workspaces.html#the-package-table
 [workspace.package]
 version = "0.0.0"
-edition = "2021"
+edition = "2024"
 rust-version = "1.85.0"
 
 [workspace.lints.rust]

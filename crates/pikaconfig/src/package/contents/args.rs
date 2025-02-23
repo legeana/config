@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 
 #[macro_export]
 macro_rules! args {
@@ -236,9 +236,11 @@ mod tests {
         assert!(Argument::VarsAndHome("~/test".into()).expect_raw().is_err());
         // "${test}"
         assert!(Argument::OnlyVars("${test}".into()).expect_raw().is_err());
-        assert!(Argument::VarsAndHome("${test}".into())
-            .expect_raw()
-            .is_err());
+        assert!(
+            Argument::VarsAndHome("${test}".into())
+                .expect_raw()
+                .is_err()
+        );
     }
 
     #[test]

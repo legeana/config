@@ -9,7 +9,7 @@ use super::engine;
 use super::inventory;
 use super::local_state;
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result, anyhow};
 use glob::glob as glob_iter;
 use indoc::formatdoc;
 use registry::Registry;

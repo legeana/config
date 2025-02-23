@@ -1,8 +1,8 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::{anyhow, Context, Result};
-use base64::engine::general_purpose::URL_SAFE;
+use anyhow::{Context, Result, anyhow};
 use base64::Engine;
+use base64::engine::general_purpose::URL_SAFE;
 use registry::Registry;
 use sha2::{Digest, Sha256};
 

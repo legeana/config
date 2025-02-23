@@ -5,7 +5,7 @@ use std::process::Command as StdCommand;
 use anyhow::Result;
 
 use crate::env::EnvOverlay;
-use crate::{process_utils, Shell};
+use crate::{Shell, process_utils};
 
 #[derive(Debug)]
 pub struct Command {

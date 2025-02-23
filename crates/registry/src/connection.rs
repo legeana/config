@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use anyhow::{anyhow, Context, Error, Result};
+use anyhow::{Context, Error, Result, anyhow};
 use rusqlite::Connection;
 
 const APPLICATION_ID: i32 = 0x12fe0c02;

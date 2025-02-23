@@ -3,7 +3,7 @@ mod unzip;
 
 use std::path::Path;
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 
 pub trait Unarchiver: Send + Sync {
     fn name(&self) -> String;

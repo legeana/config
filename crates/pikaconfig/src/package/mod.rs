@@ -7,7 +7,7 @@ mod user;
 
 use std::path::{Path, PathBuf};
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result, anyhow};
 use registry::Registry;
 
 use crate::module::{self, Module, ModuleBox, Rules};

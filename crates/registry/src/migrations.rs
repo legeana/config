@@ -1,7 +1,7 @@
 use std::sync::OnceLock;
 
 use anyhow::{Context, Result};
-use rusqlite_migration::{Migrations, M};
+use rusqlite_migration::{M, Migrations};
 
 use super::connection::AppConnection;
 

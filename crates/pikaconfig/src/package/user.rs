@@ -1,13 +1,13 @@
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result, anyhow};
 use process_utils::{cmd, opt_flag};
 
 use crate::module::{Module, Rules};
 use crate::string_list::StringList;
 use crate::tag_criteria::Criteria;
 
+use super::Installer;
 use super::config;
 use super::satisficer::{DependencySatisficer, Satisficer};
-use super::Installer;
 
 #[derive(Default)]
 pub struct UserDependency {

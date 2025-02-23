@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result, anyhow};
 use indoc::formatdoc;
 use serde::Deserialize;
 use xdg::xdg_or_win;
