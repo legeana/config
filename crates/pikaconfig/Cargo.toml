@@ -33,6 +33,7 @@ ureq = "3.0.0"
 url = "2.4.0"
 walkdir = "2"
 which = "7.0.0"
+xdg = { path = "../xdg" }
 
 # https://lalrpop.github.io/lalrpop/quick_start_guide.html
 # See also build.rs.

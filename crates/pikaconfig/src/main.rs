@@ -22,8 +22,6 @@ mod tera_helper;
 mod tera_helpers;
 mod unarchiver;
 mod uninstaller;
-mod xdg;
-mod xdg_or_win;
 
 use std::path::Path;
 

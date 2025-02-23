@@ -3,11 +3,10 @@ use std::path::PathBuf;
 use anyhow::{anyhow, Context, Result};
 use indoc::formatdoc;
 use serde::Deserialize;
+use xdg::xdg_or_win;
 
 use crate::module::ModuleBox;
 use crate::tera_helper;
-use crate::xdg;
-use crate::xdg_or_win;
 
 use super::args::Argument;
 use super::args::Arguments;
