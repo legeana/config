@@ -3,35 +3,20 @@ macro_rules! cmd {
     [@new $program:expr] => { $crate::Command::new($program) };
 
     [@push_down () -> ($($body:tt)*)] => { $($body)* };
-    [@push_down ([] $(,)*) -> ($($body:tt)*)] => { $($body)* };
-    [@push_down ([$($arg:expr),* $(,)*] $(,)*) -> ($($body:tt)*)] => {
-        $($body)* $(.arg($arg))*
-    };
-    [@push_down ([], $($tail:tt)*) -> $body:tt] => {
+    [@push_down ([$($arg:expr),* $(,)?] $(, $($tail:tt)*)?) -> ($($body:tt)*)] => {
         cmd![
             @push_down
-            ($($tail)*)
-            ->
-            $body
-        ]
-    };
-    [@push_down ([$($arg:expr),* $(,)*], $($tail:tt)*) -> ($($body:tt)*)] => {
-        cmd![
-            @push_down
-            ($($tail)*)
+            ($($($tail)*)?)
             ->
             ($($body)* $(.arg($arg))*)
         ]
     };
-    [@push_down ($arg:expr) -> ($($body:tt)*)] => {
-        $($body)*.args($arg)
-    };
-    [@push_down ($arg:expr, $($tail:tt)*) -> ($($body:tt)*)] => {
+    [@push_down ($arg:expr $(, $($tail:tt)*)?) -> ($($body:tt)*)] => {
         cmd![
             @push_down
-            ($($tail)*)
+            ($($($tail)*)?)
             ->
-            ($($body)*.args($arg))
+            ($($body)* .args($arg))
         ]
     };
 
