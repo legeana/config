@@ -8,6 +8,9 @@ pub enum StringList {
 }
 
 impl StringList {
+    pub const fn new() -> Self {
+        Self::List(Vec::new())
+    }
     pub fn as_slice(&self) -> &[String] {
         match self {
             Self::Single(e) => std::slice::from_ref(e),
@@ -20,6 +23,12 @@ impl StringList {
     pub fn to_vec(&self) -> Vec<String> {
         self.as_slice().to_vec()
     }
+    pub fn into_vec(self) -> Vec<String> {
+        match self {
+            Self::Single(e) => vec![e],
+            Self::List(v) => v,
+        }
+    }
     pub fn is_empty(&self) -> bool {
         self.as_slice().is_empty()
     }
@@ -27,7 +36,7 @@ impl StringList {
 
 impl Default for StringList {
     fn default() -> Self {
-        StringList::List(Vec::new())
+        Self::new()
     }
 }
 
@@ -197,6 +206,18 @@ mod tests {
     fn test_list_to_vec() {
         let s = StringList::List(vec!["hello".to_owned(), "world".to_owned()]);
         assert_eq!(s.to_vec(), vec!["hello".to_owned(), "world".to_owned()]);
+    }
+
+    #[test]
+    fn test_single_into_vec() {
+        let s = StringList::Single("test".to_owned());
+        assert_eq!(s.into_vec(), vec!["test".to_owned()]);
+    }
+
+    #[test]
+    fn test_list_into_vec() {
+        let s = StringList::List(vec!["hello".to_owned(), "world".to_owned()]);
+        assert_eq!(s.into_vec(), vec!["hello".to_owned(), "world".to_owned()]);
     }
 
     #[test]
