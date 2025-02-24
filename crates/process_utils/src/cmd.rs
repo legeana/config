@@ -36,41 +36,23 @@ macro_rules! cmd {
     };
 
     // cmd!(["program"])
-    ([$program:expr]) => { cmd![@new $program] };
     // cmd!(["program", ...])
-    ([$program:expr, $($tail:tt)*]) => {
-        cmd![
-            @push_down
-            ([$($tail)*])
-            ->
-            (cmd![@new $program])
-        ]
-    };
     // cmd!(["program"], ...)
-    ([$program:expr], $($tail:tt)*) => {
-        cmd![
-            @push_down
-            ($($tail)*)
-            ->
-            (cmd![@new $program])
-        ]
-    };
     // cmd!(["program", ...], ...)
-    ([$program:expr, $($arg:expr),* $(,)*], $($tail:tt)*) => {
+    ([$program:expr $(, $arg:expr)* $(,)?] $(, $($tail:tt)*)?) => {
         cmd![
             @push_down
-            ($($tail)*)
+            ($($($tail)*)?)
             ->
             (cmd![@new $program] $(.arg($arg))*)
         ]
     };
     // cmd!("program")
-    ($program:expr) => { cmd![@new $program] };
     // cmd!("program", ...)
-    ($program:expr, $($tail:tt)*) => {
+    ($program:expr $(, $($tail:tt)*)?) => {
         cmd![
             @push_down
-            ($($tail)*)
+            ($($($tail)*)?)
             ->
             (cmd![@new $program])
         ]
