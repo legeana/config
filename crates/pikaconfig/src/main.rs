@@ -1,34 +1,12 @@
-#![allow(
-    // This lint is too opinionated.
-    // In situations where enum name matches outside class
-    // the consistency is more important than repetition.
-    clippy::enum_variant_names,
-)]
-
-mod annotated_path;
-mod command;
-mod empty_struct;
-mod file_util;
-mod layout;
-mod module;
-mod package;
-mod quote;
-mod repository;
-mod string_list;
-mod symlink_util;
-mod tag_criteria;
-mod tag_util;
-mod tera_helper;
-mod tera_helpers;
-mod unarchiver;
-mod uninstaller;
-
 use std::path::Path;
 
 use anyhow::{Context, Result};
 
-use module::{Module, Rules};
-use uninstaller::Uninstaller;
+use pikaconfig::layout;
+use pikaconfig::module::{Module, Rules};
+use pikaconfig::package;
+use pikaconfig::tag_util;
+use pikaconfig::uninstaller::Uninstaller;
 
 const SQL_REGISTRY: &str = ".install.sqlite";
 
