@@ -35,6 +35,6 @@ impl engine::CommandBuilder for DeprecatedBuilder {
     }
 }
 
-pub fn register(_registry: &mut dyn inventory::Registry) {
+pub(super) fn register(_registry: &mut dyn inventory::Registry) {
     //registry.register_command(Box::new(DeprecatedBuilder("<deprecated>")));
 }

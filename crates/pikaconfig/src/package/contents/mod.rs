@@ -50,14 +50,14 @@ fn error_context(root: &Path) -> String {
     format!("{root:?}")
 }
 
-pub fn new(root: PathBuf) -> Result<ModuleBox> {
+pub(super) fn new(root: PathBuf) -> Result<ModuleBox> {
     let mut ctx = engine::Context::new();
     Ok(ConfigurationStatement::parse(root)?
         .eval(&mut ctx)?
         .unwrap_or_else(module::dummy_box))
 }
 
-pub fn verify(root: &Path) -> Result<()> {
+pub(super) fn verify(root: &Path) -> Result<()> {
     ConfigurationStatement::verify(root)
 }
 
@@ -78,7 +78,7 @@ impl Statement for ConfigurationStatement {
 
 // Analogous to engine::CommandBuilder, but can only be called from code.
 impl ConfigurationStatement {
-    pub fn parse(root: PathBuf) -> Result<StatementBox> {
+    pub(super) fn parse(root: PathBuf) -> Result<StatementBox> {
         let manifest = root.join(MANIFEST);
         let statements = engine::VecStatement(
             parser::parse(&root, &manifest)
@@ -86,7 +86,7 @@ impl ConfigurationStatement {
         );
         Ok(Box::new(ConfigurationStatement { root, statements }))
     }
-    pub fn verify(root: &Path) -> Result<()> {
+    pub(super) fn verify(root: &Path) -> Result<()> {
         let manifest = root.join(MANIFEST);
         let _statements = parser::parse(root, &manifest)
             .with_context(|| format!("failed to load {manifest:?}"))?;

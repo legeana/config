@@ -2,34 +2,35 @@ use serde::Deserialize;
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields, untagged)]
-pub enum StringList {
+pub(crate) enum StringList {
     Single(String),
     List(Vec<String>),
 }
 
 impl StringList {
-    pub const fn new() -> Self {
+    pub(crate) const fn new() -> Self {
         Self::List(Vec::new())
     }
-    pub fn as_slice(&self) -> &[String] {
+    pub(crate) fn as_slice(&self) -> &[String] {
         match self {
             Self::Single(e) => std::slice::from_ref(e),
             Self::List(v) => v,
         }
     }
-    pub fn iter(&self) -> std::slice::Iter<String> {
+    pub(crate) fn iter(&self) -> std::slice::Iter<String> {
         self.as_slice().iter()
     }
-    pub fn to_vec(&self) -> Vec<String> {
+    pub(crate) fn to_vec(&self) -> Vec<String> {
         self.as_slice().to_vec()
     }
-    pub fn into_vec(self) -> Vec<String> {
+    #[allow(dead_code)]
+    pub(crate) fn into_vec(self) -> Vec<String> {
         match self {
             Self::Single(e) => vec![e],
             Self::List(v) => v,
         }
     }
-    pub fn is_empty(&self) -> bool {
+    pub(crate) fn is_empty(&self) -> bool {
         self.as_slice().is_empty()
     }
 }
@@ -61,7 +62,7 @@ impl IntoIterator for StringList {
     }
 }
 
-pub enum IntoIter {
+pub(crate) enum IntoIter {
     Single(Option<String>),
     List(std::vec::IntoIter<String>),
 }

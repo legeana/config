@@ -4,30 +4,30 @@ use std::path::Path;
 
 use anyhow::{Context, Result, anyhow};
 
-pub struct Metadata {
+pub(crate) struct Metadata {
     metadata: fs::Metadata,
 }
 
 impl Metadata {
     #[allow(dead_code)]
-    pub fn is_symlink(&self) -> bool {
+    pub(crate) fn is_symlink(&self) -> bool {
         self.metadata.is_symlink()
     }
     #[cfg(unix)]
-    pub fn is_symlink_file(&self) -> bool {
+    pub(crate) fn is_symlink_file(&self) -> bool {
         self.metadata.is_symlink()
     }
     #[cfg(windows)]
-    pub fn is_symlink_file(&self) -> bool {
+    pub(crate) fn is_symlink_file(&self) -> bool {
         use std::os::windows::fs::FileTypeExt;
         self.metadata.file_type().is_symlink_file()
     }
     #[cfg(unix)]
-    pub fn is_symlink_dir(&self) -> bool {
+    pub(crate) fn is_symlink_dir(&self) -> bool {
         false
     }
     #[cfg(windows)]
-    pub fn is_symlink_dir(&self) -> bool {
+    pub(crate) fn is_symlink_dir(&self) -> bool {
         use std::os::windows::fs::FileTypeExt;
         self.metadata.file_type().is_symlink_dir()
     }
@@ -45,13 +45,13 @@ impl From<fs::Metadata> for Metadata {
     }
 }
 
-pub fn metadata(path: &Path) -> io::Result<Metadata> {
+pub(crate) fn metadata(path: &Path) -> io::Result<Metadata> {
     let metadata = path.symlink_metadata()?;
     Ok(metadata.into())
 }
 
 /// Remove path if it is a symlink.
-pub fn remove(path: &Path) -> Result<()> {
+pub(crate) fn remove(path: &Path) -> Result<()> {
     let md: Metadata =
         metadata(path).with_context(|| format!("failed to get {path:?} metadata"))?;
     if md.is_symlink_file() {

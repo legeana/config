@@ -2,7 +2,7 @@ use std::ffi::OsStr;
 
 use anyhow::{Context, Result};
 
-pub fn is_command<T: AsRef<OsStr> + std::fmt::Debug>(cmd: T) -> Result<bool> {
+pub(crate) fn is_command<T: AsRef<OsStr> + std::fmt::Debug>(cmd: T) -> Result<bool> {
     match which::which(&cmd) {
         Ok(_) => Ok(true),
         Err(which::Error::CannotFindBinaryPath) => Ok(false),

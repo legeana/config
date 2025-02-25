@@ -176,10 +176,10 @@ impl std::fmt::Debug for StateMapping {
     }
 }
 
-pub struct EphemeralDir(PathBuf);
+pub(super) struct EphemeralDir(PathBuf);
 
 impl EphemeralDir {
-    pub fn state(&self) -> AnnotatedPathBox {
+    pub(super) fn state(&self) -> AnnotatedPathBox {
         Box::new(self.0.clone())
     }
 }
@@ -190,10 +190,10 @@ impl Module for EphemeralDir {
     }
 }
 
-pub struct EphemeralFile(PathBuf);
+pub(super) struct EphemeralFile(PathBuf);
 
 impl EphemeralFile {
-    pub fn state(&self) -> AnnotatedPathBox {
+    pub(super) fn state(&self) -> AnnotatedPathBox {
         Box::new(self.0.clone())
     }
 }
@@ -204,10 +204,10 @@ impl Module for EphemeralFile {
     }
 }
 
-pub struct LinkedDir(StateMapping);
+pub(super) struct LinkedDir(StateMapping);
 
 impl LinkedDir {
-    pub fn state(&self) -> AnnotatedPathBox {
+    pub(super) fn state(&self) -> AnnotatedPathBox {
         Box::new(self.0.clone())
     }
 }
@@ -221,10 +221,10 @@ impl Module for LinkedDir {
     }
 }
 
-pub struct LinkedFile(StateMapping);
+pub(super) struct LinkedFile(StateMapping);
 
 impl LinkedFile {
-    pub fn state(&self) -> AnnotatedPathBox {
+    pub(super) fn state(&self) -> AnnotatedPathBox {
         Box::new(self.0.clone())
     }
 }
@@ -240,26 +240,34 @@ impl Module for LinkedFile {
 }
 
 // Available directories.
-pub fn dir_state(link: PathBuf) -> Result<LinkedDir> {
+pub(super) fn dir_state(link: PathBuf) -> Result<LinkedDir> {
     StateType("dirs").linked_dir(link)
 }
 
-pub fn ephemeral_dir_state(workdir: &Path, resource_id: &str) -> Result<EphemeralDir> {
+pub(super) fn ephemeral_dir_state(workdir: &Path, resource_id: &str) -> Result<EphemeralDir> {
     StateType("ephemeral_dir").ephemeral_dir(workdir, Path::new("ephemeral_dir_state"), resource_id)
 }
 
-pub fn file_state(link: PathBuf) -> Result<LinkedFile> {
+pub(super) fn file_state(link: PathBuf) -> Result<LinkedFile> {
     StateType("output").linked_file(link)
 }
 
-pub fn dir_cache(workdir: &Path, filename: &Path, resource_id: &str) -> Result<EphemeralDir> {
+pub(super) fn dir_cache(
+    workdir: &Path,
+    filename: &Path,
+    resource_id: &str,
+) -> Result<EphemeralDir> {
     CacheType("dirs").ephemeral_dir(workdir, filename, resource_id)
 }
 
-pub fn file_cache(workdir: &Path, filename: &Path, resource_id: &str) -> Result<EphemeralFile> {
+pub(super) fn file_cache(
+    workdir: &Path,
+    filename: &Path,
+    resource_id: &str,
+) -> Result<EphemeralFile> {
     CacheType("files").ephemeral_file(workdir, filename, resource_id)
 }
 
-pub fn linked_file_cache(link: PathBuf, resource_id: &str) -> Result<LinkedFile> {
+pub(super) fn linked_file_cache(link: PathBuf, resource_id: &str) -> Result<LinkedFile> {
     CacheType("linked_files").linked_file_cache(link, resource_id)
 }

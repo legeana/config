@@ -6,13 +6,13 @@ use super::args::{Argument, Arguments};
 use super::lexer;
 
 #[derive(Debug, PartialEq)]
-pub struct Manifest {
+pub(super) struct Manifest {
     pub location: PathBuf,
     pub statements: Vec<Statement>,
 }
 
 impl Manifest {
-    pub fn parse(location: impl AsRef<Path>, input: impl AsRef<str>) -> Result<Manifest> {
+    pub(super) fn parse(location: impl AsRef<Path>, input: impl AsRef<str>) -> Result<Manifest> {
         let location = location.as_ref();
         let lex = lexer::LalrpopLexer::new(input.as_ref());
         let parser = super::ast_parser::ManifestParser::new();
@@ -24,7 +24,7 @@ impl Manifest {
 }
 
 #[derive(Debug, PartialEq)]
-pub enum Statement {
+pub(super) enum Statement {
     Command(Invocation),
     IfStatement(IfStatement),
     CommandAssignment(CommandAssignment),
@@ -33,7 +33,7 @@ pub enum Statement {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct Invocation {
+pub(super) struct Invocation {
     pub location: lexer::Location,
     pub name: String,
     pub args: Arguments,
@@ -50,20 +50,20 @@ impl std::fmt::Display for Invocation {
 }
 
 #[derive(Debug, PartialEq)]
-pub enum Condition {
+pub(super) enum Condition {
     Command(Invocation),
     Not(Box<Condition>),
 }
 
 #[derive(Debug, PartialEq)]
-pub struct IfClause {
+pub(super) struct IfClause {
     pub location: lexer::Location,
     pub condition: Condition,
     pub statements: Vec<Statement>,
 }
 
 #[derive(Debug, PartialEq)]
-pub struct IfStatement {
+pub(super) struct IfStatement {
     pub location: lexer::Location,
     pub if_clause: IfClause,
     pub else_if_clauses: Vec<IfClause>,
@@ -71,21 +71,21 @@ pub struct IfStatement {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct CommandAssignment {
+pub(super) struct CommandAssignment {
     pub location: lexer::Location,
     pub var: String,
     pub command: Invocation,
 }
 
 #[derive(Debug, PartialEq)]
-pub struct ValueAssignment {
+pub(super) struct ValueAssignment {
     pub location: lexer::Location,
     pub var: String,
     pub value: Argument,
 }
 
 #[derive(Debug, PartialEq)]
-pub struct WithStatement {
+pub(super) struct WithStatement {
     pub wrapper: Invocation,
     pub statements: Vec<Statement>,
 }

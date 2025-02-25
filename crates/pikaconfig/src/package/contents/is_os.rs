@@ -53,7 +53,7 @@ impl inventory::RenderHelper for IsOsBuilder {
     }
 }
 
-pub fn register(registry: &mut dyn inventory::Registry) {
+pub(super) fn register(registry: &mut dyn inventory::Registry) {
     let builders = [
         IsOsBuilder("macos"),
         IsOsBuilder("linux"),

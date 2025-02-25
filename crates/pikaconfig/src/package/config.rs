@@ -19,7 +19,7 @@ fn default_has_contents() -> bool {
 /// package.toml file definition
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
-pub struct Package {
+pub(super) struct Package {
     pub name: Option<String>,
     pub requires: Option<tag_criteria::TagCriteria>,
     #[serde(default = "default_has_contents")]
@@ -45,27 +45,27 @@ impl Default for Package {
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
-pub struct Dependency {
+pub(super) struct Dependency {
     pub requires: Option<tag_criteria::TagCriteria>,
     pub names: StringList,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
-pub struct WingetConfig {
+pub(super) struct WingetConfig {
     pub packages: StringList,
     pub source: String,
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields, untagged)]
-pub enum WingetDependency {
+pub(super) enum WingetDependency {
     WingetSource(StringList),
     Config(WingetConfig),
 }
 
 impl WingetDependency {
-    pub fn to_config(&self) -> WingetConfig {
+    pub(super) fn to_config(&self) -> WingetConfig {
         match self {
             WingetDependency::WingetSource(p) => WingetConfig {
                 packages: p.clone(),
@@ -79,7 +79,7 @@ impl WingetDependency {
 /// SystemDependency doesn't consider missing package manager a failure.
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
-pub struct SystemDependency {
+pub(super) struct SystemDependency {
     pub requires: Option<tag_criteria::TagCriteria>,
     // Package managers.
     // It is expected that only one will be available at any time.
@@ -101,7 +101,7 @@ pub struct SystemDependency {
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
-pub struct BrewConfig {
+pub(super) struct BrewConfig {
     pub taps: Option<StringList>,
     pub casks: Option<StringList>,
     pub formulas: Option<StringList>,
@@ -109,13 +109,13 @@ pub struct BrewConfig {
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields, untagged)]
-pub enum BrewDependency {
+pub(super) enum BrewDependency {
     Formulas(StringList),
     Config(BrewConfig),
 }
 
 impl BrewDependency {
-    pub fn to_config(&self) -> BrewConfig {
+    pub(super) fn to_config(&self) -> BrewConfig {
         match self {
             BrewDependency::Formulas(formulas) => BrewConfig {
                 formulas: Some(formulas.clone()),
@@ -128,7 +128,7 @@ impl BrewDependency {
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
-pub struct CargoConfig {
+pub(super) struct CargoConfig {
     pub crates: Option<StringList>,
     pub git: Option<String>,
     pub tag: Option<String>,
@@ -139,13 +139,13 @@ pub struct CargoConfig {
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields, untagged)]
-pub enum CargoDependency {
+pub(super) enum CargoDependency {
     Crates(StringList),
     Config(CargoConfig),
 }
 
 impl CargoDependency {
-    pub fn to_cargo_config(&self) -> CargoConfig {
+    pub(super) fn to_cargo_config(&self) -> CargoConfig {
         match self {
             Self::Crates(crates) => CargoConfig {
                 crates: Some(crates.clone()),
@@ -155,7 +155,7 @@ impl CargoDependency {
         }
     }
     #[allow(dead_code)]
-    pub fn into_cargo_config(self) -> CargoConfig {
+    pub(super) fn into_cargo_config(self) -> CargoConfig {
         match self {
             Self::Crates(crates) => CargoConfig {
                 crates: Some(crates),
@@ -168,7 +168,7 @@ impl CargoDependency {
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
-pub struct FlatpakDependency {
+pub(super) struct FlatpakDependency {
     pub repository: String,
     pub package: String,
     pub alias: Option<String>,
@@ -177,14 +177,14 @@ pub struct FlatpakDependency {
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
-pub struct BinaryUrlDependency {
+pub(super) struct BinaryUrlDependency {
     pub url: String,
     pub filename: String,
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
-pub struct GithubReleaseDependency {
+pub(super) struct GithubReleaseDependency {
     pub owner: String,
     pub repo: String,
     // Latest if not specified.
@@ -196,7 +196,7 @@ pub struct GithubReleaseDependency {
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
-pub struct UserDependency {
+pub(super) struct UserDependency {
     pub requires: Option<tag_criteria::TagCriteria>,
     /// Satisfaction criteria.
     /// Will skip this dependency if met.
@@ -224,7 +224,7 @@ fn load_toml_file(config_path: &Path) -> Result<Package> {
     load_toml_string(&input).with_context(|| format!("failed to parse {config_path:?}"))
 }
 
-pub fn load_package(root: &Path) -> Result<Package> {
+pub(super) fn load_package(root: &Path) -> Result<Package> {
     load_toml_file(&root.join(PACKAGE_CONFIG_TOML))
 }
 

@@ -2,7 +2,7 @@ use anyhow::Result;
 
 use crate::module::Rules;
 
-pub trait Installer {
+pub(super) trait Installer {
     fn install(&self, rules: &Rules) -> Result<()>;
 }
 

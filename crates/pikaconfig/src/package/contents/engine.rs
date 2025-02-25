@@ -9,7 +9,7 @@ use crate::module::ModuleBox;
 
 use super::args::{Argument, Arguments};
 
-pub struct Context {
+pub(super) struct Context {
     pub enabled: bool,
     pub prefix: PathBuf,
     home_var: OsString,
@@ -17,7 +17,7 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn new() -> Self {
+    pub(super) fn new() -> Self {
         let home = dirs::home_dir().expect("failed to determine home dir");
         let home_var: OsString = home.clone().into();
         Self {
@@ -27,7 +27,7 @@ impl Context {
             vars: HashMap::new(), // Variables are not inherited.
         }
     }
-    pub fn subdir(&self, path: impl AsRef<Path>) -> Self {
+    pub(super) fn subdir(&self, path: impl AsRef<Path>) -> Self {
         Self {
             enabled: true,
             prefix: self.prefix.join(path.as_ref()),
@@ -35,10 +35,10 @@ impl Context {
             vars: HashMap::new(), // Variables are not inherited.
         }
     }
-    pub fn dst_path(&self, path: impl AsRef<Path>) -> PathBuf {
+    pub(super) fn dst_path(&self, path: impl AsRef<Path>) -> PathBuf {
         self.prefix.join(path)
     }
-    pub fn expand_arg<'a>(&'a self, arg: &Argument) -> Result<OsString> {
+    pub(super) fn expand_arg<'a>(&'a self, arg: &Argument) -> Result<OsString> {
         let get_var = |var: &str| -> Result<Option<&'a OsString>> {
             Ok(Some(
                 self.get_var(var)
@@ -61,7 +61,7 @@ impl Context {
             Ok(Cow::Owned(p)) => Ok(p.into()),
         }
     }
-    pub fn expand_args(&self, args: impl AsRef<[Argument]>) -> Result<Vec<OsString>> {
+    pub(super) fn expand_args(&self, args: impl AsRef<[Argument]>) -> Result<Vec<OsString>> {
         args.as_ref()
             .iter()
             .map(|arg| self.expand_arg(arg))
@@ -73,7 +73,11 @@ impl Context {
             _ => self.vars.get(var),
         }
     }
-    pub fn set_var(&mut self, name: impl Into<String>, value: impl Into<OsString>) -> Result<()> {
+    pub(super) fn set_var(
+        &mut self,
+        name: impl Into<String>,
+        value: impl Into<OsString>,
+    ) -> Result<()> {
         let name = name.into();
         let key = name.clone();
         let value = value.into();
@@ -85,31 +89,31 @@ impl Context {
 }
 
 #[derive(Debug)]
-pub enum Command {
+pub(super) enum Command {
     Statement(StatementBox),
     Expression(ExpressionBox),
 }
 
 impl Command {
-    pub fn new_statement(statement: impl Statement + 'static) -> Self {
+    pub(super) fn new_statement(statement: impl Statement + 'static) -> Self {
         Self::Statement(Box::new(statement))
     }
-    pub fn new_expression(expression: impl Expression + 'static) -> Self {
+    pub(super) fn new_expression(expression: impl Expression + 'static) -> Self {
         Self::Expression(Box::new(expression))
     }
 }
 
 /// Builds a Statement.
 /// This should be purely syntactical.
-pub trait CommandBuilder: Sync + Send {
+pub(super) trait CommandBuilder: Sync + Send {
     fn name(&self) -> String;
     fn help(&self) -> String;
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<Command>;
 }
 
-pub type CommandBuilderBox = Box<dyn CommandBuilder>;
+pub(super) type CommandBuilderBox = Box<dyn CommandBuilder>;
 
-pub trait WithWrapperBuilder: Sync + Send {
+pub(super) trait WithWrapperBuilder: Sync + Send {
     fn name(&self) -> String;
     fn help(&self) -> String;
     fn build(
@@ -120,46 +124,46 @@ pub trait WithWrapperBuilder: Sync + Send {
     ) -> Result<StatementBox>;
 }
 
-pub type WithWrapperBuilderBox = Box<dyn WithWrapperBuilder>;
+pub(super) type WithWrapperBuilderBox = Box<dyn WithWrapperBuilder>;
 
-pub trait ConditionBuilder: Sync + Send {
+pub(super) trait ConditionBuilder: Sync + Send {
     fn name(&self) -> String;
     fn help(&self) -> String;
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<ConditionBox>;
 }
 
-pub type ConditionBuilderBox = Box<dyn ConditionBuilder>;
+pub(super) type ConditionBuilderBox = Box<dyn ConditionBuilder>;
 
-pub trait Condition: std::fmt::Debug {
+pub(super) trait Condition: std::fmt::Debug {
     fn eval(&self, ctx: &Context) -> Result<bool>;
 }
 
-pub type ConditionBox = Box<dyn Condition>;
+pub(super) type ConditionBox = Box<dyn Condition>;
 
 /// Command creates a Module or modifies State.
-pub trait Statement: std::fmt::Debug {
+pub(super) trait Statement: std::fmt::Debug {
     fn eval(&self, ctx: &mut Context) -> Result<Option<ModuleBox>>;
 }
 
-pub type StatementBox = Box<dyn Statement>;
+pub(super) type StatementBox = Box<dyn Statement>;
 
-pub struct ExpressionOutput {
+pub(super) struct ExpressionOutput {
     pub module: Option<ModuleBox>,
     pub output: OsString,
 }
 
-pub trait Expression: std::fmt::Debug {
+pub(super) trait Expression: std::fmt::Debug {
     fn eval(&self, ctx: &mut Context) -> Result<ExpressionOutput>;
 }
 
-pub type ExpressionBox = Box<dyn Expression>;
+pub(super) type ExpressionBox = Box<dyn Expression>;
 
-pub fn new_command(workdir: &Path, command: &str, args: &Arguments) -> Result<Command> {
+pub(super) fn new_command(workdir: &Path, command: &str, args: &Arguments) -> Result<Command> {
     let builder = super::inventory::command(command)?;
     builder.build(workdir, args)
 }
 
-pub fn new_with_wrapper(
+pub(super) fn new_with_wrapper(
     workdir: &Path,
     name: &str,
     args: &Arguments,
@@ -169,7 +173,7 @@ pub fn new_with_wrapper(
     builder.build(workdir, args, statement)
 }
 
-pub fn new_condition(workdir: &Path, name: &str, args: &Arguments) -> Result<ConditionBox> {
+pub(super) fn new_condition(workdir: &Path, name: &str, args: &Arguments) -> Result<ConditionBox> {
     let builder = super::inventory::condition(name)?;
     builder.build(workdir, args)
 }
@@ -197,7 +201,7 @@ pub fn help() -> String {
 }
 
 #[derive(Debug)]
-pub struct VecStatement(pub Vec<StatementBox>);
+pub(super) struct VecStatement(pub Vec<StatementBox>);
 
 impl Statement for VecStatement {
     fn eval(&self, ctx: &mut Context) -> Result<Option<ModuleBox>> {

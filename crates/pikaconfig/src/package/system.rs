@@ -10,13 +10,13 @@ use super::config;
 use super::satisficer::{DependencySatisficer, Satisficer};
 
 #[derive(Default)]
-pub struct SystemDependency {
+pub(super) struct SystemDependency {
     wants: Option<DependencySatisficer>,
     installers: Vec<Box<dyn Installer>>,
 }
 
 impl SystemDependency {
-    pub fn new(cfg: &config::SystemDependency) -> Result<Self> {
+    pub(super) fn new(cfg: &config::SystemDependency) -> Result<Self> {
         let mut installers: Vec<Box<dyn Installer>> = Vec::new();
         if !cfg
             .requires

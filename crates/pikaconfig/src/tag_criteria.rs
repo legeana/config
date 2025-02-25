@@ -3,7 +3,7 @@ use serde::Deserialize;
 
 use crate::string_list::StringList;
 
-pub trait Criteria {
+pub(crate) trait Criteria {
     fn is_satisfied(&self) -> Result<bool>;
 }
 
@@ -18,7 +18,7 @@ impl<T: Criteria> Criteria for Option<T> {
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
-pub struct TagCriteria(pub StringList);
+pub(crate) struct TagCriteria(pub StringList);
 
 impl Criteria for TagCriteria {
     fn is_satisfied(&self) -> Result<bool> {

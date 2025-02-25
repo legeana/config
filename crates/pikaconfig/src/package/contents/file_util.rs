@@ -25,7 +25,7 @@ fn symlink(src: &Path, dst: &Path) -> Result<()> {
     Ok(())
 }
 
-pub fn make_symlink(registry: &mut dyn Registry, src: &Path, dst: &Path) -> Result<()> {
+pub(super) fn make_symlink(registry: &mut dyn Registry, src: &Path, dst: &Path) -> Result<()> {
     if let Err(err) = file_util::skip_not_found(symlink_util::remove(dst)) {
         return Err(err.context(format!("unable to overwrite {dst:?} by {src:?}")));
     }
@@ -42,7 +42,7 @@ pub fn make_symlink(registry: &mut dyn Registry, src: &Path, dst: &Path) -> Resu
 }
 
 #[cfg(unix)]
-pub fn set_file_executable(f: &fs::File) -> Result<()> {
+pub(super) fn set_file_executable(f: &fs::File) -> Result<()> {
     use std::os::unix::fs::PermissionsExt;
     let metadata = f.metadata()?;
     let mut perm = metadata.permissions();
@@ -52,7 +52,7 @@ pub fn set_file_executable(f: &fs::File) -> Result<()> {
 }
 
 #[cfg(unix)]
-pub fn set_path_executable(path: &Path) -> Result<()> {
+pub(super) fn set_path_executable(path: &Path) -> Result<()> {
     use std::os::unix::fs::PermissionsExt;
     let metadata = path.metadata()?;
     let mut perm = metadata.permissions();
@@ -62,13 +62,13 @@ pub fn set_path_executable(path: &Path) -> Result<()> {
 }
 
 #[cfg(windows)]
-pub fn set_file_executable(_f: &fs::File) -> Result<()> {
+pub(super) fn set_file_executable(_f: &fs::File) -> Result<()> {
     // Nothing to do on Windows.
     Ok(())
 }
 
 #[cfg(windows)]
-pub fn set_path_executable(_path: &Path) -> Result<()> {
+pub(super) fn set_path_executable(_path: &Path) -> Result<()> {
     // Nothing to do on Windows.
     Ok(())
 }

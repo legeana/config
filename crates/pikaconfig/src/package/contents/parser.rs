@@ -144,7 +144,7 @@ impl engine::Statement for ValueAssignmentStatement {
     }
 }
 
-pub fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<engine::StatementBox>> {
+pub(super) fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<engine::StatementBox>> {
     let manifest = std::fs::read_to_string(manifest_path)
         .with_context(|| format!("failed to read {manifest_path:?}"))?;
     let manifest_ast = ast::Manifest::parse(manifest_path, manifest)
@@ -152,7 +152,7 @@ pub fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<engine::Stateme
     parse_statements(workdir, manifest_path, manifest_ast.statements.iter())
 }
 
-pub fn parse_statements<'a>(
+pub(super) fn parse_statements<'a>(
     workdir: &Path,
     manifest_path: &Path,
     statements: impl Iterator<Item = &'a ast::Statement>,

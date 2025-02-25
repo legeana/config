@@ -1,6 +1,6 @@
 use std::io;
 
-pub trait IsNotFound {
+pub(crate) trait IsNotFound {
     fn is_not_found(&self) -> bool;
 }
 
@@ -19,12 +19,12 @@ impl IsNotFound for anyhow::Error {
     }
 }
 
-pub fn is_not_found(err: &impl IsNotFound) -> bool {
+pub(crate) fn is_not_found(err: &impl IsNotFound) -> bool {
     err.is_not_found()
 }
 
 /// Returns Ok(None) on std::io::ErrorKind::NotFound, result otherwise.
-pub fn skip_not_found<T, E>(result: Result<T, E>) -> Result<Option<T>, E>
+pub(crate) fn skip_not_found<T, E>(result: Result<T, E>) -> Result<Option<T>, E>
 where
     E: IsNotFound,
 {

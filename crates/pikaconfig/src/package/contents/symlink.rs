@@ -123,7 +123,7 @@ impl engine::CommandBuilder for SymlinkFromBuilder {
     }
 }
 
-pub fn register(registry: &mut dyn inventory::Registry) {
+pub(super) fn register(registry: &mut dyn inventory::Registry) {
     registry.register_command(Box::new(SymlinkBuilder));
     registry.register_command(Box::new(SymlinkToBuilder));
     registry.register_command(Box::new(SymlinkFromBuilder));

@@ -7,7 +7,8 @@ use super::ast;
 
 grammar(location: &Path);
 
-pub Manifest: ast::Manifest = {
+// pub: compiled outside of current module hierarchy.
+pub(crate) Manifest: ast::Manifest = {
     <StatementList> => ast::Manifest {
         location: location.to_owned(),
         statements: <>,

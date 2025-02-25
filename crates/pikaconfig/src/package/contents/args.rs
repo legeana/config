@@ -54,17 +54,17 @@ macro_rules! args {
 }
 
 #[allow(unused_imports)]
-pub(crate) use args;
+pub(super) use args;
 
 #[derive(Clone, Debug, PartialEq)]
-pub enum Argument {
+pub(super) enum Argument {
     Raw(String),
     OnlyVars(String),
     VarsAndHome(String),
 }
 
 impl Argument {
-    pub fn expect_raw(&self) -> Result<&str> {
+    pub(super) fn expect_raw(&self) -> Result<&str> {
         let get_env = |_: &_| -> Result<Option<String>, anyhow::Error> {
             Err(anyhow!("can't use string template in this context"))
         };
@@ -106,10 +106,10 @@ impl std::fmt::Display for Argument {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct Arguments(pub Vec<Argument>);
+pub(super) struct Arguments(pub Vec<Argument>);
 
 impl Arguments {
-    pub fn expect_no_args(&self, command: impl AsRef<str>) -> Result<()> {
+    pub(super) fn expect_no_args(&self, command: impl AsRef<str>) -> Result<()> {
         let command = command.as_ref();
         if !self.0.is_empty() {
             return Err(anyhow!(
@@ -122,12 +122,15 @@ impl Arguments {
         Ok(())
     }
 
-    pub fn expect_any_args(&self, command: impl AsRef<str>) -> Result<&[Argument]> {
+    pub(super) fn expect_any_args(&self, command: impl AsRef<str>) -> Result<&[Argument]> {
         let (_, args) = self.expect_variadic_args(command, 0)?;
         Ok(args)
     }
 
-    pub fn expect_optional_arg(&self, command: impl AsRef<str>) -> Result<Option<&Argument>> {
+    pub(super) fn expect_optional_arg(
+        &self,
+        command: impl AsRef<str>,
+    ) -> Result<Option<&Argument>> {
         let command = command.as_ref();
         let (_, args) = self.expect_variadic_args(command, 0)?;
         match args.len() {
@@ -141,11 +144,11 @@ impl Arguments {
         }
     }
 
-    pub fn expect_single_arg(&self, command: impl AsRef<str>) -> Result<&Argument> {
+    pub(super) fn expect_single_arg(&self, command: impl AsRef<str>) -> Result<&Argument> {
         Ok(&self.expect_fixed_args(command, 1)?[0])
     }
 
-    pub fn expect_at_least_one_arg(
+    pub(super) fn expect_at_least_one_arg(
         &self,
         command: impl AsRef<str>,
     ) -> Result<(&Argument, &[Argument])> {
@@ -154,7 +157,10 @@ impl Arguments {
         Ok((&arg[0], tail))
     }
 
-    pub fn expect_double_arg(&self, command: impl AsRef<str>) -> Result<(&Argument, &Argument)> {
+    pub(super) fn expect_double_arg(
+        &self,
+        command: impl AsRef<str>,
+    ) -> Result<(&Argument, &Argument)> {
         let args = self.expect_fixed_args(command, 2)?;
         Ok((&args[0], &args[1]))
     }

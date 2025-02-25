@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use serde::de::{Error, Visitor};
 
-pub struct EmptyStruct;
+pub(crate) struct EmptyStruct;
 
 struct EmptyStructVisitor;
 

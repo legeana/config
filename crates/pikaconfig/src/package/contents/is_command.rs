@@ -41,6 +41,6 @@ impl engine::ConditionBuilder for IsCommandBuilder {
     }
 }
 
-pub fn register(registry: &mut dyn inventory::Registry) {
+pub(super) fn register(registry: &mut dyn inventory::Registry) {
     registry.register_condition(Box::new(IsCommandBuilder));
 }

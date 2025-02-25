@@ -11,7 +11,7 @@ pub struct Rules {
 }
 
 impl Rules {
-    pub fn wrap_keep_going<F>(&self, f: F) -> Result<()>
+    pub(crate) fn wrap_keep_going<F>(&self, f: F) -> Result<()>
     where
         F: FnOnce() -> Result<()>,
     {
@@ -169,7 +169,7 @@ impl<T: Module> WrappedModule<T> {
 
 impl_wrap!(WrappedModule, (self.wrap), (self.module));
 
-pub fn wrap<T: Module + 'static>(module: T, error_context: String) -> ModuleBox {
+pub(crate) fn wrap<T: Module + 'static>(module: T, error_context: String) -> ModuleBox {
     Box::new(WrappedModule {
         error_context,
         module,
@@ -213,7 +213,7 @@ impl<T: Module> Module for WrappedKeepGoing<T> {
     }
 }
 
-pub fn wrap_keep_going<T>(modules: Vec<T>) -> ModuleBox
+pub(crate) fn wrap_keep_going<T>(modules: Vec<T>) -> ModuleBox
 where
     T: Module + 'static,
 {
@@ -233,17 +233,17 @@ impl<T: Module> WrappedUserDeps<T> {
 
 impl_wrap!(WrappedUserDeps, (self.wrap), (self.0));
 
-pub fn wrap_user_deps<T>(module: T) -> ModuleBox
+pub(crate) fn wrap_user_deps<T>(module: T) -> ModuleBox
 where
     T: Module + 'static,
 {
     Box::new(WrappedUserDeps(module))
 }
 
-pub struct Dummy;
+pub(crate) struct Dummy;
 
 impl Module for Dummy {}
 
-pub fn dummy_box() -> ModuleBox {
+pub(crate) fn dummy_box() -> ModuleBox {
     Box::new(Dummy)
 }

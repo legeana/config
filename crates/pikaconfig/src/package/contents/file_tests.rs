@@ -37,6 +37,6 @@ impl engine::ConditionBuilder for ExistsBuilder {
     }
 }
 
-pub fn register(registry: &mut dyn inventory::Registry) {
+pub(super) fn register(registry: &mut dyn inventory::Registry) {
     registry.register_condition(Box::new(ExistsBuilder));
 }

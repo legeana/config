@@ -70,7 +70,7 @@ impl inventory::RenderHelper for WhichBuilder {
     }
 }
 
-pub fn register(registry: &mut dyn inventory::Registry) {
+pub(super) fn register(registry: &mut dyn inventory::Registry) {
     registry.register_command(Box::new(WhichBuilder));
     registry.register_render_helper(Box::new(WhichBuilder));
 }

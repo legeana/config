@@ -17,7 +17,7 @@ where
         .context("failed to deserialize args")
 }
 
-pub trait Function {
+pub(crate) trait Function {
     type Params;
     type Result;
 
@@ -27,7 +27,7 @@ pub trait Function {
     }
 }
 
-pub struct WrappedFunction<T>(T);
+pub(crate) struct WrappedFunction<T>(T);
 
 impl<T> TeraFunction for WrappedFunction<T>
 where
@@ -57,12 +57,12 @@ where
     }
 }
 
-pub struct WrappedFnFunction<F, Params, R> {
+pub(crate) struct WrappedFnFunction<F, Params, R> {
     f: F,
     _t: PhantomData<(Params, R)>,
 }
 
-pub fn wrap_fn<F, Params, R>(f: F) -> WrappedFunction<WrappedFnFunction<F, Params, R>>
+pub(crate) fn wrap_fn<F, Params, R>(f: F) -> WrappedFunction<WrappedFnFunction<F, Params, R>>
 where
     F: Fn(&Params) -> Result<R>,
 {
@@ -81,13 +81,13 @@ where
     }
 }
 
-pub struct WrappedNilFunction<F, R> {
+pub(crate) struct WrappedNilFunction<F, R> {
     f: F,
     _t: PhantomData<R>,
 }
 
 #[allow(dead_code)]
-pub fn wrap_nil<F, R>(f: F) -> WrappedFunction<WrappedNilFunction<F, R>>
+pub(crate) fn wrap_nil<F, R>(f: F) -> WrappedFunction<WrappedNilFunction<F, R>>
 where
     F: Fn() -> Result<R>,
 {
@@ -106,7 +106,7 @@ where
     }
 }
 
-pub trait Filter {
+pub(crate) trait Filter {
     type Value;
     type Params;
     type Result;
@@ -117,7 +117,7 @@ pub trait Filter {
     }
 }
 
-pub struct WrappedFilter<T>(T);
+pub(crate) struct WrappedFilter<T>(T);
 
 impl<T> TeraFilter for WrappedFilter<T>
 where
@@ -149,7 +149,7 @@ where
     }
 }
 
-pub struct WrappedFnFilter<F, V, Params, R> {
+pub(crate) struct WrappedFnFilter<F, V, Params, R> {
     f: F,
     _t: PhantomData<(V, Params, R)>,
 }
@@ -168,14 +168,14 @@ where
 }
 
 #[allow(dead_code)]
-pub fn wrap_filter<F, V, Params, R>(f: F) -> WrappedFilter<WrappedFnFilter<F, V, Params, R>>
+pub(crate) fn wrap_filter<F, V, Params, R>(f: F) -> WrappedFilter<WrappedFnFilter<F, V, Params, R>>
 where
     F: Fn(&V, &Params) -> Result<R>,
 {
     WrappedFnFilter { f, _t: PhantomData }.into()
 }
 
-pub struct WrappedNilFilter<F, V, R> {
+pub(crate) struct WrappedNilFilter<F, V, R> {
     f: F,
     _t: PhantomData<(V, R)>,
 }
@@ -194,7 +194,7 @@ where
 }
 
 #[allow(dead_code)]
-pub fn wrap_nil_filter<F, V, R>(f: F) -> WrappedFilter<WrappedNilFilter<F, V, R>>
+pub(crate) fn wrap_nil_filter<F, V, R>(f: F) -> WrappedFilter<WrappedNilFilter<F, V, R>>
 where
     F: Fn(&V) -> Result<R>,
 {

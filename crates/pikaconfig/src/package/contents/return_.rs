@@ -38,6 +38,6 @@ impl engine::CommandBuilder for ReturnBuilder {
     }
 }
 
-pub fn register(registry: &mut dyn inventory::Registry) {
+pub(super) fn register(registry: &mut dyn inventory::Registry) {
     registry.register_command(Box::new(ReturnBuilder));
 }

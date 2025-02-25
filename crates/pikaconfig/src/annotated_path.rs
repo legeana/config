@@ -1,14 +1,14 @@
 use std::path::{Path, PathBuf};
 
 // AnnotatedPath represents a path with a custom debug representation.
-pub trait AnnotatedPath: std::fmt::Debug {
+pub(crate) trait AnnotatedPath: std::fmt::Debug {
     fn as_path(&self) -> &Path;
     fn to_path_buf(&self) -> PathBuf {
         self.as_path().to_path_buf()
     }
 }
 
-pub type AnnotatedPathBox = Box<dyn AnnotatedPath>;
+pub(crate) type AnnotatedPathBox = Box<dyn AnnotatedPath>;
 
 impl<T: AnnotatedPath + ?Sized> AnnotatedPath for &T {
     fn as_path(&self) -> &Path {

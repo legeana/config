@@ -151,7 +151,7 @@ impl engine::CommandBuilder for CopyToBuilder {
     }
 }
 
-pub fn register(registry: &mut dyn inventory::Registry) {
+pub(super) fn register(registry: &mut dyn inventory::Registry) {
     registry.register_command(Box::new(CopyBuilder));
     registry.register_command(Box::new(CopyFromBuilder));
     registry.register_command(Box::new(CopyToBuilder));

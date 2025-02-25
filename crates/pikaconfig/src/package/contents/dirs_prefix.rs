@@ -93,7 +93,7 @@ impl inventory::RenderHelper for DirsPrefixBuilder {
     }
 }
 
-pub fn register(registry: &mut dyn inventory::Registry) {
+pub(super) fn register(registry: &mut dyn inventory::Registry) {
     let parsers = [
         DirsPrefixBuilder {
             command: "audio_prefix",

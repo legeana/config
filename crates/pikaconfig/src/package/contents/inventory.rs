@@ -6,14 +6,14 @@ use tera::Tera;
 
 use super::engine;
 
-pub trait Registry {
+pub(super) trait Registry {
     fn register_command(&mut self, parser: engine::CommandBuilderBox);
     fn register_condition(&mut self, builder: engine::ConditionBuilderBox);
     fn register_with_wrapper(&mut self, builder: engine::WithWrapperBuilderBox);
     fn register_render_helper(&mut self, render_helper: Box<dyn RenderHelper>);
 }
 
-pub trait RenderHelper: Sync + Send {
+pub(super) trait RenderHelper: Sync + Send {
     fn register_render_helper(&self, tera: &mut Tera);
 }
 
@@ -100,7 +100,7 @@ fn registry() -> &'static RegistryImpl {
     })
 }
 
-pub fn commands() -> impl Iterator<Item = &'static engine::CommandBuilderBox> {
+pub(super) fn commands() -> impl Iterator<Item = &'static engine::CommandBuilderBox> {
     registry().commands_order.iter().map(|name| {
         registry()
             .commands
@@ -109,7 +109,7 @@ pub fn commands() -> impl Iterator<Item = &'static engine::CommandBuilderBox> {
     })
 }
 
-pub fn command(name: &str) -> Result<&dyn engine::CommandBuilder> {
+pub(super) fn command(name: &str) -> Result<&dyn engine::CommandBuilder> {
     registry()
         .commands
         .get(name)
@@ -117,7 +117,7 @@ pub fn command(name: &str) -> Result<&dyn engine::CommandBuilder> {
         .map(|p| p.as_ref())
 }
 
-pub fn conditions() -> impl Iterator<Item = &'static engine::ConditionBuilderBox> {
+pub(super) fn conditions() -> impl Iterator<Item = &'static engine::ConditionBuilderBox> {
     registry().conditions_order.iter().map(|name| {
         registry()
             .conditions
@@ -126,7 +126,7 @@ pub fn conditions() -> impl Iterator<Item = &'static engine::ConditionBuilderBox
     })
 }
 
-pub fn condition(name: &str) -> Result<&dyn engine::ConditionBuilder> {
+pub(super) fn condition(name: &str) -> Result<&dyn engine::ConditionBuilder> {
     registry()
         .conditions
         .get(name)
@@ -134,7 +134,7 @@ pub fn condition(name: &str) -> Result<&dyn engine::ConditionBuilder> {
         .map(|p| p.as_ref())
 }
 
-pub fn with_wrappers() -> impl Iterator<Item = &'static engine::WithWrapperBuilderBox> {
+pub(super) fn with_wrappers() -> impl Iterator<Item = &'static engine::WithWrapperBuilderBox> {
     registry().with_wrappers_order.iter().map(|name| {
         registry()
             .with_wrappers
@@ -143,7 +143,7 @@ pub fn with_wrappers() -> impl Iterator<Item = &'static engine::WithWrapperBuild
     })
 }
 
-pub fn with_wrapper(name: &str) -> Result<&dyn engine::WithWrapperBuilder> {
+pub(super) fn with_wrapper(name: &str) -> Result<&dyn engine::WithWrapperBuilder> {
     registry()
         .with_wrappers
         .get(name)
@@ -151,7 +151,7 @@ pub fn with_wrapper(name: &str) -> Result<&dyn engine::WithWrapperBuilder> {
         .map(|p| p.as_ref())
 }
 
-pub fn register_render_helpers(tera: &mut Tera) {
+pub(super) fn register_render_helpers(tera: &mut Tera) {
     for rh in &registry().render_helpers {
         rh.register_render_helper(tera);
     }

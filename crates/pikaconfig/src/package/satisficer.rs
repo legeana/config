@@ -6,7 +6,7 @@ use serde::Deserialize;
 
 use crate::command;
 
-pub trait Satisficer {
+pub(super) trait Satisficer {
     fn is_satisfied(&self) -> Result<bool>;
 }
 
@@ -24,7 +24,7 @@ where
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields, untagged)]
-pub enum DependencySatisficer {
+pub(super) enum DependencySatisficer {
     Command { command: PathBuf },
     AnyCommand { any_command: Vec<PathBuf> },
     AllCommands { all_commands: Vec<PathBuf> },

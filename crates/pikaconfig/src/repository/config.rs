@@ -10,7 +10,7 @@ const REPOSITORY_CONFIG_TOML: &str = "repository.toml";
 /// repository.toml file definition
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
-pub struct Repository {
+pub(super) struct Repository {
     pub requires: Option<tag_criteria::TagCriteria>,
 }
 
@@ -24,7 +24,7 @@ fn load_toml_file(config_path: &Path) -> Result<Repository> {
     load_toml_string(&input).with_context(|| format!("failed to parse {config_path:?}"))
 }
 
-pub fn load_repository(root: &Path) -> Result<Repository> {
+pub(super) fn load_repository(root: &Path) -> Result<Repository> {
     load_toml_file(&root.join(REPOSITORY_CONFIG_TOML))
 }
 

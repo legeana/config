@@ -5,21 +5,25 @@ use crate::annotated_path::AnnotatedPath;
 use super::file_util;
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct FetchOptions {
+pub(super) struct FetchOptions {
     executable: bool,
 }
 
 impl FetchOptions {
-    pub fn new() -> Self {
+    pub(super) fn new() -> Self {
         Self { executable: false }
     }
-    pub fn executable(&mut self, executable: bool) -> &mut Self {
+    pub(super) fn executable(&mut self, executable: bool) -> &mut Self {
         self.executable = executable;
         self
     }
 }
 
-pub fn fetch(url: impl AsRef<str>, dst: impl AnnotatedPath, opts: &FetchOptions) -> Result<()> {
+pub(super) fn fetch(
+    url: impl AsRef<str>,
+    dst: impl AnnotatedPath,
+    opts: &FetchOptions,
+) -> Result<()> {
     let url = url.as_ref();
     log::info!("Fetch: {url:?} -> {dst:?}");
     let mut reader = ureq::get(url)

@@ -1,3 +1,6 @@
+// pub: required by Logos derive macro.
+#![allow(unreachable_pub)]
+
 use logos::Logos;
 use thiserror::Error;
 
