@@ -3,8 +3,6 @@ use std::path::Path;
 use anyhow::{Context, Result};
 use indoc::formatdoc;
 
-use crate::tag_util;
-
 use super::args::Arguments;
 use super::engine;
 use super::inventory;

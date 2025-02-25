@@ -16,7 +16,6 @@ dirs = "6.0"
 git_utils = { path = "../git_utils" }
 glob = "0.3.1"
 indoc = "2.0.1"
-libc = "0.2.147"
 log = "0.4"
 logos = "0.15.0"
 process_utils = { path = "../process_utils" }
@@ -27,6 +26,7 @@ serde_json = "1.0.97"
 sha2 = "0.10.6"
 shellexpand = { version = "3.1", features = ["path"] }
 shlexfmt = { path = "../shlexfmt" }
+tag_util = { path = "../tag_util" }
 tera = { version = "1.19.0", default-features = false }
 thiserror = "2.0"
 toml = "0.8.10"
@@ -47,11 +47,6 @@ features = ["lexer", "unicode"]
 version = "0.22.0"
 default-features = false
 features = ["lexer", "unicode"]
-
-[dependencies.sysinfo]
-version = "0.33.0"
-default-features = false
-features = ["system"]
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"

@@ -2,7 +2,6 @@ use anyhow::{Context, Result};
 use serde::Deserialize;
 
 use crate::string_list::StringList;
-use crate::tag_util;
 
 pub trait Criteria {
     fn is_satisfied(&self) -> Result<bool>;

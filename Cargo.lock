@@ -1076,7 +1076,6 @@ dependencies = [
  "indoc",
  "lalrpop",
  "lalrpop-util",
- "libc",
  "log",
  "logos",
  "pretty_assertions",
@@ -1088,7 +1087,7 @@ dependencies = [
  "sha2",
  "shellexpand",
  "shlexfmt",
- "sysinfo",
+ "tag_util",
  "tera",
  "test-case",
  "thiserror 2.0.11",
@@ -1539,6 +1538,15 @@ dependencies = [
  "memchr",
  "ntapi",
  "windows",
+]
+
+[[package]]
+name = "tag_util"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "libc",
+ "sysinfo",
 ]
 
 [[package]]

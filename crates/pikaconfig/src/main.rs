@@ -5,7 +5,6 @@ use anyhow::{Context, Result};
 use pikaconfig::layout;
 use pikaconfig::module::{Module, Rules};
 use pikaconfig::package;
-use pikaconfig::tag_util;
 use pikaconfig::uninstaller::Uninstaller;
 
 const SQL_REGISTRY: &str = ".install.sqlite";
