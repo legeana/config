@@ -9,4 +9,4 @@ edition = "2024"
 rust-version = "1.85.0"
 
 [workspace.lints.rust]
-unreachable_pub = "forbid"
+unreachable_pub = "deny"
