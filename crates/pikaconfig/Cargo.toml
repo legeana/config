@@ -29,6 +29,7 @@ shlexfmt = { path = "../shlexfmt" }
 tera = { version = "1.19.0", default-features = false }
 thiserror = "2.0"
 toml = "0.8.10"
+unarchiver = { path = "../unarchiver" }
 ureq = "3.0.0"
 url = "2.4.0"
 walkdir = "2"

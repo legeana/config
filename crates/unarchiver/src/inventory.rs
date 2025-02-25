@@ -3,18 +3,18 @@ use std::sync::{Arc, OnceLock};
 
 use anyhow::{Result, anyhow};
 
-use super::{Unarchiver, UnarchiverBox};
+use crate::{Unarchiver, UnarchiverBox};
 
 type UnarchiverArc = Arc<dyn Unarchiver>;
 
 #[derive(Default)]
-pub struct Registry {
+pub(crate) struct Registry {
     unarchivers: HashMap<String, UnarchiverArc>,
     by_extension: HashMap<String, Vec<UnarchiverArc>>,
 }
 
 impl Registry {
-    pub fn register(&mut self, unarchiver: UnarchiverBox) {
+    pub(crate) fn register(&mut self, unarchiver: UnarchiverBox) {
         let name = unarchiver.name();
         let unarchiver: UnarchiverArc = unarchiver.into();
         if let Some(u) = self.unarchivers.insert(name, unarchiver.clone()) {
@@ -45,7 +45,7 @@ fn register_all(registry: &mut Registry) {
     super::unzip::register(registry)
 }
 
-pub fn by_name(name: impl AsRef<str>) -> Result<&'static dyn Unarchiver> {
+pub(crate) fn by_name(name: impl AsRef<str>) -> Result<&'static dyn Unarchiver> {
     let name = name.as_ref();
     registry()
         .unarchivers
@@ -54,7 +54,7 @@ pub fn by_name(name: impl AsRef<str>) -> Result<&'static dyn Unarchiver> {
         .map(|u| u.as_ref())
 }
 
-pub fn by_extension(ext: impl AsRef<str>) -> Result<&'static dyn Unarchiver> {
+pub(crate) fn by_extension(ext: impl AsRef<str>) -> Result<&'static dyn Unarchiver> {
     let ext = ext.as_ref();
     registry()
         .by_extension

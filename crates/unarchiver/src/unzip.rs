@@ -17,6 +17,6 @@ impl super::Unarchiver for Unzip {
     }
 }
 
-pub fn register(registry: &mut super::inventory::Registry) {
+pub(crate) fn register(registry: &mut super::inventory::Registry) {
     registry.register(Box::new(Unzip))
 }

@@ -20,5 +20,4 @@ mod tag_criteria;
 pub mod tag_util;
 mod tera_helper;
 mod tera_helpers;
-mod unarchiver;
 pub mod uninstaller;

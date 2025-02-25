@@ -6,7 +6,6 @@ use registry::Registry;
 
 use crate::annotated_path::AnnotatedPathBox;
 use crate::module::{Module, Rules};
-use crate::unarchiver;
 
 use super::args::Arguments;
 use super::engine;
