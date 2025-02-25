@@ -44,7 +44,6 @@ pub(crate) type Type = FileType<()>;
 pub type FilePath<'a> = FileType<&'a Path>;
 pub type FilePathBuf = FileType<PathBuf>;
 
-#[allow(dead_code)]
 impl Type {
     pub fn with_path(self, path: &Path) -> FilePath {
         match self {
@@ -60,7 +59,6 @@ impl Type {
     }
 }
 
-#[allow(dead_code)]
 impl<'a> FilePath<'a> {
     pub fn new_symlink<T>(path: &'a T) -> Self
     where
@@ -76,7 +74,6 @@ impl<'a> FilePath<'a> {
     }
 }
 
-#[allow(dead_code)]
 impl FilePathBuf {
     pub fn new_symlink(path: impl Into<PathBuf>) -> Self {
         Self::Symlink(path.into())
