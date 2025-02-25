@@ -12,7 +12,6 @@ mod file_util;
 pub mod layout;
 pub mod module;
 pub mod package;
-mod quote;
 pub mod repository;
 mod string_list;
 mod symlink_util;

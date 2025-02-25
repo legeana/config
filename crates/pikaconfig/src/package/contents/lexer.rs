@@ -1,8 +1,6 @@
 use logos::Logos;
 use thiserror::Error;
 
-use crate::quote;
-
 #[derive(Error, Clone, Debug, Default, PartialEq)]
 pub enum LexerError {
     #[error(transparent)]

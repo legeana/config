@@ -1,4 +1,3 @@
-use crate::quote;
 use crate::tera_helper;
 
 pub fn register(tera: &mut tera::Tera) {
