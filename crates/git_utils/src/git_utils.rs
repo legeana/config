@@ -69,7 +69,7 @@ fn get_head(root: &Path) -> Result<String> {
     let rev_parse = cmd!(["git", "rev-parse", HEAD])
         .current_dir(root)
         .output()?;
-    Ok(rev_parse.trim().to_string())
+    Ok(rev_parse.trim().to_owned())
 }
 
 pub fn get_head_ref(root: &Path) -> Result<String> {
@@ -78,7 +78,7 @@ pub fn get_head_ref(root: &Path) -> Result<String> {
         .rsplit_once('/')
         .ok_or_else(|| anyhow!("failed to parse {symbolic_ref}"))?
         .1
-        .to_string())
+        .to_owned())
 }
 
 pub fn get_remote_head_ref(root: &Path) -> Result<String> {
@@ -87,7 +87,7 @@ pub fn get_remote_head_ref(root: &Path) -> Result<String> {
         .rsplit_once('/')
         .ok_or_else(|| anyhow!("failed to parse {symbolic_ref}"))?
         .1
-        .to_string())
+        .to_owned())
 }
 
 fn get_symbolic_ref(root: &Path, name: impl AsRef<str>) -> Result<String> {

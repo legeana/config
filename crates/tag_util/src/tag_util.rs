@@ -110,12 +110,12 @@ impl SystemInfo {
         // TODO: https://github.com/GuillaumeGomez/sysinfo/pull/1460
         // Return [self.distro] + System::distribution_id_like().
         match self.distro().as_str() {
-            "ubuntu" => vec!["ubuntu".to_string(), "debian".to_string()],
-            other => vec![other.to_string()],
+            "ubuntu" => vec!["ubuntu".to_owned(), "debian".to_owned()],
+            other => vec![other.to_owned()],
         }
     }
     fn match_distro_like(&self, want_distro: &str) -> bool {
-        self.distro_like().contains(&want_distro.to_string())
+        self.distro_like().contains(&want_distro.to_owned())
     }
     fn match_uid(&self, want_uid: &str) -> bool {
         match getuid() {
