@@ -88,7 +88,7 @@ impl engine::CommandBuilder for RenderBuilder {
                 render template
         ", command=self.name()}
     }
-    fn build(&self, workdir: &Path, args: &Arguments) -> anyhow::Result<engine::Command> {
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let filename = args.expect_single_arg(self.name())?.clone();
         Ok(engine::Command::new_statement(RenderStatement {
             workdir: workdir.to_owned(),

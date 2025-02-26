@@ -7,7 +7,7 @@ use crate::module::ModuleBox;
 use super::args::Argument;
 use super::ast;
 use super::engine;
-use super::engine::Statement;
+use super::engine::Statement as _;
 
 #[derive(Debug)]
 struct ParsedStatement {

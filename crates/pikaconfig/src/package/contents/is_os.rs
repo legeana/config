@@ -3,7 +3,8 @@ use std::path::Path;
 use crate::tera_helper;
 
 use super::args::Arguments;
-use super::engine::{self, ConditionBuilder};
+use super::engine;
+use super::engine::ConditionBuilder as _;
 use super::inventory;
 
 use anyhow::Result;

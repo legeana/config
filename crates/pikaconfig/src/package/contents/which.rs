@@ -8,7 +8,7 @@ use crate::tera_helper;
 
 use super::args::{Argument, Arguments};
 use super::engine;
-use super::engine::CommandBuilder;
+use super::engine::CommandBuilder as _;
 use super::inventory;
 
 #[derive(Debug)]
