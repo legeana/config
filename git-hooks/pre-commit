@@ -7,5 +7,6 @@ BUILD=--release
 ./setup -d list
 
 cargo fmt --check
-cargo clippy $BUILD -- -Dwarnings  # Treat warnings as errors.
+cargo check --all-targets $BUILD
+cargo clippy --all-targets $BUILD -- -Dwarnings  # Treat warnings as errors.
 cargo test $BUILD
