@@ -92,8 +92,8 @@ impl engine::CommandBuilder for RenderBuilder {
         let filename = args.expect_single_arg(self.name())?.clone();
         Ok(engine::Command::new_statement(RenderStatement {
             workdir: workdir.to_owned(),
-            src: filename.to_owned(),
-            dst: filename.to_owned(),
+            src: filename.clone(),
+            dst: filename,
         }))
     }
 }
