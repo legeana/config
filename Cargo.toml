@@ -51,4 +51,8 @@ str_to_string = "deny"
 
 # https://doc.rust-lang.org/rustc/lints/listing/allowed-by-default.html
 [workspace.lints.rust]
+ambiguous_negative_literals = "deny"
+closure-returning-async-block = "deny"
+let_underscore_drop = "deny"
+redundant_lifetimes = "deny"
 unreachable_pub = "deny"
