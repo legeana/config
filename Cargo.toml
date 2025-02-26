@@ -21,7 +21,6 @@ thiserror = "2.0"
 # https://rust-lang.github.io/rust-clippy/stable/index.html
 [workspace.lints.clippy]
 pedantic = { level = "deny", priority = -1 }
-default_trait_access = "allow" # TODO: enable
 doc_markdown = "allow"
 explicit_into_iter_loop = "allow" # TODO: enable
 explicit_iter_loop = "allow" # TODO: enable

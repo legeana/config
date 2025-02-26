@@ -30,6 +30,7 @@ pub(super) struct Package {
 }
 
 impl Default for Package {
+    #[allow(clippy::default_trait_access)]
     fn default() -> Self {
         Self {
             name: Default::default(),
