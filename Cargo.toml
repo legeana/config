@@ -18,7 +18,10 @@ serde = { version = "1.0", features = ["derive"] }
 test-case = "3.3.1"
 thiserror = "2.0"
 
+# https://rust-lang.github.io/rust-clippy/stable/index.html
 [workspace.lints.clippy]
 str_to_string = "deny"
+
+# https://doc.rust-lang.org/rustc/lints/listing/allowed-by-default.html
 [workspace.lints.rust]
 unreachable_pub = "deny"
