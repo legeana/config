@@ -175,7 +175,7 @@ mod tests {
     #[test_case(finalise)]
     #[test_case(finalise_with_default)]
     fn test_finalise_args(finalise: FinaliseFn) {
-        let cmd = Command::new("").arg("arg-1").args(&["arg-2", "arg-3"]);
+        let cmd = Command::new("").arg("arg-1").args(["arg-2", "arg-3"]);
 
         let std_cmd = finalise(cmd);
 
