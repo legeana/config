@@ -8,10 +8,10 @@ rust-version.workspace = true
 workspace = true
 
 [dependencies]
-anyhow = "1.0"
+anyhow.workspace = true
 cli = { path = "../cli" }
 dir_layout = { path = "../dir_layout" }
-log = "0.4"
+log.workspace = true
 
 [dev-dependencies]
-pretty_assertions = "1.4.0"
+pretty_assertions.workspace = true

@@ -11,7 +11,7 @@ workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0"
+anyhow.workspace = true
 base64 = "0.22.0"
 cli = { path = "../cli" }
 dir_layout = { path = "../dir_layout" }
@@ -19,19 +19,19 @@ dirs = "6.0"
 git_utils = { path = "../git_utils" }
 glob = "0.3.1"
 indoc = "2.0.1"
-log = "0.4"
+log.workspace = true
 logos = "0.15.0"
 process_utils = { path = "../process_utils" }
 quote = { path = "../quote" }
 registry = { path = "../registry" }
-serde = { version = "1.0", features = ["derive"] }
+serde.workspace = true
 serde_json = "1.0.97"
 sha2 = "0.10.6"
 shellexpand = { version = "3.1", features = ["path"] }
 shlexfmt = { path = "../shlexfmt" }
 tag_util = { path = "../tag_util" }
 tera = { version = "1.19.0", default-features = false }
-thiserror = "2.0"
+thiserror.workspace = true
 toml = "0.8.10"
 unarchiver = { path = "../unarchiver" }
 ureq = "3.0.0"

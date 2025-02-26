@@ -8,5 +8,5 @@ rust-version.workspace = true
 workspace = true
 
 [dependencies]
-anyhow = "1.0"
+anyhow.workspace = true
 git_utils = { path = "../git_utils" }
