@@ -287,7 +287,7 @@ mod tests {
         }
     }
 
-    impl<'input> Iterator for TestLexer<'input> {
+    impl Iterator for TestLexer<'_> {
         type Item = Result<Token, LocationError>;
 
         fn next(&mut self) -> Option<Result<Token, LocationError>> {
