@@ -45,7 +45,13 @@ unnecessary_wraps = "allow"
 unreadable_literal = "allow"
 unused_self = "allow"
 # Restriction.
+empty_structs_with_brackets = "deny"
+pub_without_shorthand = "deny"
 str_to_string = "deny"
+string_to_string = "deny"
+tests_outside_test_module = "deny"
+try_err = "deny"
+unneeded_field_pattern = "deny"
 
 # https://doc.rust-lang.org/rustc/lints/listing/allowed-by-default.html
 [workspace.lints.rust]
