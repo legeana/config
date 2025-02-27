@@ -60,7 +60,7 @@ pub fn repositories(root: &Path) -> Result<Vec<Repository>> {
     }
     log::debug!(
         "successfully loaded all repositories in {root:?}: {:?}",
-        result.iter().map(|r| r.name()).collect::<Vec<&str>>()
+        result.iter().map(Repository::name).collect::<Vec<&str>>()
     );
     Ok(result)
 }

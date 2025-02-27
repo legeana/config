@@ -51,7 +51,7 @@ pub(crate) fn by_name(name: impl AsRef<str>) -> Result<&'static dyn Unarchiver> 
         .unarchivers
         .get(name)
         .ok_or_else(|| anyhow!("{name:?} unarchiver does not exist"))
-        .map(|u| u.as_ref())
+        .map(AsRef::as_ref)
 }
 
 pub(crate) fn by_extension(ext: impl AsRef<str>) -> Result<&'static dyn Unarchiver> {

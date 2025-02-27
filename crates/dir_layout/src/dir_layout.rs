@@ -12,7 +12,7 @@ fn read_dir_sorted(path: &Path) -> Result<Vec<DirEntry>> {
         .with_context(|| format!("failed to read directory {path:?}"))?
         .collect::<Result<Vec<_>, _>>()
         .with_context(|| format!("failed to read dir {path:?}"))?;
-    paths.sort_by_key(|de| de.file_name());
+    paths.sort_by_key(DirEntry::file_name);
     Ok(paths)
 }
 

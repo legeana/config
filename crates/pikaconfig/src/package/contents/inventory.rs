@@ -114,7 +114,7 @@ pub(super) fn command(name: &str) -> Result<&dyn engine::CommandBuilder> {
         .commands
         .get(name)
         .ok_or_else(|| anyhow!("unknown command {name}"))
-        .map(|p| p.as_ref())
+        .map(AsRef::as_ref)
 }
 
 pub(super) fn conditions() -> impl Iterator<Item = &'static engine::ConditionBuilderBox> {
@@ -131,7 +131,7 @@ pub(super) fn condition(name: &str) -> Result<&dyn engine::ConditionBuilder> {
         .conditions
         .get(name)
         .ok_or_else(|| anyhow!("unknown condition {name}"))
-        .map(|p| p.as_ref())
+        .map(AsRef::as_ref)
 }
 
 pub(super) fn with_wrappers() -> impl Iterator<Item = &'static engine::WithWrapperBuilderBox> {
@@ -148,7 +148,7 @@ pub(super) fn with_wrapper(name: &str) -> Result<&dyn engine::WithWrapperBuilder
         .with_wrappers
         .get(name)
         .ok_or_else(|| anyhow!("unknown with wrapper {name}"))
-        .map(|p| p.as_ref())
+        .map(AsRef::as_ref)
 }
 
 pub(super) fn register_render_helpers(tera: &mut Tera) {

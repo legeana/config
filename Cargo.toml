@@ -34,7 +34,6 @@ must_use_candidate = "allow"
 needless_pass_by_value = "allow" # TODO: re-evaluate
 needless_raw_string_hashes = "allow"
 option_option = "allow" # TODO: re-evaluate
-redundant_closure_for_method_calls = "allow" # TODO: enable
 return_self_not_must_use = "allow"
 semicolon_if_nothing_returned = "allow" # TODO: enable
 struct_excessive_bools = "allow"
