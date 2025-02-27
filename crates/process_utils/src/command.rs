@@ -22,10 +22,12 @@ impl Command {
             env: EnvOverlay::new(),
         }
     }
+    #[must_use]
     pub fn arg(mut self, arg: impl AsRef<OsStr>) -> Self {
         self.inner.arg(arg);
         self
     }
+    #[must_use]
     pub fn args<I, S>(mut self, args: I) -> Self
     where
         I: IntoIterator<Item = S>,
@@ -34,14 +36,17 @@ impl Command {
         self.inner.args(args);
         self
     }
+    #[must_use]
     pub fn current_dir(mut self, dir: impl AsRef<Path>) -> Self {
         self.current_dir = Some(dir.as_ref().to_path_buf());
         self
     }
+    #[must_use]
     pub fn env(mut self, key: impl AsRef<OsStr>, value: impl AsRef<OsStr>) -> Self {
         self.env.insert(key, value);
         self
     }
+    #[must_use]
     pub fn envs<I, K, V>(mut self, vars: I) -> Self
     where
         I: IntoIterator<Item = (K, V)>,
@@ -53,10 +58,12 @@ impl Command {
         }
         self
     }
+    #[must_use]
     pub fn env_remove(mut self, key: impl AsRef<OsStr>) -> Self {
         self.env.remove(key);
         self
     }
+    #[must_use]
     pub fn env_clear(mut self) -> Self {
         self.env.clear();
         self
