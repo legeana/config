@@ -43,7 +43,7 @@ impl Shell {
         K: AsRef<OsStr>,
         V: AsRef<OsStr>,
     {
-        for (key, value) in vars.into_iter() {
+        for (key, value) in vars {
             self.env.insert(key, value);
         }
     }

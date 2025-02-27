@@ -22,7 +22,6 @@ thiserror = "2.0"
 [workspace.lints.clippy]
 pedantic = { level = "deny", priority = -1 }
 doc_markdown = "allow"
-explicit_into_iter_loop = "allow" # TODO: enable
 explicit_iter_loop = "allow" # TODO: enable
 ignored_unit_patterns = "allow"
 map_unwrap_or = "allow" # TODO: enable
