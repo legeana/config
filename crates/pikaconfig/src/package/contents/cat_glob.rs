@@ -24,7 +24,7 @@ impl Module for CatGlobInto {
         let out_file = std::fs::File::create(self.output.as_path())
             .with_context(|| format!("unable to create {:?}", self.output))?;
         let mut out = std::io::BufWriter::new(out_file);
-        for glob in self.globs.iter() {
+        for glob in &self.globs {
             for entry in glob_iter(glob).with_context(|| format!("failed to glob {glob}"))? {
                 let path = entry.with_context(|| format!("failed to iterate over glob {glob}"))?;
                 let inp_file = std::fs::File::open(&path)

@@ -8,7 +8,7 @@ pub(super) trait Installer {
 
 impl<T: Installer> Installer for Vec<T> {
     fn install(&self, rules: &Rules) -> Result<()> {
-        for installer in self.iter() {
+        for installer in self {
             installer.install(rules)?;
         }
         Ok(())

@@ -34,7 +34,7 @@ fn name_from_path(path: &Path) -> Result<String> {
 
 fn filter_dependencies(dependencies: &[config::Dependency]) -> Result<Vec<String>> {
     let mut deps: Vec<String> = Vec::new();
-    for dep in dependencies.iter() {
+    for dep in dependencies {
         if !dep
             .requires
             .is_satisfied()

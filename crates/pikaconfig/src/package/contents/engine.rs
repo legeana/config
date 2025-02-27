@@ -206,7 +206,7 @@ pub(super) struct VecStatement(pub Vec<StatementBox>);
 impl Statement for VecStatement {
     fn eval(&self, ctx: &mut Context) -> Result<Option<ModuleBox>> {
         let mut modules: Vec<_> = Vec::new();
-        for statement in self.0.iter() {
+        for statement in &self.0 {
             if !ctx.enabled {
                 break;
             }

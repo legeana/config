@@ -57,7 +57,7 @@ struct SubdirsStatement {
 impl engine::Statement for SubdirsStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         let mut modules: Vec<ModuleBox> = Vec::new();
-        for subdir in self.subdirs.iter() {
+        for subdir in &self.subdirs {
             if let Some(m) = subdir.eval(ctx)? {
                 modules.push(m);
             }

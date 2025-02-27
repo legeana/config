@@ -51,7 +51,7 @@ fn install(rules: &Rules, root: &Path) -> Result<()> {
 
 fn system_install(rules: &Rules, root: &Path) -> Result<()> {
     let repos = layout::repositories(root)?;
-    for repo in repos.iter() {
+    for repo in &repos {
         repo.system_install(rules)
             .with_context(|| format!("failed to system_install {}", repo.name()))?;
     }
@@ -113,7 +113,7 @@ fn main() -> Result<()> {
         cli::Commands::List => {
             let repos = layout::repositories(&root)
                 .with_context(|| format!("failed to get repositories from {root:?}"))?;
-            for repo in repos.iter() {
+            for repo in &repos {
                 let status = if repo.enabled()? {
                     "[enabled]"
                 } else {
