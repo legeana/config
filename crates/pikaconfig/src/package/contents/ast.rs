@@ -23,6 +23,7 @@ impl Manifest {
     }
 }
 
+#[allow(clippy::enum_variant_names)]
 #[derive(Debug, PartialEq)]
 pub(super) enum Statement {
     Command(Invocation),

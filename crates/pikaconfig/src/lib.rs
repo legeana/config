@@ -1,10 +1,3 @@
-#![allow(
-    // This lint is too opinionated.
-    // In situations where enum name matches outside class
-    // the consistency is more important than repetition.
-    clippy::enum_variant_names,
-)]
-
 mod annotated_path;
 mod command;
 mod empty_struct;
