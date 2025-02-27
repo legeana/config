@@ -28,7 +28,7 @@ impl Repository {
             .into();
         let config = config::load_repository(&root)
             .with_context(|| format!("failed to load repository {root:?} config"))?;
-        let mut repository = Repository {
+        let mut repository = Self {
             root,
             name,
             config,

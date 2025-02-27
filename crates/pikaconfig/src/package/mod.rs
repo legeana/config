@@ -82,7 +82,7 @@ impl Package {
         } else {
             module::dummy_box()
         };
-        Ok(Package {
+        Ok(Self {
             name: pkgconfig.name.unwrap_or(backup_name),
             criteria,
             modules: vec![

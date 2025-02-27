@@ -42,6 +42,7 @@ use crate::package::contents::engine::{Statement, StatementBox};
 
 lalrpop_mod!(
     #[allow(clippy::pedantic)]
+    #[allow(clippy::use_self)]
     #[allow(unused_qualifications)]
     ast_parser,
     "/package/contents/ast_parser.rs"
@@ -89,7 +90,7 @@ impl ConfigurationStatement {
             parser::parse(&root, &manifest)
                 .with_context(|| format!("failed to load {manifest:?}"))?,
         );
-        Ok(Box::new(ConfigurationStatement { root, statements }))
+        Ok(Box::new(Self { root, statements }))
     }
     pub(super) fn verify(root: &Path) -> Result<()> {
         let manifest = root.join(MANIFEST);

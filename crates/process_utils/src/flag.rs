@@ -29,8 +29,8 @@ where
 /// Arguments can be converted into OsString.
 impl<N, V> From<FlagArg<N, V>> for OsString
 where
-    N: Into<OsString>,
-    V: Into<OsString>,
+    N: Into<Self>,
+    V: Into<Self>,
 {
     fn from(value: FlagArg<N, V>) -> Self {
         for_both!(value.0, v => v.into())

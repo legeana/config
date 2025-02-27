@@ -80,21 +80,21 @@ pub enum Token {
 impl std::fmt::Display for Token {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Token::EndOfInput => write!(f, "Token::EndOfInput"),
-            Token::Space => write!(f, "Token::Space"),
-            Token::Newline => write!(f, "Token::Newline"),
-            Token::SingleQuotedLiteral(s) => write!(f, "Token::SingleQuotedLiteral({s:?})"),
-            Token::DoubleQuotedLiteral(s) => write!(f, "Token::DoubleQuotedLiteral({s:?})"),
-            Token::UnquotedLiteral(s) => write!(f, "Token::UnquotedLiteral({s:?})"),
-            Token::If => write!(f, "Token::If"),
-            Token::Else => write!(f, "Token::Else"),
-            Token::Begin => write!(f, "Token::Begin"),
-            Token::End => write!(f, "Token::End"),
-            Token::SubstitutionBegin => write!(f, "Token::SubstitutionBegin"),
-            Token::SubstitutionEnd => write!(f, "Token::SubstitutionEnd"),
-            Token::Assign => write!(f, "Token::Assign"),
-            Token::Not => write!(f, "Token::Not"),
-            Token::With => write!(f, "Token::With"),
+            Self::EndOfInput => write!(f, "Token::EndOfInput"),
+            Self::Space => write!(f, "Token::Space"),
+            Self::Newline => write!(f, "Token::Newline"),
+            Self::SingleQuotedLiteral(s) => write!(f, "Token::SingleQuotedLiteral({s:?})"),
+            Self::DoubleQuotedLiteral(s) => write!(f, "Token::DoubleQuotedLiteral({s:?})"),
+            Self::UnquotedLiteral(s) => write!(f, "Token::UnquotedLiteral({s:?})"),
+            Self::If => write!(f, "Token::If"),
+            Self::Else => write!(f, "Token::Else"),
+            Self::Begin => write!(f, "Token::Begin"),
+            Self::End => write!(f, "Token::End"),
+            Self::SubstitutionBegin => write!(f, "Token::SubstitutionBegin"),
+            Self::SubstitutionEnd => write!(f, "Token::SubstitutionEnd"),
+            Self::Assign => write!(f, "Token::Assign"),
+            Self::Not => write!(f, "Token::Not"),
+            Self::With => write!(f, "Token::With"),
         }
     }
 }
@@ -176,13 +176,13 @@ struct LocationRange {
 
 impl LocationRange {
     fn new_pair(start: Location, end: Location) -> Self {
-        LocationRange {
+        Self {
             start,
             end: Some(end),
         }
     }
     fn new_single(start: Location) -> Self {
-        LocationRange { start, end: None }
+        Self { start, end: None }
     }
 }
 

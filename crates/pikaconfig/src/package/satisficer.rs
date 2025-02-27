@@ -37,9 +37,9 @@ pub(super) enum DependencySatisficer {
 impl Satisficer for DependencySatisficer {
     fn is_satisfied(&self) -> Result<bool> {
         match self {
-            DependencySatisficer::Command { command } => command::is_command(command)
+            Self::Command { command } => command::is_command(command)
                 .with_context(|| format!("failed to check if {command:?} is available")),
-            DependencySatisficer::AnyCommand { any_command } => {
+            Self::AnyCommand { any_command } => {
                 for cmd in any_command {
                     if command::is_command(cmd)
                         .with_context(|| format!("failed to check if {cmd:?} is available"))?
@@ -49,7 +49,7 @@ impl Satisficer for DependencySatisficer {
                 }
                 Ok(false)
             }
-            DependencySatisficer::AllCommands { all_commands } => {
+            Self::AllCommands { all_commands } => {
                 for cmd in all_commands {
                     if !command::is_command(cmd)
                         .with_context(|| format!("failed to check if {cmd:?} is available"))?
@@ -59,13 +59,13 @@ impl Satisficer for DependencySatisficer {
                 }
                 Ok(true)
             }
-            DependencySatisficer::File { file } => {
+            Self::File { file } => {
                 let path = shellexpand::path::tilde(file);
                 Ok(path
                     .try_exists()
                     .with_context(|| format!("failed to check if {file:?} exists"))?)
             }
-            DependencySatisficer::AnyFile { any_file } => {
+            Self::AnyFile { any_file } => {
                 for path in any_file {
                     if path
                         .try_exists()
@@ -76,7 +76,7 @@ impl Satisficer for DependencySatisficer {
                 }
                 Ok(false)
             }
-            DependencySatisficer::AllFiles { all_files } => {
+            Self::AllFiles { all_files } => {
                 for path in all_files {
                     if !path
                         .try_exists()
@@ -87,7 +87,7 @@ impl Satisficer for DependencySatisficer {
                 }
                 Ok(true)
             }
-            DependencySatisficer::PkgConfig { pkg_config } => {
+            Self::PkgConfig { pkg_config } => {
                 Ok(cmd!(["pkg-config", "--", pkg_config]).run().is_ok())
             }
         }

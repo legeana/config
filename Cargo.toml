@@ -24,6 +24,7 @@ thiserror = "2.0"
 cognitive_complexity = "deny"
 suspicious_operation_groupings = "deny"
 trait_duplication_in_bounds = "deny"
+use_self = "deny"
 useless_let_if_seq = "deny"
 # Pedantic.
 pedantic = { level = "deny", priority = -1 }

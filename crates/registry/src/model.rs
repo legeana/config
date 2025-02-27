@@ -44,8 +44,8 @@ impl FromSql for FilePurpose {
             return Err(FromSqlError::InvalidType);
         };
         match value {
-            v if v == FilePurpose::User as i64 => Ok(FilePurpose::User),
-            v if v == FilePurpose::State as i64 => Ok(FilePurpose::State),
+            v if v == Self::User as i64 => Ok(Self::User),
+            v if v == Self::State as i64 => Ok(Self::State),
             unknown => Err(FromSqlError::OutOfRange(unknown)),
         }
     }
@@ -79,7 +79,7 @@ impl FromSql for SqlPathBuf {
         let decoded = os_str::from_vec(blob.to_vec())
             .context("failed to parse path")
             .map_err(|e| FromSqlError::Other(e.into()))?;
-        Ok(SqlPathBuf(decoded.into()))
+        Ok(Self(decoded.into()))
     }
 }
 
@@ -99,8 +99,8 @@ impl FromSql for file_type::Type {
             return Err(FromSqlError::InvalidType);
         };
         match value {
-            1 => Ok(file_type::Type::Symlink(())),
-            2 => Ok(file_type::Type::Directory(())),
+            1 => Ok(Self::Symlink(())),
+            2 => Ok(Self::Directory(())),
             unknown => Err(FromSqlError::OutOfRange(unknown)),
         }
     }

@@ -68,11 +68,11 @@ pub(super) enum WingetDependency {
 impl WingetDependency {
     pub(super) fn to_config(&self) -> WingetConfig {
         match self {
-            WingetDependency::WingetSource(p) => WingetConfig {
+            Self::WingetSource(p) => WingetConfig {
                 packages: p.clone(),
                 source: "winget".to_owned(),
             },
-            WingetDependency::Config(cfg) => cfg.clone(),
+            Self::Config(cfg) => cfg.clone(),
         }
     }
 }
@@ -118,11 +118,11 @@ pub(super) enum BrewDependency {
 impl BrewDependency {
     pub(super) fn to_config(&self) -> BrewConfig {
         match self {
-            BrewDependency::Formulas(formulas) => BrewConfig {
+            Self::Formulas(formulas) => BrewConfig {
                 formulas: Some(formulas.clone()),
                 ..Default::default()
             },
-            BrewDependency::Config(config) => config.clone(),
+            Self::Config(config) => config.clone(),
         }
     }
 }

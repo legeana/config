@@ -30,8 +30,8 @@ where
 {
     fn eq(&self, other: &FileType<O>) -> bool {
         match (self, other) {
-            (FileType::Symlink(s), FileType::Symlink(o)) => s == o,
-            (FileType::Directory(s), FileType::Directory(o)) => s == o,
+            (Self::Symlink(s), FileType::Symlink(o)) => s == o,
+            (Self::Directory(s), FileType::Directory(o)) => s == o,
             _ => false,
         }
     }

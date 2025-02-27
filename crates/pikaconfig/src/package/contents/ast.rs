@@ -12,7 +12,7 @@ pub(super) struct Manifest {
 }
 
 impl Manifest {
-    pub(super) fn parse(location: impl AsRef<Path>, input: impl AsRef<str>) -> Result<Manifest> {
+    pub(super) fn parse(location: impl AsRef<Path>, input: impl AsRef<str>) -> Result<Self> {
         let location = location.as_ref();
         let lex = lexer::LalrpopLexer::new(input.as_ref());
         let parser = super::ast_parser::ManifestParser::new();
