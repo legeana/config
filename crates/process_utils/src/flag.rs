@@ -96,9 +96,9 @@ mod tests {
 
     use super::*;
 
-    #[test_case("--test", None, vec![])]
-    #[test_case("--test", Some("value"), vec!["--test", "value"])]
-    fn test_as_ref(name: &str, value: Option<&str>, want: Vec<&str>) {
+    #[test_case("--test", None, &[])]
+    #[test_case("--test", Some("value"), &["--test", "value"])]
+    fn test_as_ref(name: &str, value: Option<&str>, want: &[&str]) {
         let args = opt_flag(name, value);
 
         let result: Vec<_> = args
@@ -108,9 +108,9 @@ mod tests {
         assert_eq!(result, want);
     }
 
-    #[test_case("--test", None, vec![])]
-    #[test_case("--test", Some("value"), vec!["--test", "value"])]
-    fn test_into(name: &str, value: Option<&str>, want: Vec<&str>) {
+    #[test_case("--test", None, &[])]
+    #[test_case("--test", Some("value"), &["--test", "value"])]
+    fn test_into(name: &str, value: Option<&str>, want: &[&str]) {
         let args = opt_flag(name, value);
 
         let result: Vec<_> = args.into_iter().map(OsString::from).collect();
