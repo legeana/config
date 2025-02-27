@@ -42,7 +42,7 @@ fn registry() -> &'static Registry {
 }
 
 fn register_all(registry: &mut Registry) {
-    super::unzip::register(registry)
+    super::unzip::register(registry);
 }
 
 pub(crate) fn by_name(name: impl AsRef<str>) -> Result<&'static dyn Unarchiver> {
