@@ -38,7 +38,6 @@ return_self_not_must_use = "allow"
 semicolon_if_nothing_returned = "allow" # TODO: enable
 struct_excessive_bools = "allow"
 too_many_lines = "allow"
-uninlined_format_args = "allow" # TODO: enable
 unnecessary_wraps = "allow"
 unreadable_literal = "allow"
 unused_self = "allow"

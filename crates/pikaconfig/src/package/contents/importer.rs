@@ -58,7 +58,7 @@ fn parse_import_tree<W: Write>(prefix: &Path, line: &str, out: &mut W) -> Result
             .parent()
             .ok_or_else(|| anyhow!("failed to get parent of {include_file:?}"))?;
         render(subprefix, include_file, out)
-            .with_context(|| format!("failed to import tree {}", arg))?;
+            .with_context(|| format!("failed to import tree {arg}"))?;
     }
     Ok(true)
 }
@@ -70,7 +70,7 @@ fn parse_line<W: Write>(prefix: &Path, line: &str, out: &mut W) -> Result<()> {
     if parse_import_tree(prefix, line, out)? {
         return Ok(());
     }
-    writeln!(out, "{}", line).with_context(|| "failed to write line")?;
+    writeln!(out, "{line}").with_context(|| "failed to write line")?;
     Ok(())
 }
 

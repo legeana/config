@@ -84,9 +84,9 @@ impl engine::CommandBuilder for SubdirsBuilder {
         let mut subdirs: Vec<SubdirStatement> = Vec::new();
         for entry in workdir
             .read_dir()
-            .with_context(|| format!("failed to read {:?}", workdir))?
+            .with_context(|| format!("failed to read {workdir:?}"))?
         {
-            let entry = entry.with_context(|| format!("failed to read {:?}", workdir))?;
+            let entry = entry.with_context(|| format!("failed to read {workdir:?}"))?;
             let md = std::fs::metadata(entry.path())
                 .with_context(|| format!("failed to read metadata for {:?}", entry.path()))?;
             if !md.is_dir() {

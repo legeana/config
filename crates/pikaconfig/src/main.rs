@@ -107,7 +107,7 @@ fn main() -> Result<()> {
         }
         cli::Commands::Tags => {
             for tag in tag_util::tags().context("failed to get tags")? {
-                println!("{}", tag);
+                println!("{tag}");
             }
         }
         cli::Commands::List => {
