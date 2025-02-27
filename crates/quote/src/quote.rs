@@ -182,7 +182,7 @@ mod tests {
                 text: r#""hello"world"#.to_owned()
             })
         );
-        assert_eq!(unquote_impl(""), S::Error(E::NoQuotes("".to_owned())));
+        assert_eq!(unquote_impl(""), S::Error(E::NoQuotes(String::new())));
         assert_eq!(
             unquote_impl(r#"hello"#),
             S::Error(E::BeforeInit {
