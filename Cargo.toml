@@ -47,6 +47,7 @@ unused_self = "allow"
 # Restriction.
 empty_structs_with_brackets = "deny"
 pub_without_shorthand = "deny"
+shadow_unrelated = "deny"
 str_to_string = "deny"
 string_to_string = "deny"
 tests_outside_test_module = "deny"

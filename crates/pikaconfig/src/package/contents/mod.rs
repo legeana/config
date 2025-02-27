@@ -42,6 +42,7 @@ use crate::package::contents::engine::{Statement, StatementBox};
 
 lalrpop_mod!(
     #[allow(clippy::pedantic)]
+    #[allow(clippy::shadow_unrelated)]
     #[allow(clippy::use_self)]
     #[allow(unused_qualifications)]
     ast_parser,
