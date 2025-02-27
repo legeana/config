@@ -171,8 +171,8 @@ impl_wrap!(WrappedModule, (self.wrap), (self.module));
 
 pub(crate) fn wrap<T: Module + 'static>(module: T, error_context: String) -> ModuleBox {
     Box::new(WrappedModule {
-        error_context,
         module,
+        error_context,
     })
 }
 
