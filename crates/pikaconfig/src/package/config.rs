@@ -1,5 +1,3 @@
-#![allow(clippy::bool_assert_comparison)]
-
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context as _, Result};
