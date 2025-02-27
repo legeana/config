@@ -34,7 +34,7 @@ mod which;
 
 use std::path::{Path, PathBuf};
 
-use anyhow::{Context, Result};
+use anyhow::{Context as _, Result};
 use lalrpop_util::lalrpop_mod;
 
 use crate::module::{self, ModuleBox};

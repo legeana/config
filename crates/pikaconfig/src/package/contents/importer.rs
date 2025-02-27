@@ -1,4 +1,4 @@
-use std::io::{BufRead, BufReader, BufWriter};
+use std::io::{BufRead as _, BufReader, BufWriter};
 use std::path::{Path, PathBuf};
 use std::{fs::File, io::Write};
 
@@ -10,7 +10,7 @@ use super::engine;
 use super::inventory;
 use super::local_state;
 
-use anyhow::{Context, Result, anyhow};
+use anyhow::{Context as _, Result, anyhow};
 use indoc::formatdoc;
 use registry::Registry;
 use walkdir::WalkDir;

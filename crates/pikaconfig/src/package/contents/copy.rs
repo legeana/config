@@ -8,7 +8,7 @@ use super::engine;
 use super::inventory;
 use super::local_state;
 
-use anyhow::{Context, Result, anyhow};
+use anyhow::{Context as _, Result, anyhow};
 use indoc::formatdoc;
 use registry::Registry;
 

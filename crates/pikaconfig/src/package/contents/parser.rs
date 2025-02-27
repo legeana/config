@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::{Context, Result, bail};
+use anyhow::{Context as _, Result, bail};
 
 use crate::module::ModuleBox;
 

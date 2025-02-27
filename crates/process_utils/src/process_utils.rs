@@ -1,6 +1,6 @@
 use std::process::Command;
 
-use anyhow::{Context, Error, Result, anyhow};
+use anyhow::{Context as _, Error, Result, anyhow};
 
 fn pretty_args(cmd: &Command) -> String {
     let mut result: Vec<String> = Vec::new();

@@ -7,7 +7,7 @@ use super::engine;
 use super::file_util;
 use super::inventory;
 
-use anyhow::{Context, Result};
+use anyhow::{Context as _, Result};
 use indoc::formatdoc;
 use registry::Registry;
 use walkdir::WalkDir;

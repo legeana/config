@@ -1,11 +1,11 @@
 use std::path::Path;
 
-use anyhow::{Context, Result};
+use anyhow::{Context as _, Result};
 
 use pikaconfig::layout;
-use pikaconfig::module::{Module, Rules};
+use pikaconfig::module::{Module as _, Rules};
 use pikaconfig::package;
-use pikaconfig::uninstaller::Uninstaller;
+use pikaconfig::uninstaller::Uninstaller as _;
 
 const SQL_REGISTRY: &str = ".install.sqlite";
 

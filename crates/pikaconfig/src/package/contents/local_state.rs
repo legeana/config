@@ -1,10 +1,10 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::{Context, Result, anyhow};
-use base64::Engine;
+use anyhow::{Context as _, Result, anyhow};
+use base64::Engine as _;
 use base64::engine::general_purpose::URL_SAFE;
 use registry::Registry;
-use sha2::{Digest, Sha256};
+use sha2::{Digest as _, Sha256};
 
 use crate::annotated_path::{AnnotatedPath, AnnotatedPathBox};
 use crate::module::{Module, Rules};

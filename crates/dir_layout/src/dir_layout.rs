@@ -1,7 +1,7 @@
 use std::fs::DirEntry;
 use std::path::{Path, PathBuf};
 
-use anyhow::{Context, Result};
+use anyhow::{Context as _, Result};
 
 const APPS: &str = "apps";
 const OVERLAY: &str = "overlay.d";

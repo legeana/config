@@ -48,7 +48,7 @@ mod windows {
 #[cfg(unix)]
 mod platform {
     use std::ffi::OsString;
-    use std::os::unix::ffi::OsStringExt;
+    use std::os::unix::ffi::OsStringExt as _;
 
     use anyhow::Result;
 
@@ -64,8 +64,8 @@ mod platform {
 #[cfg(windows)]
 mod platform {
     use std::ffi::OsString;
-    use std::os::windows::ffi::OsStrExt;
-    use std::os::windows::ffi::OsStringExt;
+    use std::os::windows::ffi::OsStrExt as _;
+    use std::os::windows::ffi::OsStringExt as _;
 
     use anyhow::Result;
 

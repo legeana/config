@@ -7,12 +7,12 @@ mod user;
 
 use std::path::{Path, PathBuf};
 
-use anyhow::{Context, Result, anyhow};
+use anyhow::{Context as _, Result, anyhow};
 use registry::Registry;
 
 use crate::module::{self, Module, ModuleBox, Rules};
 use crate::package::installer::Installer;
-use crate::tag_criteria::{self, Criteria};
+use crate::tag_criteria::{self, Criteria as _};
 
 pub use contents::help as manifest_help;
 

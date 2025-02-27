@@ -1,6 +1,6 @@
 use std::{collections::HashMap, marker::PhantomData};
 
-use anyhow::{Context, Result};
+use anyhow::{Context as _, Result};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 use serde::de::value::MapDeserializer;

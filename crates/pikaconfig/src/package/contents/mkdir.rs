@@ -6,7 +6,7 @@ use super::args::{Argument, Arguments};
 use super::engine;
 use super::inventory;
 
-use anyhow::{Context, Result};
+use anyhow::{Context as _, Result};
 use indoc::formatdoc;
 use registry::{FilePath, Registry};
 

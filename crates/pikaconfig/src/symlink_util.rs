@@ -2,7 +2,7 @@ use std::fs;
 use std::io;
 use std::path::Path;
 
-use anyhow::{Context, Result, anyhow};
+use anyhow::{Context as _, Result, anyhow};
 
 pub(crate) struct Metadata {
     metadata: fs::Metadata,
@@ -19,7 +19,7 @@ impl Metadata {
     }
     #[cfg(windows)]
     pub(crate) fn is_symlink_file(&self) -> bool {
-        use std::os::windows::fs::FileTypeExt;
+        use std::os::windows::fs::FileTypeExt as _;
         self.metadata.file_type().is_symlink_file()
     }
     #[cfg(unix)]
@@ -28,7 +28,7 @@ impl Metadata {
     }
     #[cfg(windows)]
     pub(crate) fn is_symlink_dir(&self) -> bool {
-        use std::os::windows::fs::FileTypeExt;
+        use std::os::windows::fs::FileTypeExt as _;
         self.metadata.file_type().is_symlink_dir()
     }
 }

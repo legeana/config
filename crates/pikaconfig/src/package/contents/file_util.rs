@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::Path;
 
-use anyhow::{Context, Result, anyhow};
+use anyhow::{Context as _, Result, anyhow};
 use registry::{FilePath, Registry};
 
 use crate::file_util;
@@ -43,7 +43,7 @@ pub(super) fn make_symlink(registry: &mut dyn Registry, src: &Path, dst: &Path) 
 
 #[cfg(unix)]
 pub(super) fn set_file_executable(f: &fs::File) -> Result<()> {
-    use std::os::unix::fs::PermissionsExt;
+    use std::os::unix::fs::PermissionsExt as _;
     let metadata = f.metadata()?;
     let mut perm = metadata.permissions();
     perm.set_mode(perm.mode() | 0o111);
@@ -53,7 +53,7 @@ pub(super) fn set_file_executable(f: &fs::File) -> Result<()> {
 
 #[cfg(unix)]
 pub(super) fn set_path_executable(path: &Path) -> Result<()> {
-    use std::os::unix::fs::PermissionsExt;
+    use std::os::unix::fs::PermissionsExt as _;
     let metadata = path.metadata()?;
     let mut perm = metadata.permissions();
     perm.set_mode(perm.mode() | 0o111);

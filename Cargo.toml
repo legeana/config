@@ -53,6 +53,7 @@ string_to_string = "deny"
 tests_outside_test_module = "deny"
 try_err = "deny"
 unneeded_field_pattern = "deny"
+unused_trait_names = "deny"
 
 # https://doc.rust-lang.org/rustc/lints/listing/allowed-by-default.html
 [workspace.lints.rust]

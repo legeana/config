@@ -1,4 +1,4 @@
-use std::io::Write;
+use std::io::Write as _;
 use std::path::Path;
 
 use crate::annotated_path::AnnotatedPathBox;
@@ -9,7 +9,7 @@ use super::engine;
 use super::inventory;
 use super::local_state;
 
-use anyhow::{Context, Result, anyhow};
+use anyhow::{Context as _, Result, anyhow};
 use glob::glob as glob_iter;
 use indoc::formatdoc;
 use registry::Registry;

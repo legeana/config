@@ -1,10 +1,10 @@
 use std::path::Path;
 
-use anyhow::{Context, Result};
+use anyhow::{Context as _, Result};
 
 use super::connection::AppConnection;
 use super::model::{FilePurpose, UpdateId};
-use super::queries::AppQueries;
+use super::queries::AppQueries as _;
 use super::{FilePath, FilePathBuf, ImmutableRegistry, Registry};
 
 #[derive(Debug)]

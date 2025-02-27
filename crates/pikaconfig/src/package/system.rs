@@ -1,13 +1,13 @@
-use anyhow::{Context, Result};
+use anyhow::{Context as _, Result};
 use process_utils::cmd;
 
 use crate::command::is_command;
 use crate::module::{Module, Rules};
-use crate::tag_criteria::Criteria;
+use crate::tag_criteria::Criteria as _;
 
 use super::Installer;
 use super::config;
-use super::satisficer::{DependencySatisficer, Satisficer};
+use super::satisficer::{DependencySatisficer, Satisficer as _};
 
 #[derive(Default)]
 pub(super) struct SystemDependency {

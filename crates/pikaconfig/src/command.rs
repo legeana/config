@@ -1,6 +1,6 @@
 use std::ffi::OsStr;
 
-use anyhow::{Context, Result};
+use anyhow::{Context as _, Result};
 
 pub(crate) fn is_command<T: AsRef<OsStr> + std::fmt::Debug>(cmd: T) -> Result<bool> {
     match which::which(&cmd) {

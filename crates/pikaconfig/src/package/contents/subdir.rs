@@ -1,7 +1,7 @@
 use std::path::Path;
 use std::path::PathBuf;
 
-use anyhow::{Context, Result};
+use anyhow::{Context as _, Result};
 use indoc::formatdoc;
 
 use crate::module::ModuleBox;

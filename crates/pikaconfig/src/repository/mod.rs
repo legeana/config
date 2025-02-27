@@ -3,12 +3,12 @@ mod config;
 use std::ffi::OsStr;
 use std::path::PathBuf;
 
-use anyhow::{Context, Result, anyhow};
+use anyhow::{Context as _, Result, anyhow};
 use registry::Registry;
 
 use crate::module::{Module, Rules};
 use crate::package::Package;
-use crate::tag_criteria::Criteria;
+use crate::tag_criteria::Criteria as _;
 
 pub use config::is_repository_dir;
 

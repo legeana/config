@@ -1,7 +1,7 @@
 use std::env;
 use std::path::PathBuf;
 
-use anyhow::{Context, Result};
+use anyhow::{Context as _, Result};
 use clap::{Parser, Subcommand};
 
 const CONFIG_ROOT_ENV: &str = "PIKACONFIG_CONFIG_ROOT";

@@ -1,4 +1,4 @@
-use anyhow::{Context, Result};
+use anyhow::{Context as _, Result};
 use rusqlite::{Connection, named_params};
 
 use super::connection::AppConnection;
@@ -142,7 +142,7 @@ mod tests {
     use pretty_assertions::assert_eq;
     use test_case::test_case;
 
-    use crate::row_queries::{FileRow, RowQueries, UpdateRow};
+    use crate::row_queries::{FileRow, RowQueries as _, UpdateRow};
 
     use super::*;
 
