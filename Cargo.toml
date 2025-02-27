@@ -20,6 +20,12 @@ thiserror = "2.0"
 
 # https://rust-lang.github.io/rust-clippy/stable/index.html
 [workspace.lints.clippy]
+# Nursery.
+cognitive_complexity = "deny"
+suspicious_operation_groupings = "deny"
+trait_duplication_in_bounds = "deny"
+useless_let_if_seq = "deny"
+# Pedantic.
 pedantic = { level = "deny", priority = -1 }
 doc_markdown = "allow"
 ignored_unit_patterns = "allow"
