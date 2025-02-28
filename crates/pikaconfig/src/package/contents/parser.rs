@@ -62,14 +62,18 @@ struct IfClauseStatement {
     statements: engine::VecStatement,
 }
 
+enum IfClauseAction {
+    Execute(Option<ModuleBox>),
+    TryNext,
+}
+
 impl IfClauseStatement {
-    /// Returns Some(_) if condition is true, None otherwise (try next IfClause).
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<Option<ModuleBox>>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<IfClauseAction> {
         if self.cond.eval(ctx)? {
             let opt_mod = self.statements.eval(ctx)?;
-            Ok(Some(opt_mod))
+            Ok(IfClauseAction::Execute(opt_mod))
         } else {
-            Ok(None)
+            Ok(IfClauseAction::TryNext)
         }
     }
 }
@@ -83,8 +87,9 @@ struct IfStatement {
 impl engine::Statement for IfStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         for if_clause in &self.if_clauses {
-            if let Some(opt_mod) = if_clause.eval(ctx)? {
-                return Ok(opt_mod);
+            match if_clause.eval(ctx)? {
+                IfClauseAction::Execute(opt_mod) => return Ok(opt_mod),
+                IfClauseAction::TryNext => continue,
             }
         }
         self.else_clause.eval(ctx)
