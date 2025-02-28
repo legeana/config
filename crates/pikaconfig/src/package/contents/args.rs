@@ -97,9 +97,7 @@ impl Argument {
 impl std::fmt::Display for Argument {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let s = match self {
-            Self::Raw(s) => s,
-            Self::OnlyVars(s) => s,
-            Self::VarsAndHome(s) => s,
+            Self::Raw(s) | Self::OnlyVars(s) | Self::VarsAndHome(s) => s,
         };
         write!(f, "{}", shlexfmt::quote(s))
     }

@@ -12,8 +12,7 @@ where
 {
     pub fn path(&self) -> &Path {
         match self {
-            Self::Symlink(p) => p.as_ref(),
-            Self::Directory(p) => p.as_ref(),
+            Self::Directory(p) | Self::Symlink(p) => p.as_ref(),
         }
     }
     pub fn file_type(&self) -> Type {
@@ -30,8 +29,8 @@ where
 {
     fn eq(&self, other: &FileType<O>) -> bool {
         match (self, other) {
-            (Self::Symlink(s), FileType::Symlink(o)) => s == o,
-            (Self::Directory(s), FileType::Directory(o)) => s == o,
+            (Self::Directory(s), FileType::Directory(o))
+            | (Self::Symlink(s), FileType::Symlink(o)) => s == o,
             _ => false,
         }
     }
