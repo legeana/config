@@ -29,7 +29,6 @@ useless_let_if_seq = "deny"
 # Pedantic.
 pedantic = { level = "deny", priority = -1 }
 doc_markdown = "allow"
-ignored_unit_patterns = "allow"
 map_unwrap_or = "allow" # TODO: enable
 missing_errors_doc = "allow"
 missing_panics_doc = "allow"

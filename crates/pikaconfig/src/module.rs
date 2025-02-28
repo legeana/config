@@ -16,7 +16,7 @@ impl Rules {
         F: FnOnce() -> Result<()>,
     {
         match f() {
-            Ok(_) => Ok(()),
+            Ok(()) => Ok(()),
             Err(err) => {
                 if self.keep_going {
                     log::error!("{err:?}");

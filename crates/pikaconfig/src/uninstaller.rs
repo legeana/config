@@ -45,7 +45,7 @@ where
 
 fn remove_symlink(path: &Path) -> Result<()> {
     match file_util::skip_not_found(symlink_util::remove(path)) {
-        Ok(Some(_)) => {}
+        Ok(Some(())) => {}
         Ok(None) => {
             log::debug!("Nothing to remove: {path:?}");
             return Ok(());
