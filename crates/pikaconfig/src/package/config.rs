@@ -75,7 +75,7 @@ impl WingetDependency {
     }
 }
 
-/// SystemDependency doesn't consider missing package manager a failure.
+/// `SystemDependency` doesn't consider missing package manager a failure.
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub(super) struct SystemDependency {
@@ -88,7 +88,7 @@ pub(super) struct SystemDependency {
     pub winget: Option<WingetDependency>,
     /// Satisfaction criteria.
     /// Will skip this dependency if met.
-    /// Rules::force_update will force this dependency to be updated.
+    /// `Rules::force_update` will force this dependency to be updated.
     pub wants: Option<DependencySatisficer>,
     /// Custom multi-line shell script.
     /// Use requires for platform selection.
@@ -199,7 +199,7 @@ pub(super) struct UserDependency {
     pub requires: Option<tag_criteria::TagCriteria>,
     /// Satisfaction criteria.
     /// Will skip this dependency if met.
-    /// Rules::force_update will force this dependency to be updated.
+    /// `Rules::force_update` will force this dependency to be updated.
     pub wants: Option<DependencySatisficer>,
     // User-level package managers.
     pub brew: Option<BrewDependency>,

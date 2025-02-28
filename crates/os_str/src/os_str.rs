@@ -1,6 +1,6 @@
 #![allow(clippy::needless_pass_by_value)]
 
-/// Platform-dependent os_str <-> [u8] conversions.
+/// Platform-dependent `os_str` <-> [u8] conversions.
 ///
 /// Use for local storage such as local registry,
 /// and never transmit across OS boundary.

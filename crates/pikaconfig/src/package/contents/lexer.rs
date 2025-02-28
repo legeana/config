@@ -212,7 +212,7 @@ impl<'input> LalrpopLexer<'input> {
             lexer: Token::lexer(source),
         }
     }
-    /// Handles literal separation and EndOfInput.
+    /// Handles literal separation and `EndOfInput`.
     fn next_logos_tok(&mut self) -> Option<Result<Token, LexerError>> {
         if self.stop_iteration {
             return None;

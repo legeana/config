@@ -26,7 +26,7 @@ pub fn state_dir() -> Option<PathBuf> {
 }
 
 /// Returns "$HOME/.local/bin".
-/// See https://specifications.freedesktop.org/basedir-spec/latest/#variables
+/// See <https://specifications.freedesktop.org/basedir-spec/latest/#variables>.
 pub fn executable_dir() -> Option<PathBuf> {
     dirs::home_dir().map(|home| home.join(".local").join("bin"))
 }

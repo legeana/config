@@ -79,7 +79,7 @@ impl SystemInfo {
         Some(want_hostname.into()) == self.hostname()
     }
     /// Returns 'linux', 'macos', 'windows' etc.
-    /// See https://doc.rust-lang.org/std/env/consts/constant.OS.html
+    /// See <https://doc.rust-lang.org/std/env/consts/constant.OS.html>.
     fn os(&self) -> &'static str {
         std::env::consts::OS
     }

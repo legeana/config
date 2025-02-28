@@ -15,7 +15,7 @@ impl<N, V> FlagArg<N, V> {
     }
 }
 
-/// Arguments are converted into OsStr.
+/// Arguments are converted into `OsStr`.
 impl<N, V> AsRef<OsStr> for FlagArg<N, V>
 where
     N: AsRef<OsStr>,
@@ -26,7 +26,7 @@ where
     }
 }
 
-/// Arguments can be converted into OsString.
+/// Arguments can be converted into `OsString`.
 impl<N, V> From<FlagArg<N, V>> for OsString
 where
     N: Into<Self>,

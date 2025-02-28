@@ -175,7 +175,7 @@ impl Arguments {
         Ok(&self.0)
     }
 
-    /// Returns (required_args, remainder_args).
+    /// Returns `(required_args, remainder_args)`.
     fn expect_variadic_args(
         &self,
         command: impl AsRef<str>,
