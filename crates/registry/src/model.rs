@@ -86,8 +86,8 @@ impl FromSql for SqlPathBuf {
 impl ToSql for file_type::Type {
     fn to_sql(&self) -> rusqlite::Result<ToSqlOutput<'_>> {
         let value: i64 = match self {
-            Self::Symlink(()) => 1,
-            Self::Directory(()) => 2,
+            Self::Symlink => 1,
+            Self::Directory => 2,
         };
         Ok(ToSqlOutput::Owned(Value::Integer(value)))
     }
@@ -99,8 +99,8 @@ impl FromSql for file_type::Type {
             return Err(FromSqlError::InvalidType);
         };
         match value {
-            1 => Ok(Self::Symlink(())),
-            2 => Ok(Self::Directory(())),
+            1 => Ok(Self::Symlink),
+            2 => Ok(Self::Directory),
             unknown => Err(FromSqlError::OutOfRange(unknown)),
         }
     }

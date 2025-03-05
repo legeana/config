@@ -6,6 +6,16 @@ pub enum FileType<T> {
     Directory(T),
 }
 
+/// `FileType` variants.
+///
+/// Consider implementing a macro to define this based on `FileType`.
+/// Generic parameter in `FileType` will make this complicated.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub(crate) enum Type {
+    Symlink,
+    Directory,
+}
+
 impl<T> FileType<T>
 where
     T: AsRef<Path>,
@@ -15,10 +25,10 @@ where
             Self::Directory(p) | Self::Symlink(p) => p.as_ref(),
         }
     }
-    pub fn file_type(&self) -> Type {
+    pub(crate) fn file_type(&self) -> Type {
         match self {
-            Self::Symlink(_) => Type::Symlink(()),
-            Self::Directory(_) => Type::Directory(()),
+            Self::Symlink(_) => Type::Symlink,
+            Self::Directory(_) => Type::Directory,
         }
     }
 }
@@ -39,21 +49,21 @@ where
 impl<T> Eq for FileType<T> where T: Eq {}
 impl<T> Copy for FileType<T> where T: Copy {}
 
-pub(crate) type Type = FileType<()>;
 pub type FilePath<'a> = FileType<&'a Path>;
 pub type FilePathBuf = FileType<PathBuf>;
 
 impl Type {
-    pub fn with_path(self, path: &Path) -> FilePath {
+    #[allow(dead_code)]
+    pub(crate) fn with_path(self, path: &Path) -> FilePath {
         match self {
-            Self::Symlink(()) => FilePath::Symlink(path),
-            Self::Directory(()) => FilePath::Directory(path),
+            Self::Symlink => FilePath::Symlink(path),
+            Self::Directory => FilePath::Directory(path),
         }
     }
-    pub fn with_path_buf(self, path: PathBuf) -> FilePathBuf {
+    pub(crate) fn with_path_buf(self, path: PathBuf) -> FilePathBuf {
         match self {
-            Self::Symlink(()) => FilePathBuf::Symlink(path),
-            Self::Directory(()) => FilePathBuf::Directory(path),
+            Self::Symlink => FilePathBuf::Symlink(path),
+            Self::Directory => FilePathBuf::Directory(path),
         }
     }
 }
@@ -123,21 +133,18 @@ mod tests {
 
     #[test]
     fn file_type_file_type() {
-        assert_eq!(FilePath::new_symlink("test").file_type(), Type::Symlink(()));
-        assert_eq!(
-            FilePath::new_directory("test").file_type(),
-            Type::Directory(()),
-        );
+        assert_eq!(FilePath::new_symlink("test").file_type(), Type::Symlink);
+        assert_eq!(FilePath::new_directory("test").file_type(), Type::Directory,);
     }
 
     #[test]
     fn test_type_with_path() {
         assert_eq!(
-            Type::Symlink(()).with_path(Path::new("test")),
+            Type::Symlink.with_path(Path::new("test")),
             FilePath::Symlink(Path::new("test")),
         );
         assert_eq!(
-            Type::Directory(()).with_path(Path::new("test")),
+            Type::Directory.with_path(Path::new("test")),
             FilePath::Directory(Path::new("test")),
         );
     }
@@ -145,11 +152,11 @@ mod tests {
     #[test]
     fn test_type_with_path_buf() {
         assert_eq!(
-            Type::Symlink(()).with_path_buf(PathBuf::from("test")),
+            Type::Symlink.with_path_buf(PathBuf::from("test")),
             FilePathBuf::Symlink(PathBuf::from("test")),
         );
         assert_eq!(
-            Type::Directory(()).with_path_buf(PathBuf::from("test")),
+            Type::Directory.with_path_buf(PathBuf::from("test")),
             FilePathBuf::Directory(PathBuf::from("test")),
         );
     }
