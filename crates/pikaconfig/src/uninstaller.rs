@@ -1,7 +1,7 @@
 use std::path::Path;
 
 use anyhow::{Context as _, Result, anyhow};
-use registry::{FileType, ImmutableRegistry};
+use registry::{FileType, Registry};
 
 use crate::file_util;
 use crate::symlink_util;
@@ -14,7 +14,7 @@ pub trait Uninstaller {
 
 impl<T> Uninstaller for T
 where
-    T: ImmutableRegistry,
+    T: Registry,
 {
     fn uninstall(&mut self) -> Result<()> {
         let paths = self.user_files().context("failed to get installed files")?;

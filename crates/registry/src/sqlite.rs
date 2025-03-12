@@ -5,7 +5,7 @@ use anyhow::{Context as _, Result};
 use super::connection::AppConnection;
 use super::model::{FilePurpose, UpdateId};
 use super::queries::AppQueries as _;
-use super::{FilePath, FilePathBuf, ImmutableRegistry, Registry};
+use super::{FilePath, FilePathBuf, Registry};
 
 #[derive(Debug)]
 pub struct SqliteRegistry {
@@ -34,9 +34,13 @@ impl SqliteRegistry {
     }
 }
 
-impl ImmutableRegistry for SqliteRegistry {
+impl Registry for SqliteRegistry {
     fn user_files(&self) -> Result<Vec<FilePathBuf>> {
         self.conn.files(FilePurpose::User)
+    }
+    fn register_user_file(&mut self, file: FilePath) -> Result<()> {
+        self.conn
+            .register_file(UpdateId(None), FilePurpose::User, file)
     }
     fn clear_user_files(&mut self) -> Result<()> {
         self.conn.clear_files(FilePurpose::User)
@@ -45,19 +49,12 @@ impl ImmutableRegistry for SqliteRegistry {
     fn state_files(&self) -> Result<Vec<FilePathBuf>> {
         self.conn.files(FilePurpose::State)
     }
-    fn clear_state_files(&mut self) -> Result<()> {
-        self.conn.clear_files(FilePurpose::State)
-    }
-}
-
-impl Registry for SqliteRegistry {
-    fn register_user_file(&mut self, file: FilePath) -> Result<()> {
-        self.conn
-            .register_file(UpdateId(None), FilePurpose::User, file)
-    }
     fn register_state_file(&mut self, file: FilePath) -> Result<()> {
         self.conn
             .register_file(UpdateId(None), FilePurpose::State, file)
+    }
+    fn clear_state_files(&mut self) -> Result<()> {
+        self.conn.clear_files(FilePurpose::State)
     }
 }
 
