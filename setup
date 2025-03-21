@@ -34,32 +34,58 @@ fatal() {
 load_cargo_env() {
     CARGO_ENV="${CARGO_HOME:-$HOME/.cargo}/env"
     if [ -f "$CARGO_ENV" ]; then
+        log "Found $CARGO_ENV file, loading"
         . "$CARGO_ENV"
     fi
 }
 
+check_cargo() {
+    cargo --version >/dev/null 2>&1
+}
+
+try_cargo_env() {
+    load_cargo_env
+    if check_cargo; then
+        log "Using existing cargo"
+        return
+    fi
+}
+
+try_rustup_cargo() {
+    if rustup --version >/dev/null 2>&1; then
+        log_eval rustup install toolchain stable
+        # No need to load cargo environment as this is controlled by the OS.
+    fi
+    # Try OS environment first.
+    if check_cargo; then
+        return;
+    fi
+    # Try to load cargo environment in case we used user-installed rustup.
+    load_cargo_env
+    check_cargo
+}
+
+# Ensures rust is installed.
+# Avoids package manager rust installations because they often don't have fresh
+# enough rust toolchain.
 get_rust() {
-    if cargo --version >/dev/null 2>&1; then
+    # Try cargo directly first.
+    if check_cargo; then
         log "Using existing cargo"
         return
     fi
 
     # Opportunistically try to find existing Cargo installation.
-    load_cargo_env
-    if cargo --version >/dev/null 2>&1; then
-        log "Using existing cargo"
+    if try_cargo_env; then
         return
     fi
 
     # Use system rustup if available.
-    if rustup --version >/dev/null 2>&1; then
-        rustup install toolchain stable
-        # No need to load cargo environment as this is controlled by the OS.
+    if try_rustup_cargo; then
         return
     fi
 
-    # Use https://rustup.rs/ as package managers often don't have new enough
-    # rust toolchain.
+    # Fallback: install rustup from the web.
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s - --no-modify-path
     # Load environment from the newly installed Rust.
     load_cargo_env
