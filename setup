@@ -43,12 +43,21 @@ get_rust() {
         log "Using existing cargo"
         return
     fi
+
     # Opportunistically try to find existing Cargo installation.
     load_cargo_env
     if cargo --version >/dev/null 2>&1; then
         log "Using existing cargo"
         return
     fi
+
+    # Use system rustup if available.
+    if rustup --version >/dev/null 2>&1; then
+        rustup install toolchain stable
+        # No need to load cargo environment as this is controlled by the OS.
+        return
+    fi
+
     # Use https://rustup.rs/ as package managers often don't have new enough
     # rust toolchain.
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s - --no-modify-path
