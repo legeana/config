@@ -1,12 +1,9 @@
 has_contents = false
 
 [[system_dependencies]]
-requires = "os=linux"
-bash = "sudo localectl set-locale en_GB.UTF-8"
-
-[[system_dependencies]]
 requires = ["os=linux", "distro_like!=debian"]
 bash = """
+sudo localectl set-locale en_GB.UTF-8"
 sudo localectl set-x11-keymap gb,ru pc105 '' caps:escape,grp:alt_space_toggle
 """
 
@@ -21,6 +18,7 @@ s|^XKBMODEL=.*$|XKBMODEL="pc105"|;
 s|^XKBOPTIONS=.*$|XKBOPTIONS="caps:escape,grp:alt_space_toggle"|;
 s|^XKBVARIANT=.*$|XKBVARIANT=""|;
 '
+sudo update-locale LANG=en_GB.UTF-8
 sudo sed -r "$sedscript" -i /etc/default/keyboard
 sudo udevadm trigger --subsystem-match=input --action=change
 """
