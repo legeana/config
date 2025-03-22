@@ -49,11 +49,12 @@ try_cargo_env() {
         log "Using existing cargo"
         return
     fi
+    return 1
 }
 
 try_rustup_cargo() {
     if rustup --version >/dev/null 2>&1; then
-        log_eval rustup install toolchain stable
+        log_eval rustup toolchain install stable
         # No need to load cargo environment as this is controlled by the OS.
     fi
     # Try OS environment first.
