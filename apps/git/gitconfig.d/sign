@@ -1,0 +1,9 @@
+[commit]
+gpgsign = true
+
+[gpg]
+format = ssh
+
+[gpg.ssh]
+allowedSignersFile = ~/.gitconfig.keys/allowed-signers
+revocationFile = ~/.gitconfig.keys/revoked-signers

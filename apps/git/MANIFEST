@@ -1,15 +1,13 @@
 prefix ~
 symlink_to .gitconfig gitconfig
-symlink_to .gitconfig-hubs gitconfig-hubs
-symlink_to .gitconfig-sign gitconfig-sign
-symlink_to .gitconfig-town gitconfig-town
-symlink_to .gitconfig-user gitconfig-user
+symlink_tree_to .gitconfig.d gitconfig.d
 
-symlink_to .gitconfig-allowed-signers allowed-signers
-symlink_to .gitconfig-revoked-signers revoked-signers
-
+prefix ~/.gitconfig.d
 if is_windows {
-    symlink_to .gitconfig-editor gitconfig-editor-windows
+    symlink_to editor gitconfig-editor-windows
 } else {
-    symlink_to .gitconfig-editor gitconfig-editor-unspecified
+    symlink_to editor gitconfig-editor-unspecified
 }
+
+prefix ~
+symlink_tree_to .gitconfig.keys gitconfig.keys

@@ -2,11 +2,11 @@
     editor = nvim
 
 [include]
-    path = ~/.gitconfig-editor
-    path = ~/.gitconfig-hubs
-    path = ~/.gitconfig-sign
-    path = ~/.gitconfig-town
-    path = ~/.gitconfig-user
+    path = ~/.gitconfig.d/editor
+    path = ~/.gitconfig.d/hubs
+    path = ~/.gitconfig.d/sign
+    path = ~/.gitconfig.d/town
+    path = ~/.gitconfig.d/user
 
 [merge]
     tool = vimdiff
