@@ -40,13 +40,14 @@ impl Module for SymlinkTree {
 struct SymlinkTreeStatement {
     workdir: PathBuf,
     directory: String,
+    destination: String,
 }
 
 impl engine::Statement for SymlinkTreeStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         Ok(Some(Box::new(SymlinkTree {
             src: self.workdir.join(&self.directory),
-            dst: ctx.dst_path(&self.directory),
+            dst: ctx.dst_path(&self.destination),
         })))
     }
 }
@@ -70,13 +71,43 @@ impl engine::CommandBuilder for SymlinkTreeBuilder {
             .expect_raw()
             .context("directory")?
             .to_owned();
+        let destination = directory.clone();
         Ok(engine::Command::new_statement(SymlinkTreeStatement {
             workdir: workdir.to_owned(),
             directory,
+            destination,
+        }))
+    }
+}
+
+#[derive(Clone)]
+struct SymlinkTreeToBuilder;
+
+impl engine::CommandBuilder for SymlinkTreeToBuilder {
+    fn name(&self) -> String {
+        "symlink_tree_to".to_owned()
+    }
+    fn help(&self) -> String {
+        formatdoc! {"
+            {command} <destination> <directory>
+                create a symlink for every file in a directory recursively
+                into the destination directory:
+                    <directory>/foo/bar -> <destination>/foo/bar
+        ", command=self.name()}
+    }
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::Command> {
+        let (destination, directory) = args.expect_double_arg(self.name())?;
+        let destination = destination.expect_raw().context("destination")?.to_owned();
+        let directory = directory.expect_raw().context("directory")?.to_owned();
+        Ok(engine::Command::new_statement(SymlinkTreeStatement {
+            workdir: workdir.to_owned(),
+            directory,
+            destination,
         }))
     }
 }
 
 pub(super) fn register(registry: &mut dyn inventory::Registry) {
     registry.register_command(Box::new(SymlinkTreeBuilder));
+    registry.register_command(Box::new(SymlinkTreeToBuilder));
 }
