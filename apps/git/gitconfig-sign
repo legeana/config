@@ -6,3 +6,4 @@ format = ssh
 
 [gpg.ssh]
 allowedSignersFile = ~/.gitconfig-allowed-signers
+revocationFile = ~/.gitconfig-revoked-signers
