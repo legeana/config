@@ -51,6 +51,10 @@ version = "0.22.0"
 default-features = false
 features = ["lexer", "unicode"]
 
+[dependencies.minijinja]
+version = "2.8.0"
+default-features = false
+
 [dev-dependencies]
 pretty_assertions = "1.4.0"
 test-case = { version = "3.3.1" }
