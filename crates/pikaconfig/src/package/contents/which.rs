@@ -51,7 +51,7 @@ impl engine::CommandBuilder for WhichBuilder {
 }
 
 impl inventory::RenderHelper for WhichBuilder {
-    fn register_render_helper2(&self, env: &mut Environment) {
+    fn register_render_helper(&self, env: &mut Environment) {
         use crate::minijinja_helper::{JResult, map_anyhow, map_error, to_string};
         env.add_function(self.name(), |binary: &str| -> JResult<String> {
             let path = which::which(binary)

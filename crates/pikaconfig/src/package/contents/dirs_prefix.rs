@@ -70,7 +70,7 @@ impl engine::CommandBuilder for DirsPrefixBuilder {
 }
 
 impl inventory::RenderHelper for DirsPrefixBuilder {
-    fn register_render_helper2(&self, env: &mut Environment) {
+    fn register_render_helper(&self, env: &mut Environment) {
         use crate::minijinja_helper::{JResult, map_error, to_string};
         let Some(base_dir) = self.base_dir.clone() else {
             return;
