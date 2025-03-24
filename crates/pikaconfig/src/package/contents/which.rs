@@ -2,6 +2,7 @@ use std::path::Path;
 
 use anyhow::{Context as _, Result};
 use indoc::formatdoc;
+use minijinja::Environment;
 use serde::Deserialize;
 
 use crate::tera_helper;
@@ -67,6 +68,15 @@ impl inventory::RenderHelper for WhichBuilder {
                     .with_context(|| format!("failed to find {:?} path", &args.binary))
             }),
         );
+    }
+    fn register_render_helper2(&self, env: &mut Environment) {
+        use crate::minijinja_helper::{JResult, map_anyhow, map_error, to_string};
+        env.add_function(self.name(), |binary: &str| -> JResult<String> {
+            let path = which::which(binary)
+                .with_context(|| format!("failed to find {binary:?} path"))
+                .map_err(map_anyhow)?;
+            to_string("path", path).map_err(map_error)
+        });
     }
 }
 

@@ -9,6 +9,7 @@ use super::inventory;
 
 use anyhow::Result;
 use indoc::formatdoc;
+use minijinja::Environment;
 
 #[derive(Debug)]
 struct IsOs(&'static str);
@@ -51,6 +52,10 @@ impl inventory::RenderHelper for IsOsBuilder {
         let name = self.name();
         let is_os = IsOs(self.0);
         tera.register_function(&name, tera_helper::wrap_nil(move || Ok(is_os.check())));
+    }
+    fn register_render_helper2(&self, env: &mut Environment) {
+        let is_os = IsOs(self.0);
+        env.add_function(self.name(), move || is_os.check());
     }
 }
 

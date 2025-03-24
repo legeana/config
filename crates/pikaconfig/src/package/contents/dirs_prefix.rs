@@ -2,6 +2,7 @@ use std::path::PathBuf;
 
 use anyhow::{Context as _, Result, anyhow};
 use indoc::formatdoc;
+use minijinja::Environment;
 use serde::Deserialize;
 use xdg::xdg_or_win;
 
@@ -89,6 +90,22 @@ impl inventory::RenderHelper for DirsPrefixBuilder {
                     None => base_dir.clone(),
                 })
             }),
+        );
+    }
+    fn register_render_helper2(&self, env: &mut Environment) {
+        use crate::minijinja_helper::{JResult, map_error, to_string};
+        let Some(base_dir) = self.base_dir.clone() else {
+            return;
+        };
+        env.add_function(
+            engine::CommandBuilder::name(self),
+            move |path: Option<String>| -> JResult<String> {
+                let joined = match &path {
+                    Some(path) => base_dir.join(path),
+                    None => base_dir.clone(),
+                };
+                to_string("path", joined).map_err(map_error)
+            },
         );
     }
 }

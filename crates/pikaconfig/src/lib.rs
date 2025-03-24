@@ -3,6 +3,7 @@ mod command;
 mod empty_struct;
 mod file_util;
 pub mod layout;
+mod minijinja_helper;
 pub mod module;
 pub mod package;
 pub mod repository;

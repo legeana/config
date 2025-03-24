@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::sync::OnceLock;
 
 use anyhow::{Result, anyhow};
+use minijinja::Environment;
 use tera::Tera;
 
 use super::engine;
@@ -15,6 +16,7 @@ pub(super) trait Registry {
 
 pub(super) trait RenderHelper: Sync + Send {
     fn register_render_helper(&self, tera: &mut Tera);
+    fn register_render_helper2(&self, env: &mut Environment);
 }
 
 #[derive(Default)]
@@ -74,6 +76,7 @@ fn register_all(registry: &mut dyn Registry) {
     super::set_contents::register(registry);
     super::importer::register(registry);
     super::render::register(registry);
+    super::render2::register(registry);
     // Downloads.
     super::fetch::register(registry);
     super::git_clone::register(registry);
@@ -154,6 +157,12 @@ pub(super) fn with_wrapper(name: &str) -> Result<&dyn engine::WithWrapperBuilder
 pub(super) fn register_render_helpers(tera: &mut Tera) {
     for rh in &registry().render_helpers {
         rh.register_render_helper(tera);
+    }
+}
+
+pub(super) fn register_render_helpers2(env: &mut Environment) {
+    for rh in &registry().render_helpers {
+        rh.register_render_helper2(env);
     }
 }
 
