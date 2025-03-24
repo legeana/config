@@ -3,11 +3,9 @@ use std::path::PathBuf;
 use anyhow::{Context as _, Result, anyhow};
 use indoc::formatdoc;
 use minijinja::Environment;
-use serde::Deserialize;
 use xdg::xdg_or_win;
 
 use crate::module::ModuleBox;
-use crate::tera_helper;
 
 use super::args::Argument;
 use super::args::Arguments;
@@ -33,12 +31,6 @@ impl engine::Statement for DirsPrefixStatement {
         };
         Ok(None)
     }
-}
-
-#[derive(Deserialize)]
-#[serde(deny_unknown_fields)]
-struct DirsPrefixParams {
-    path: Option<PathBuf>,
 }
 
 #[derive(Clone)]
@@ -78,20 +70,6 @@ impl engine::CommandBuilder for DirsPrefixBuilder {
 }
 
 impl inventory::RenderHelper for DirsPrefixBuilder {
-    fn register_render_helper(&self, tera: &mut tera::Tera) {
-        let Some(base_dir) = self.base_dir.clone() else {
-            return;
-        };
-        tera.register_function(
-            &engine::CommandBuilder::name(self),
-            tera_helper::wrap_fn(move |args: &DirsPrefixParams| {
-                Ok(match args.path {
-                    Some(ref path) => base_dir.join(path),
-                    None => base_dir.clone(),
-                })
-            }),
-        );
-    }
     fn register_render_helper2(&self, env: &mut Environment) {
         use crate::minijinja_helper::{JResult, map_error, to_string};
         let Some(base_dir) = self.base_dir.clone() else {

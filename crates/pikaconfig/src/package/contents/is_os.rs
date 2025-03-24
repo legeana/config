@@ -1,7 +1,5 @@
 use std::path::Path;
 
-use crate::tera_helper;
-
 use super::args::Arguments;
 use super::engine;
 use super::engine::ConditionBuilder as _;
@@ -48,11 +46,6 @@ impl engine::ConditionBuilder for IsOsBuilder {
 }
 
 impl inventory::RenderHelper for IsOsBuilder {
-    fn register_render_helper(&self, tera: &mut tera::Tera) {
-        let name = self.name();
-        let is_os = IsOs(self.0);
-        tera.register_function(&name, tera_helper::wrap_nil(move || Ok(is_os.check())));
-    }
     fn register_render_helper2(&self, env: &mut Environment) {
         let is_os = IsOs(self.0);
         env.add_function(self.name(), move || is_os.check());

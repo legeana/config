@@ -3,9 +3,6 @@ use std::path::Path;
 use anyhow::{Context as _, Result};
 use indoc::formatdoc;
 use minijinja::Environment;
-use serde::Deserialize;
-
-use crate::tera_helper;
 
 use super::args::{Argument, Arguments};
 use super::engine;
@@ -32,12 +29,6 @@ impl engine::Expression for WhichExpression {
     }
 }
 
-#[derive(Deserialize)]
-#[serde(deny_unknown_fields)]
-struct WhichParams {
-    binary: String,
-}
-
 #[derive(Clone)]
 struct WhichBuilder;
 
@@ -60,15 +51,6 @@ impl engine::CommandBuilder for WhichBuilder {
 }
 
 impl inventory::RenderHelper for WhichBuilder {
-    fn register_render_helper(&self, tera: &mut tera::Tera) {
-        tera.register_function(
-            &self.name(),
-            tera_helper::wrap_fn(move |args: &WhichParams| {
-                which::which(&args.binary)
-                    .with_context(|| format!("failed to find {:?} path", &args.binary))
-            }),
-        );
-    }
     fn register_render_helper2(&self, env: &mut Environment) {
         use crate::minijinja_helper::{JResult, map_anyhow, map_error, to_string};
         env.add_function(self.name(), |binary: &str| -> JResult<String> {

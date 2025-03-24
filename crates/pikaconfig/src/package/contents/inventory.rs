@@ -3,7 +3,6 @@ use std::sync::OnceLock;
 
 use anyhow::{Result, anyhow};
 use minijinja::Environment;
-use tera::Tera;
 
 use super::engine;
 
@@ -15,7 +14,6 @@ pub(super) trait Registry {
 }
 
 pub(super) trait RenderHelper: Sync + Send {
-    fn register_render_helper(&self, tera: &mut Tera);
     fn register_render_helper2(&self, env: &mut Environment);
 }
 
@@ -75,7 +73,6 @@ fn register_all(registry: &mut dyn Registry) {
     super::cat_glob::register(registry);
     super::set_contents::register(registry);
     super::importer::register(registry);
-    super::render::register(registry);
     super::render2::register(registry);
     // Downloads.
     super::fetch::register(registry);
@@ -152,12 +149,6 @@ pub(super) fn with_wrapper(name: &str) -> Result<&dyn engine::WithWrapperBuilder
         .get(name)
         .ok_or_else(|| anyhow!("unknown with wrapper {name}"))
         .map(AsRef::as_ref)
-}
-
-pub(super) fn register_render_helpers(tera: &mut Tera) {
-    for rh in &registry().render_helpers {
-        rh.register_render_helper(tera);
-    }
 }
 
 pub(super) fn register_render_helpers2(env: &mut Environment) {

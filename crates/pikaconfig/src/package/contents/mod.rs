@@ -23,7 +23,6 @@ mod output_file;
 mod parser;
 mod prefix;
 mod remote_source;
-mod render;
 mod render2;
 mod return_;
 mod set_contents;

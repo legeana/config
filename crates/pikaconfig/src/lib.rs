@@ -10,6 +10,4 @@ pub mod repository;
 mod string_list;
 mod symlink_util;
 mod tag_criteria;
-mod tera_helper;
-mod tera_helpers;
 pub mod uninstaller;
