@@ -1,5 +1,5 @@
 xdg_config_prefix sway
-render2 config
+render config
 symlink_tree config-vars.d
 symlink_tree config.d
 

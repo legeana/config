@@ -93,7 +93,7 @@ struct RenderBuilder;
 
 impl engine::CommandBuilder for RenderBuilder {
     fn name(&self) -> String {
-        "render2".to_owned()
+        "render".to_owned()
     }
     fn help(&self) -> String {
         formatdoc! {"
@@ -116,7 +116,7 @@ struct RenderToBuilder;
 
 impl engine::CommandBuilder for RenderToBuilder {
     fn name(&self) -> String {
-        "render2_to".to_owned()
+        "render_to".to_owned()
     }
     fn help(&self) -> String {
         formatdoc! {"

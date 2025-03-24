@@ -1,9 +1,9 @@
 if is_unix {
     xdg_config_prefix wezterm
-    render2 wezterm.lua
+    render wezterm.lua
 }
 
 if is_windows {
     prefix ~
-    render2_to .wezterm.lua wezterm.lua
+    render_to .wezterm.lua wezterm.lua
 }
