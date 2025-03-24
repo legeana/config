@@ -73,7 +73,7 @@ fn register_all(registry: &mut dyn Registry) {
     super::cat_glob::register(registry);
     super::set_contents::register(registry);
     super::importer::register(registry);
-    super::render2::register(registry);
+    super::render::register(registry);
     // Downloads.
     super::fetch::register(registry);
     super::git_clone::register(registry);
