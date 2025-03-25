@@ -12,11 +12,11 @@ use super::engine;
 use super::file_util;
 use super::inventory;
 use super::local_state;
-use super::net_util;
+use super::net_util::{FetchOptions, Url, fetch};
 
 struct FetchInto {
     executable: bool,
-    url: String,
+    url: Url,
     output: AnnotatedPathBox,
 }
 
@@ -37,10 +37,10 @@ impl Module for FetchInto {
                 .with_context(|| format!("failed to make {:?} executable", self.output))?;
             return Ok(());
         }
-        net_util::fetch(
+        fetch(
             &self.url,
             &self.output,
-            net_util::FetchOptions::new().executable(self.executable),
+            FetchOptions::new().executable(self.executable),
         )
         .with_context(|| format!("failed to fetch {:?}", self.url))
     }
@@ -49,14 +49,14 @@ impl Module for FetchInto {
 #[derive(Debug)]
 struct FetchIntoStatement {
     filename: Argument,
-    url: String,
+    url: Url,
     executable: bool,
 }
 
 impl engine::Statement for FetchIntoStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
         let dst = ctx.dst_path(ctx.expand_arg(&self.filename)?);
-        let output = local_state::linked_file_cache(dst.clone(), &self.url)
+        let output = local_state::linked_file_cache(dst.clone(), self.url.text())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;
         let output_state = output.state();
         Ok(Some(Box::new((
@@ -86,9 +86,11 @@ impl engine::CommandBuilder for FetchIntoBuilder {
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (filename, url) = args.expect_double_arg(self.name())?;
+        let url = url.expect_raw().context("url")?;
+        let url = Url::new(url).with_context(|| format!("failed to parse URL {url:?}"))?;
         Ok(engine::Command::new_statement(FetchIntoStatement {
             filename: filename.clone(),
-            url: url.expect_raw().context("url")?.to_owned(),
+            url,
             executable: false,
         }))
     }
@@ -110,9 +112,11 @@ impl engine::CommandBuilder for FetchExeIntoBuilder {
     }
     fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (filename, url) = args.expect_double_arg(self.name())?;
+        let url = url.expect_raw().context("url")?;
+        let url = Url::new(url).with_context(|| format!("failed to parse URL {url:?}"))?;
         Ok(engine::Command::new_statement(FetchIntoStatement {
             filename: filename.clone(),
-            url: url.expect_raw().context("url")?.to_owned(),
+            url,
             executable: true,
         }))
     }

@@ -1,4 +1,5 @@
 use anyhow::{Context as _, Result};
+use http::Uri as HttpUri;
 
 use crate::annotated_path::AnnotatedPath;
 
@@ -19,14 +20,46 @@ impl FetchOptions {
     }
 }
 
-pub(super) fn fetch(
-    url: impl AsRef<str>,
-    dst: impl AnnotatedPath,
-    opts: &FetchOptions,
-) -> Result<()> {
-    let url = url.as_ref();
+#[derive(Clone)]
+pub(super) struct Url {
+    text: String,
+    uri: HttpUri,
+}
+
+impl std::fmt::Debug for Url {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Debug::fmt(&self.text, f)
+    }
+}
+
+impl std::fmt::Display for Url {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(&self.text, f)
+    }
+}
+
+impl Url {
+    pub(super) fn new(text_url: impl Into<String>) -> Result<Self> {
+        let text: String = text_url.into();
+        let uri = text
+            .parse::<HttpUri>()
+            .with_context(|| format!("failed to parse URL {text:?}"))?;
+        Ok(Self { text, uri })
+    }
+    pub(super) fn text(&self) -> &str {
+        &self.text
+    }
+}
+
+impl AsRef<str> for Url {
+    fn as_ref(&self) -> &str {
+        self.text()
+    }
+}
+
+pub(super) fn fetch(url: &Url, dst: impl AnnotatedPath, opts: &FetchOptions) -> Result<()> {
     log::info!("Fetch: {url:?} -> {dst:?}");
-    let mut reader = ureq::get(url)
+    let mut reader = ureq::get(&url.uri)
         .call()
         .with_context(|| format!("failed to fetch {url:?}"))?
         .into_body()

@@ -11,10 +11,10 @@ use super::args::Arguments;
 use super::engine;
 use super::inventory;
 use super::local_state;
-use super::net_util;
+use super::net_util::{FetchOptions, Url, fetch};
 
 struct RemoteArchive {
-    url: String,
+    url: Url,
     archive: AnnotatedPathBox,
     source: AnnotatedPathBox,
     unarchiver: &'static dyn unarchiver::Unarchiver,
@@ -46,7 +46,7 @@ impl RemoteArchive {
             return Ok(false);
         }
         // TODO: Use checksum to verify version/integrity.
-        net_util::fetch(&self.url, &self.archive, &net_util::FetchOptions::new())
+        fetch(&self.url, &self.archive, &FetchOptions::new())
             .with_context(|| format!("failed to fetch {:?}", self.url))?;
         Ok(true)
     }
@@ -86,14 +86,16 @@ impl Module for RemoteArchive {
 struct RemoteArchiveExpression {
     workdir: PathBuf,
     filename: String,
-    url: String,
+    url: Url,
 }
 
 impl engine::Expression for RemoteArchiveExpression {
     fn eval(&self, _ctx: &mut engine::Context) -> Result<engine::ExpressionOutput> {
-        let archive = local_state::file_cache(&self.workdir, Path::new(&self.filename), &self.url)?;
+        let archive =
+            local_state::file_cache(&self.workdir, Path::new(&self.filename), self.url.text())?;
         let archive_path = archive.state();
-        let source = local_state::dir_cache(&self.workdir, Path::new(&self.filename), &self.url)?;
+        let source =
+            local_state::dir_cache(&self.workdir, Path::new(&self.filename), self.url.text())?;
         let source_path = source.state();
         let output = source_path.to_path_buf().into_os_string();
         // TODO: consider building this in Builder.
@@ -133,10 +135,8 @@ impl engine::CommandBuilder for RemoteArchiveBuilder {
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<engine::Command> {
         let (filename, url) = args.expect_double_arg(self.name())?;
         let filename = filename.expect_raw().context("filename")?.to_owned();
-        let url = url.expect_raw().context("url")?.to_owned();
-        url::Url::parse(&url)
-            .with_context(|| format!("failed to parse URL {url:?}"))
-            .context("URL verification")?;
+        let url = url.expect_raw().context("url")?;
+        let url = Url::new(url).with_context(|| format!("failed to parse URL {url:?}"))?;
         // TODO: add checksum.
         Ok(engine::Command::new_expression(RemoteArchiveExpression {
             workdir: workdir.to_owned(),
