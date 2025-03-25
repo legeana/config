@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::{Context as _, Result};
+use anyhow::{Context as _, Result, anyhow};
 use indoc::formatdoc;
 use minijinja::Environment;
 use registry::Registry;
@@ -19,9 +19,20 @@ const TEMPLATE_NAME: &str = "template";
 
 #[derive(Debug, Serialize)]
 struct Context {
+    // Filename of the template.
     source_file: PathBuf,
+    // Directory of the template.
+    source_dir: PathBuf,
+    // Filename of the rendered file.
     destination_file: PathBuf,
+    // Directory of the rendered file.
+    destination_dir: PathBuf,
+    // Directory of MANIFEST.
+    // May be different from source_dir if render argument consists of multiple
+    // path components.
     workdir: PathBuf,
+    // MANIFEST prefix render was called in.
+    // May be different from destination_dir if render_to is used.
     prefix: PathBuf,
 }
 
@@ -77,7 +88,15 @@ impl engine::Statement for RenderStatement {
                 env,
                 ctx: Context {
                     source_file: src.clone(),
+                    source_dir: src
+                        .parent()
+                        .ok_or_else(|| anyhow!("failed to get parent of source_file {src:?}"))?
+                        .to_owned(),
                     destination_file: dst.clone(),
+                    destination_dir: dst
+                        .parent()
+                        .ok_or_else(|| anyhow!("failed to get parent of destination_file {dst:?}"))?
+                        .to_owned(),
                     workdir: self.workdir.clone(),
                     prefix: ctx.prefix.clone(),
                 },
