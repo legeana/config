@@ -17,7 +17,7 @@ use super::local_state;
 
 const TEMPLATE_NAME: &str = "template";
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 struct Context {
     source_file: PathBuf,
     destination_file: PathBuf,
