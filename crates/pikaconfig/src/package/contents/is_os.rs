@@ -46,7 +46,7 @@ impl engine::ConditionBuilder for IsOsBuilder {
 }
 
 impl inventory::RenderHelper for IsOsBuilder {
-    fn register_render_helper(&self, env: &mut Environment) {
+    fn register_globals(&self, env: &mut Environment) {
         let is_os = IsOs(self.0);
         env.add_function(self.name(), move || is_os.check());
     }

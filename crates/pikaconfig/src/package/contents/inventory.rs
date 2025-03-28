@@ -14,7 +14,7 @@ pub(super) trait Registry {
 }
 
 pub(super) trait RenderHelper: Sync + Send {
-    fn register_render_helper(&self, env: &mut Environment);
+    fn register_globals(&self, env: &mut Environment);
 }
 
 #[derive(Default)]
@@ -151,9 +151,9 @@ pub(super) fn with_wrapper(name: &str) -> Result<&dyn engine::WithWrapperBuilder
         .map(AsRef::as_ref)
 }
 
-pub(super) fn register_render_helpers(env: &mut Environment) {
+pub(super) fn register_render_globals(env: &mut Environment) {
     for rh in &registry().render_helpers {
-        rh.register_render_helper(env);
+        rh.register_globals(env);
     }
 }
 

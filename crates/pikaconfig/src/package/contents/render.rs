@@ -80,7 +80,7 @@ impl engine::Statement for RenderStatement {
         let permissions = std::fs::metadata(&src)
             .with_context(|| format!("failed to load {src:?} metadata"))?
             .permissions();
-        inventory::register_render_helpers(&mut env);
+        inventory::register_render_globals(&mut env);
         minijinja_helper::register(&mut env);
         Ok(Some(Box::new((
             output,
