@@ -4,7 +4,7 @@ use anyhow::{Context as _, Result};
 use indoc::formatdoc;
 use registry::Registry;
 
-use crate::annotated_path::AnnotatedPathBox;
+use crate::annotated_path::BoxedAnnotatedPath;
 use crate::module::{Module, Rules};
 
 use super::args::Arguments;
@@ -15,8 +15,8 @@ use super::net_util::{FetchOptions, Url, fetch};
 
 struct RemoteArchive {
     url: Url,
-    archive: AnnotatedPathBox,
-    source: AnnotatedPathBox,
+    archive: BoxedAnnotatedPath,
+    source: BoxedAnnotatedPath,
     unarchiver: &'static dyn unarchiver::Unarchiver,
 }
 

@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 
-use crate::annotated_path::AnnotatedPathBox;
-use crate::module::{Module, ModuleBox, Rules};
+use crate::annotated_path::BoxedAnnotatedPath;
+use crate::module::{BoxedModule, Module, Rules};
 
 use super::args::{Argument, Arguments};
 use super::engine;
@@ -14,7 +14,7 @@ use registry::Registry;
 
 struct Copy {
     src: PathBuf,
-    output: AnnotatedPathBox,
+    output: BoxedAnnotatedPath,
 }
 
 impl Module for Copy {
@@ -45,7 +45,7 @@ struct CopyStatement {
 }
 
 impl engine::Statement for CopyStatement {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
         let src = self.workdir.join(ctx.expand_arg(&self.src)?);
         let dst = ctx.dst_path(ctx.expand_arg(&self.dst)?);
         let output = local_state::file_state(dst.clone())
@@ -67,7 +67,7 @@ struct CopyFromStatement {
 }
 
 impl engine::Statement for CopyFromStatement {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
         let src: PathBuf = ctx.expand_arg(&self.path)?.into();
         let dst = ctx.dst_path(
             src.file_name()

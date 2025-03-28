@@ -4,7 +4,7 @@ use anyhow::{Context as _, Result};
 use indoc::formatdoc;
 use registry::{FilePath, Registry};
 
-use crate::module::{Module, ModuleBox, Rules};
+use crate::module::{BoxedModule, Module, Rules};
 
 use super::args::Arguments;
 use super::engine;
@@ -15,7 +15,7 @@ struct Once {
     pre_install_tag: PathBuf,
     install_tag: PathBuf,
     post_install_tag: PathBuf,
-    module: ModuleBox,
+    module: BoxedModule,
 }
 
 fn wrap<F>(tag: &Path, f: F, force: bool, registry: &mut dyn Registry) -> Result<()>
@@ -79,11 +79,11 @@ impl Module for Once {
 struct OnceStatement {
     workdir: PathBuf,
     tag: String,
-    statement: engine::StatementBox,
+    statement: engine::BoxedStatement,
 }
 
 impl engine::Statement for OnceStatement {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
         match self.statement.eval(ctx)? {
             Some(module) => {
                 let tags = local_state::ephemeral_dir_state(&self.workdir, &self.tag)?;
@@ -123,8 +123,8 @@ impl engine::WithWrapperBuilder for OnceBuilder {
         &self,
         workdir: &Path,
         args: &Arguments,
-        statement: engine::StatementBox,
-    ) -> Result<engine::StatementBox> {
+        statement: engine::BoxedStatement,
+    ) -> Result<engine::BoxedStatement> {
         let tag = args.expect_single_arg(self.name())?;
         Ok(Box::new(OnceStatement {
             workdir: workdir.to_owned(),

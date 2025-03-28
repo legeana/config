@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use anyhow::{Context as _, Result};
 use indoc::formatdoc;
 
-use crate::module::ModuleBox;
+use crate::module::BoxedModule;
 
 use super::args::Arguments;
 use super::engine;
@@ -13,11 +13,11 @@ use super::inventory;
 #[derive(Debug)]
 struct SubdirStatement {
     subdir: PathBuf,
-    config: engine::StatementBox,
+    config: engine::BoxedStatement,
 }
 
 impl engine::Statement for SubdirStatement {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
         let mut substate = ctx.subdir(&self.subdir);
         self.config.eval(&mut substate)
     }
@@ -55,8 +55,8 @@ struct SubdirsStatement {
 }
 
 impl engine::Statement for SubdirsStatement {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
-        let mut modules: Vec<ModuleBox> = Vec::new();
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
+        let mut modules: Vec<BoxedModule> = Vec::new();
         for subdir in &self.subdirs {
             if let Some(m) = subdir.eval(ctx)? {
                 modules.push(m);

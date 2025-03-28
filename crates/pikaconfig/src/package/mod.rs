@@ -10,7 +10,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context as _, Result, anyhow};
 use registry::Registry;
 
-use crate::module::{self, Module, ModuleBox, Rules};
+use crate::module::{self, BoxedModule, Module, Rules};
 use crate::package::installer::Installer;
 use crate::tag_criteria::{self, Criteria as _};
 
@@ -19,7 +19,7 @@ pub use contents::help as manifest_help;
 pub struct Package {
     name: String,
     criteria: Option<tag_criteria::TagCriteria>,
-    modules: Vec<ModuleBox>,
+    modules: Vec<BoxedModule>,
     #[allow(dead_code)]
     dependencies: Vec<String>,
 }
@@ -72,7 +72,7 @@ impl Package {
             .map(user::UserDependency::new)
             .collect::<Result<_>>()
             .context("failed to parse user_dependencies")?;
-        let configuration: ModuleBox = if pkgconfig.has_contents {
+        let configuration: BoxedModule = if pkgconfig.has_contents {
             if criteria.is_satisfied()? {
                 contents::new(root)?
             } else {

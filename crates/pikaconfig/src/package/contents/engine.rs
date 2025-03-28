@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Result, anyhow, bail};
 
-use crate::module::ModuleBox;
+use crate::module::BoxedModule;
 
 use super::args::{Argument, Arguments};
 
@@ -90,8 +90,8 @@ impl Context {
 
 #[derive(Debug)]
 pub(super) enum Command {
-    Statement(StatementBox),
-    Expression(ExpressionBox),
+    Statement(BoxedStatement),
+    Expression(BoxedExpression),
 }
 
 impl Command {
@@ -111,7 +111,7 @@ pub(super) trait CommandBuilder: Sync + Send {
     fn build(&self, workdir: &Path, args: &Arguments) -> Result<Command>;
 }
 
-pub(super) type CommandBuilderBox = Box<dyn CommandBuilder>;
+pub(super) type BoxedCommandBuilder = Box<dyn CommandBuilder>;
 
 pub(super) trait WithWrapperBuilder: Sync + Send {
     fn name(&self) -> String;
@@ -120,35 +120,35 @@ pub(super) trait WithWrapperBuilder: Sync + Send {
         &self,
         workdir: &Path,
         args: &Arguments,
-        statement: StatementBox,
-    ) -> Result<StatementBox>;
+        statement: BoxedStatement,
+    ) -> Result<BoxedStatement>;
 }
 
-pub(super) type WithWrapperBuilderBox = Box<dyn WithWrapperBuilder>;
+pub(super) type BoxedWithWrapperBuilder = Box<dyn WithWrapperBuilder>;
 
 pub(super) trait ConditionBuilder: Sync + Send {
     fn name(&self) -> String;
     fn help(&self) -> String;
-    fn build(&self, workdir: &Path, args: &Arguments) -> Result<ConditionBox>;
+    fn build(&self, workdir: &Path, args: &Arguments) -> Result<BoxedCondition>;
 }
 
-pub(super) type ConditionBuilderBox = Box<dyn ConditionBuilder>;
+pub(super) type BoxedConditionBuilder = Box<dyn ConditionBuilder>;
 
 pub(super) trait Condition: std::fmt::Debug {
     fn eval(&self, ctx: &Context) -> Result<bool>;
 }
 
-pub(super) type ConditionBox = Box<dyn Condition>;
+pub(super) type BoxedCondition = Box<dyn Condition>;
 
 /// Command creates a Module or modifies State.
 pub(super) trait Statement: std::fmt::Debug {
-    fn eval(&self, ctx: &mut Context) -> Result<Option<ModuleBox>>;
+    fn eval(&self, ctx: &mut Context) -> Result<Option<BoxedModule>>;
 }
 
-pub(super) type StatementBox = Box<dyn Statement>;
+pub(super) type BoxedStatement = Box<dyn Statement>;
 
 pub(super) struct ExpressionOutput {
-    pub module: Option<ModuleBox>,
+    pub module: Option<BoxedModule>,
     pub output: OsString,
 }
 
@@ -156,7 +156,7 @@ pub(super) trait Expression: std::fmt::Debug {
     fn eval(&self, ctx: &mut Context) -> Result<ExpressionOutput>;
 }
 
-pub(super) type ExpressionBox = Box<dyn Expression>;
+pub(super) type BoxedExpression = Box<dyn Expression>;
 
 pub(super) fn new_command(workdir: &Path, command: &str, args: &Arguments) -> Result<Command> {
     let builder = super::inventory::command(command)?;
@@ -167,13 +167,17 @@ pub(super) fn new_with_wrapper(
     workdir: &Path,
     name: &str,
     args: &Arguments,
-    statement: StatementBox,
-) -> Result<StatementBox> {
+    statement: BoxedStatement,
+) -> Result<BoxedStatement> {
     let builder = super::inventory::with_wrapper(name)?;
     builder.build(workdir, args, statement)
 }
 
-pub(super) fn new_condition(workdir: &Path, name: &str, args: &Arguments) -> Result<ConditionBox> {
+pub(super) fn new_condition(
+    workdir: &Path,
+    name: &str,
+    args: &Arguments,
+) -> Result<BoxedCondition> {
     let builder = super::inventory::condition(name)?;
     builder.build(workdir, args)
 }
@@ -201,10 +205,10 @@ pub fn help() -> String {
 }
 
 #[derive(Debug)]
-pub(super) struct VecStatement(pub Vec<StatementBox>);
+pub(super) struct VecStatement(pub Vec<BoxedStatement>);
 
 impl Statement for VecStatement {
-    fn eval(&self, ctx: &mut Context) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut Context) -> Result<Option<BoxedModule>> {
         let mut modules: Vec<_> = Vec::new();
         for statement in &self.0 {
             if !ctx.enabled {

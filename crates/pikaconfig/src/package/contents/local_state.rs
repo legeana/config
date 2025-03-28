@@ -6,7 +6,7 @@ use base64::engine::general_purpose::URL_SAFE;
 use registry::Registry;
 use sha2::{Digest as _, Sha256};
 
-use crate::annotated_path::{AnnotatedPath, AnnotatedPathBox};
+use crate::annotated_path::{AnnotatedPath, BoxedAnnotatedPath};
 use crate::module::{Module, Rules};
 
 use super::file_util;
@@ -179,7 +179,7 @@ impl std::fmt::Debug for StateMapping {
 pub(super) struct EphemeralDir(PathBuf);
 
 impl EphemeralDir {
-    pub(super) fn state(&self) -> AnnotatedPathBox {
+    pub(super) fn state(&self) -> BoxedAnnotatedPath {
         Box::new(self.0.clone())
     }
 }
@@ -193,7 +193,7 @@ impl Module for EphemeralDir {
 pub(super) struct EphemeralFile(PathBuf);
 
 impl EphemeralFile {
-    pub(super) fn state(&self) -> AnnotatedPathBox {
+    pub(super) fn state(&self) -> BoxedAnnotatedPath {
         Box::new(self.0.clone())
     }
 }
@@ -207,7 +207,7 @@ impl Module for EphemeralFile {
 pub(super) struct LinkedDir(StateMapping);
 
 impl LinkedDir {
-    pub(super) fn state(&self) -> AnnotatedPathBox {
+    pub(super) fn state(&self) -> BoxedAnnotatedPath {
         Box::new(self.0.clone())
     }
 }
@@ -224,7 +224,7 @@ impl Module for LinkedDir {
 pub(super) struct LinkedFile(StateMapping);
 
 impl LinkedFile {
-    pub(super) fn state(&self) -> AnnotatedPathBox {
+    pub(super) fn state(&self) -> BoxedAnnotatedPath {
         Box::new(self.0.clone())
     }
 }

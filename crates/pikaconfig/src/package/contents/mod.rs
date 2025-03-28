@@ -37,8 +37,8 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context as _, Result};
 use lalrpop_util::lalrpop_mod;
 
-use crate::module::{self, ModuleBox};
-use crate::package::contents::engine::{Statement, StatementBox};
+use crate::module::{self, BoxedModule};
+use crate::package::contents::engine::{BoxedStatement, Statement};
 
 lalrpop_mod!(
     #[allow(clippy::pedantic)]
@@ -57,7 +57,7 @@ fn error_context(root: &Path) -> String {
     format!("{root:?}")
 }
 
-pub(super) fn new(root: PathBuf) -> Result<ModuleBox> {
+pub(super) fn new(root: PathBuf) -> Result<BoxedModule> {
     let mut ctx = engine::Context::new();
     Ok(ConfigurationStatement::parse(root)?
         .eval(&mut ctx)?
@@ -75,7 +75,7 @@ struct ConfigurationStatement {
 }
 
 impl Statement for ConfigurationStatement {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
         match self.statements.eval(ctx)? {
             Some(m) => Ok(Some(module::wrap(m, error_context(&self.root)))),
             None => Ok(None),
@@ -85,7 +85,7 @@ impl Statement for ConfigurationStatement {
 
 // Analogous to engine::CommandBuilder, but can only be called from code.
 impl ConfigurationStatement {
-    pub(super) fn parse(root: PathBuf) -> Result<StatementBox> {
+    pub(super) fn parse(root: PathBuf) -> Result<BoxedStatement> {
         let manifest = root.join(MANIFEST);
         let statements = engine::VecStatement(
             parser::parse(&root, &manifest)

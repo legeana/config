@@ -31,7 +31,7 @@ impl engine::ConditionBuilder for ExistsBuilder {
                 true if <path> exists
         ", command=self.name()}
     }
-    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::ConditionBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::BoxedCondition> {
         let path = args.expect_single_arg(self.name())?.clone();
         Ok(Box::new(Exists(path)))
     }

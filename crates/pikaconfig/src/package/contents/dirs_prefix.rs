@@ -5,7 +5,7 @@ use indoc::formatdoc;
 use minijinja::Environment;
 use xdg::xdg_or_win;
 
-use crate::module::ModuleBox;
+use crate::module::BoxedModule;
 
 use super::args::Argument;
 use super::args::Arguments;
@@ -20,7 +20,7 @@ struct DirsPrefixStatement {
 }
 
 impl engine::Statement for DirsPrefixStatement {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
         let base_dir = self
             .base_dir
             .as_ref()

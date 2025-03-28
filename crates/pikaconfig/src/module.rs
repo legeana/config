@@ -57,7 +57,7 @@ pub trait Module {
     }
 }
 
-pub type ModuleBox = Box<dyn Module>;
+pub type BoxedModule = Box<dyn Module>;
 
 impl<T: Module> Module for [T] {
     fn pre_uninstall(&self, rules: &Rules) -> Result<()> {
@@ -169,7 +169,7 @@ impl<T: Module> WrappedModule<T> {
 
 impl_wrap!(WrappedModule, (self.wrap), (self.module));
 
-pub(crate) fn wrap<T: Module + 'static>(module: T, error_context: String) -> ModuleBox {
+pub(crate) fn wrap<T: Module + 'static>(module: T, error_context: String) -> BoxedModule {
     Box::new(WrappedModule {
         module,
         error_context,
@@ -213,7 +213,7 @@ impl<T: Module> Module for WrappedKeepGoing<T> {
     }
 }
 
-pub(crate) fn wrap_keep_going<T>(modules: Vec<T>) -> ModuleBox
+pub(crate) fn wrap_keep_going<T>(modules: Vec<T>) -> BoxedModule
 where
     T: Module + 'static,
 {
@@ -233,7 +233,7 @@ impl<T: Module> WrappedUserDeps<T> {
 
 impl_wrap!(WrappedUserDeps, (self.wrap), (self.0));
 
-pub(crate) fn wrap_user_deps<T>(module: T) -> ModuleBox
+pub(crate) fn wrap_user_deps<T>(module: T) -> BoxedModule
 where
     T: Module + 'static,
 {
@@ -244,6 +244,6 @@ pub(crate) struct Dummy;
 
 impl Module for Dummy {}
 
-pub(crate) fn dummy_box() -> ModuleBox {
+pub(crate) fn dummy_box() -> BoxedModule {
     Box::new(Dummy)
 }

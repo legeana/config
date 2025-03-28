@@ -7,9 +7,9 @@ use minijinja::Environment;
 use super::engine;
 
 pub(super) trait Registry {
-    fn register_command(&mut self, parser: engine::CommandBuilderBox);
-    fn register_condition(&mut self, builder: engine::ConditionBuilderBox);
-    fn register_with_wrapper(&mut self, builder: engine::WithWrapperBuilderBox);
+    fn register_command(&mut self, parser: engine::BoxedCommandBuilder);
+    fn register_condition(&mut self, builder: engine::BoxedConditionBuilder);
+    fn register_with_wrapper(&mut self, builder: engine::BoxedWithWrapperBuilder);
     fn register_render_helper(&mut self, render_helper: Box<dyn RenderHelper>);
 }
 
@@ -19,17 +19,17 @@ pub(super) trait RenderHelper: Sync + Send {
 
 #[derive(Default)]
 struct RegistryImpl {
-    commands: HashMap<String, engine::CommandBuilderBox>,
+    commands: HashMap<String, engine::BoxedCommandBuilder>,
     commands_order: Vec<String>,
-    conditions: HashMap<String, engine::ConditionBuilderBox>,
+    conditions: HashMap<String, engine::BoxedConditionBuilder>,
     conditions_order: Vec<String>,
-    with_wrappers: HashMap<String, engine::WithWrapperBuilderBox>,
+    with_wrappers: HashMap<String, engine::BoxedWithWrapperBuilder>,
     with_wrappers_order: Vec<String>,
     render_helpers: Vec<Box<dyn RenderHelper>>,
 }
 
 impl Registry for RegistryImpl {
-    fn register_command(&mut self, parser: engine::CommandBuilderBox) {
+    fn register_command(&mut self, parser: engine::BoxedCommandBuilder) {
         let name = parser.name();
         let former = self.commands.insert(parser.name(), parser);
         if let Some(former) = former {
@@ -37,7 +37,7 @@ impl Registry for RegistryImpl {
         }
         self.commands_order.push(name);
     }
-    fn register_condition(&mut self, builder: engine::ConditionBuilderBox) {
+    fn register_condition(&mut self, builder: engine::BoxedConditionBuilder) {
         let name = builder.name();
         let former = self.conditions.insert(builder.name(), builder);
         if let Some(former) = former {
@@ -45,7 +45,7 @@ impl Registry for RegistryImpl {
         }
         self.conditions_order.push(name);
     }
-    fn register_with_wrapper(&mut self, builder: engine::WithWrapperBuilderBox) {
+    fn register_with_wrapper(&mut self, builder: engine::BoxedWithWrapperBuilder) {
         let name = builder.name();
         let former = self.with_wrappers.insert(builder.name(), builder);
         if let Some(former) = former {
@@ -100,7 +100,7 @@ fn registry() -> &'static RegistryImpl {
     })
 }
 
-pub(super) fn commands() -> impl Iterator<Item = &'static engine::CommandBuilderBox> {
+pub(super) fn commands() -> impl Iterator<Item = &'static engine::BoxedCommandBuilder> {
     registry().commands_order.iter().map(|name| {
         registry()
             .commands
@@ -117,7 +117,7 @@ pub(super) fn command(name: &str) -> Result<&dyn engine::CommandBuilder> {
         .map(AsRef::as_ref)
 }
 
-pub(super) fn conditions() -> impl Iterator<Item = &'static engine::ConditionBuilderBox> {
+pub(super) fn conditions() -> impl Iterator<Item = &'static engine::BoxedConditionBuilder> {
     registry().conditions_order.iter().map(|name| {
         registry()
             .conditions
@@ -134,7 +134,7 @@ pub(super) fn condition(name: &str) -> Result<&dyn engine::ConditionBuilder> {
         .map(AsRef::as_ref)
 }
 
-pub(super) fn with_wrappers() -> impl Iterator<Item = &'static engine::WithWrapperBuilderBox> {
+pub(super) fn with_wrappers() -> impl Iterator<Item = &'static engine::BoxedWithWrapperBuilder> {
     registry().with_wrappers_order.iter().map(|name| {
         registry()
             .with_wrappers

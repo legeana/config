@@ -39,7 +39,7 @@ impl engine::ConditionBuilder for IsOsBuilder {
                 true if os is {os}
         ", condition=self.name(), os=self.0}
     }
-    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::ConditionBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::BoxedCondition> {
         args.expect_no_args(self.name())?;
         Ok(Box::new(IsOs(self.0)))
     }

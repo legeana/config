@@ -4,8 +4,8 @@ use anyhow::{Context as _, Result};
 use indoc::formatdoc;
 use registry::Registry;
 
-use crate::annotated_path::AnnotatedPathBox;
-use crate::module::{Module, ModuleBox, Rules};
+use crate::annotated_path::BoxedAnnotatedPath;
+use crate::module::{BoxedModule, Module, Rules};
 
 use super::args::{Argument, Arguments};
 use super::engine;
@@ -13,7 +13,7 @@ use super::inventory;
 use super::local_state;
 
 struct SetContents {
-    output: AnnotatedPathBox,
+    output: BoxedAnnotatedPath,
     contents: String,
 }
 
@@ -47,7 +47,7 @@ struct SetContentsStatement {
 }
 
 impl engine::Statement for SetContentsStatement {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
         let dst = ctx.dst_path(ctx.expand_arg(&self.filename)?);
         let output = local_state::file_state(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;

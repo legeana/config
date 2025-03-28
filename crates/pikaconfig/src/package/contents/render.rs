@@ -6,9 +6,9 @@ use minijinja::Environment;
 use registry::Registry;
 use serde::Serialize;
 
-use crate::annotated_path::AnnotatedPathBox;
+use crate::annotated_path::BoxedAnnotatedPath;
 use crate::minijinja_helper;
-use crate::module::{Module, ModuleBox, Rules};
+use crate::module::{BoxedModule, Module, Rules};
 
 use super::args::{Argument, Arguments};
 use super::engine;
@@ -39,7 +39,7 @@ struct Context {
 struct Render {
     env: Environment<'static>,
     ctx: Context,
-    output: AnnotatedPathBox,
+    output: BoxedAnnotatedPath,
     permissions: std::fs::Permissions,
 }
 
@@ -66,7 +66,7 @@ struct RenderStatement {
 }
 
 impl engine::Statement for RenderStatement {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
         let src = self.workdir.join(ctx.expand_arg(&self.src)?);
         let dst = ctx.dst_path(ctx.expand_arg(&self.dst)?);
         let output = local_state::file_state(dst.clone())

@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use crate::module::{Module, ModuleBox, Rules};
+use crate::module::{BoxedModule, Module, Rules};
 
 use super::args::{Argument, Arguments};
 use super::engine;
@@ -31,7 +31,7 @@ struct MkDirStatement {
 }
 
 impl engine::Statement for MkDirStatement {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
         Ok(Some(Box::new(MkDir {
             dst: ctx.dst_path(ctx.expand_arg(&self.dir)?),
         })))

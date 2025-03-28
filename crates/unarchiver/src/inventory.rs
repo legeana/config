@@ -3,7 +3,7 @@ use std::sync::{Arc, OnceLock};
 
 use anyhow::{Result, anyhow};
 
-use crate::{Unarchiver, UnarchiverBox};
+use crate::{BoxedUnarchiver, Unarchiver};
 
 type UnarchiverArc = Arc<dyn Unarchiver>;
 
@@ -14,7 +14,7 @@ pub(crate) struct Registry {
 }
 
 impl Registry {
-    pub(crate) fn register(&mut self, unarchiver: UnarchiverBox) {
+    pub(crate) fn register(&mut self, unarchiver: BoxedUnarchiver) {
         let name = unarchiver.name();
         let unarchiver: UnarchiverArc = unarchiver.into();
         if let Some(u) = self.unarchivers.insert(name, unarchiver.clone()) {

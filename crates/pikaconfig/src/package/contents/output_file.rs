@@ -3,7 +3,7 @@ use std::path::Path;
 use anyhow::{Context as _, Result};
 use indoc::formatdoc;
 
-use crate::module::ModuleBox;
+use crate::module::BoxedModule;
 
 use super::args::{Argument, Arguments};
 use super::engine;
@@ -16,7 +16,7 @@ struct OutputFileStatement {
 }
 
 impl engine::Statement for OutputFileStatement {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
         let dst = ctx.dst_path(ctx.expand_arg(&self.filename)?);
         let output = local_state::file_state(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;

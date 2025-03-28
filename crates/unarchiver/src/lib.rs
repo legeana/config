@@ -11,7 +11,7 @@ pub trait Unarchiver: Send + Sync {
     fn unarchive(&self, src: &Path, dst: &Path) -> Result<()>;
 }
 
-type UnarchiverBox = Box<dyn Unarchiver>;
+type BoxedUnarchiver = Box<dyn Unarchiver>;
 
 pub fn by_name(name: impl AsRef<str>) -> Result<&'static dyn Unarchiver> {
     inventory::by_name(name.as_ref())

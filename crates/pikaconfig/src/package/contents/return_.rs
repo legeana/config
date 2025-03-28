@@ -3,7 +3,7 @@ use std::path::Path;
 use anyhow::Result;
 use indoc::formatdoc;
 
-use crate::module::ModuleBox;
+use crate::module::BoxedModule;
 
 use super::args::Arguments;
 use super::engine;
@@ -13,7 +13,7 @@ use super::inventory;
 struct ReturnStatement;
 
 impl engine::Statement for ReturnStatement {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
         ctx.enabled = false;
         Ok(None)
     }

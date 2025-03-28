@@ -3,7 +3,7 @@ use std::path::Path;
 use anyhow::Result;
 use indoc::formatdoc;
 
-use crate::module::ModuleBox;
+use crate::module::BoxedModule;
 
 use super::args::{Argument, Arguments};
 use super::engine;
@@ -15,7 +15,7 @@ struct PrefixStatement {
 }
 
 impl engine::Statement for PrefixStatement {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
         ctx.prefix = ctx.expand_arg(&self.prefix)?.into();
         Ok(None)
     }

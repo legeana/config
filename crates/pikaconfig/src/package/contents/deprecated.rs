@@ -4,7 +4,7 @@ use std::path::Path;
 
 use anyhow::Result;
 
-use crate::module::ModuleBox;
+use crate::module::BoxedModule;
 
 use super::args::Arguments;
 use super::engine;
@@ -14,7 +14,7 @@ use super::inventory;
 struct NoOpStatement;
 
 impl engine::Statement for NoOpStatement {
-    fn eval(&self, _ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+    fn eval(&self, _ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
         Ok(None)
     }
 }

@@ -8,7 +8,7 @@ pub(crate) trait AnnotatedPath: std::fmt::Debug {
     }
 }
 
-pub(crate) type AnnotatedPathBox = Box<dyn AnnotatedPath>;
+pub(crate) type BoxedAnnotatedPath = Box<dyn AnnotatedPath>;
 
 impl<T: AnnotatedPath + ?Sized> AnnotatedPath for &T {
     fn as_path(&self) -> &Path {
@@ -49,7 +49,7 @@ mod tests {
     #[test]
     fn test_path_buf() {
         let path = Path::new("test");
-        let ap: AnnotatedPathBox = Box::new(path.to_owned());
+        let ap: BoxedAnnotatedPath = Box::new(path.to_owned());
         assert_eq!(format!("{ap:?}"), "\"test\"");
         assert_eq!(ap.as_path(), path);
         assert_eq!(ap.to_path_buf(), path);
@@ -58,7 +58,7 @@ mod tests {
     #[test]
     fn test_path() {
         let path = Path::new("test");
-        let ap: AnnotatedPathBox = Box::new(path);
+        let ap: BoxedAnnotatedPath = Box::new(path);
         assert_eq!(format!("{ap:?}"), "\"test\"");
         assert_eq!(ap.as_path(), path);
         assert_eq!(ap.to_path_buf(), path);

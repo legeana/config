@@ -37,7 +37,7 @@ impl engine::ConditionBuilder for TagsBuilder {
                 Both tag=value and tag!=value are supported.
         ", command=self.name()}
     }
-    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::ConditionBox> {
+    fn build(&self, _workdir: &Path, args: &Arguments) -> Result<engine::BoxedCondition> {
         let tags = args.expect_any_args(self.name())?;
         let tags: Vec<_> = tags
             .iter()

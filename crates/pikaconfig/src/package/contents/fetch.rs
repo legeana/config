@@ -4,8 +4,8 @@ use anyhow::{Context as _, Result};
 use indoc::formatdoc;
 use registry::Registry;
 
-use crate::annotated_path::AnnotatedPathBox;
-use crate::module::{Module, ModuleBox, Rules};
+use crate::annotated_path::BoxedAnnotatedPath;
+use crate::module::{BoxedModule, Module, Rules};
 
 use super::args::{Argument, Arguments};
 use super::engine;
@@ -17,7 +17,7 @@ use super::net_util::{FetchOptions, Url, fetch};
 struct FetchInto {
     executable: bool,
     url: Url,
-    output: AnnotatedPathBox,
+    output: BoxedAnnotatedPath,
 }
 
 impl Module for FetchInto {
@@ -54,7 +54,7 @@ struct FetchIntoStatement {
 }
 
 impl engine::Statement for FetchIntoStatement {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
         let dst = ctx.dst_path(ctx.expand_arg(&self.filename)?);
         let output = local_state::linked_file_cache(dst.clone(), self.url.text())
             .with_context(|| format!("failed to create FileState from {dst:?}"))?;

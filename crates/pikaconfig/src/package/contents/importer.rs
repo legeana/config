@@ -2,8 +2,8 @@ use std::io::{BufRead as _, BufReader, BufWriter};
 use std::path::{Path, PathBuf};
 use std::{fs::File, io::Write};
 
-use crate::annotated_path::AnnotatedPathBox;
-use crate::module::{Module, ModuleBox, Rules};
+use crate::annotated_path::BoxedAnnotatedPath;
+use crate::module::{BoxedModule, Module, Rules};
 
 use super::args::{Argument, Arguments};
 use super::engine;
@@ -18,7 +18,7 @@ use walkdir::WalkDir;
 struct Importer {
     prefix: PathBuf,
     src: PathBuf,
-    output: AnnotatedPathBox,
+    output: BoxedAnnotatedPath,
 }
 
 /// Returns true if parser matched.
@@ -101,7 +101,7 @@ struct ImporterStatement {
 }
 
 impl engine::Statement for ImporterStatement {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
         let dst = ctx.dst_path(ctx.expand_arg(&self.filename)?);
         let prefix = dst
             .parent()

@@ -2,7 +2,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context as _, Result, bail};
 
-use crate::module::ModuleBox;
+use crate::module::BoxedModule;
 
 use super::args::Argument;
 use super::ast;
@@ -13,11 +13,11 @@ use super::engine::Statement as _;
 struct ParsedStatement {
     manifest_path: PathBuf,
     line: String,
-    statement: engine::StatementBox,
+    statement: engine::BoxedStatement,
 }
 
 impl engine::Statement for ParsedStatement {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
         self.statement.eval(ctx).with_context(|| {
             format!(
                 "failed to evaluate {manifest_path:?}: {line:?}",
@@ -32,7 +32,7 @@ impl engine::Statement for ParsedStatement {
 struct Condition {
     manifest_path: PathBuf,
     line: String,
-    cond: engine::ConditionBox,
+    cond: engine::BoxedCondition,
 }
 
 impl engine::Condition for Condition {
@@ -48,7 +48,7 @@ impl engine::Condition for Condition {
 }
 
 #[derive(Debug)]
-struct NotCondition(engine::ConditionBox);
+struct NotCondition(engine::BoxedCondition);
 
 impl engine::Condition for NotCondition {
     fn eval(&self, ctx: &engine::Context) -> Result<bool> {
@@ -58,12 +58,12 @@ impl engine::Condition for NotCondition {
 
 #[derive(Debug)]
 struct IfClauseStatement {
-    cond: engine::ConditionBox,
+    cond: engine::BoxedCondition,
     statements: engine::VecStatement,
 }
 
 enum IfClauseAction {
-    Execute(Option<ModuleBox>),
+    Execute(Option<BoxedModule>),
     TryNext,
 }
 
@@ -85,7 +85,7 @@ struct IfStatement {
 }
 
 impl engine::Statement for IfStatement {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
         for if_clause in &self.if_clauses {
             match if_clause.eval(ctx)? {
                 IfClauseAction::Execute(opt_mod) => return Ok(opt_mod),
@@ -101,11 +101,11 @@ struct CommandAssignmentStatement {
     manifest_path: PathBuf,
     line: String,
     var_name: String,
-    expression: engine::ExpressionBox,
+    expression: engine::BoxedExpression,
 }
 
 impl engine::Statement for CommandAssignmentStatement {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
         let engine::ExpressionOutput { module, output } = self.expression.eval(ctx)?;
         ctx.set_var(self.var_name.clone(), output)
             .with_context(|| {
@@ -128,7 +128,7 @@ struct ValueAssignmentStatement {
 }
 
 impl engine::Statement for ValueAssignmentStatement {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
         let value = ctx.expand_arg(&self.value).with_context(|| {
             format!(
                 "failed to expand assignment {var} value {value:?} in {manifest_path:?}",
@@ -149,7 +149,7 @@ impl engine::Statement for ValueAssignmentStatement {
     }
 }
 
-pub(super) fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<engine::StatementBox>> {
+pub(super) fn parse(workdir: &Path, manifest_path: &Path) -> Result<Vec<engine::BoxedStatement>> {
     let manifest = std::fs::read_to_string(manifest_path)
         .with_context(|| format!("failed to read {manifest_path:?}"))?;
     let manifest_ast = ast::Manifest::parse(manifest_path, manifest)
@@ -161,9 +161,9 @@ pub(super) fn parse_statements<'a>(
     workdir: &Path,
     manifest_path: &Path,
     statements: impl Iterator<Item = &'a ast::Statement>,
-) -> Result<Vec<engine::StatementBox>> {
+) -> Result<Vec<engine::BoxedStatement>> {
     statements
-        .map(|statement| -> Result<engine::StatementBox> {
+        .map(|statement| -> Result<engine::BoxedStatement> {
             match statement {
                 ast::Statement::Command(cmd) => parse_command(workdir, manifest_path, cmd),
                 ast::Statement::IfStatement(if_st) => {
@@ -187,7 +187,7 @@ fn parse_command(
     workdir: &Path,
     manifest_path: &Path,
     cmd: &ast::Invocation,
-) -> Result<engine::StatementBox> {
+) -> Result<engine::BoxedStatement> {
     let line = cmd.to_string();
     let command = engine::new_command(workdir, &cmd.name, &cmd.args)
         .with_context(|| format!("failed to parse {manifest_path:?} line: {line}"))?;
@@ -208,7 +208,7 @@ fn parse_command_assignment(
     workdir: &Path,
     manifest_path: &Path,
     assignment: &ast::CommandAssignment,
-) -> Result<engine::StatementBox> {
+) -> Result<engine::BoxedStatement> {
     let cmd = &assignment.command;
     let line = cmd.to_string();
     let command = engine::new_command(workdir, &cmd.name, &cmd.args)
@@ -232,7 +232,7 @@ fn parse_value_assignment(
     _workdir: &Path,
     manifest_path: &Path,
     assignment: &ast::ValueAssignment,
-) -> Result<engine::StatementBox> {
+) -> Result<engine::BoxedStatement> {
     Ok(Box::new(ValueAssignmentStatement {
         manifest_path: manifest_path.to_owned(),
         var_name: assignment.var.clone(),
@@ -244,7 +244,7 @@ fn parse_condition(
     workdir: &Path,
     manifest_path: &Path,
     condition: &ast::Condition,
-) -> Result<engine::ConditionBox> {
+) -> Result<engine::BoxedCondition> {
     match condition {
         ast::Condition::Command(cmd) => {
             let line = cmd.to_string();
@@ -282,7 +282,7 @@ fn parse_if_statement(
     workdir: &Path,
     manifest_path: &Path,
     if_st: &ast::IfStatement,
-) -> Result<engine::StatementBox> {
+) -> Result<engine::BoxedStatement> {
     let mut if_clauses: Vec<IfClauseStatement> =
         Vec::with_capacity(if_st.else_if_clauses.len() + 1);
     if_clauses.push(parse_if_clause(workdir, manifest_path, &if_st.if_clause)?);
@@ -304,7 +304,7 @@ fn parse_with_statement(
     workdir: &Path,
     manifest_path: &Path,
     with_st: &ast::WithStatement,
-) -> Result<engine::StatementBox> {
+) -> Result<engine::BoxedStatement> {
     let statement = Box::new(engine::VecStatement(parse_statements(
         workdir,
         manifest_path,

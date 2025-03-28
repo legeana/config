@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use crate::module::{Module, ModuleBox, Rules};
+use crate::module::{BoxedModule, Module, Rules};
 
 use super::args::Arguments;
 use super::engine;
@@ -44,7 +44,7 @@ struct SymlinkTreeStatement {
 }
 
 impl engine::Statement for SymlinkTreeStatement {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
         Ok(Some(Box::new(SymlinkTree {
             src: self.workdir.join(&self.directory),
             dst: ctx.dst_path(&self.destination),

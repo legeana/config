@@ -6,7 +6,7 @@ use indoc::formatdoc;
 use process_utils::Command;
 use registry::Registry;
 
-use crate::module::{Module, ModuleBox, Rules};
+use crate::module::{BoxedModule, Module, Rules};
 
 use super::args::{Argument, Arguments};
 use super::engine;
@@ -45,7 +45,7 @@ struct PostInstallStatement {
 }
 
 impl engine::Statement for PostInstallStatement {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
         let args = ctx.expand_args(&self.args)?;
         Ok(Some(Box::new(PostInstallExec {
             exec_condition: self.exec_condition.clone(),

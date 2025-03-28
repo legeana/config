@@ -1,8 +1,8 @@
 use std::io::Write as _;
 use std::path::Path;
 
-use crate::annotated_path::AnnotatedPathBox;
-use crate::module::{Module, ModuleBox, Rules};
+use crate::annotated_path::BoxedAnnotatedPath;
+use crate::module::{BoxedModule, Module, Rules};
 
 use super::args::{Argument, Arguments};
 use super::engine;
@@ -16,7 +16,7 @@ use registry::Registry;
 
 struct CatGlobInto {
     globs: Vec<String>,
-    output: AnnotatedPathBox,
+    output: BoxedAnnotatedPath,
 }
 
 impl Module for CatGlobInto {
@@ -48,7 +48,7 @@ struct CatGlobIntoStatement {
 }
 
 impl engine::Statement for CatGlobIntoStatement {
-    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<ModuleBox>> {
+    fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
         let current_prefix = ctx.prefix.to_str().ok_or_else(|| {
             anyhow!(
                 "failed to represent current prefix {:?} as a string",
