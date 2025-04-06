@@ -71,7 +71,7 @@ impl engine::CommandBuilder for DirsPrefixBuilder {
 
 impl inventory::RenderHelper for DirsPrefixBuilder {
     fn register_globals(&self, env: &mut Environment) {
-        use crate::minijinja_helper::{JResult, map_error, to_string};
+        use crate::jinja::{JResult, map_error, to_string};
         let Some(base_dir) = self.base_dir.clone() else {
             return;
         };

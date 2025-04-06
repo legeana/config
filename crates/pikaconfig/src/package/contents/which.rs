@@ -52,7 +52,7 @@ impl engine::CommandBuilder for WhichBuilder {
 
 impl inventory::RenderHelper for WhichBuilder {
     fn register_globals(&self, env: &mut Environment) {
-        use crate::minijinja_helper::{JResult, map_anyhow, map_error, to_string};
+        use crate::jinja::{JResult, map_anyhow, map_error, to_string};
         env.add_function(self.name(), |binary: &str| -> JResult<String> {
             let path = which::which(binary)
                 .with_context(|| format!("failed to find {binary:?} path"))

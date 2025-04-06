@@ -7,7 +7,7 @@ use registry::Registry;
 use serde::Serialize;
 
 use crate::annotated_path::BoxedAnnotatedPath;
-use crate::minijinja_helper;
+use crate::jinja;
 use crate::module::{BoxedModule, Module, Rules};
 
 use super::args::{Argument, Arguments};
@@ -81,7 +81,7 @@ impl engine::Statement for RenderStatement {
             .with_context(|| format!("failed to load {src:?} metadata"))?
             .permissions();
         inventory::register_render_globals(&mut env);
-        minijinja_helper::register(&mut env);
+        jinja::register(&mut env);
         Ok(Some(Box::new((
             output,
             Render {
