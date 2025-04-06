@@ -6,7 +6,7 @@ use std::ffi::{OsStr, OsString};
 use minijinja::{Error as JError, ErrorKind as JErrorKind};
 use thiserror::Error as ThisError;
 
-pub(crate) use context::{Context, DynamicContext};
+pub(crate) use context::Context;
 pub(crate) use helpers::register;
 
 // https://github.com/dtolnay/anyhow/issues/153#issuecomment-833718851

@@ -2,7 +2,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context as _, Result, anyhow};
 use indoc::formatdoc;
-use minijinja::{Environment, Value};
+use minijinja::Environment;
 use registry::Registry;
 
 use crate::annotated_path::BoxedAnnotatedPath;
@@ -18,7 +18,7 @@ const TEMPLATE_NAME: &str = "template";
 
 struct Render {
     env: Environment<'static>,
-    ctx: Value,
+    ctx: jinja::Context,
     output: BoxedAnnotatedPath,
     permissions: std::fs::Permissions,
 }
@@ -62,25 +62,24 @@ impl engine::Statement for RenderStatement {
             .permissions();
         inventory::register_render_globals(&mut env);
         jinja::register(&mut env);
-        let ctx = jinja::DynamicContext::new(jinja::Context {
-            source_file: src.clone(),
-            source_dir: src
-                .parent()
-                .ok_or_else(|| anyhow!("failed to get parent of source_file {src:?}"))?
-                .to_owned(),
-            destination_file: dst.clone(),
-            destination_dir: dst
-                .parent()
-                .ok_or_else(|| anyhow!("failed to get parent of destination_file {dst:?}"))?
-                .to_owned(),
-            workdir: self.workdir.clone(),
-            prefix: ctx.prefix.clone(),
-        });
         Ok(Some(Box::new((
             output,
             Render {
                 env,
-                ctx: Value::from_object(ctx),
+                ctx: jinja::Context {
+                    source_file: src.clone(),
+                    source_dir: src
+                        .parent()
+                        .ok_or_else(|| anyhow!("failed to get parent of source_file {src:?}"))?
+                        .to_owned(),
+                    destination_file: dst.clone(),
+                    destination_dir: dst
+                        .parent()
+                        .ok_or_else(|| anyhow!("failed to get parent of destination_file {dst:?}"))?
+                        .to_owned(),
+                    workdir: self.workdir.clone(),
+                    prefix: ctx.prefix.clone(),
+                },
                 output: output_state,
                 permissions,
             },
