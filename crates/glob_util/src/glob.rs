@@ -26,6 +26,7 @@ pub fn glob(root: impl AsRef<Path>, pattern: impl AsRef<str>) -> Result<Iter> {
     let full_pattern = full
         .to_str()
         .ok_or_else(|| anyhow!("failed to convert {full:?} to utf-8"))?;
+    log::debug!("glob({root:?}, {pattern:?}) => glob({full_pattern:?})");
     let paths = glob_iter(full_pattern)?;
     Ok(Iter(paths))
 }

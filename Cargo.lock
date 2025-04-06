@@ -463,6 +463,7 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "glob",
+ "log",
  "pretty_assertions",
  "test-case",
 ]
