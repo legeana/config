@@ -1,5 +1,6 @@
 mod context;
 mod glob;
+mod header;
 mod helpers;
 
 use std::ffi::{OsStr, OsString};
