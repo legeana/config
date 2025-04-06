@@ -4,7 +4,6 @@ use anyhow::{Context as _, Result, anyhow};
 use indoc::formatdoc;
 use minijinja::Environment;
 use registry::Registry;
-use serde::Serialize;
 
 use crate::annotated_path::BoxedAnnotatedPath;
 use crate::jinja;
@@ -17,28 +16,9 @@ use super::local_state;
 
 const TEMPLATE_NAME: &str = "template";
 
-#[derive(Debug, Serialize)]
-struct Context {
-    // Filename of the template.
-    source_file: PathBuf,
-    // Directory of the template.
-    source_dir: PathBuf,
-    // Filename of the rendered file.
-    destination_file: PathBuf,
-    // Directory of the rendered file.
-    destination_dir: PathBuf,
-    // Directory of MANIFEST.
-    // May be different from source_dir if render argument consists of multiple
-    // path components.
-    workdir: PathBuf,
-    // MANIFEST prefix render was called in.
-    // May be different from destination_dir if render_to is used.
-    prefix: PathBuf,
-}
-
 struct Render {
     env: Environment<'static>,
-    ctx: Context,
+    ctx: jinja::Context,
     output: BoxedAnnotatedPath,
     permissions: std::fs::Permissions,
 }
@@ -86,7 +66,7 @@ impl engine::Statement for RenderStatement {
             output,
             Render {
                 env,
-                ctx: Context {
+                ctx: jinja::Context {
                     source_file: src.clone(),
                     source_dir: src
                         .parent()
