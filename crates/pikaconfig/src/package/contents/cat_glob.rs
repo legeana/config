@@ -1,5 +1,5 @@
 use std::io::Write as _;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use crate::annotated_path::BoxedAnnotatedPath;
 use crate::module::{BoxedModule, Module, Rules};
@@ -9,12 +9,13 @@ use super::engine;
 use super::inventory;
 use super::local_state;
 
-use anyhow::{Context as _, Result, anyhow};
-use glob::glob as glob_iter;
+use anyhow::{Context as _, Result};
+use glob_util::glob as glob_iter;
 use indoc::formatdoc;
 use registry::Registry;
 
 struct CatGlobInto {
+    glob_root: PathBuf,
     globs: Vec<String>,
     output: BoxedAnnotatedPath,
 }
@@ -25,7 +26,9 @@ impl Module for CatGlobInto {
             .with_context(|| format!("unable to create {:?}", self.output))?;
         let mut out = std::io::BufWriter::new(out_file);
         for glob in &self.globs {
-            for entry in glob_iter(glob).with_context(|| format!("failed to glob {glob}"))? {
+            for entry in glob_iter(&self.glob_root, glob)
+                .with_context(|| format!("failed to glob {glob:?}"))?
+            {
                 let path = entry.with_context(|| format!("failed to iterate over glob {glob}"))?;
                 let inp_file = std::fs::File::open(&path)
                     .with_context(|| format!("failed to open {path:?}"))?;
@@ -49,15 +52,6 @@ struct CatGlobIntoStatement {
 
 impl engine::Statement for CatGlobIntoStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
-        let current_prefix = ctx.prefix.to_str().ok_or_else(|| {
-            anyhow!(
-                "failed to represent current prefix {:?} as a string",
-                &ctx.prefix
-            )
-        })?;
-        let glob_prefix = current_prefix.to_owned() + std::path::MAIN_SEPARATOR_STR;
-        let concatenated_globs: Vec<String> =
-            self.globs.iter().map(|g| glob_prefix.clone() + g).collect();
         let dst = ctx.dst_path(ctx.expand_arg(&self.filename)?);
         let output = local_state::file_state(dst.clone())
             .with_context(|| format!("failed to create FileState for {dst:?}"))?;
@@ -65,7 +59,8 @@ impl engine::Statement for CatGlobIntoStatement {
         Ok(Some(Box::new((
             output,
             CatGlobInto {
-                globs: concatenated_globs,
+                glob_root: ctx.prefix.clone(),
+                globs: self.globs.clone(),
                 output: output_state,
             },
         ))))
