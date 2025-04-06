@@ -5,6 +5,7 @@ use anyhow::{Result, anyhow};
 use minijinja::Environment;
 
 use super::engine;
+use crate::jinja::DynamicContext;
 
 pub(super) trait Registry {
     fn register_command(&mut self, parser: engine::BoxedCommandBuilder);
@@ -14,7 +15,12 @@ pub(super) trait Registry {
 }
 
 pub(super) trait RenderHelper: Sync + Send {
-    fn register_globals(&self, env: &mut Environment);
+    fn register_globals(&self, env: &mut Environment) {
+        _ = env;
+    }
+    fn register_methods(&self, ctx: &mut DynamicContext) {
+        _ = ctx;
+    }
 }
 
 #[derive(Default)]
@@ -154,6 +160,12 @@ pub(super) fn with_wrapper(name: &str) -> Result<&dyn engine::WithWrapperBuilder
 pub(super) fn register_render_globals(env: &mut Environment) {
     for rh in &registry().render_helpers {
         rh.register_globals(env);
+    }
+}
+
+pub(super) fn register_render_locals(ctx: &mut DynamicContext) {
+    for rh in &registry().render_helpers {
+        rh.register_methods(ctx);
     }
 }
 

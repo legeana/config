@@ -62,7 +62,7 @@ impl engine::Statement for RenderStatement {
             .permissions();
         inventory::register_render_globals(&mut env);
         jinja::register(&mut env);
-        let ctx = jinja::DynamicContext::new(jinja::Context {
+        let mut ctx = jinja::DynamicContext::new(jinja::Context {
             source_file: src.clone(),
             source_dir: src
                 .parent()
@@ -76,6 +76,7 @@ impl engine::Statement for RenderStatement {
             workdir: self.workdir.clone(),
             prefix: ctx.prefix.clone(),
         });
+        inventory::register_render_locals(&mut ctx);
         Ok(Some(Box::new((
             output,
             Render {
