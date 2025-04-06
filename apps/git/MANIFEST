@@ -1,5 +1,5 @@
 prefix ~
-symlink_to .gitconfig gitconfig
+render_to .gitconfig gitconfig
 symlink_tree_to .gitconfig.d gitconfig.d
 
 prefix ~/.gitconfig.d
