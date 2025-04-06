@@ -1,7 +1,11 @@
+mod helpers;
+
 use std::ffi::{OsStr, OsString};
 
-use minijinja::{Environment, Error as JError, ErrorKind as JErrorKind};
+use minijinja::{Error as JError, ErrorKind as JErrorKind};
 use thiserror::Error as ThisError;
+
+pub(crate) use helpers::register;
 
 // https://github.com/dtolnay/anyhow/issues/153#issuecomment-833718851
 #[derive(Debug, ThisError)]
@@ -34,8 +38,4 @@ pub(crate) fn to_string(name: &'static str, b: impl AsRef<OsStr>) -> Result<Stri
     b.to_str()
         .map(String::from)
         .ok_or_else(|| Error::OsStrToString(name, b.to_owned()))
-}
-
-pub(crate) fn register(env: &mut Environment) {
-    env.add_filter("enquote", quote::enquote);
 }
