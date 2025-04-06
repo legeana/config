@@ -1,4 +1,5 @@
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
 use anyhow::{Context as _, Result, anyhow};
 use indoc::formatdoc;
@@ -18,7 +19,7 @@ const TEMPLATE_NAME: &str = "template";
 
 struct Render {
     env: Environment<'static>,
-    ctx: jinja::Context,
+    ctx: Arc<jinja::Context>,
     output: BoxedAnnotatedPath,
     permissions: std::fs::Permissions,
 }
@@ -29,7 +30,7 @@ impl Module for Render {
             .with_context(|| format!("failed to create a file {:?}", self.output))?;
         self.env
             .get_template(TEMPLATE_NAME)?
-            .render_to_write(&self.ctx, &mut file)
+            .render_to_write(self.ctx.as_ref(), &mut file)
             .with_context(|| format!("failed to render to file {:?}", self.output))?;
         file.sync_all()
             .with_context(|| format!("failed to flush {:?}", self.output))?;
@@ -60,26 +61,27 @@ impl engine::Statement for RenderStatement {
         let permissions = std::fs::metadata(&src)
             .with_context(|| format!("failed to load {src:?} metadata"))?
             .permissions();
-        inventory::register_render_globals(&mut env);
-        jinja::register(&mut env);
+        let ctx = Arc::new(jinja::Context {
+            source_file: src.clone(),
+            source_dir: src
+                .parent()
+                .ok_or_else(|| anyhow!("failed to get parent of source_file {src:?}"))?
+                .to_owned(),
+            destination_file: dst.clone(),
+            destination_dir: dst
+                .parent()
+                .ok_or_else(|| anyhow!("failed to get parent of destination_file {dst:?}"))?
+                .to_owned(),
+            workdir: self.workdir.clone(),
+            prefix: ctx.prefix.clone(),
+        });
+        inventory::register_render_globals(&mut env, &ctx);
+        jinja::register(&mut env, &ctx);
         Ok(Some(Box::new((
             output,
             Render {
                 env,
-                ctx: jinja::Context {
-                    source_file: src.clone(),
-                    source_dir: src
-                        .parent()
-                        .ok_or_else(|| anyhow!("failed to get parent of source_file {src:?}"))?
-                        .to_owned(),
-                    destination_file: dst.clone(),
-                    destination_dir: dst
-                        .parent()
-                        .ok_or_else(|| anyhow!("failed to get parent of destination_file {dst:?}"))?
-                        .to_owned(),
-                    workdir: self.workdir.clone(),
-                    prefix: ctx.prefix.clone(),
-                },
+                ctx,
                 output: output_state,
                 permissions,
             },

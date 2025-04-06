@@ -1,9 +1,11 @@
 use std::path::Path;
+use std::sync::Arc;
 
 use super::args::Arguments;
 use super::engine;
 use super::engine::ConditionBuilder as _;
 use super::inventory;
+use crate::jinja;
 
 use anyhow::Result;
 use indoc::formatdoc;
@@ -46,7 +48,7 @@ impl engine::ConditionBuilder for IsOsBuilder {
 }
 
 impl inventory::RenderHelper for IsOsBuilder {
-    fn register_globals(&self, env: &mut Environment) {
+    fn register_globals(&self, env: &mut Environment, _ctx: &Arc<jinja::Context>) {
         let is_os = IsOs(self.0);
         env.add_function(self.name(), move || is_os.check());
     }

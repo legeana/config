@@ -1,4 +1,5 @@
 use std::path::Path;
+use std::sync::Arc;
 
 use anyhow::{Context as _, Result};
 use indoc::formatdoc;
@@ -8,6 +9,7 @@ use super::args::{Argument, Arguments};
 use super::engine;
 use super::engine::CommandBuilder as _;
 use super::inventory;
+use crate::jinja;
 
 #[derive(Debug)]
 struct WhichExpression {
@@ -51,7 +53,7 @@ impl engine::CommandBuilder for WhichBuilder {
 }
 
 impl inventory::RenderHelper for WhichBuilder {
-    fn register_globals(&self, env: &mut Environment) {
+    fn register_globals(&self, env: &mut Environment, _ctx: &Arc<jinja::Context>) {
         use crate::jinja::{JResult, map_anyhow, map_error, to_string};
         env.add_function(self.name(), |binary: &str| -> JResult<String> {
             let path = which::which(binary)

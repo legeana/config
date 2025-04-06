@@ -1,10 +1,12 @@
 use std::path::PathBuf;
+use std::sync::Arc;
 
 use anyhow::{Context as _, Result, anyhow};
 use indoc::formatdoc;
 use minijinja::Environment;
 use xdg::xdg_or_win;
 
+use crate::jinja;
 use crate::module::BoxedModule;
 
 use super::args::Argument;
@@ -70,7 +72,7 @@ impl engine::CommandBuilder for DirsPrefixBuilder {
 }
 
 impl inventory::RenderHelper for DirsPrefixBuilder {
-    fn register_globals(&self, env: &mut Environment) {
+    fn register_globals(&self, env: &mut Environment, _ctx: &Arc<jinja::Context>) {
         use crate::jinja::{JResult, map_error, to_string};
         let Some(base_dir) = self.base_dir.clone() else {
             return;

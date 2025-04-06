@@ -1,10 +1,11 @@
 use std::collections::HashMap;
-use std::sync::OnceLock;
+use std::sync::{Arc, OnceLock};
 
 use anyhow::{Result, anyhow};
 use minijinja::Environment;
 
 use super::engine;
+use crate::jinja;
 
 pub(super) trait Registry {
     fn register_command(&mut self, parser: engine::BoxedCommandBuilder);
@@ -14,7 +15,7 @@ pub(super) trait Registry {
 }
 
 pub(super) trait RenderHelper: Sync + Send {
-    fn register_globals(&self, env: &mut Environment);
+    fn register_globals(&self, env: &mut Environment, ctx: &Arc<jinja::Context>);
 }
 
 #[derive(Default)]
@@ -151,9 +152,9 @@ pub(super) fn with_wrapper(name: &str) -> Result<&dyn engine::WithWrapperBuilder
         .map(AsRef::as_ref)
 }
 
-pub(super) fn register_render_globals(env: &mut Environment) {
+pub(super) fn register_render_globals(env: &mut Environment, ctx: &Arc<jinja::Context>) {
     for rh in &registry().render_helpers {
-        rh.register_globals(env);
+        rh.register_globals(env, ctx);
     }
 }
 
