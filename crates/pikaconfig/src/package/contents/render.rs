@@ -25,7 +25,9 @@ struct Render {
 }
 
 impl Module for Render {
-    fn install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
+    // We need to run in post_install to allow jinja functions such as glob to
+    // have access to installed symlinks.
+    fn post_install(&self, _rules: &Rules, _registry: &mut dyn Registry) -> Result<()> {
         let mut file = std::fs::File::create(self.output.as_path())
             .with_context(|| format!("failed to create a file {:?}", self.output))?;
         self.env
