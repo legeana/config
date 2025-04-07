@@ -6,7 +6,7 @@
 [include]
     # path = ".gitconfig.d/*"
     {%- for path in glob(".gitconfig.d/*") %}
-    path = {{path}}
+    path = {{path | enquote()}}
     {%- endfor %}
 
 [merge]
