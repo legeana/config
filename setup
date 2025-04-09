@@ -122,13 +122,14 @@ docker_build() {
         rust:latest \
         cargo build \
         --locked \
+        --release \
         "$@"
 }
 
 docker_setup_base() {
-    docker_build --package="$BOOTSTRAP" --release
+    docker_build --package="$BOOTSTRAP"
     "$CACHED_BOOTSTRAP" "$@"
-    docker_build --package="$BINARY" --release
+    docker_build --package="$BINARY"
     "$CACHED_BINARY" "$@"
 }
 
