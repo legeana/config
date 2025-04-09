@@ -17,6 +17,6 @@ echo "Running in %ROOT%"
 set PIKACONFIG_CONFIG_ROOT=%ROOT%
 
 :: Setup using native tools.
-cargo run --manifest-path="%SRC%\Cargo.toml" --package="%BOOTSTRAP%" --release -- %* || exit /b 1
-cargo build --manifest-path="%SRC%\Cargo.toml" --package="%BINARY%" --release || exit /b 1
+cargo run --manifest-path="%SRC%\Cargo.toml" --locked --package="%BOOTSTRAP%" --release -- %* || exit /b 1
+cargo build --manifest-path="%SRC%\Cargo.toml" --locked --package="%BINARY%" --release || exit /b 1
 gsudo %CACHED_BINARY% %* || exit /b 1

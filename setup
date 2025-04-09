@@ -96,11 +96,13 @@ native_setup() {
     get_rust
     cargo run \
         --manifest-path="$SRC/Cargo.toml" \
+        --locked \
         --package="$BOOTSTRAP" \
         --release \
         -- "$@"
     cargo run \
         --manifest-path="$SRC/Cargo.toml" \
+        --locked \
         --package="$BINARY" \
         --release \
         -- "$@"
@@ -118,7 +120,9 @@ docker_build() {
         --rm \
         --workdir=/app \
         rust:latest \
-        cargo build "$@"
+        cargo build \
+        --locked \
+        "$@"
 }
 
 docker_setup_base() {
