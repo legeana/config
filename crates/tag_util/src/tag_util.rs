@@ -107,12 +107,12 @@ impl SystemInfo {
         want_distro == self.distro()
     }
     fn distro_like(&self) -> Vec<String> {
-        // TODO: https://github.com/GuillaumeGomez/sysinfo/pull/1460
-        // Return [self.distro] + System::distribution_id_like().
-        match self.distro().as_str() {
-            "ubuntu" => vec!["ubuntu".to_owned(), "debian".to_owned()],
-            other => vec![other.to_owned()],
+        let id = System::distribution_id();
+        let mut id_like = System::distribution_id_like();
+        if !id_like.contains(&id) {
+            id_like.insert(0, id);
         }
+        id_like
     }
     fn match_distro_like(&self, want_distro: &str) -> bool {
         self.distro_like().contains(&want_distro.to_owned())
