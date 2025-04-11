@@ -85,6 +85,7 @@ struct IfStatement {
 }
 
 impl engine::Statement for IfStatement {
+    #[allow(clippy::needless_continue)]
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
         for if_clause in &self.if_clauses {
             match if_clause.eval(ctx)? {

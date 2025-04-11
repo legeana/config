@@ -7,7 +7,7 @@ fn main() -> Result<()> {
     let root = cli::config_root()?;
     let command_needs_update = matches!(
         args.command,
-        cli::Commands::Install {} | cli::Commands::Update {} | cli::Commands::SystemInstall {}
+        cli::Commands::Install | cli::Commands::Update | cli::Commands::SystemInstall
     );
     if command_needs_update && !args.no_update {
         // Bootstrap is stable enough we don't attempt to restart.
