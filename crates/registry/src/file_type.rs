@@ -134,7 +134,7 @@ mod tests {
     #[test]
     fn file_type_file_type() {
         assert_eq!(FilePath::new_symlink("test").file_type(), Type::Symlink);
-        assert_eq!(FilePath::new_directory("test").file_type(), Type::Directory,);
+        assert_eq!(FilePath::new_directory("test").file_type(), Type::Directory);
     }
 
     #[test]
