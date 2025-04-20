@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use anyhow::{Context as _, Result};
 
 use registry::Registry;
@@ -155,7 +157,7 @@ macro_rules! impl_wrap {
 
 struct WrappedModule<T: Module> {
     module: T,
-    error_context: String,
+    error_context_debug: String,
 }
 
 impl<T: Module> WrappedModule<T> {
@@ -163,16 +165,20 @@ impl<T: Module> WrappedModule<T> {
     where
         F: FnOnce() -> Result<()>,
     {
-        f().with_context(|| format!("failed {method} in {:?}", self.error_context))
+        f().with_context(|| format!("failed {method} in {}", self.error_context_debug))
     }
 }
 
 impl_wrap!(WrappedModule, (self.wrap), (self.module));
 
-pub(crate) fn wrap<T: Module + 'static>(module: T, error_context: String) -> BoxedModule {
+pub(crate) fn wrap<T, C>(module: T, error_context: C) -> BoxedModule
+where
+    T: Module + 'static,
+    C: Debug,
+{
     Box::new(WrappedModule {
         module,
-        error_context,
+        error_context_debug: format!("{error_context:?}"),
     })
 }
 

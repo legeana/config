@@ -53,10 +53,6 @@ const MANIFEST: &str = "MANIFEST";
 
 pub use engine::help;
 
-fn error_context(root: &Path) -> String {
-    format!("{root:?}")
-}
-
 pub(super) fn new(root: PathBuf) -> Result<BoxedModule> {
     let mut ctx = engine::Context::new();
     Ok(ConfigurationStatement::parse(root)?
@@ -77,7 +73,7 @@ struct ConfigurationStatement {
 impl Statement for ConfigurationStatement {
     fn eval(&self, ctx: &mut engine::Context) -> Result<Option<BoxedModule>> {
         match self.statements.eval(ctx)? {
-            Some(m) => Ok(Some(module::wrap(m, error_context(&self.root)))),
+            Some(m) => Ok(Some(module::wrap(m, &self.root))),
             None => Ok(None),
         }
     }
