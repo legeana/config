@@ -2,10 +2,10 @@ use std::path::Path;
 
 use anyhow::{Context as _, Result};
 
-use pikaconfig::layout;
-use pikaconfig::module::{Module as _, Rules};
-use pikaconfig::package;
-use pikaconfig::uninstaller::Uninstaller as _;
+use lontra::layout;
+use lontra::module::{Module as _, Rules};
+use lontra::package;
+use lontra::uninstaller::Uninstaller as _;
 
 const SQL_REGISTRY: &str = ".install.sqlite";
 

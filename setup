@@ -6,16 +6,16 @@ src_root() {
     pwd
 }
 
-BOOTSTRAP=pikaconfig-bootstrap
-BINARY=pikaconfig
+BOOTSTRAP=lontra-bootstrap
+BINARY=lontra
 ROOT="$(src_root)"
 SRC="${ROOT?}"
 BUILD="$SRC/target/release"
 CACHED_BOOTSTRAP="$BUILD/$BOOTSTRAP"
 CACHED_BINARY="$BUILD/$BINARY"
 
-# Environment used by pikaconfig binary.
-export PIKACONFIG_CONFIG_ROOT="$ROOT"
+# Environment used by lontra binary.
+export LONTRA_CONFIG_ROOT="$ROOT"
 
 log() {
     echo "$@" >&2

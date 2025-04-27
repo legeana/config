@@ -652,6 +652,54 @@ dependencies = [
 ]
 
 [[package]]
+name = "lontra"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "base64",
+ "cli",
+ "dir_layout",
+ "dirs",
+ "git_utils",
+ "glob_util",
+ "http",
+ "indoc",
+ "lalrpop",
+ "lalrpop-util",
+ "log",
+ "logos",
+ "minijinja",
+ "pretty_assertions",
+ "process_utils",
+ "quote 0.0.0",
+ "registry",
+ "serde",
+ "sha2",
+ "shellexpand",
+ "shlexfmt",
+ "tag_util",
+ "test-case",
+ "thiserror",
+ "toml",
+ "unarchiver",
+ "ureq",
+ "walkdir",
+ "which",
+ "xdg",
+]
+
+[[package]]
+name = "lontra-bootstrap"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "cli",
+ "dir_layout",
+ "log",
+ "pretty_assertions",
+]
+
+[[package]]
 name = "memchr"
 version = "2.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -783,54 +831,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "67eabc2ef2a60eb7faa00097bd1ffdb5bd28e62bf39990626a582201b7a754e5"
 dependencies = [
  "siphasher",
-]
-
-[[package]]
-name = "pikaconfig"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "base64",
- "cli",
- "dir_layout",
- "dirs",
- "git_utils",
- "glob_util",
- "http",
- "indoc",
- "lalrpop",
- "lalrpop-util",
- "log",
- "logos",
- "minijinja",
- "pretty_assertions",
- "process_utils",
- "quote 0.0.0",
- "registry",
- "serde",
- "sha2",
- "shellexpand",
- "shlexfmt",
- "tag_util",
- "test-case",
- "thiserror",
- "toml",
- "unarchiver",
- "ureq",
- "walkdir",
- "which",
- "xdg",
-]
-
-[[package]]
-name = "pikaconfig-bootstrap"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "cli",
- "dir_layout",
- "log",
- "pretty_assertions",
 ]
 
 [[package]]

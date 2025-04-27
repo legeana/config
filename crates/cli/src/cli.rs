@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use anyhow::{Context as _, Result};
 use clap::{Parser, Subcommand};
 
-const CONFIG_ROOT_ENV: &str = "PIKACONFIG_CONFIG_ROOT";
+const CONFIG_ROOT_ENV: &str = "LONTRA_CONFIG_ROOT";
 
 #[derive(Debug, Parser)]
 pub struct Cli {
