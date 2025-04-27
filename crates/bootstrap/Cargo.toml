@@ -9,7 +9,7 @@ workspace = true
 
 [dependencies]
 anyhow.workspace = true
-cli = { path = "../cli" }
+cli = { package = "lontra-cli", path = "../lontra-cli" }
 dir_layout = { path = "../dir_layout" }
 log.workspace = true
 

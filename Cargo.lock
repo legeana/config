@@ -203,16 +203,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f46ad14479a25103f283c0f10005961cf086d8dc42205bb44c46ac563475dca6"
 
 [[package]]
-name = "cli"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "clap",
- "env_logger",
- "log",
-]
-
-[[package]]
 name = "colorchoice"
 version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -657,7 +647,6 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "base64",
- "cli",
  "dir_layout",
  "dirs",
  "git_utils",
@@ -668,6 +657,7 @@ dependencies = [
  "lalrpop-util",
  "log",
  "logos",
+ "lontra-cli",
  "minijinja",
  "pretty_assertions",
  "process_utils",
@@ -693,10 +683,20 @@ name = "lontra-bootstrap"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "cli",
  "dir_layout",
  "log",
+ "lontra-cli",
  "pretty_assertions",
+]
+
+[[package]]
+name = "lontra-cli"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "env_logger",
+ "log",
 ]
 
 [[package]]

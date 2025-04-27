@@ -13,7 +13,7 @@ workspace = true
 [dependencies]
 anyhow.workspace = true
 base64 = "0.22.0"
-cli = { path = "../cli" }
+cli = { package = "lontra-cli", path = "../lontra-cli" }
 dir_layout = { path = "../dir_layout" }
 dirs = "6.0"
 git_utils = { path = "../git_utils" }
