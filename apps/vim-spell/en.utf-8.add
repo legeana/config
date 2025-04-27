@@ -4,6 +4,7 @@ BTrees
 RPCs
 TODOs
 abc
+abi
 abortable
 absl
 abstractmethod
@@ -17,6 +18,7 @@ addon
 addons
 addr
 addrs
+adhoc
 ai
 alacritty
 algo
@@ -77,6 +79,8 @@ backend
 backends
 base46
 base64
+basedir
+basedirs
 basename
 basenames
 basestring
@@ -84,6 +88,7 @@ bashrc
 batcat
 baz
 bazel
+bikeshedding
 bincode
 bindsym
 blackbox
@@ -135,6 +140,7 @@ codelab
 colorscheme
 commandline
 compat
+composable
 cond
 conf
 config
@@ -178,8 +184,10 @@ dataclasses
 datamodel
 datamodels
 datetime
+dbg
 debian
 debuggability
+decl
 decryptor
 dedent
 deepcopy
@@ -265,6 +273,7 @@ fd
 fdpass
 fedex
 fedoraproject
+fi
 filegroup
 filepath
 filesystem
@@ -283,6 +292,7 @@ fname
 fnameescape
 fontconfig
 foreach
+formatdoc
 freebsd
 freedesktop
 frontend
@@ -368,6 +378,8 @@ hostinfo
 hostname
 hostnames
 hostport
+hotfix
+hotfixes
 hotspotting
 hotswap
 howto
@@ -475,6 +487,7 @@ loglevel
 logname
 logtostderr
 lol
+lontra
 loopback
 lsb
 lsp
@@ -505,6 +518,7 @@ milli
 mimetype
 minecraft
 mingw
+minijinja
 mit
 mitm
 mixin
@@ -520,6 +534,7 @@ mplayer
 mprocs
 mr
 mro
+msg
 msrv
 msvc
 mtime
@@ -540,11 +555,13 @@ neovim
 nespresso
 netrwhist
 newtype
+newtypes
 nginx
 nic
 nixpkgs
 noconfirm
 nodryrun
+noexcept
 nofork
 nolint
 nonblocking
@@ -695,6 +712,7 @@ readlink
 readonly
 readwrite
 rebase
+rebased
 rebasing
 reconstructors
 recv
@@ -710,6 +728,7 @@ reqwest
 resizer
 returncode
 rfc
+rfcs
 rhai
 rhel
 ripgrep
@@ -724,10 +743,13 @@ rsa
 rsfp
 rsplit
 rss
+rstest
 rstrip
 runfiles
+runstates
 runtimepath
 rusqlite
+rustc
 rustdoc
 rustification
 rustls
@@ -759,6 +781,7 @@ sharding
 shellexpand
 shlex
 shlexfmt
+shortlog
 shoutout
 shutil
 sighup
@@ -882,6 +905,7 @@ textwrap
 tgif
 thiserror
 threadpool
+threadsafe
 tig
 timeseries
 timespec
@@ -932,9 +956,12 @@ unarchiver
 unarchiving
 unbreak
 uncommenting
+unconfigured
 undrain
 undraining
+unescape
 unexport
+unexported
 unhashable
 unicode
 unittest
@@ -951,7 +978,9 @@ unraid
 unregister
 unregistering
 unregistration
+unrepresentable
 unstashed
+unsynced
 unterminated
 upsert
 ureq
