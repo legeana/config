@@ -28,7 +28,7 @@ where
                 }
             }
         }
-        if entry.path().file_name() == Some(OsStr::new(git_utils::GIT_DIR)) {
+        if entry.path().file_name() == Some(OsStr::new(git::GIT_DIR)) {
             it.skip_current_dir();
             continue;
         }

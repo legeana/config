@@ -257,7 +257,7 @@ name = "dir_layout"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "git_utils",
+ "lontra-git",
 ]
 
 [[package]]
@@ -398,14 +398,6 @@ dependencies = [
  "cfg-if",
  "libc",
  "wasi",
-]
-
-[[package]]
-name = "git_utils"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "process_utils",
 ]
 
 [[package]]
@@ -649,7 +641,6 @@ dependencies = [
  "base64",
  "dir_layout",
  "dirs",
- "git_utils",
  "glob_util",
  "http",
  "indoc",
@@ -658,6 +649,7 @@ dependencies = [
  "log",
  "logos",
  "lontra-cli",
+ "lontra-git",
  "minijinja",
  "pretty_assertions",
  "process_utils",
@@ -697,6 +689,14 @@ dependencies = [
  "clap",
  "env_logger",
  "log",
+]
+
+[[package]]
+name = "lontra-git"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "process_utils",
 ]
 
 [[package]]

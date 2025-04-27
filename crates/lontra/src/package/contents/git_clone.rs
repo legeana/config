@@ -13,28 +13,28 @@ use super::inventory;
 use super::local_state;
 
 struct GitClone {
-    remote: git_utils::Remote,
+    remote: git::Remote,
     repo: BoxedAnnotatedPath,
 }
 
 impl GitClone {
     fn need_update(&self) -> Result<bool> {
-        let remote_url = git_utils::get_remote_url(self.repo.as_path())?;
+        let remote_url = git::get_remote_url(self.repo.as_path())?;
         if remote_url != self.remote.url {
             return Ok(true);
         }
         let target_branch = match self.remote.branch {
             Some(ref branch) => branch.clone(),
-            None => git_utils::get_remote_head_ref(self.repo.as_path())?,
+            None => git::get_remote_head_ref(self.repo.as_path())?,
         };
-        let current_branch = git_utils::get_head_ref(self.repo.as_path())?;
+        let current_branch = git::get_head_ref(self.repo.as_path())?;
         Ok(target_branch != current_branch)
     }
     fn force_pull(&self) -> Result<()> {
-        git_utils::git_force_shallow_pull(self.repo.as_path(), &self.remote)
+        git::git_force_shallow_pull(self.repo.as_path(), &self.remote)
     }
     fn clone(&self) -> Result<()> {
-        git_utils::git_shallow_clone(&self.remote, self.repo.as_path())
+        git::git_shallow_clone(&self.remote, self.repo.as_path())
     }
     fn is_empty(&self) -> Result<bool> {
         let count = std::fs::read_dir(self.repo.as_path())
@@ -74,7 +74,7 @@ impl engine::Statement for GitCloneStatement {
         Ok(Some(Box::new((
             output,
             GitClone {
-                remote: git_utils::Remote::new(&self.url),
+                remote: git::Remote::new(&self.url),
                 repo,
             },
         ))))
@@ -92,7 +92,7 @@ impl engine::Expression for GitExpression {
         let output = local_state::dir_cache(&self.workdir, Path::new(""), &self.url)?;
         let output_state = output.state();
         let git_clone = GitClone {
-            remote: git_utils::Remote::new(&self.url),
+            remote: git::Remote::new(&self.url),
             repo: output.state(),
         };
         Ok(engine::ExpressionOutput {

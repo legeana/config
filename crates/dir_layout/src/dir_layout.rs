@@ -42,8 +42,8 @@ pub fn repositories_dirs(root: &Path) -> Result<Vec<PathBuf>> {
 
 /// Returns true if restart is required.
 fn update_repository(root: &Path) -> Result<bool> {
-    if root.join(git_utils::GIT_DIR).is_dir() {
-        return git_utils::git_pull(root);
+    if root.join(git::GIT_DIR).is_dir() {
+        return git::git_pull(root);
     }
     // Unsupported version control system, if any. Skip.
     Ok(false)
