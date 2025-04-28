@@ -640,6 +640,7 @@ dependencies = [
  "lontra-git",
  "lontra-glob",
  "lontra-process",
+ "lontra-unarchiver",
  "minijinja",
  "pretty_assertions",
  "quote 0.0.0",
@@ -652,7 +653,6 @@ dependencies = [
  "test-case",
  "thiserror",
  "toml",
- "unarchiver",
  "ureq",
  "walkdir",
  "which",
@@ -709,6 +709,14 @@ dependencies = [
  "pretty_assertions",
  "shlexfmt",
  "test-case",
+]
+
+[[package]]
+name = "lontra-unarchiver"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "lontra-process",
 ]
 
 [[package]]
@@ -1333,14 +1341,6 @@ name = "typenum"
 version = "1.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1dccffe3ce07af9386bfd29e80c0ab1a8205a2fc34e4bcd40364df902cfa8f3f"
-
-[[package]]
-name = "unarchiver"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "lontra-process",
-]
 
 [[package]]
 name = "unicode-ident"

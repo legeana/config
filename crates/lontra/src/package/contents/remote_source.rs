@@ -17,7 +17,7 @@ struct RemoteArchive {
     url: Url,
     archive: BoxedAnnotatedPath,
     source: BoxedAnnotatedPath,
-    unarchiver: &'static dyn unarchiver::Unarchiver,
+    unarchiver: &'static dyn lontra_unarchiver::Unarchiver,
 }
 
 fn is_dir_empty(path: &Path) -> Result<bool> {
@@ -100,7 +100,7 @@ impl engine::Expression for RemoteArchiveExpression {
         let output = source_path.to_path_buf().into_os_string();
         // TODO: consider building this in Builder.
         // This will not evaluate in a false branch of an if statement.
-        let unarchiver = unarchiver::by_filename(archive_path.as_path())
+        let unarchiver = lontra_unarchiver::by_filename(archive_path.as_path())
             .with_context(|| format!("failed to find unarchiver for {archive_path:?}"))?;
         Ok(engine::ExpressionOutput {
             module: Some(Box::new((

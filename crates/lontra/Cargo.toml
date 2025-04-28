@@ -23,6 +23,7 @@ log.workspace = true
 logos = "0.15.0"
 lontra-glob = { path = "../lontra-glob" }
 lontra-process = { path = "../lontra-process" }
+lontra-unarchiver = { path = "../lontra-unarchiver" }
 quote = { path = "../quote" }
 registry = { path = "../registry" }
 serde.workspace = true
@@ -32,7 +33,6 @@ shlexfmt = { path = "../shlexfmt" }
 tag_util = { path = "../tag_util" }
 thiserror.workspace = true
 toml = "0.8.10"
-unarchiver = { path = "../unarchiver" }
 ureq = "3.0.0"
 walkdir = "2"
 which = "7.0.0"

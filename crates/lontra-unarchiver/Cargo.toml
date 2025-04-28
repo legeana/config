@@ -1,5 +1,5 @@
 [package]
-name = "unarchiver"
+name = "lontra-unarchiver"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
