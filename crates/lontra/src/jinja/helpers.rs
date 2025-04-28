@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use lontra_strings::quote;
 use minijinja::Environment;
 
 pub(crate) fn register(env: &mut Environment, ctx: &Arc<super::Context>) {

@@ -2,6 +2,7 @@
 #![allow(unreachable_pub)]
 
 use logos::Logos;
+use lontra_strings::quote;
 use thiserror::Error;
 
 #[derive(Error, Clone, Debug, Default, PartialEq)]
