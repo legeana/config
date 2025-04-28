@@ -26,7 +26,7 @@ lontra-process = { path = "../lontra-process" }
 lontra-strings = { path = "../lontra-strings" }
 lontra-unarchiver = { path = "../lontra-unarchiver" }
 lontra-xdg = { path = "../lontra-xdg" }
-registry = { path = "../registry" }
+registry = { package = "lontra-registry", path = "../lontra-registry" }
 serde.workspace = true
 sha2 = "0.10.6"
 shellexpand = { version = "3.1", features = ["path"] }
