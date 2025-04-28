@@ -48,7 +48,7 @@ where
 
 pub fn repositories(root: &Path) -> Result<Vec<Repository>> {
     let mut result = Vec::<Repository>::new();
-    for repo in dir_layout::repositories_dirs(root)? {
+    for repo in lontra_layout::repositories_dirs(root)? {
         walk_repositories(&repo, |dir| {
             log::debug!("loading repository {:?}", dir.path());
             result.push(

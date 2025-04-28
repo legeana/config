@@ -12,7 +12,7 @@ fn main() -> Result<()> {
     if command_needs_update && !args.no_update {
         // Bootstrap is stable enough we don't attempt to restart.
         // Might reconsider in the future.
-        dir_layout::update(&root)?;
+        lontra_layout::update(&root)?;
     }
     log::debug!("Bootstrapped successfully");
     Ok(())

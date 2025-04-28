@@ -253,14 +253,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "dir_layout"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "lontra-git",
-]
-
-[[package]]
 name = "dirs"
 version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -628,7 +620,6 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "base64",
- "dir_layout",
  "dirs",
  "http",
  "indoc",
@@ -639,6 +630,7 @@ dependencies = [
  "lontra-cli",
  "lontra-git",
  "lontra-glob",
+ "lontra-layout",
  "lontra-process",
  "lontra-registry",
  "lontra-strings",
@@ -663,9 +655,9 @@ name = "lontra-bootstrap"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "dir_layout",
  "log",
  "lontra-cli",
+ "lontra-layout",
  "pretty_assertions",
 ]
 
@@ -696,6 +688,14 @@ dependencies = [
  "log",
  "pretty_assertions",
  "test-case",
+]
+
+[[package]]
+name = "lontra-layout"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "lontra-git",
 ]
 
 [[package]]
