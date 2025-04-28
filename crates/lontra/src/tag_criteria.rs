@@ -23,7 +23,7 @@ pub(crate) struct TagCriteria(pub StringList);
 impl Criteria for TagCriteria {
     fn is_satisfied(&self) -> Result<bool> {
         let requires = self.0.as_slice();
-        if !tag_util::has_all_tags(requires)
+        if !lontra_tags::has_all_tags(requires)
             .with_context(|| format!("failed to check tags {requires:?}"))?
         {
             return Ok(false);

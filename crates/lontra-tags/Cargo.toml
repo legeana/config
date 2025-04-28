@@ -1,5 +1,5 @@
 [package]
-name = "tag_util"
+name = "lontra-tags"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

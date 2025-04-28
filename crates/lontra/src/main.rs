@@ -6,6 +6,7 @@ use lontra::layout;
 use lontra::module::{Module as _, Rules};
 use lontra::package;
 use lontra::uninstaller::Uninstaller as _;
+use lontra_tags::tags;
 
 const SQL_REGISTRY: &str = ".install.sqlite";
 
@@ -106,7 +107,7 @@ fn main() -> Result<()> {
             print!("{}", package::manifest_help());
         }
         cli::Commands::Tags => {
-            for tag in tag_util::tags().context("failed to get tags")? {
+            for tag in tags().context("failed to get tags")? {
                 println!("{tag}");
             }
         }

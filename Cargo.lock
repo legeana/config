@@ -642,6 +642,7 @@ dependencies = [
  "lontra-process",
  "lontra-registry",
  "lontra-strings",
+ "lontra-tags",
  "lontra-unarchiver",
  "lontra-xdg",
  "minijinja",
@@ -650,7 +651,6 @@ dependencies = [
  "sha2",
  "shellexpand",
  "shlexfmt",
- "tag_util",
  "test-case",
  "thiserror",
  "toml",
@@ -729,6 +729,15 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "thiserror",
+]
+
+[[package]]
+name = "lontra-tags"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "libc",
+ "sysinfo",
 ]
 
 [[package]]
@@ -1235,15 +1244,6 @@ dependencies = [
  "ntapi",
  "objc2-core-foundation",
  "windows",
-]
-
-[[package]]
-name = "tag_util"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "libc",
- "sysinfo",
 ]
 
 [[package]]

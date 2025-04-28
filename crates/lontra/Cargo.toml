@@ -24,6 +24,7 @@ logos = "0.15.0"
 lontra-glob = { path = "../lontra-glob" }
 lontra-process = { path = "../lontra-process" }
 lontra-strings = { path = "../lontra-strings" }
+lontra-tags = { path = "../lontra-tags" }
 lontra-unarchiver = { path = "../lontra-unarchiver" }
 lontra-xdg = { path = "../lontra-xdg" }
 registry = { package = "lontra-registry", path = "../lontra-registry" }
@@ -31,7 +32,6 @@ serde.workspace = true
 sha2 = "0.10.6"
 shellexpand = { version = "3.1", features = ["path"] }
 shlexfmt = { path = "../shlexfmt" }
-tag_util = { path = "../tag_util" }
 thiserror.workspace = true
 toml = "0.8.10"
 ureq = "3.0.0"

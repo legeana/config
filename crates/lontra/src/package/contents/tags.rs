@@ -14,7 +14,7 @@ impl engine::Condition for TagsCondition {
     fn eval(&self, _ctx: &engine::Context) -> Result<bool> {
         for tag in &self.0 {
             let has_tag =
-                tag_util::has_tag(tag).with_context(|| format!("failed to check tag {tag}"))?;
+                lontra_tags::has_tag(tag).with_context(|| format!("failed to check tag {tag}"))?;
             if !has_tag {
                 return Ok(false);
             }
