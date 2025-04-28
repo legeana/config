@@ -1,5 +1,5 @@
 [package]
-name = "glob_util"
+name = "lontra-glob"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

@@ -407,17 +407,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a8d1add55171497b4705a648c6b583acafb01d58050a51727785f0b2c8e0a2b2"
 
 [[package]]
-name = "glob_util"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "glob",
- "log",
- "pretty_assertions",
- "test-case",
-]
-
-[[package]]
 name = "hashbrown"
 version = "0.15.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -641,7 +630,6 @@ dependencies = [
  "base64",
  "dir_layout",
  "dirs",
- "glob_util",
  "http",
  "indoc",
  "lalrpop",
@@ -650,6 +638,7 @@ dependencies = [
  "logos",
  "lontra-cli",
  "lontra-git",
+ "lontra-glob",
  "lontra-process",
  "minijinja",
  "pretty_assertions",
@@ -697,6 +686,17 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "lontra-process",
+]
+
+[[package]]
+name = "lontra-glob"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "glob",
+ "log",
+ "pretty_assertions",
+ "test-case",
 ]
 
 [[package]]

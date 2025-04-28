@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use anyhow::Result;
-use glob_util::glob as glob_iter;
+use lontra_glob::glob as glob_iter;
 use minijinja::{Environment, Value};
 
 use crate::jinja::{Context, map_anyhow};
