@@ -1,4 +1,4 @@
 mod glob;
 
 pub use glob::Iter;
-pub use glob::glob;
+pub use glob::glob_iter;

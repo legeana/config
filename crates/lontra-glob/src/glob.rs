@@ -2,7 +2,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Result, anyhow};
 use glob::Paths;
-use glob::glob as glob_iter;
+use glob::glob as str_glob;
 
 pub struct Iter(Paths);
 
@@ -19,7 +19,7 @@ impl Iterator for Iter {
 
 /// Returns an iterator that produces all the `Path`s that match the given
 /// pattern relative to `root`.
-pub fn glob(root: impl AsRef<Path>, pattern: impl AsRef<str>) -> Result<Iter> {
+pub fn glob_iter(root: impl AsRef<Path>, pattern: impl AsRef<str>) -> Result<Iter> {
     let root = root.as_ref();
     let pattern = pattern.as_ref();
     let full = root.join(pattern);
@@ -27,6 +27,6 @@ pub fn glob(root: impl AsRef<Path>, pattern: impl AsRef<str>) -> Result<Iter> {
         .to_str()
         .ok_or_else(|| anyhow!("failed to convert {full:?} to utf-8"))?;
     log::debug!("glob({root:?}, {pattern:?}) => glob({full_pattern:?})");
-    let paths = glob_iter(full_pattern)?;
+    let paths = str_glob(full_pattern)?;
     Ok(Iter(paths))
 }
