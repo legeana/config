@@ -31,7 +31,6 @@ registry = { package = "lontra-registry", path = "../lontra-registry" }
 serde.workspace = true
 sha2 = "0.10.6"
 shellexpand = { version = "3.1", features = ["path"] }
-shlexfmt = { path = "../shlexfmt" }
 thiserror.workspace = true
 toml = "0.8.10"
 ureq = "3.0.0"

@@ -1,6 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::{Result, anyhow};
+use lontra_process::shlexfmt;
 
 use super::args::{Argument, Arguments};
 use super::lexer;

@@ -11,7 +11,7 @@ workspace = true
 anyhow.workspace = true
 either.workspace = true
 log.workspace = true
-shlexfmt = { path = "../shlexfmt" }
+shlex = "1.1.0"
 
 [dev-dependencies]
 pretty_assertions.workspace = true
