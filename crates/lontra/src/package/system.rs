@@ -1,5 +1,5 @@
 use anyhow::{Context as _, Result};
-use process_utils::cmd;
+use lontra_process::cmd;
 
 use crate::command::is_command;
 use crate::module::{Module, Rules};

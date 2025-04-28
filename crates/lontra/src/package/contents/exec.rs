@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 use indoc::formatdoc;
-use process_utils::Command;
+use lontra_process::Command;
 use registry::Registry;
 
 use crate::module::{BoxedModule, Module, Rules};

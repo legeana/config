@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use anyhow::{Context as _, Result};
-use process_utils::cmd;
+use lontra_process::cmd;
 use serde::Deserialize;
 
 use crate::command;

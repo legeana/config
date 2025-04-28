@@ -9,4 +9,4 @@ workspace = true
 
 [dependencies]
 anyhow.workspace = true
-process_utils = { path = "../process_utils" }
+lontra-process = { path = "../lontra-process" }

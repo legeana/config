@@ -1,7 +1,7 @@
 use std::path::Path;
 
 use anyhow::Result;
-use process_utils::cmd;
+use lontra_process::cmd;
 
 struct Unzip;
 

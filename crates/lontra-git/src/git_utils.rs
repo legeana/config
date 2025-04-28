@@ -1,7 +1,7 @@
 use std::path::Path;
 
 use anyhow::{Result, anyhow};
-use process_utils::{Shell, cmd};
+use lontra_process::{Shell, cmd};
 
 const ORIGIN: &str = "origin";
 const HEAD: &str = "HEAD";
