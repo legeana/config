@@ -10,3 +10,6 @@ workspace = true
 [dependencies]
 anyhow.workspace = true
 thiserror.workspace = true
+
+[dev-dependencies]
+pretty_assertions.workspace = true

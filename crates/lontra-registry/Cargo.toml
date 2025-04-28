@@ -9,7 +9,7 @@ workspace = true
 
 [dependencies]
 anyhow.workspace = true
-os_str = { path = "../os_str" }
+lontra-strings = { path = "../lontra-strings" }
 rusqlite = { version = "0.34.0", features = ["bundled"] }
 rusqlite_migration = "2.0.0"
 
