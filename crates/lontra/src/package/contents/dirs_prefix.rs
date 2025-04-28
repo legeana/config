@@ -3,8 +3,9 @@ use std::sync::Arc;
 
 use anyhow::{Context as _, Result, anyhow};
 use indoc::formatdoc;
+use lontra_xdg as xdg;
+use lontra_xdg::xdg_or_win;
 use minijinja::Environment;
-use xdg::xdg_or_win;
 
 use crate::jinja;
 use crate::module::BoxedModule;

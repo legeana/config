@@ -642,6 +642,7 @@ dependencies = [
  "lontra-process",
  "lontra-strings",
  "lontra-unarchiver",
+ "lontra-xdg",
  "minijinja",
  "pretty_assertions",
  "registry",
@@ -656,7 +657,6 @@ dependencies = [
  "ureq",
  "walkdir",
  "which",
- "xdg",
 ]
 
 [[package]]
@@ -725,6 +725,13 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "lontra-process",
+]
+
+[[package]]
+name = "lontra-xdg"
+version = "0.0.0"
+dependencies = [
+ "dirs",
 ]
 
 [[package]]
@@ -1631,13 +1638,6 @@ name = "winsafe"
 version = "0.0.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d135d17ab770252ad95e9a872d365cf3090e3be864a34ab46f48555993efc904"
-
-[[package]]
-name = "xdg"
-version = "0.0.0"
-dependencies = [
- "dirs",
-]
 
 [[package]]
 name = "yansi"
