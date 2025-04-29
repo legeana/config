@@ -1,5 +1,3 @@
-#![allow(clippy::needless_pass_by_value)]
-
 use std::ffi::OsString;
 use std::os::windows::ffi::OsStrExt as _;
 use std::os::windows::ffi::OsStringExt as _;
@@ -14,7 +12,7 @@ fn from_wide(b: u16) -> [u8; 2] {
     b.to_le_bytes()
 }
 
-fn to_wide_vec(b: Vec<u8>) -> Result<Vec<u16>> {
+fn to_wide_vec(b: &[u8]) -> Result<Vec<u16>> {
     if b.len() % 2 != 0 {
         return Err(Error::OddNumberOfBytes);
     }
@@ -36,7 +34,7 @@ pub(in crate::os_str) struct WindowsConverter;
 
 impl Converter for WindowsConverter {
     fn from_vec(vec: Vec<u8>) -> Result<OsString> {
-        let w = to_wide_vec(vec)?;
+        let w = to_wide_vec(&vec)?;
         Ok(OsString::from_wide(&w))
     }
     fn to_vec(os_str: OsString) -> Vec<u8> {
@@ -67,20 +65,20 @@ mod tests {
     #[test]
     fn test_to_wide_vec() {
         assert_eq!(
-            to_wide_vec(vec![0x00, 0x01, 0x02, 0x03]).unwrap(),
+            to_wide_vec(&[0x00, 0x01, 0x02, 0x03]).unwrap(),
             vec![0x0100, 0x0302],
         );
     }
 
     #[test]
     fn test_to_wide_vec_odd() {
-        assert_eq!(to_wide_vec(vec![0x00]), Err(Error::OddNumberOfBytes),);
+        assert_eq!(to_wide_vec(&[0x00]), Err(Error::OddNumberOfBytes),);
     }
 
     #[test]
     fn test_from_wide_iter() {
         assert_eq!(
-            from_wide_iter(vec![0x0100, 0x0302].into_iter()),
+            from_wide_iter([0x0100, 0x0302].into_iter()),
             vec![0x00, 0x01, 0x02, 0x03],
         );
     }
