@@ -72,7 +72,7 @@ mod tests {
 
     #[test]
     fn test_to_wide_vec_odd() {
-        assert_eq!(to_wide_vec(&[0x00]), Err(Error::OddNumberOfBytes),);
+        assert_eq!(to_wide_vec(&[0x00]), Err(Error::OddNumberOfBytes));
     }
 
     #[test]
