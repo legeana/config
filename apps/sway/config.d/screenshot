@@ -1,6 +1,6 @@
 bindsym --to-code {
-    $super+Shift+s exec --no-startup-id $launch sway-screenshot
-    $super+$mod+Shift+s exec --no-startup-id slurp | grim -g - - | wl-copy
+    $mod+Shift+s exec --no-startup-id $launch sway-screenshot
+    $mod+Ctrl+Shift+s exec --no-startup-id slurp | grim -g - - | wl-copy
 }
 
 for_window [title="imv.*sway_grim_screenshot"] floating enable

@@ -1,1 +1,1 @@
-bindsym $super+l exec i3lock -c 000000 && xset dpms force off
+bindsym $mod+ctrl+l exec i3lock -c 000000 && xset dpms force off

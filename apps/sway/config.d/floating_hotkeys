@@ -10,5 +10,5 @@ bindsym --to-code {
     $mod+Shift+space floating toggle
 
     # Swap focus between the tiling area and the floating area
-    $super+space focus mode_toggle
+    $mod+space focus mode_toggle
 }

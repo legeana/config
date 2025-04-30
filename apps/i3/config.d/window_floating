@@ -1,1 +1,1 @@
-bindsym $super+Shift+space floating toggle
+bindsym $mod+Shift+space floating toggle

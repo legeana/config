@@ -13,4 +13,4 @@ exec swayidle -w \
     resume 'swaymsg "output * dpms on"' \
     before-sleep 'swaylock -f -c 000000'
 
-bindsym --release --to-code $super+l exec killall -USR1 swayidle
+bindsym --release --to-code $mod+ctrl+l exec killall -USR1 swayidle
