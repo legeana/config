@@ -10,7 +10,7 @@ use super::local_state;
 
 use anyhow::{Context as _, Result, anyhow};
 use indoc::formatdoc;
-use registry::Registry;
+use lontra_registry::Registry;
 
 struct Copy {
     src: PathBuf,

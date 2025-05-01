@@ -1,7 +1,7 @@
 use std::path::Path;
 
 use anyhow::{Context as _, Result, anyhow};
-use registry::{FileType, Registry};
+use lontra_registry::{FileType, Registry};
 
 use crate::file_util;
 use crate::symlink_util;

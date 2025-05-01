@@ -9,7 +9,7 @@ use super::inventory;
 
 use anyhow::{Context as _, Result};
 use indoc::formatdoc;
-use registry::Registry;
+use lontra_registry::Registry;
 use walkdir::WalkDir;
 
 struct SymlinkTree {

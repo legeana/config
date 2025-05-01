@@ -6,13 +6,14 @@ use lontra::layout;
 use lontra::module::{Module as _, Rules};
 use lontra::package;
 use lontra::uninstaller::Uninstaller as _;
+use lontra_registry::sqlite::SqliteRegistry;
 use lontra_tags::tags;
 
 const SQL_REGISTRY: &str = ".install.sqlite";
 
-fn registry(root: &Path) -> Result<registry::sqlite::SqliteRegistry> {
+fn registry(root: &Path) -> Result<SqliteRegistry> {
     let sql_path = root.join(SQL_REGISTRY);
-    registry::sqlite::SqliteRegistry::open(&sql_path)
+    SqliteRegistry::open(&sql_path)
         .with_context(|| format!("failed to open SQLite registry {sql_path:?}"))
 }
 

@@ -3,8 +3,8 @@ use std::sync::Arc;
 
 use anyhow::{Context as _, Result, anyhow};
 use indoc::formatdoc;
+use lontra_registry::Registry;
 use minijinja::Environment;
-use registry::Registry;
 
 use crate::annotated_path::BoxedAnnotatedPath;
 use crate::jinja;

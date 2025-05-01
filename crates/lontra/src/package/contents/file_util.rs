@@ -2,7 +2,7 @@ use std::fs;
 use std::path::Path;
 
 use anyhow::{Context as _, Result, anyhow};
-use registry::{FilePath, Registry};
+use lontra_registry::{FilePath, Registry};
 
 use crate::file_util;
 use crate::symlink_util;

@@ -2,7 +2,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context as _, Result};
 use indoc::formatdoc;
-use registry::Registry;
+use lontra_registry::Registry;
 
 use crate::annotated_path::BoxedAnnotatedPath;
 use crate::module::{Module, Rules};

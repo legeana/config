@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 use anyhow::{Context as _, Result};
 
-use registry::Registry;
+use lontra_registry::Registry;
 
 #[derive(Default)]
 pub struct Rules {

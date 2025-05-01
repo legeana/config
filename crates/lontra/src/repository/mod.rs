@@ -4,7 +4,7 @@ use std::ffi::OsStr;
 use std::path::PathBuf;
 
 use anyhow::{Context as _, Result, anyhow};
-use registry::Registry;
+use lontra_registry::Registry;
 
 use crate::module::{Module, Rules};
 use crate::package::Package;

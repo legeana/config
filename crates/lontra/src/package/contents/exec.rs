@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use anyhow::Result;
 use indoc::formatdoc;
 use lontra_process::Command;
-use registry::Registry;
+use lontra_registry::Registry;
 
 use crate::module::{BoxedModule, Module, Rules};
 

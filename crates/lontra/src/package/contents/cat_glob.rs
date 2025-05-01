@@ -12,7 +12,7 @@ use super::local_state;
 use anyhow::{Context as _, Result};
 use indoc::formatdoc;
 use lontra_glob::glob_iter;
-use registry::Registry;
+use lontra_registry::Registry;
 
 struct CatGlobInto {
     glob_root: PathBuf,

@@ -8,7 +8,7 @@ mod user;
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context as _, Result, anyhow};
-use registry::Registry;
+use lontra_registry::Registry;
 
 use crate::module::{self, BoxedModule, Module, Rules};
 use crate::package::installer::Installer;

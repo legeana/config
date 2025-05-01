@@ -23,11 +23,11 @@ logos = "0.15.0"
 lontra-glob = { path = "../lontra-glob" }
 lontra-layout = { path = "../lontra-layout" }
 lontra-process = { path = "../lontra-process" }
+lontra-registry = { path = "../lontra-registry" }
 lontra-strings = { path = "../lontra-strings" }
 lontra-tags = { path = "../lontra-tags" }
 lontra-unarchiver = { path = "../lontra-unarchiver" }
 lontra-xdg = { path = "../lontra-xdg" }
-registry = { package = "lontra-registry", path = "../lontra-registry" }
 serde.workspace = true
 sha2 = "0.10.6"
 shellexpand = { version = "3.1", features = ["path"] }

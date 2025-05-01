@@ -12,7 +12,7 @@ use super::local_state;
 
 use anyhow::{Context as _, Result, anyhow};
 use indoc::formatdoc;
-use registry::Registry;
+use lontra_registry::Registry;
 use walkdir::WalkDir;
 
 struct Importer {
