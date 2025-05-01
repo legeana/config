@@ -3,7 +3,7 @@ use std::path::Path;
 use anyhow::{Context as _, Error, Result, anyhow};
 use rusqlite::Connection;
 
-const APPLICATION_ID: i32 = 0x12fe0c02;
+const APPLICATION_ID: i32 = 0x12fe_0c02;
 
 #[derive(Debug)]
 pub(crate) struct AppConnection(Connection);
