@@ -30,9 +30,9 @@ fn from_wide_iter(w: impl Iterator<Item = u16>) -> Vec<u8> {
     w.flat_map(from_wide).collect()
 }
 
-pub(in crate::os_str) struct WindowsConverter;
+pub(in crate::os_str) struct SysConverter;
 
-impl Converter for WindowsConverter {
+impl Converter for SysConverter {
     fn from_vec(vec: Vec<u8>) -> Result<OsString> {
         let w = to_wide_vec(&vec)?;
         Ok(OsString::from_wide(&w))

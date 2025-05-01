@@ -1,11 +1,11 @@
-#[cfg(windows)]
-mod windows;
+cfg_if::cfg_if! {
+    if #[cfg(windows)] {
+        mod windows;
+        use windows as platform;
+    } else if #[cfg(unix)] {
+        mod unix;
+        use unix as platform;
+    }
+}
 
-#[cfg(unix)]
-mod unix;
-
-#[cfg(windows)]
-pub(super) use windows::WindowsConverter as SysConverter;
-
-#[cfg(unix)]
-pub(super) use unix::UnixConverter as SysConverter;
+pub(super) use platform::SysConverter;
