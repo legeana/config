@@ -1,12 +1,28 @@
 #!/bin/sh -e
 
+verbose_eval() {
+    echo '$' "$@" >&2
+    "$@"
+}
+
 # setup will build everything in --release mode anyway.
 # Running tests in --release will be faster overall.
-BUILD=--release
+CARGO_ARGS="--release --all-targets"
 
-./setup -d list
+verbose_eval ./setup -d list
 
-cargo fmt --check
-cargo check --all-targets $BUILD
-cargo clippy --all-targets $BUILD -- -Dwarnings  # Treat warnings as errors.
-cargo test $BUILD
+verbose_eval cargo fmt --check
+
+if cargo xwin --version >/dev/null 2>&1; then
+    for target in $(rustup target list --installed); do
+        verbose_eval cargo xwin check --target="$target" $CARGO_ARGS
+        # Treat warnings as errors.
+        verbose_eval cargo xwin clippy --target="$target" $CARGO_ARGS -- -Dwarnings
+        verbose_eval cargo xwin test --target="$target" $CARGO_ARGS
+    done
+else
+    verbose_eval cargo check $CARGO_ARGS
+    # Treat warnings as errors.
+    verbose_eval cargo clippy $CARGO_ARGS -- -Dwarnings
+    verbose_eval cargo test $CARGO_ARGS
+fi
