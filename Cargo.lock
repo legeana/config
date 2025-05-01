@@ -738,6 +738,7 @@ name = "lontra-tags"
 version = "0.0.0"
 dependencies = [
  "anyhow",
+ "cfg-if",
  "libc",
  "sysinfo",
 ]

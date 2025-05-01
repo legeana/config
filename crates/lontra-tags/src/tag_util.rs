@@ -40,14 +40,12 @@ fn has_tag_kv(key: &str, value: &str) -> bool {
     }
 }
 
-#[cfg(unix)]
-fn getuid() -> Option<u32> {
-    Some(unsafe { libc::getuid() })
+pub(super) trait UidGetter {
+    fn getuid() -> Option<u32>;
 }
 
-#[cfg(windows)]
 fn getuid() -> Option<u32> {
-    None
+    crate::sys::SysUidGetter::getuid()
 }
 
 struct SystemInfo;
