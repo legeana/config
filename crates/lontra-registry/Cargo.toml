@@ -10,8 +10,8 @@ workspace = true
 [dependencies]
 anyhow.workspace = true
 lontra-strings = { path = "../lontra-strings" }
-rusqlite = { version = "0.34.0", features = ["bundled"] }
-rusqlite_migration = "2.0.0"
+rusqlite = { version = "0.35.0", features = ["bundled"] }
+rusqlite_migration = "2.1.0"
 
 [dev-dependencies]
 pretty_assertions.workspace = true
