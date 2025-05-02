@@ -51,7 +51,7 @@ pub(crate) fn metadata(path: &Path) -> io::Result<Metadata> {
 }
 
 /// Remove path if it is a symlink.
-pub(crate) fn remove(path: &Path) -> Result<()> {
+pub fn remove(path: &Path) -> Result<()> {
     let md: Metadata =
         metadata(path).with_context(|| format!("failed to get {path:?} metadata"))?;
     if md.is_symlink_file() {

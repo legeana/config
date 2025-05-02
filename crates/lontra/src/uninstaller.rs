@@ -2,9 +2,8 @@ use std::path::Path;
 
 use anyhow::{Context as _, Result, anyhow};
 use lontra_fs::errkind;
+use lontra_fs::symlinks;
 use lontra_registry::{FileType, Registry};
-
-use crate::symlink_util;
 
 pub trait Uninstaller {
     fn uninstall(&mut self) -> Result<()>;
@@ -44,7 +43,7 @@ where
 }
 
 fn remove_symlink(path: &Path) -> Result<()> {
-    match errkind::skip_not_found(symlink_util::remove(path)) {
+    match errkind::skip_not_found(symlinks::remove(path)) {
         Ok(Some(())) => {}
         Ok(None) => {
             log::debug!("Nothing to remove: {path:?}");

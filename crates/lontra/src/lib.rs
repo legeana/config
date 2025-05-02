@@ -7,6 +7,5 @@ pub mod module;
 pub mod package;
 pub mod repository;
 mod string_list;
-mod symlink_util;
 mod tag_criteria;
 pub mod uninstaller;

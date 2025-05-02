@@ -3,9 +3,8 @@ use std::path::Path;
 
 use anyhow::{Context as _, Result, anyhow};
 use lontra_fs::errkind;
+use lontra_fs::symlinks;
 use lontra_registry::{FilePath, Registry};
-
-use crate::symlink_util;
 
 #[cfg(unix)]
 fn symlink(src: &Path, dst: &Path) -> Result<()> {
@@ -26,7 +25,7 @@ fn symlink(src: &Path, dst: &Path) -> Result<()> {
 }
 
 pub(super) fn make_symlink(registry: &mut dyn Registry, src: &Path, dst: &Path) -> Result<()> {
-    if let Err(err) = errkind::skip_not_found(symlink_util::remove(dst)) {
+    if let Err(err) = errkind::skip_not_found(symlinks::remove(dst)) {
         return Err(err.context(format!("unable to overwrite {dst:?} by {src:?}")));
     }
     let parent = dst
