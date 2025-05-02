@@ -628,6 +628,7 @@ dependencies = [
  "log",
  "logos",
  "lontra-cli",
+ "lontra-fs",
  "lontra-git",
  "lontra-glob",
  "lontra-layout",
@@ -669,6 +670,13 @@ dependencies = [
  "clap",
  "env_logger",
  "log",
+]
+
+[[package]]
+name = "lontra-fs"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
 ]
 
 [[package]]
