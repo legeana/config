@@ -677,6 +677,7 @@ name = "lontra-fs"
 version = "0.0.0"
 dependencies = [
  "anyhow",
+ "cfg-if",
 ]
 
 [[package]]
