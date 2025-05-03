@@ -22,35 +22,3 @@ pub(super) fn make_symlink(registry: &mut dyn Registry, src: &Path, dst: &Path) 
     log::info!("Symlink {src:?} -> {dst:?}");
     Ok(())
 }
-
-#[cfg(unix)]
-pub(super) fn set_file_executable(f: &fs::File) -> Result<()> {
-    use std::os::unix::fs::PermissionsExt as _;
-    let metadata = f.metadata()?;
-    let mut perm = metadata.permissions();
-    perm.set_mode(perm.mode() | 0o111);
-    f.set_permissions(perm)?;
-    Ok(())
-}
-
-#[cfg(unix)]
-pub(super) fn set_path_executable(path: &Path) -> Result<()> {
-    use std::os::unix::fs::PermissionsExt as _;
-    let metadata = path.metadata()?;
-    let mut perm = metadata.permissions();
-    perm.set_mode(perm.mode() | 0o111);
-    fs::set_permissions(path, perm)?;
-    Ok(())
-}
-
-#[cfg(windows)]
-pub(super) fn set_file_executable(_f: &fs::File) -> Result<()> {
-    // Nothing to do on Windows.
-    Ok(())
-}
-
-#[cfg(windows)]
-pub(super) fn set_path_executable(_path: &Path) -> Result<()> {
-    // Nothing to do on Windows.
-    Ok(())
-}

@@ -2,6 +2,7 @@ use std::path::Path;
 
 use anyhow::{Context as _, Result};
 use indoc::formatdoc;
+use lontra_fs::permissions;
 use lontra_registry::Registry;
 
 use crate::annotated_path::BoxedAnnotatedPath;
@@ -9,7 +10,6 @@ use crate::module::{BoxedModule, Module, Rules};
 
 use super::args::{Argument, Arguments};
 use super::engine;
-use super::file_util;
 use super::inventory;
 use super::local_state;
 use super::net_util::{FetchOptions, Url, fetch};
@@ -33,7 +33,7 @@ impl Module for FetchInto {
                 self.output
             );
             log::info!("Fetch: setting {:?} executable", self.output);
-            file_util::set_path_executable(self.output.as_path())
+            permissions::set_path_executable(self.output.as_path())
                 .with_context(|| format!("failed to make {:?} executable", self.output))?;
             return Ok(());
         }

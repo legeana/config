@@ -1,9 +1,8 @@
 use anyhow::{Context as _, Result};
 use http::Uri as HttpUri;
+use lontra_fs::permissions;
 
 use crate::annotated_path::AnnotatedPath;
-
-use super::file_util;
 
 #[derive(Clone, Debug, PartialEq)]
 pub(super) struct FetchOptions {
@@ -69,7 +68,7 @@ pub(super) fn fetch(url: &Url, dst: impl AnnotatedPath, opts: &FetchOptions) -> 
     let mut writer = std::io::BufWriter::new(&output);
     std::io::copy(&mut reader, &mut writer).with_context(|| format!("failed to write {dst:?}"))?;
     if opts.executable {
-        file_util::set_file_executable(&output)
+        permissions::set_file_executable(&output)
             .with_context(|| format!("failed to make {dst:?} executable"))?;
     }
     output
