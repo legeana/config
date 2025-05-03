@@ -1,4 +1,5 @@
 use std::fs;
+use std::os::windows;
 use std::os::windows::fs::FileTypeExt as _;
 use std::path::Path;
 
@@ -24,5 +25,13 @@ impl Symlinker for SysSymlinker {
         } else {
             bail!("{path:?} is not a symlink");
         }
+    }
+    fn symlink(src: &Path, dst: &Path) -> Result<()> {
+        if src.is_dir() {
+            windows::fs::symlink_dir(src, dst)?;
+        } else {
+            windows::fs::symlink_file(src, dst)?;
+        }
+        Ok(())
     }
 }

@@ -1,4 +1,5 @@
 use std::fs;
+use std::os::unix;
 use std::path::Path;
 
 use anyhow::Context as _;
@@ -18,6 +19,10 @@ impl Symlinker for SysSymlinker {
             bail!("{path:?} is not a symlink");
         }
         fs::remove_file(path)?;
+        Ok(())
+    }
+    fn symlink(src: &Path, dst: &Path) -> Result<()> {
+        unix::fs::symlink(src, dst)?;
         Ok(())
     }
 }
