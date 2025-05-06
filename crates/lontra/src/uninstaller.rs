@@ -1,3 +1,5 @@
+#![allow(clippy::unnecessary_wraps)]
+
 use std::path::Path;
 
 use anyhow::{Context as _, Result, anyhow};

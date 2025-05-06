@@ -176,6 +176,7 @@ impl Flatpak {
         )
         .run_verbose()
     }
+    #[allow(clippy::unnecessary_wraps)]
     fn make_alias(&self) -> Result<()> {
         // TODO: need registry
         Ok(())

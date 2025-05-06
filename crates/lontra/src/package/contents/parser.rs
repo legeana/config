@@ -229,6 +229,7 @@ fn parse_command_assignment(
     }))
 }
 
+#[allow(clippy::unnecessary_wraps)]
 fn parse_value_assignment(
     _workdir: &Path,
     manifest_path: &Path,

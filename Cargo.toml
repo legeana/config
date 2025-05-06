@@ -36,7 +36,6 @@ must_use_candidate = "allow"
 needless_raw_string_hashes = "allow"
 struct_excessive_bools = "allow"
 too_many_lines = "allow"
-unnecessary_wraps = "allow"
 unused_self = "allow"
 # Restriction.
 empty_structs_with_brackets = "deny"
