@@ -45,8 +45,26 @@ impl Converter for SysConverter {
 #[cfg(test)]
 mod tests {
     use pretty_assertions::assert_eq;
+    use test_case::test_case;
 
     use super::*;
+
+    #[test_case("", &[])]
+    #[test_case(
+        "hello",
+        // UTF-16
+        &[
+            b'h', 0x00,
+            b'e', 0x00,
+            b'l', 0x00,
+            b'l', 0x00,
+            b'o', 0x00,
+        ])]
+    fn test_sanity(text: &str, bytes: &[u8]) {
+        let os_text = OsString::from(text);
+        assert_eq!(SysConverter::from_vec(bytes.to_vec()), Ok(os_text.clone()));
+        assert_eq!(SysConverter::to_vec(os_text), bytes);
+    }
 
     #[test]
     fn test_to_wide() {
