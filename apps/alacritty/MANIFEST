@@ -1,3 +1,3 @@
-prefix ~/.config/alacritty
+xdg_or_win_config_local_prefix alacritty
 symlink_tree alacritty.d
 cat_glob_into alacritty.toml alacritty.d/*
