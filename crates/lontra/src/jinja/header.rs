@@ -22,7 +22,5 @@ fn header(ctx: &Context, prefix: &str) -> Value {
 
 pub(super) fn register(env: &mut Environment, ctx: &Arc<Context>) {
     let ctx = Arc::clone(ctx);
-    env.add_function("header", move |prefix: &str| {
-        header(ctx.as_ref(), prefix)
-    });
+    env.add_function("header", move |prefix: &str| header(ctx.as_ref(), prefix));
 }
