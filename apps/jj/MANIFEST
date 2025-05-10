@@ -1,0 +1,2 @@
+xdg_or_win_config_prefix jj
+symlink_tree conf.d
