@@ -1,3 +1,8 @@
+[[dependencies]]
+names = [
+    "nerd-fonts",
+]
+
 [[system_dependencies]]
 # Debian alacritty is usually too old.
 requires = "distro!=debian"
