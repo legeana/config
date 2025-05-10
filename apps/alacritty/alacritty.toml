@@ -1,0 +1,8 @@
+# {{ header("#") }}
+
+[general]
+import = [
+    {%- for path in glob("alacritty.d/*") %}
+    {{ path | enquote() }},
+    {%- endfor %}
+]
