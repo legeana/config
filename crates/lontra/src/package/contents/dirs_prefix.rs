@@ -38,13 +38,14 @@ impl engine::Statement for DirsPrefixStatement {
 
 #[derive(Clone)]
 struct DirsPrefixBuilder {
-    command: &'static str,
+    manifest_command: &'static str,
+    render_command: &'static str,
     base_dir: Option<PathBuf>,
 }
 
 impl engine::CommandBuilder for DirsPrefixBuilder {
     fn name(&self) -> String {
-        self.command.to_owned()
+        self.manifest_command.to_owned()
     }
     fn help(&self) -> String {
         let prefix = self
@@ -65,7 +66,7 @@ impl engine::CommandBuilder for DirsPrefixBuilder {
             .context("subdir")?
             .map(ToOwned::to_owned);
         Ok(engine::Command::new_statement(DirsPrefixStatement {
-            command: self.command,
+            command: self.manifest_command,
             base_dir: self.base_dir.clone(),
             subdir,
         }))
@@ -79,7 +80,7 @@ impl inventory::RenderHelper for DirsPrefixBuilder {
             return;
         };
         env.add_function(
-            engine::CommandBuilder::name(self),
+            self.render_command,
             move |path: Option<String>| -> JResult<String> {
                 let joined = match &path {
                     Some(path) => base_dir.join(path),
@@ -94,121 +95,150 @@ impl inventory::RenderHelper for DirsPrefixBuilder {
 pub(super) fn register(registry: &mut dyn inventory::Registry) {
     let parsers = [
         DirsPrefixBuilder {
-            command: "audio_prefix",
+            manifest_command: "audio_prefix",
+            render_command: "audio_dir",
             base_dir: dirs::audio_dir(),
         },
         DirsPrefixBuilder {
-            command: "cache_prefix",
+            manifest_command: "cache_prefix",
+            render_command: "cache_dir",
             base_dir: dirs::cache_dir(),
         },
         DirsPrefixBuilder {
-            command: "config_prefix",
+            manifest_command: "config_prefix",
+            render_command: "config_dir",
             base_dir: dirs::config_dir(),
         },
         DirsPrefixBuilder {
-            command: "config_local_prefix",
+            manifest_command: "config_local_prefix",
+            render_command: "config_local_dir",
             base_dir: dirs::config_local_dir(),
         },
         DirsPrefixBuilder {
-            command: "data_prefix",
+            manifest_command: "data_prefix",
+            render_command: "data_dir",
             base_dir: dirs::data_dir(),
         },
         DirsPrefixBuilder {
-            command: "data_local_prefix",
+            manifest_command: "data_local_prefix",
+            render_command: "data_local_dir",
             base_dir: dirs::data_local_dir(),
         },
         DirsPrefixBuilder {
-            command: "desktop_prefix",
+            manifest_command: "desktop_prefix",
+            render_command: "desktop_dir",
             base_dir: dirs::desktop_dir(),
         },
         DirsPrefixBuilder {
-            command: "document_prefix",
+            manifest_command: "document_prefix",
+            render_command: "document_dir",
             base_dir: dirs::document_dir(),
         },
         DirsPrefixBuilder {
-            command: "download_prefix",
+            manifest_command: "download_prefix",
+            render_command: "download_dir",
             base_dir: dirs::download_dir(),
         },
         DirsPrefixBuilder {
-            command: "executable_prefix",
+            manifest_command: "executable_prefix",
+            render_command: "executable_dir",
             base_dir: dirs::executable_dir(),
         },
         DirsPrefixBuilder {
-            command: "font_prefix",
+            manifest_command: "font_prefix",
+            render_command: "font_dir",
             base_dir: dirs::font_dir(),
         },
         DirsPrefixBuilder {
-            command: "home_prefix",
+            manifest_command: "home_prefix",
+            render_command: "home_dir",
             base_dir: dirs::home_dir(),
         },
         DirsPrefixBuilder {
-            command: "picture_prefix",
+            manifest_command: "picture_prefix",
+            render_command: "picture_dir",
             base_dir: dirs::picture_dir(),
         },
         DirsPrefixBuilder {
-            command: "preference_prefix",
+            manifest_command: "preference_prefix",
+            render_command: "preference_dir",
             base_dir: dirs::preference_dir(),
         },
         DirsPrefixBuilder {
-            command: "public_prefix",
+            manifest_command: "public_prefix",
+            render_command: "public_dir",
             base_dir: dirs::public_dir(),
         },
         DirsPrefixBuilder {
-            command: "runtime_prefix",
+            manifest_command: "runtime_prefix",
+            render_command: "runtime_dir",
             base_dir: dirs::runtime_dir(),
         },
         DirsPrefixBuilder {
-            command: "state_prefix",
+            manifest_command: "state_prefix",
+            render_command: "state_dir",
             base_dir: dirs::state_dir(),
         },
         DirsPrefixBuilder {
-            command: "template_prefix",
+            manifest_command: "template_prefix",
+            render_command: "template_dir",
             base_dir: dirs::template_dir(),
         },
         DirsPrefixBuilder {
-            command: "video_prefix",
+            manifest_command: "video_prefix",
+            render_command: "video_dir",
             base_dir: dirs::video_dir(),
         },
         // XDG
         DirsPrefixBuilder {
-            command: "xdg_cache_prefix",
+            manifest_command: "xdg_cache_prefix",
+            render_command: "xdg_cache_dir",
             base_dir: xdg::cache_dir(),
         },
         DirsPrefixBuilder {
-            command: "xdg_config_prefix",
+            manifest_command: "xdg_config_prefix",
+            render_command: "xdg_config_dir",
             base_dir: xdg::config_dir(),
         },
         DirsPrefixBuilder {
-            command: "xdg_data_prefix",
+            manifest_command: "xdg_data_prefix",
+            render_command: "xdg_data_dir",
             base_dir: xdg::data_dir(),
         },
         DirsPrefixBuilder {
-            command: "xdg_executable_prefix",
+            manifest_command: "xdg_executable_prefix",
+            render_command: "xdg_executable_dir",
             base_dir: xdg::executable_dir(),
         },
         DirsPrefixBuilder {
-            command: "xdg_state_prefix",
+            manifest_command: "xdg_state_prefix",
+            render_command: "xdg_state_dir",
             base_dir: xdg::state_dir(),
         },
         // XDG (for UNIX) or Windows.
         DirsPrefixBuilder {
-            command: "xdg_or_win_cache_prefix",
+            manifest_command: "xdg_or_win_cache_prefix",
+            render_command: "xdg_or_win_cache_dir",
             base_dir: xdg_or_win::cache_dir(),
         },
         DirsPrefixBuilder {
-            command: "xdg_or_win_config_prefix",
+            manifest_command: "xdg_or_win_config_prefix",
+            render_command: "xdg_or_win_config_dir",
             base_dir: xdg_or_win::config_dir(),
         },
         DirsPrefixBuilder {
-            command: "xdg_or_win_config_local_prefix",
+            manifest_command: "xdg_or_win_config_local_prefix",
+            render_command: "xdg_or_win_config_local_dir",
             base_dir: xdg_or_win::config_local_dir(),
         },
         DirsPrefixBuilder {
-            command: "xdg_or_win_data_prefix",
+            manifest_command: "xdg_or_win_data_prefix",
+            render_command: "xdg_or_win_data_dir",
             base_dir: xdg_or_win::data_dir(),
         },
         DirsPrefixBuilder {
-            command: "xdg_or_win_data_local_prefix",
+            manifest_command: "xdg_or_win_data_local_prefix",
+            render_command: "xdg_or_win_data_local_dir",
             base_dir: xdg_or_win::data_local_dir(),
         },
     ];
