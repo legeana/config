@@ -1,0 +1,8 @@
+[signing]
+behavior = "own"
+backend = "ssh"
+
+[signing.backends.ssh]
+allowed-signers = "~/.gitconfig.keys/allowed-signers"
+# TODO: revocation file
+# https://github.com/jj-vcs/jj/issues/6504
