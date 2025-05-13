@@ -6,7 +6,7 @@ import = [
     {{ path | enquote() }},
     {%- endfor %}
 ]
-{%- if is_windows %}
+{%- if is_windows() %}
 # Alacritty closes on Windows when configs are regenerated.
 # TODO: Figure out why.
 live_config_reload = false
