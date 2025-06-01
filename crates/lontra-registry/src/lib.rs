@@ -7,6 +7,7 @@ mod model;
 mod queries;
 #[cfg(test)]
 mod row_queries;
+mod schema;
 pub mod sqlite;
 
 pub use file_type::{FilePath, FilePathBuf, FileType};
