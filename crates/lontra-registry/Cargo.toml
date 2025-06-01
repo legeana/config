@@ -19,6 +19,9 @@ features = [
     "returning_clauses_for_sqlite_3_35",
     "sqlite",
 ]
+[dependencies.diesel_migrations]
+version = "2.2.0"
+features = ["sqlite"]
 [dependencies.libsqlite3-sys]
 version = "0.33.0"
 default-features = false
