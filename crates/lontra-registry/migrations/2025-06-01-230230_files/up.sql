@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS files (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    purpose INTEGER NOT NULL,
+    file_type INTEGER NOT NULL,
+    path BLOB NOT NULL,
+    update_id INTEGER
+        DEFAULT (NULL)
+        REFERENCES updates (id)
+        ON DELETE CASCADE
+) STRICT;

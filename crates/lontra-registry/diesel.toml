@@ -1,0 +1,4 @@
+# https://diesel.rs/guides/configuring-diesel-cli.html
+
+[migrations_directory]
+dir = "migrations"
