@@ -1,10 +1,20 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::Context as _;
+use diesel::Insertable;
+use diesel::Queryable;
 use lontra_strings::os_str;
 use rusqlite::types::{FromSql, FromSqlError, FromSqlResult, ToSql, ToSqlOutput, Value, ValueRef};
 
 use super::file_type;
+//use super::schema::files;
+use super::schema::updates;
+
+#[derive(Clone, Copy, Debug, Insertable, PartialEq, Queryable)]
+#[diesel(table_name = updates)]
+pub(crate) struct Update {
+    id: i64,
+}
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub(crate) struct UpdateId(pub(crate) Option<i64>);
