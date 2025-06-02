@@ -2,3 +2,6 @@
 
 [migrations_directory]
 dir = "migrations"
+
+[print_schema]
+sqlite_integer_primary_key_is_bigint = true

@@ -1,18 +1,23 @@
 // @generated automatically by Diesel CLI.
+// Fixed in accordance with <https://sqlite.org/stricttables.html>.
+// See <https://github.com/diesel-rs/diesel/discussions/4628>.
 
 diesel::table! {
     files (id) {
-        id -> Nullable<Integer>,
+        // Removed Nullable due to STRICT.
+        id -> BigInt,
         purpose -> Integer,
         file_type -> Integer,
         path -> Binary,
-        update_id -> Nullable<Integer>,
+        // Use BigInt.
+        update_id -> Nullable<BigInt>,
     }
 }
 
 diesel::table! {
     updates (id) {
-        id -> Nullable<Integer>,
+        // Removed Nullable due to STRICT.
+        id -> BigInt,
     }
 }
 
