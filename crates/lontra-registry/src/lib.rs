@@ -4,6 +4,7 @@ mod connection;
 mod file_type;
 mod migrations;
 mod model;
+pub(crate) mod proxied;
 mod queries;
 #[cfg(test)]
 mod row_queries;
