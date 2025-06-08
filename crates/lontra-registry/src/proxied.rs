@@ -32,8 +32,10 @@ macro_rules! sqlx_type_impl {
             <Self as $crate::proxied::Type>::Proxy: $crate::proxied::SqlxType<DB>,
         {
             fn type_info() -> <DB as $crate::proxied::SqlxDatabase>::TypeInfo {
-                type Proxy = <$type as $crate::proxied::Type>::Proxy;
-                <Proxy as $crate::proxied::SqlxType<DB>>::type_info()
+                use $crate::proxied::SqlxType;
+                use $crate::proxied::Type;
+
+                <<Self as Type>::Proxy as SqlxType<DB>>::type_info()
             }
         }
     };
@@ -51,9 +53,12 @@ macro_rules! sqlx_decode_impl {
             fn decode(
                 value: <DB as $crate::proxied::SqlxDatabase>::ValueRef<'r>,
             ) -> BoxDynResult<Self> {
-                type Proxy = <$type as $crate::proxied::Type>::Proxy;
-                let proxy = <Proxy as $crate::proxied::SqlxDecode<'r, DB>>::decode(value)?;
-                Ok(<Self as $crate::proxied::SizedType>::from_proxy(proxy)?)
+                use $crate::proxied::SizedType;
+                use $crate::proxied::SqlxDecode;
+                use $crate::proxied::Type;
+
+                let proxy = <<Self as Type>::Proxy as SqlxDecode<'r, DB>>::decode(value)?;
+                Ok(<Self as SizedType>::from_proxy(proxy)?)
             }
         }
     };
@@ -90,6 +95,14 @@ macro_rules! sqlx_encode_impl {
 }
 
 #[macro_export]
+macro_rules! sqlx_unsized_impl {
+    ($type:ty) => {
+        $crate::sqlx_type_impl!($type);
+        $crate::sqlx_encode_impl!($type);
+    };
+}
+
+#[macro_export]
 macro_rules! sqlx_impl {
     ($type:ty) => {
         $crate::sqlx_type_impl!($type);
@@ -104,9 +117,14 @@ mod tests {
 
     use super::*;
 
-    struct TestType;
+    fn assert_type<T: SqlxType<Sqlite>>() {}
+    fn assert_decode<'r, T: SqlxDecode<'r, Sqlite>>() {}
+    fn assert_encode<'q, T: SqlxEncode<'q, Sqlite>>() {}
 
-    impl Type for TestType {
+    // Tests for OwnedType.
+    struct OwnedType;
+
+    impl Type for OwnedType {
         type Proxy = Vec<u8>;
 
         fn into_proxy(self) -> Result<Self::Proxy> {
@@ -117,22 +135,40 @@ mod tests {
         }
     }
 
-    impl SizedType for TestType {
+    impl SizedType for OwnedType {
         fn from_proxy(_proxy: Self::Proxy) -> Result<Self> {
             Ok(Self)
         }
     }
 
-    sqlx_impl!(TestType);
+    sqlx_impl!(OwnedType);
 
     #[test]
-    fn test_sqlite() {
-        fn assert_type<T: SqlxType<Sqlite>>() {}
-        fn assert_decode<'r, T: SqlxDecode<'r, Sqlite>>() {}
-        fn assert_encode<'q, T: SqlxEncode<'q, Sqlite>>() {}
+    fn test_owned() {
+        assert_type::<OwnedType>();
+        assert_decode::<OwnedType>();
+        assert_encode::<OwnedType>();
+    }
 
-        assert_type::<TestType>();
-        assert_decode::<TestType>();
-        assert_encode::<TestType>();
+    // Tests for ReferenceType.
+    struct ReferenceType<'a>(&'a str);
+
+    impl<'a> Type for ReferenceType<'a> {
+        type Proxy = &'a str;
+
+        fn into_proxy(self) -> Result<Self::Proxy> {
+            Ok(self.0)
+        }
+        fn to_proxy(&self) -> Result<Self::Proxy> {
+            Ok(self.0)
+        }
+    }
+
+    sqlx_unsized_impl!(ReferenceType<'_>);
+
+    #[test]
+    fn test_ref() {
+        assert_type::<ReferenceType<'_>>();
+        assert_encode::<ReferenceType<'_>>();
     }
 }
