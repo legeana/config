@@ -10,15 +10,15 @@ pub(crate) use sqlx::error::BoxDynError;
 
 pub(crate) type BoxDynResult<T> = Result<T, BoxDynError>;
 
-pub(crate) trait Type
-where
-    Self: Sized,
-{
+pub(crate) trait Type {
     type Proxy;
 
     // Required.
     fn into_proxy(self) -> Result<Self::Proxy>;
     fn to_proxy(&self) -> Result<Self::Proxy>;
+}
+
+pub(crate) trait SizedType: Type + Sized {
     fn from_proxy(proxy: Self::Proxy) -> Result<Self>;
 }
 
@@ -45,7 +45,7 @@ macro_rules! sqlx_decode_impl {
         impl<'r, DB> $crate::proxied::SqlxDecode<'r, DB> for $type
         where
             DB: $crate::proxied::SqlxDatabase,
-            Self: $crate::proxied::Type,
+            Self: $crate::proxied::SizedType,
             <Self as $crate::proxied::Type>::Proxy: $crate::proxied::SqlxDecode<'r, DB>,
         {
             fn decode(
@@ -53,7 +53,7 @@ macro_rules! sqlx_decode_impl {
             ) -> BoxDynResult<Self> {
                 type Proxy = <$type as $crate::proxied::Type>::Proxy;
                 let proxy = <Proxy as $crate::proxied::SqlxDecode<'r, DB>>::decode(value)?;
-                Ok(<Self as $crate::proxied::Type>::from_proxy(proxy)?)
+                Ok(<Self as $crate::proxied::SizedType>::from_proxy(proxy)?)
             }
         }
     };
@@ -115,6 +115,9 @@ mod tests {
         fn to_proxy(&self) -> Result<Self::Proxy> {
             Ok(Vec::new())
         }
+    }
+
+    impl SizedType for TestType {
         fn from_proxy(_proxy: Self::Proxy) -> Result<Self> {
             Ok(Self)
         }
