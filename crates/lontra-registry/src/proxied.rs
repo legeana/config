@@ -41,6 +41,12 @@ macro_rules! sqlx_type_impl {
 
                 <<Self as Type>::Proxy as SqlxType<DB>>::type_info()
             }
+            fn compatible(ty: &<DB as $crate::proxied::internal::SqlxDatabase>::TypeInfo) -> bool {
+                use $crate::proxied::Type;
+                use $crate::proxied::internal::SqlxType;
+
+                <<Self as Type>::Proxy as SqlxType<DB>>::compatible(ty)
+            }
         }
     };
 }
