@@ -1,5 +1,5 @@
 use anyhow::{Context as _, Result};
-use rusqlite::Connection;
+use sqlx::{SqliteConnection, query};
 
 use super::connection::AppConnection;
 use super::file_type::{self, FilePathBuf};
@@ -19,49 +19,55 @@ pub(crate) struct FileRow {
 
 pub(crate) trait RowQueries
 where
-    Self: AsRef<Connection>,
+    Self: AsMut<SqliteConnection>,
 {
-    fn update_rows(&self) -> Result<Vec<UpdateRow>> {
-        let mut stmt = self
-            .as_ref()
-            .prepare_cached(
-                "
-                SELECT id FROM updates
-                ORDER BY id ASC
-                ",
-            )
-            .context("failed to prepare statement")?;
-        let update_rows: Result<Vec<_>, _> = stmt
-            .query_map([], |row| Ok(UpdateRow { id: row.get("id")? }))
-            .context("failed to query updates")?
-            .collect();
-        update_rows.context("query updates")
+    async fn update_rows(&mut self) -> Result<Vec<UpdateRow>> {
+        let updates = query!(
+            r#"
+            SELECT
+                id AS "id: UpdateId"
+            FROM updates
+            ORDER BY id ASC
+            "#,
+        )
+        .fetch_all(self.as_mut())
+        .await
+        .context("failed to query updates")?
+        .into_iter()
+        .map(|row| UpdateRow { id: row.id })
+        .collect();
+        Ok(updates)
     }
 
-    fn file_rows(&self) -> Result<Vec<FileRow>> {
-        let mut stmt = self
-            .as_ref()
-            .prepare_cached(
-                "
-                SELECT update_id, purpose, file_type, path
-                FROM files
-                ORDER BY id ASC
-                ",
-            )
-            .context("files statement prepare")?;
-        let file_rows: Result<Vec<_>, _> = stmt
-            .query_map([], |row| {
-                let file_type: file_type::Type = row.get("file_type")?;
-                let SqlPathBuf(path) = row.get("path")?;
-                Ok(FileRow {
-                    update_id: row.get("update_id")?,
-                    purpose: row.get("purpose")?,
-                    file: file_type.with_path_buf(path),
-                })
-            })
-            .context("failed to query files")?
-            .collect();
-        file_rows.context("query files")
+    async fn file_rows(&mut self) -> Result<Vec<FileRow>> {
+        let files = query!(
+            r#"
+            SELECT
+                update_id AS "update_id: UpdateId",
+                purpose AS "purpose: FilePurpose",
+                file_type AS "file_type: file_type::Type",
+                path AS "path: SqlPathBuf"
+            FROM files
+            ORDER BY id ASC
+            "#,
+        )
+        .fetch_all(self.as_mut())
+        .await
+        .context("failed to query files")?
+        .into_iter()
+        .map(|row| {
+            // TODO: Try to fix the model.
+            // Ideally row.update_id would be just UpdateId which can be None internally.
+            let update_id = row.update_id.unwrap_or(UpdateId(None));
+            let SqlPathBuf(path) = row.path;
+            FileRow {
+                update_id,
+                purpose: row.purpose,
+                file: row.file_type.with_path_buf(path),
+            }
+        })
+        .collect();
+        Ok(files)
     }
 }
 
