@@ -13,6 +13,15 @@ verbose_eval ./setup -d list
 
 verbose_eval cargo fmt --check
 
+# sqlx
+export DATABASE_URL=sqlite://$PWD/target/sqlx.sqlite
+cd crates/lontra-registry
+verbose_eval sqlx database reset -y
+verbose_eval cargo sqlx prepare --check \
+    -- --all-targets --all-features
+unset DATABASE_URL
+cd -
+
 if cargo xwin --version >/dev/null 2>&1; then
     for target in $(rustup target list --installed); do
         verbose_eval cargo xwin check --target="$target" $CARGO_ARGS

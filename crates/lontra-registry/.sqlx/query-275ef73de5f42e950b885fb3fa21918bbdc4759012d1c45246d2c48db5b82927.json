@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT\n                update_id AS \"update_id: UpdateId\",\n                purpose AS \"purpose: FilePurpose\",\n                file_type AS \"file_type: file_type::Type\",\n                path AS \"path: SqlPathBuf\"\n            FROM files\n            ORDER BY id ASC\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "update_id: UpdateId",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "purpose: FilePurpose",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "file_type: file_type::Type",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "path: SqlPathBuf",
+        "ordinal": 3,
+        "type_info": "Blob"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "275ef73de5f42e950b885fb3fa21918bbdc4759012d1c45246d2c48db5b82927"
+}

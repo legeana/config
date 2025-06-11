@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            DELETE FROM files\n            WHERE\n                purpose = ?\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "497bbc21754934cc2ad6c77393df79670f419af4dffe3ad282f1cc9f10d822ec"
+}
