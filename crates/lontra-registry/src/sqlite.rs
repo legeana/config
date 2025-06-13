@@ -6,55 +6,75 @@ use super::connection::AppConnection;
 use super::model::{FilePurpose, UpdateId};
 use super::queries::AppQueries as _;
 use super::{FilePath, FilePathBuf, Registry};
+use crate::migrations;
+use crate::runtime::Runtime;
 
 #[derive(Debug)]
 pub struct SqliteRegistry {
+    rt: Runtime,
     conn: AppConnection,
 }
 
 impl SqliteRegistry {
     #[cfg(test)]
     fn open_in_memory() -> Result<Self> {
-        Self::with_connection(AppConnection::open_in_memory()?)
+        let rt = Runtime::new_current_thread()?;
+        let conn = rt.block_on(AppConnection::open_in_memory())?;
+        Self::with_connection(rt, conn)
     }
 
     pub fn open(path: &Path) -> Result<Self> {
-        Self::with_connection(AppConnection::open(path)?)
+        let rt = Runtime::new_current_thread()?;
+        let conn = rt.block_on(AppConnection::open(path))?;
+        Self::with_connection(rt, conn)
     }
 
-    fn with_connection(mut conn: AppConnection) -> Result<Self> {
-        super::migrations::config()
-            .to_stable(&mut conn)
-            .context("failed to migrate")?;
-        Ok(Self { conn })
+    fn with_connection(rt: Runtime, mut conn: AppConnection) -> Result<Self> {
+        rt.block_on(async {
+            migrations::config()
+                .run(conn.as_mut())
+                .await
+                .context("failed to migrate")
+        })?;
+        Ok(Self { rt, conn })
     }
 
     pub fn close(self) -> Result<()> {
-        self.conn.close()
+        self.rt.block_on(self.conn.close())
     }
 }
 
 impl Registry for SqliteRegistry {
-    fn user_files(&self) -> Result<Vec<FilePathBuf>> {
-        self.conn.files(FilePurpose::User)
+    fn user_files(&mut self) -> Result<Vec<FilePathBuf>> {
+        self.rt
+            .block_on(async { self.conn.files(FilePurpose::User).await })
     }
     fn register_user_file(&mut self, file: FilePath) -> Result<()> {
-        self.conn
-            .register_file(UpdateId(None), FilePurpose::User, file)
+        self.rt.block_on(async {
+            self.conn
+                .register_file(UpdateId(None), FilePurpose::User, file)
+                .await
+        })
     }
     fn clear_user_files(&mut self) -> Result<()> {
-        self.conn.clear_files(FilePurpose::User)
+        self.rt
+            .block_on(async { self.conn.clear_files(FilePurpose::User).await })
     }
 
-    fn state_files(&self) -> Result<Vec<FilePathBuf>> {
-        self.conn.files(FilePurpose::State)
+    fn state_files(&mut self) -> Result<Vec<FilePathBuf>> {
+        self.rt
+            .block_on(async { self.conn.files(FilePurpose::State).await })
     }
     fn register_state_file(&mut self, file: FilePath) -> Result<()> {
-        self.conn
-            .register_file(UpdateId(None), FilePurpose::State, file)
+        self.rt.block_on(async {
+            self.conn
+                .register_file(UpdateId(None), FilePurpose::State, file)
+                .await
+        })
     }
     fn clear_state_files(&mut self) -> Result<()> {
-        self.conn.clear_files(FilePurpose::State)
+        self.rt
+            .block_on(async { self.conn.clear_files(FilePurpose::State).await })
     }
 }
 

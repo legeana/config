@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            INSERT INTO updates\n            DEFAULT VALUES\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": []
+  },
+  "hash": "ae39a91170e4affbf3d1c48f8d50abf563e2e440fd875db49e49d823e4525c9c"
+}

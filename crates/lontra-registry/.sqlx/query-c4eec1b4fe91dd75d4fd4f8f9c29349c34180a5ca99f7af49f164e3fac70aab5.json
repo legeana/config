@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            DELETE FROM updates\n            WHERE id != ?\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "c4eec1b4fe91dd75d4fd4f8f9c29349c34180a5ca99f7af49f164e3fac70aab5"
+}
