@@ -36,7 +36,7 @@ thiserror.workspace = true
 toml = "0.8.10"
 ureq = "3.0.0"
 walkdir = "2"
-which = "7.0.0"
+which = "8.0.0"
 
 # https://lalrpop.github.io/lalrpop/quick_start_guide.html
 # See also build.rs.
