@@ -43,7 +43,7 @@ where
         let files = query!(
             r#"
             SELECT
-                update_id AS "update_id: UpdateId",
+                update_id AS "update_id!: UpdateId",
                 purpose AS "purpose: FilePurpose",
                 file_type AS "file_type: file_type::Type",
                 path AS "path: SqlPathBuf"
@@ -56,12 +56,9 @@ where
         .context("failed to query files")?
         .into_iter()
         .map(|row| {
-            // TODO: Try to fix the model.
-            // Ideally row.update_id would be just UpdateId which can be None internally.
-            let update_id = row.update_id.unwrap_or(UpdateId(None));
             let SqlPathBuf(path) = row.path;
             FileRow {
-                update_id,
+                update_id: row.update_id,
                 purpose: row.purpose,
                 file: row.file_type.with_path_buf(path),
             }
