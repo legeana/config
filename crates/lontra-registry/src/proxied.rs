@@ -13,9 +13,9 @@ pub(crate) trait SizedType: Type + Sized {
 // Internal types made public for macros only.
 // Do not use directly.
 pub(crate) mod internal {
-    pub(crate) use sqlx::Database as SqlxDatabase;
-    pub(crate) use sqlx::Decode as SqlxDecode;
-    pub(crate) use sqlx::Encode as SqlxEncode;
+    pub(crate) use sqlx::Database;
+    pub(crate) use sqlx::Decode;
+    pub(crate) use sqlx::Encode;
     pub(crate) use sqlx::Type as SqlxType;
     pub(crate) use sqlx::encode::IsNull;
     pub(crate) use sqlx::error::BoxDynError;
@@ -29,17 +29,17 @@ macro_rules! sqlx_type_impl {
     ($type:ty) => {
         impl<DB> $crate::proxied::internal::SqlxType<DB> for $type
         where
-            DB: $crate::proxied::internal::SqlxDatabase,
+            DB: $crate::proxied::internal::Database,
             Self: $crate::proxied::Type,
             <Self as $crate::proxied::Type>::Proxy: $crate::proxied::internal::SqlxType<DB>,
         {
-            fn type_info() -> <DB as $crate::proxied::internal::SqlxDatabase>::TypeInfo {
+            fn type_info() -> <DB as $crate::proxied::internal::Database>::TypeInfo {
                 use $crate::proxied::Type;
                 use $crate::proxied::internal::SqlxType;
 
                 <<Self as Type>::Proxy as SqlxType<DB>>::type_info()
             }
-            fn compatible(ty: &<DB as $crate::proxied::internal::SqlxDatabase>::TypeInfo) -> bool {
+            fn compatible(ty: &<DB as $crate::proxied::internal::Database>::TypeInfo) -> bool {
                 use $crate::proxied::Type;
                 use $crate::proxied::internal::SqlxType;
 
@@ -52,20 +52,20 @@ macro_rules! sqlx_type_impl {
 #[macro_export]
 macro_rules! sqlx_decode_impl {
     ($type:ty) => {
-        impl<'r, DB> $crate::proxied::internal::SqlxDecode<'r, DB> for $type
+        impl<'r, DB> $crate::proxied::internal::Decode<'r, DB> for $type
         where
-            DB: $crate::proxied::internal::SqlxDatabase,
+            DB: $crate::proxied::internal::Database,
             Self: $crate::proxied::SizedType,
-            <Self as $crate::proxied::Type>::Proxy: $crate::proxied::internal::SqlxDecode<'r, DB>,
+            <Self as $crate::proxied::Type>::Proxy: $crate::proxied::internal::Decode<'r, DB>,
         {
             fn decode(
-                value: <DB as $crate::proxied::internal::SqlxDatabase>::ValueRef<'r>,
+                value: <DB as $crate::proxied::internal::Database>::ValueRef<'r>,
             ) -> $crate::proxied::internal::BoxDynResult<Self> {
                 use $crate::proxied::SizedType;
                 use $crate::proxied::Type;
-                use $crate::proxied::internal::SqlxDecode;
+                use $crate::proxied::internal::Decode;
 
-                let proxy = <<Self as Type>::Proxy as SqlxDecode<'r, DB>>::decode(value)?;
+                let proxy = <<Self as Type>::Proxy as Decode<'r, DB>>::decode(value)?;
                 Ok(<Self as SizedType>::from_proxy(proxy)?)
             }
         }
@@ -75,15 +75,15 @@ macro_rules! sqlx_decode_impl {
 #[macro_export]
 macro_rules! sqlx_encode_impl {
     ($type:ty) => {
-        impl<'q, DB> $crate::proxied::internal::SqlxEncode<'q, DB> for $type
+        impl<'q, DB> $crate::proxied::internal::Encode<'q, DB> for $type
         where
-            DB: $crate::proxied::internal::SqlxDatabase,
+            DB: $crate::proxied::internal::Database,
             Self: $crate::proxied::Type,
-            <Self as $crate::proxied::Type>::Proxy: $crate::proxied::internal::SqlxEncode<'q, DB>,
+            <Self as $crate::proxied::Type>::Proxy: $crate::proxied::internal::Encode<'q, DB>,
         {
             fn encode_by_ref(
                 &self,
-                buf: &mut <DB as $crate::proxied::internal::SqlxDatabase>::ArgumentBuffer<'q>,
+                buf: &mut <DB as $crate::proxied::internal::Database>::ArgumentBuffer<'q>,
             ) -> $crate::proxied::internal::IsNullResult {
                 use $crate::proxied::Type as _;
 
@@ -92,7 +92,7 @@ macro_rules! sqlx_encode_impl {
             }
             fn encode(
                 self,
-                buf: &mut <DB as $crate::proxied::internal::SqlxDatabase>::ArgumentBuffer<'q>,
+                buf: &mut <DB as $crate::proxied::internal::Database>::ArgumentBuffer<'q>,
             ) -> $crate::proxied::internal::IsNullResult
             where
                 Self: Sized,
