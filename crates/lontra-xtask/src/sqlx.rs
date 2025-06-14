@@ -41,10 +41,12 @@ fn set_database_url(sh: &Shell) -> Result<()> {
     let workspace_root = workspace::root(sh)?;
     let db = workspace_root.join("target").join("sqlx.sqlite");
     let url = {
-        let mut url = OsString::from("sqlite://");
+        // https://github.com/launchbadge/sqlx/issues/2771#issuecomment-2831396223
+        let mut url = OsString::from("sqlite:");
         url.push(db);
         url
     };
+    eprintln!("DATABASE_URL={}", url.to_string_lossy());
     sh.set_var("DATABASE_URL", url);
 
     Ok(())
