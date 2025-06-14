@@ -1,2 +1,2 @@
 [alias]
-xtask = "run --package=lontra-xtask --"
+xtask = "run --package=lontra-xtask --bin=lontra-xtask --"

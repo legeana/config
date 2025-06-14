@@ -16,3 +16,7 @@ xshell = "0.2.7"
 
 [dev-dependencies]
 pretty_assertions.workspace = true
+
+[[bin]]
+name = "pre-commit-shim"
+path = "src/bin/pre-commit-shim.rs"

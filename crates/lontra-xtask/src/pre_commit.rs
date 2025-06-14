@@ -7,6 +7,8 @@ use anyhow::bail;
 use xshell::Shell;
 use xshell::cmd;
 
+use crate::install::install_shim;
+
 pub fn run() -> Result<()> {
     let sh = Shell::new()?;
     verify_cwd(&sh)?;
@@ -17,6 +19,17 @@ pub fn run() -> Result<()> {
     rust_pre_commit(&sh)?;
 
     Ok(())
+}
+
+pub fn install() -> Result<()> {
+    static SHIM: &str = "pre-commit-shim";
+    let sh = Shell::new()?;
+    // Why shims?
+    // - Shims are trivial and don't need to be rebuilt frequently.
+    // - Symlinks are not always available on Windows, and even if they are we
+    //   need to store the executable somewhere (e.g. in target). But in that
+    //   case the hook will fail if we run `cargo clean`.
+    install_shim(&sh, SHIM).with_context(|| format!("failed to install {SHIM}"))
 }
 
 pub fn verify_cwd(sh: &Shell) -> Result<()> {
@@ -40,6 +53,7 @@ fn fmt_pre_commit(sh: &Shell) -> Result<()> {
 
 fn sqlx_pre_commit(sh: &Shell) -> Result<()> {
     let sh = sh.clone(); // Shell uses interior mutability.
+
     // Set DATABASE_URL.
     let db = sh.current_dir().join("target").join("sqlx.sqlite");
     let url = {
@@ -49,6 +63,7 @@ fn sqlx_pre_commit(sh: &Shell) -> Result<()> {
     };
     sh.set_var("DATABASE_URL", url);
 
+    // Verify sqlx offline files.
     sh.change_dir("crates/lontra-registry");
     cmd!(sh, "sqlx database reset -y").run()?;
     let cargo = sh.var_os("CARGO").context("failed to find CARGO")?;
