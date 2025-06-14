@@ -1,4 +1,5 @@
 use std::ffi::OsString;
+use std::path::PathBuf;
 
 use anyhow::Context as _;
 use anyhow::Ok;
@@ -11,7 +12,7 @@ use crate::install::install_shim;
 
 pub fn run() -> Result<()> {
     let sh = Shell::new()?;
-    verify_cwd(&sh)?;
+    change_dir_to_root(&sh)?;
 
     setup_pre_commit(&sh)?;
     fmt_pre_commit(&sh)?;
@@ -32,7 +33,23 @@ pub fn install() -> Result<()> {
     install_shim(&sh, SHIM).with_context(|| format!("failed to install {SHIM}"))
 }
 
-pub fn verify_cwd(sh: &Shell) -> Result<()> {
+fn change_dir_to_root(sh: &Shell) -> Result<()> {
+    let cargo = sh.var_os("CARGO").context("failed to find CARGO")?;
+    let workspace_manifest: PathBuf = cmd!(
+        sh,
+        "{cargo} locate-project --workspace --message-format=plain"
+    )
+    .read()?
+    .into();
+    let workspace_root = workspace_manifest
+        .parent()
+        .with_context(|| format!("failed to find {workspace_manifest:?}'s parent"))?;
+    eprintln!("$ cd {workspace_root:?}");
+    sh.change_dir(workspace_root);
+    verify_cwd(sh)
+}
+
+fn verify_cwd(sh: &Shell) -> Result<()> {
     let manifest = sh.read_file("Cargo.toml")?;
     if !manifest.contains("[workspace]\n") {
         bail!("Cargo.toml doesn't contain [workspace] section");
