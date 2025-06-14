@@ -23,10 +23,26 @@ pub(crate) fn root(sh: &Shell) -> Result<PathBuf> {
     Ok(workspace_root.into())
 }
 
+pub(crate) fn crate_root(sh: &Shell, crate_: &str) -> Result<PathBuf> {
+    let workspace_root = root(sh)?;
+    // Assuming lontra project layout.
+    // This may not work in other projects.
+    let crate_root = workspace_root.join("crates").join(crate_);
+    verify_crate(sh, crate_, &crate_root)?;
+    Ok(crate_root)
+}
+
 pub(crate) fn change_dir_to_root(sh: &Shell) -> Result<()> {
     let workspace_root = root(sh)?;
     eprintln!("$ cd {workspace_root:?}");
     sh.change_dir(workspace_root);
+    Ok(())
+}
+
+pub(crate) fn change_dir_to_crate(sh: &Shell, crate_: &str) -> Result<()> {
+    let crate_root = crate_root(sh, crate_)?;
+    eprintln!("$ cd {crate_root:?}");
+    sh.change_dir(crate_root);
     Ok(())
 }
 
@@ -37,6 +53,18 @@ fn verify_root(sh: &Shell, root: &Path) -> Result<()> {
         .with_context(|| format!("failed to read {workspace_manifest:?}"))?;
     if !manifest.contains("[workspace]\n") {
         bail!("{root:?}: Cargo.toml doesn't contain [workspace] section");
+    }
+    Ok(())
+}
+
+fn verify_crate(sh: &Shell, crate_: &str, crate_root: &Path) -> Result<()> {
+    let crate_manifest = crate_root.join("Cargo.toml");
+    let manifest = sh
+        .read_file(&crate_manifest)
+        .with_context(|| format!("failed to read {crate_manifest:?}"))?;
+    let expected_entry = format!("name = {crate_:?}");
+    if !manifest.contains(&expected_entry) {
+        bail!("{crate_root:?}: Cargo.toml doesn't contain: {expected_entry}");
     }
     Ok(())
 }

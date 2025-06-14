@@ -16,6 +16,7 @@ struct Cli {
 enum Commands {
     InstallGitHooks,
     PreCommit,
+    SqlxPrepare,
 }
 
 fn main() -> Result<()> {
@@ -27,5 +28,6 @@ fn main() -> Result<()> {
             Ok(())
         }
         Commands::PreCommit => xt::pre_commit::run(),
+        Commands::SqlxPrepare => xt::sqlx::prepare(),
     }
 }

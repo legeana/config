@@ -1,5 +1,3 @@
-use std::ffi::OsString;
-
 use anyhow::Context as _;
 use anyhow::Ok;
 use anyhow::Result;
@@ -15,7 +13,7 @@ pub fn run() -> Result<()> {
 
     setup_pre_commit(&sh)?;
     fmt_pre_commit(&sh)?;
-    sqlx_pre_commit(&sh)?;
+    crate::sqlx::pre_commit(&sh)?;
     rust_pre_commit(&sh)?;
 
     Ok(())
@@ -40,31 +38,6 @@ fn setup_pre_commit(sh: &Shell) -> Result<()> {
 fn fmt_pre_commit(sh: &Shell) -> Result<()> {
     let cargo = sh.var_os("CARGO").context("failed to find CARGO")?;
     cmd!(sh, "{cargo} fmt --check").run()?;
-    Ok(())
-}
-
-fn sqlx_pre_commit(sh: &Shell) -> Result<()> {
-    let sh = sh.clone(); // Shell uses interior mutability.
-
-    // Set DATABASE_URL.
-    let db = sh.current_dir().join("target").join("sqlx.sqlite");
-    let url = {
-        let mut url = OsString::from("sqlite://");
-        url.push(db);
-        url
-    };
-    sh.set_var("DATABASE_URL", url);
-
-    // Verify sqlx offline files.
-    sh.change_dir("crates/lontra-registry");
-    cmd!(sh, "sqlx database reset -y").run()?;
-    let cargo = sh.var_os("CARGO").context("failed to find CARGO")?;
-    cmd!(
-        sh,
-        "{cargo} sqlx prepare --check -- --all-targets --all-features"
-    )
-    .run()?;
-
     Ok(())
 }
 
