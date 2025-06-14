@@ -11,6 +11,7 @@ rust-version = "1.86.0"
 [workspace.dependencies]
 anyhow = "1.0"
 cfg-if = "1.0.0"
+clap = { version = "4.2", features = ["derive"] }
 dirs = "6.0"
 either = "1.13.0"
 log = "0.4"

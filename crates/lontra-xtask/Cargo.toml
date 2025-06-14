@@ -1,5 +1,5 @@
 [package]
-name = "lontra-cli"
+name = "lontra-xtask"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -10,9 +10,9 @@ workspace = true
 [dependencies]
 anyhow.workspace = true
 clap.workspace = true
+cli = { package = "lontra-cli", path = "../lontra-cli" }
 log.workspace = true
+xshell = "0.2.7"
 
-[dependencies.env_logger]
-version = "0.11.3"
-default-features = false
-features = ["auto-color"]
+[dev-dependencies]
+pretty_assertions.workspace = true
