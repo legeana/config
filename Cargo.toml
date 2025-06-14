@@ -6,7 +6,7 @@ members = ["crates/*"]
 [workspace.package]
 version = "0.0.0"
 edition = "2024"
-rust-version = "1.86.0"
+rust-version = "1.87.0"
 
 [workspace.dependencies]
 anyhow = "1.0"
@@ -37,6 +37,8 @@ must_use_candidate = "allow"
 needless_raw_string_hashes = "allow"
 struct_excessive_bools = "allow"
 too_many_lines = "allow"
+# Lots of false positives.
+unnecessary_debug_formatting = "allow"
 unused_self = "allow"
 # Restriction.
 empty_structs_with_brackets = "deny"
