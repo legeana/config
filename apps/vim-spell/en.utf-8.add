@@ -259,6 +259,7 @@ etags
 eval
 exa
 exe
+exhaustruct
 expanduser
 expr
 extern
@@ -318,6 +319,7 @@ gethostname
 getitem
 getopt
 getpass
+getuid
 getvalue
 gflags
 gh
@@ -437,6 +439,7 @@ itertools
 javascript
 jdbc
 jinja
+jj
 js
 json
 jsonnet
@@ -445,6 +448,7 @@ jvm
 kdl
 keepalive
 keybase
+keygen
 keygrip
 keymap
 keymaps
@@ -785,6 +789,7 @@ shlexfmt
 shortlog
 shoutout
 shutil
+sig
 sighup
 sigint
 signame
@@ -793,6 +798,7 @@ significands
 sigquit
 sigterm
 skippable
+slackware
 smartstring
 socat
 solarized
@@ -1016,6 +1022,7 @@ varargs
 variadic
 vcat
 vcc
+vcs
 vec
 vecs
 vendored
@@ -1079,6 +1086,8 @@ xrandr
 xsrf
 xsrftoken
 xss
+xtask
+xwin
 yaml
 yazi
 yml
