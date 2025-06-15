@@ -1,0 +1,19 @@
+[package]
+name = "lontra-sig"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+anyhow.workspace = true
+thiserror.workspace = true
+
+[dependencies.ssh-key]
+version = "0.6.7"
+features = ["ed25519"]
+
+[dev-dependencies]
+test-case.workspace = true
