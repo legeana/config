@@ -1,5 +1,0 @@
-requires = "os=windows"
-
-[[system_dependencies]]
-winget = "GlazeWM"
-wants = { command = "glazewm" }
