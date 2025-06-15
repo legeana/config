@@ -22,7 +22,7 @@ where
         .await
         .context("failed to create new update")?
         .last_insert_rowid();
-        Ok(UpdateId(Some(row_id)))
+        Ok(UpdateId(row_id))
     }
 
     #[allow(dead_code)]
@@ -42,7 +42,7 @@ where
 
     async fn register_file(
         &mut self,
-        update: UpdateId,
+        update: Option<UpdateId>,
         purpose: FilePurpose,
         file: FilePath<'_>,
     ) -> Result<()> {
@@ -167,14 +167,14 @@ mod tests {
     fn test_register_file(purpose: FilePurpose) {
         crate::runtime::block_on(async {
             let mut conn = conn().await;
-            conn.register_file(UpdateId(None), purpose, FilePath::new_symlink("/test/file"))
+            conn.register_file(None, purpose, FilePath::new_symlink("/test/file"))
                 .await
                 .expect("register_file");
 
             assert_eq!(
                 conn.file_rows().await.unwrap(),
                 vec![FileRow {
-                    update_id: UpdateId(None),
+                    update_id: None,
                     purpose,
                     file: FilePathBuf::new_symlink("/test/file"),
                 }],
@@ -187,11 +187,11 @@ mod tests {
     fn test_files(purpose: FilePurpose, other_purpose: FilePurpose) {
         crate::runtime::block_on(async {
             let mut conn = conn().await;
-            conn.register_file(UpdateId(None), purpose, FilePath::new_symlink("/test/file"))
+            conn.register_file(None, purpose, FilePath::new_symlink("/test/file"))
                 .await
                 .expect("register_file");
             conn.register_file(
-                UpdateId(None),
+                None,
                 other_purpose,
                 FilePath::new_symlink("/test/other/file"),
             )
@@ -220,7 +220,7 @@ mod tests {
                 FilePath::new_symlink("/test/3/file/3"),
             ];
             for f in files.iter().copied() {
-                conn.register_file(UpdateId(None), purpose, f)
+                conn.register_file(None, purpose, f)
                     .await
                     .expect("register_file");
             }
@@ -236,11 +236,11 @@ mod tests {
             let mut conn = conn().await;
             let update = conn.create_update().await.expect("create_update");
             let other_update = conn.create_update().await.expect("create_update");
-            conn.register_file(update, purpose, FilePath::new_symlink("/this/update"))
+            conn.register_file(Some(update), purpose, FilePath::new_symlink("/this/update"))
                 .await
                 .expect("register_file");
             conn.register_file(
-                other_update,
+                Some(other_update),
                 purpose,
                 FilePath::new_symlink("/other/update"),
             )
@@ -269,7 +269,7 @@ mod tests {
             let update = conn.create_update().await.expect("create_update");
             let other_update = conn.create_update().await.expect("create_update");
             for f in want_files.iter().copied() {
-                conn.register_file(other_update, purpose, f)
+                conn.register_file(Some(other_update), purpose, f)
                     .await
                     .expect("register_file");
             }
@@ -288,7 +288,7 @@ mod tests {
     fn test_clear_files(purpose: FilePurpose) {
         crate::runtime::block_on(async {
             let mut conn = conn().await;
-            conn.register_file(UpdateId(None), purpose, FilePath::new_symlink("/test/file"))
+            conn.register_file(None, purpose, FilePath::new_symlink("/test/file"))
                 .await
                 .expect("register_file");
             assert_eq!(
@@ -310,20 +310,16 @@ mod tests {
     ) {
         crate::runtime::block_on(async {
             let mut conn = conn().await;
-            conn.register_file(UpdateId(None), purpose, FilePath::new_symlink("/test/file"))
+            conn.register_file(None, purpose, FilePath::new_symlink("/test/file"))
                 .await
                 .expect("register_file");
             assert_eq!(
                 conn.files(purpose).await.unwrap(),
                 vec![FilePathBuf::new_symlink("/test/file")]
             );
-            conn.register_file(
-                UpdateId(None),
-                other_purpose,
-                FilePath::new_symlink("/other/file"),
-            )
-            .await
-            .expect("register_file");
+            conn.register_file(None, other_purpose, FilePath::new_symlink("/other/file"))
+                .await
+                .expect("register_file");
             assert_eq!(
                 conn.files(other_purpose).await.unwrap(),
                 vec![FilePathBuf::new_symlink("/other/file")]
@@ -334,7 +330,7 @@ mod tests {
             assert_eq!(
                 conn.file_rows().await.unwrap(),
                 vec![FileRow {
-                    update_id: UpdateId(None),
+                    update_id: None,
                     purpose: other_purpose,
                     file: FilePathBuf::new_symlink("/other/file"),
                 }],
@@ -378,14 +374,14 @@ mod tests {
         let update = conn.create_update().await.expect("create_update");
         let other_update = conn.create_update().await.expect("create_update");
         conn.register_file(
-            update,
+            Some(update),
             FilePurpose::User,
             FilePath::new_symlink("test-update"),
         )
         .await
         .expect("register_file");
         conn.register_file(
-            other_update,
+            Some(other_update),
             FilePurpose::User,
             FilePath::new_symlink("test-other-update"),
         )
@@ -399,7 +395,7 @@ mod tests {
         assert_eq!(
             conn.file_rows().await.expect("file_rows"),
             vec![FileRow {
-                update_id: update,
+                update_id: Some(update),
                 purpose: FilePurpose::User,
                 file: FilePathBuf::new_symlink("test-update"),
             }],

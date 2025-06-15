@@ -9,7 +9,7 @@ use super::file_type;
 
 #[derive(Clone, Copy, Debug, PartialEq, sqlx::Type)]
 #[sqlx(transparent)]
-pub(crate) struct UpdateId(pub(crate) Option<i64>);
+pub(crate) struct UpdateId(pub(crate) i64);
 
 #[derive(Clone, Copy, Debug, PartialEq, sqlx::Type)]
 #[repr(i32)]
@@ -121,20 +121,20 @@ mod tests {
         };
     }
 
-    #[test_case(UpdateId(None), None)]
-    #[test_case(UpdateId(Some(123)), Some(123))]
-    fn test_update_id_encode(update_id: UpdateId, want: Option<i64>) {
+    #[test_case(None, None)]
+    #[test_case(Some(UpdateId(123)), Some(123))]
+    fn test_update_id_encode(update_id: Option<UpdateId>, want: Option<i64>) {
         crate::runtime::block_on(async {
             let res: Option<i64> = query_into!(update_id).await;
             assert_eq!(res, want);
         });
     }
 
-    #[test_case(None, UpdateId(None))]
-    #[test_case(Some(123), UpdateId(Some(123)))]
-    fn test_update_id_decode(update_id: Option<i64>, want: UpdateId) {
+    #[test_case(None, None)]
+    #[test_case(Some(123), Some(UpdateId(123)))]
+    fn test_update_id_decode(update_id: Option<i64>, want: Option<UpdateId>) {
         crate::runtime::block_on(async {
-            let res: UpdateId = query_into!(update_id).await;
+            let res: Option<UpdateId> = query_into!(update_id).await;
             assert_eq!(res, want);
         });
     }

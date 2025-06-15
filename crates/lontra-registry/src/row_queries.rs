@@ -12,7 +12,7 @@ pub(crate) struct UpdateRow {
 
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct FileRow {
-    pub update_id: UpdateId,
+    pub update_id: Option<UpdateId>,
     pub purpose: FilePurpose,
     pub file: FilePathBuf,
 }
@@ -43,7 +43,7 @@ where
         let files = query!(
             r#"
             SELECT
-                update_id AS "update_id!: UpdateId",
+                update_id AS "update_id: UpdateId",
                 purpose AS "purpose: FilePurpose",
                 file_type AS "file_type: file_type::Type",
                 path AS "path: SqlPathBuf"

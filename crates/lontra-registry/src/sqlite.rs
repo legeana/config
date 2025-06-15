@@ -3,7 +3,7 @@ use std::path::Path;
 use anyhow::{Context as _, Result};
 
 use super::connection::AppConnection;
-use super::model::{FilePurpose, UpdateId};
+use super::model::FilePurpose;
 use super::queries::AppQueries as _;
 use super::{FilePath, FilePathBuf, Registry};
 use crate::migrations;
@@ -50,11 +50,8 @@ impl Registry for SqliteRegistry {
             .block_on(async { self.conn.files(FilePurpose::User).await })
     }
     fn register_user_file(&mut self, file: FilePath) -> Result<()> {
-        self.rt.block_on(async {
-            self.conn
-                .register_file(UpdateId(None), FilePurpose::User, file)
-                .await
-        })
+        self.rt
+            .block_on(async { self.conn.register_file(None, FilePurpose::User, file).await })
     }
     fn clear_user_files(&mut self) -> Result<()> {
         self.rt
@@ -68,7 +65,7 @@ impl Registry for SqliteRegistry {
     fn register_state_file(&mut self, file: FilePath) -> Result<()> {
         self.rt.block_on(async {
             self.conn
-                .register_file(UpdateId(None), FilePurpose::State, file)
+                .register_file(None, FilePurpose::State, file)
                 .await
         })
     }
