@@ -95,6 +95,10 @@ static ALLOWED_KEYS: LazyLock<AllowedKeySet> = LazyLock::new(|| {
     AllowedKeySet::from_raw_keys(RAW_ALLOWED_KEYS).expect("failed to parse RAW_ALLOWED_KEYS")
 });
 
+/// Verifies that a given message is signed by a given ssh signature, and the
+/// signature is trusted by lontra.
+///
+/// The list of trusted keys is compiled into the binary.
 pub fn verify(msg: impl AsRef<[u8]>, ssh_sig: impl AsRef<[u8]>) -> Result<()> {
     ALLOWED_KEYS.verify(msg, ssh_sig)
 }
