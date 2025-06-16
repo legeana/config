@@ -1,6 +1,7 @@
 ACLs
 BTree
 BTrees
+RAII
 RPCs
 TODOs
 abc
@@ -110,6 +111,7 @@ caddyfile
 canarying
 cd
 cdn
+cerr
 certtool
 cfg
 cgroup
@@ -162,6 +164,7 @@ corp
 counterintuitive
 cp
 cpp
+cppreference
 cpu
 crashlooping
 crc
@@ -171,6 +174,7 @@ crl
 cronjob
 css
 ctl
+ctor
 ctrl
 ctx
 ctypes
@@ -203,6 +207,10 @@ deref
 deregister
 desc
 deschedule
+deserialisation
+deserialise
+deserialiser
+deserialization
 deserialize
 deserializer
 dest
@@ -280,6 +288,8 @@ filepath
 filesystem
 filesystems
 filetypes
+finaliser
+finalizer
 firefox
 fishshell
 fixup
@@ -291,9 +301,11 @@ fmt
 fn
 fname
 fnameescape
+fns
 fontconfig
 foreach
 formatdoc
+fp
 freebsd
 freedesktop
 frontend
@@ -308,6 +320,7 @@ func
 funcs
 functools
 fuzzel
+fwrite
 fxn
 fzf
 gc
@@ -419,6 +432,7 @@ interpolator
 interpolators
 inthe
 io
+iostream
 ioutil
 ip
 ipaddress
@@ -433,6 +447,7 @@ isreadable
 isrecursive
 issubclass
 issuecomment
+istream
 iter
 iterable
 itertools
@@ -509,6 +524,7 @@ manpath
 mappingproxy
 mapreduce
 mariadb
+mb
 md
 mem
 meminfo
@@ -535,6 +551,7 @@ modeline
 modeset
 moreutils
 moshtm
+mountpoint
 mplayer
 mprocs
 mr
@@ -571,6 +588,7 @@ nofork
 nolint
 nonblocking
 noninteractive
+nonnull
 nonprod
 noop
 noparent
@@ -581,6 +599,7 @@ npm
 ns
 nsec
 nsecs
+nullability
 nullopt
 nullptr
 num
@@ -608,6 +627,7 @@ opensource
 openssh
 orgmode
 os
+ostream
 osx
 overprovisioned
 p0
@@ -708,6 +728,7 @@ pylint
 python3
 qall
 qps
+quickstart
 randr
 ratelimit
 rawproto
@@ -836,6 +857,7 @@ stdpath
 stockout
 str
 strictyaml
+stringify
 stringset
 struct
 structs
@@ -955,6 +977,7 @@ udev
 udp
 ui
 uid
+uint
 ulimit
 ulong
 uname
@@ -962,6 +985,7 @@ unanchored
 unarchiver
 unarchiving
 unbreak
+uncommanded
 uncommenting
 unconfigured
 undrain
@@ -984,6 +1008,7 @@ unpause
 unraid
 unregister
 unregistering
+unregisters
 unregistration
 unrepresentable
 unstashed
