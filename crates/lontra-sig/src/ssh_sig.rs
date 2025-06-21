@@ -2,15 +2,16 @@
 
 use std::sync::LazyLock;
 
+use ssh_key::Error as SshError;
 use ssh_key::PublicKey;
 use ssh_key::SshSig;
 
 #[derive(Clone, Debug, thiserror::Error, PartialEq)]
 pub enum Error {
     #[error("invalid ssh key {0:?}: {1}")]
-    InvalidSshKey(RawAllowedKey, ssh_key::Error),
+    InvalidSshKey(RawAllowedKey, SshError),
     #[error("invalid signature: {0}")]
-    InvalidSignature(ssh_key::Error),
+    InvalidSignature(SshError),
     #[error("invalid namespace {0}, expected {NAMESPACE}")]
     InvalidNamespace(String),
     #[error("the signature is valid but not trusted")]
@@ -18,7 +19,7 @@ pub enum Error {
     #[error(
         "found key {0:?} matching the signature's public key, but the verification failed: {1}"
     )]
-    CryptographicError(RawAllowedKey, ssh_key::Error),
+    CryptographicError(RawAllowedKey, SshError),
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -65,13 +66,13 @@ impl AllowedKeySet {
         for allowed_key in self.iter() {
             match allowed_key.ssh_key.verify(NAMESPACE, msg.as_ref(), &sig) {
                 Ok(()) => return Ok(()),
-                Err(ssh_key::Error::Namespace) => {
+                Err(SshError::Namespace) => {
                     // Namespace is a property of the signature, so retrying
                     // with a different key won't help. Returning early to
                     // produce a better error message.
                     return Err(Error::InvalidNamespace(sig.namespace().to_owned()));
                 }
-                Err(ssh_key::Error::PublicKey) => {
+                Err(SshError::PublicKey) => {
                     // Other keys may still match.
                     continue;
                 }
