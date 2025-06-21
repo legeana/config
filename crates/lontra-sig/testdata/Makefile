@@ -7,9 +7,12 @@ SIGN_LONTRA = $(SIGN) -n lontra
 TEST_MESSAGE = 'test message'
 
 .PHONY: all
-all: trusted-a@lontra.sig trusted@bad.sig untrusted@lontra.sig
+all: trusted-a@lontra.sig trusted-b@lontra.sig trusted@bad.sig untrusted@lontra.sig
 
 trusted-a@lontra.sig: trusted_a_id_ed25519
+	$(ECHO) $(TEST_MESSAGE) | $(SIGN_LONTRA) -f $< >$@
+
+trusted-b@lontra.sig: trusted_b_id_ed25519
 	$(ECHO) $(TEST_MESSAGE) | $(SIGN_LONTRA) -f $< >$@
 
 trusted@bad.sig: trusted_a_id_ed25519

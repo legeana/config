@@ -113,10 +113,16 @@ mod tests {
 
     // ALLOWED_KEYS may change in the future making tests brittle.
     // Use test-only values instead.
-    const TEST_RAW_ALLOWED_KEYS: &[RawAllowedKey] = &[RawAllowedKey {
-        principals: "a@example.com",
-        ssh_key: include_str!("../testdata/trusted_a_id_ed25519.pub"),
-    }];
+    const TEST_RAW_ALLOWED_KEYS: &[RawAllowedKey] = &[
+        RawAllowedKey {
+            principals: "a@example.com",
+            ssh_key: include_str!("../testdata/trusted_a_id_ed25519.pub"),
+        },
+        RawAllowedKey {
+            principals: "b@example.com",
+            ssh_key: include_str!("../testdata/trusted_b_id_ed25519.pub"),
+        },
+    ];
     static TEST_ALLOWED_KEYS: LazyLock<AllowedKeySet> = LazyLock::new(|| {
         AllowedKeySet::from_raw_keys(TEST_RAW_ALLOWED_KEYS).expect("invalid TEST_RAW_ALLOWED_KEYS")
     });
@@ -124,7 +130,8 @@ mod tests {
     // exclusively for testing and have no bearing on signing.
     const TEST_MSG: &str = "test message";
     // A signature listed in TEST_ALLOWED_KEYS with namespace=NAMESPACE.
-    const TEST_GOOD_SIG: &str = include_str!("../testdata/trusted-a@lontra.sig");
+    const TEST_GOOD_A_SIG: &str = include_str!("../testdata/trusted-a@lontra.sig");
+    const TEST_GOOD_B_SIG: &str = include_str!("../testdata/trusted-b@lontra.sig");
     // A signature that can't be decoded.
     const TEST_INVALID_SIG: &str = r"
 -----BEGIN SSH SIGNATURE-----
@@ -148,10 +155,11 @@ U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAg9LrBUjaWAah9Rj7MjjM0TK1NgL
         assert!(count > 0, "count > 0, count = {count}");
     }
 
-    #[test]
-    fn test_verify() {
+    #[test_case(TEST_GOOD_A_SIG)]
+    #[test_case(TEST_GOOD_B_SIG)]
+    fn test_verify(sig: &str) {
         TEST_ALLOWED_KEYS
-            .verify(TEST_MSG, TEST_GOOD_SIG)
+            .verify(TEST_MSG, sig)
             .expect("trusted signature");
     }
 
@@ -176,7 +184,7 @@ U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAg9LrBUjaWAah9Rj7MjjM0TK1NgL
 
     #[test]
     fn test_verify_cryptographic() {
-        let r = TEST_ALLOWED_KEYS.verify("wrong-message", TEST_GOOD_SIG);
+        let r = TEST_ALLOWED_KEYS.verify("wrong-message", TEST_GOOD_A_SIG);
         assert_matches!(r, Err(Error::CryptographicError(_, _)));
     }
 }
