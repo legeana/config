@@ -107,6 +107,8 @@ pub fn verify(msg: impl AsRef<[u8]>, ssh_sig: impl AsRef<[u8]>) -> Result<()> {
 mod tests {
     use test_case::test_case;
 
+    use crate::assert_matches;
+
     use super::*;
 
     // ALLOWED_KEYS may change in the future making tests brittle.
@@ -138,20 +140,6 @@ U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAg9LrBUjaWAah9Rj7MjjM0TK1NgL
     const TEST_BAD_NAMESPACE_SIG: &str = include_str!("../testdata/trusted@bad.sig");
     // A signature not listed in TEST_ALLOWED_KEYS with namespace=NAMESPACE.
     const TEST_UNTRUSTED_SIG: &str = include_str!("../testdata/untrusted@lontra.sig");
-
-    macro_rules! assert_matches {
-        ($e:expr, $($tail:tt)*) => {
-            {
-                let expr = $e;
-                assert!(
-                    matches!(expr, $($tail)*),
-                    "{} doesn't match {}: got {expr:?}",
-                    stringify!($e),
-                    stringify!($($tail)*),
-                );
-            }
-        };
-    }
 
     #[test]
     fn test_allowed_keys_not_empty() {
