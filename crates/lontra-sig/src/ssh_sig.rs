@@ -114,8 +114,8 @@ mod tests {
     // ALLOWED_KEYS may change in the future making tests brittle.
     // Use test-only values instead.
     const TEST_RAW_ALLOWED_KEYS: &[RawAllowedKey] = &[RawAllowedKey {
-        principals: "legeana@liri.ie",
-        ssh_key: include_str!("../testdata/trusted_id_ed25519.pub"),
+        principals: "a@example.com",
+        ssh_key: include_str!("../testdata/trusted_a_id_ed25519.pub"),
     }];
     static TEST_ALLOWED_KEYS: LazyLock<AllowedKeySet> = LazyLock::new(|| {
         AllowedKeySet::from_raw_keys(TEST_RAW_ALLOWED_KEYS).expect("invalid TEST_RAW_ALLOWED_KEYS")
@@ -124,7 +124,7 @@ mod tests {
     // exclusively for testing and have no bearing on signing.
     const TEST_MSG: &str = "test message";
     // A signature listed in TEST_ALLOWED_KEYS with namespace=NAMESPACE.
-    const TEST_GOOD_SIG: &str = include_str!("../testdata/trusted@lontra.sig");
+    const TEST_GOOD_SIG: &str = include_str!("../testdata/trusted-a@lontra.sig");
     // A signature that can't be decoded.
     const TEST_INVALID_SIG: &str = r"
 -----BEGIN SSH SIGNATURE-----
