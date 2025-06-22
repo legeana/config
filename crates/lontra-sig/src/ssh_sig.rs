@@ -6,6 +6,9 @@ use ssh_key::Error as SshError;
 use ssh_key::PublicKey;
 use ssh_key::SshSig;
 
+use crate::allowed_keys::RawAllowedKey;
+use crate::allowed_keys::builtin;
+
 #[derive(Clone, Debug, thiserror::Error, PartialEq)]
 pub enum Error {
     #[error("invalid ssh key {0:?}: {1}")]
@@ -25,13 +28,6 @@ pub enum Error {
 pub type Result<T> = std::result::Result<T, Error>;
 
 const NAMESPACE: &str = "lontra";
-
-#[derive(Clone, Debug, PartialEq)]
-pub struct RawAllowedKey {
-    // See ssh-keygen(1) ALLOWED SIGNERS.
-    principals: &'static str,
-    ssh_key: &'static str,
-}
 
 #[derive(Clone, Debug, PartialEq)]
 struct AllowedKey {
@@ -87,13 +83,8 @@ impl AllowedKeySet {
     }
 }
 
-// TODO: load from file, e.g. via include_str!().
-static RAW_ALLOWED_KEYS: &[RawAllowedKey] = &[RawAllowedKey {
-    principals: "legeana@liri.ie",
-    ssh_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDDShKKJSxIoOefearxLMuKT+Y4TkyypOTU4weoatzvJ",
-}];
 static ALLOWED_KEYS: LazyLock<AllowedKeySet> = LazyLock::new(|| {
-    AllowedKeySet::from_raw_keys(RAW_ALLOWED_KEYS).expect("failed to parse RAW_ALLOWED_KEYS")
+    AllowedKeySet::from_raw_keys(builtin()).expect("failed to parse builtin keys")
 });
 
 /// Verifies that a given message is signed by a given ssh signature, and the

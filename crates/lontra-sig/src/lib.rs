@@ -1,3 +1,4 @@
+mod allowed_keys;
 #[cfg(test)]
 mod asserts;
 pub mod ssh_sig;
