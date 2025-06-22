@@ -73,6 +73,15 @@ impl Registry for SqliteRegistry {
         self.rt
             .block_on(async { self.conn.clear_files(FilePurpose::State).await })
     }
+
+    fn config_get(&mut self, key: &str, default_value: &str) -> Result<String> {
+        self.rt
+            .block_on(async { self.conn.config_get(key, default_value).await })
+    }
+    fn config_set(&mut self, key: &str, value: &str) -> Result<()> {
+        self.rt
+            .block_on(async { self.conn.config_set(key, value).await })
+    }
 }
 
 #[cfg(test)]

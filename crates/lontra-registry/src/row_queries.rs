@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use anyhow::{Context as _, Result};
 use sqlx::{SqliteConnection, query};
 
@@ -65,6 +67,22 @@ where
         })
         .collect();
         Ok(files)
+    }
+
+    async fn config_rows(&mut self) -> Result<HashMap<String, String>> {
+        let entries: HashMap<String, String> = query!(
+            "
+            SELECT key, value
+            FROM config
+            ",
+        )
+        .fetch_all(self.as_mut())
+        .await
+        .context("failed to query config entries")?
+        .into_iter()
+        .map(|row| (row.key, row.value))
+        .collect();
+        Ok(entries)
     }
 }
 

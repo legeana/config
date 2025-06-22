@@ -21,4 +21,7 @@ pub trait Registry {
     fn state_files(&mut self) -> Result<Vec<FilePathBuf>>;
     fn register_state_file(&mut self, file: FilePath) -> Result<()>;
     fn clear_state_files(&mut self) -> Result<()>;
+
+    fn config_get(&mut self, key: &str, default_value: &str) -> Result<String>;
+    fn config_set(&mut self, key: &str, value: &str) -> Result<()>;
 }

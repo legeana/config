@@ -1,4 +1,5 @@
 use anyhow::{Context as _, Result};
+use sqlx::Connection as _;
 use sqlx::SqliteConnection;
 use sqlx::query;
 
@@ -138,12 +139,68 @@ where
         .with_context(|| format!("clear {purpose:?} files"))?;
         Ok(())
     }
+
+    async fn config_get(&mut self, key: &str, default_value: &str) -> Result<String> {
+        let mut tx = self.as_mut().begin().await?;
+        let r = query!(
+            "
+            SELECT value
+            FROM config
+            WHERE
+                key = ?
+            ",
+            key,
+        )
+        .fetch_optional(&mut *tx)
+        .await
+        .with_context(|| format!("failed to query config for {key:?}"))?;
+        if let Some(r) = r {
+            return Ok(r.value);
+        }
+        query!(
+            "
+            INSERT INTO config (key, value)
+            VALUES(?, ?)
+            ",
+            key,
+            default_value,
+        )
+        .execute(&mut *tx)
+        .await
+        .with_context(|| {
+            format!("failed to set config {key:?}'s value to default {default_value:?}")
+        })?;
+        tx.commit().await.with_context(|| {
+            format!("failed to commit transaction config_get({key:?}, {default_value:?})")
+        })?;
+        Ok(default_value.to_owned())
+    }
+
+    async fn config_set(&mut self, key: &str, value: &str) -> Result<()> {
+        query!(
+            "
+            INSERT INTO config (key, value)
+            VALUES(?, ?)
+            ON CONFLICT(key)
+            DO UPDATE SET value=?
+            ",
+            key,
+            value,
+            value,
+        )
+        .execute(self.as_mut())
+        .await
+        .with_context(|| format!("failed to set {key:?} to {value:?}"))?;
+        Ok(())
+    }
 }
 
 impl AppQueries for AppConnection {}
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
+
     use pretty_assertions::assert_eq;
     use test_case::test_case;
 
@@ -399,6 +456,72 @@ mod tests {
                 purpose: FilePurpose::User,
                 file: FilePathBuf::new_symlink("test-update"),
             }],
+        );
+    }
+
+    #[tokio::test]
+    async fn test_config_get_uninitialised() {
+        let mut conn = conn().await;
+
+        let value = conn
+            .config_get("new-key", "default-value")
+            .await
+            .expect("config_get");
+
+        assert_eq!(value, "default-value");
+        assert_eq!(
+            conn.config_rows().await.unwrap(),
+            HashMap::from([("new-key".to_owned(), "default-value".to_owned())])
+        );
+    }
+
+    #[tokio::test]
+    async fn test_config_get_initialised() {
+        let mut conn = conn().await;
+        conn.config_set("key", "starting-value").await.unwrap();
+        assert_eq!(
+            conn.config_rows().await.unwrap(),
+            HashMap::from([("key".to_owned(), "starting-value".to_owned())])
+        );
+
+        let value = conn
+            .config_get("key", "default-value")
+            .await
+            .expect("config_get");
+
+        assert_eq!(value, "starting-value");
+        assert_eq!(
+            conn.config_rows().await.unwrap(),
+            HashMap::from([("key".to_owned(), "starting-value".to_owned())])
+        );
+    }
+
+    #[tokio::test]
+    async fn test_config_set_uninitialised() {
+        let mut conn = conn().await;
+
+        conn.config_set("key", "value").await.expect("config_get");
+
+        assert_eq!(
+            conn.config_rows().await.unwrap(),
+            HashMap::from([("key".to_owned(), "value".to_owned())])
+        );
+    }
+
+    #[tokio::test]
+    async fn test_config_set_initialised() {
+        let mut conn = conn().await;
+        conn.config_set("key", "starting-value").await.unwrap();
+        assert_eq!(
+            conn.config_rows().await.unwrap(),
+            HashMap::from([("key".to_owned(), "starting-value".to_owned())])
+        );
+
+        conn.config_set("key", "value").await.expect("config_get");
+
+        assert_eq!(
+            conn.config_rows().await.unwrap(),
+            HashMap::from([("key".to_owned(), "value".to_owned())])
         );
     }
 }

@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT value\n            FROM config\n            WHERE\n                key = ?\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "value",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "a9127f7300d926cf47b727431abad44c8b1fd5dc3f3f29e874ef21ad1c3b24b9"
+}
