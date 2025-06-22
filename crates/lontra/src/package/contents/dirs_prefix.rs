@@ -51,8 +51,7 @@ impl engine::CommandBuilder for DirsPrefixBuilder {
         let prefix = self
             .base_dir
             .as_ref()
-            .map(|base| base.join("<directory>"))
-            .unwrap_or("<unavailable>".into());
+            .map_or("<unavailable>".into(), |base| base.join("<directory>"));
         formatdoc! {"
             {command} [<directory>]
                 set current installation prefix to {prefix:?}
