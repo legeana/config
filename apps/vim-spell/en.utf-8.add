@@ -92,6 +92,7 @@ bazel
 bikeshedding
 bincode
 bindsym
+binutils
 blackbox
 blackhole
 bool
@@ -172,6 +173,7 @@ creds
 crit
 crl
 cronjob
+crosstool
 css
 ctl
 ctor
@@ -246,6 +248,7 @@ dyn
 ecommerce
 editorconfig
 eg
+emacs
 emea
 enablement
 encryptor
@@ -362,6 +365,7 @@ gpg
 gpio
 gpiozero
 gpt
+graal
 gui
 gunit
 gunzip
@@ -453,6 +457,7 @@ iterable
 itertools
 javascript
 jdbc
+jdk
 jinja
 jj
 js
@@ -471,6 +476,8 @@ kilometrage
 komorebi
 komorebic
 konsole
+kotlin
+kubectl
 kubernetes
 kwargs
 lalrpop
@@ -494,6 +501,7 @@ linters
 linux
 liri
 lisa
+llvm
 ln
 loadavg
 loc
@@ -572,6 +580,7 @@ mysql
 myvhi
 namedtuple
 nasm
+ndk
 ne
 neovim
 nespresso
@@ -688,6 +697,7 @@ posix
 postexec
 poweroff
 poweron
+powerpc
 powershell
 pprint
 pragma
@@ -774,6 +784,7 @@ rstrip
 runfiles
 runstates
 runtimepath
+runtimes
 rusqlite
 rustc
 rustdoc
@@ -787,6 +798,7 @@ saferepr
 sbin
 scrollback
 sdk
+sdks
 sed
 selfhost
 selfhosted
@@ -819,6 +831,7 @@ significands
 sigquit
 sigterm
 skippable
+skylib
 slackware
 smartstring
 socat
@@ -956,6 +969,7 @@ tokio
 tombstoned
 toml
 toolchain
+toolchains
 tools
 tpm
 tpope
@@ -970,6 +984,8 @@ turndown
 tx
 txt
 txtpbfmt
+typedef
+typedefs
 tz
 u32
 u8
@@ -1064,6 +1080,7 @@ vulkan
 wal
 walkdir
 walltime
+wasm
 wayland
 weakref
 weakrefs
