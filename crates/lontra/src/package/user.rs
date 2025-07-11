@@ -1,3 +1,6 @@
+use std::path::Path;
+use std::path::PathBuf;
+
 use anyhow::{Context as _, Result, anyhow};
 use lontra_process::{cmd, opt_flag};
 
@@ -16,7 +19,7 @@ pub(super) struct UserDependency {
 }
 
 impl UserDependency {
-    pub(super) fn new(cfg: &config::UserDependency) -> Result<Self> {
+    pub(super) fn new(cfg: &config::UserDependency, root: &Path) -> Result<Self> {
         if !cfg
             .requires
             .is_satisfied()
@@ -32,6 +35,7 @@ impl UserDependency {
         }
         if let Some(cargo) = &cfg.cargo {
             installers.push(Box::new(Cargo {
+                root: root.to_owned(),
                 config: cargo.to_cargo_config(),
             }));
         }
@@ -107,7 +111,15 @@ impl Installer for Brew {
 }
 
 struct Cargo {
+    root: PathBuf,
     config: config::CargoConfig,
+}
+
+impl Cargo {
+    fn absolute_path(&self) -> Option<PathBuf> {
+        let path = self.config.path.as_ref()?;
+        Some(self.root.join(path))
+    }
 }
 
 impl Installer for Cargo {
@@ -118,7 +130,7 @@ impl Installer for Cargo {
             opt_flag("--git", self.config.git.as_ref()),
             opt_flag("--branch", self.config.branch.as_ref()),
             opt_flag("--tag", self.config.tag.as_ref()),
-            opt_flag("--path", self.config.path.as_ref()),
+            opt_flag("--path", self.absolute_path()),
             self.config.locked.unwrap_or_default().then_some("--locked"),
             // Must be trailing arguments.
             ["--"],

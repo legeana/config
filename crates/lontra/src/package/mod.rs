@@ -69,7 +69,7 @@ impl Package {
             .user_dependencies
             .unwrap_or_default()
             .iter()
-            .map(user::UserDependency::new)
+            .map(|ud| user::UserDependency::new(ud, &root))
             .collect::<Result<_>>()
             .context("failed to parse user_dependencies")?;
         let configuration: BoxedModule = if pkgconfig.has_contents {
