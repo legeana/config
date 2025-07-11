@@ -1,3 +1,7 @@
 [[system_dependencies]]
 any = "git"
 wants = { command = "git" }
+
+[[user_dependencies]]
+cargo = { path = "git-signing-key", locked = true }
+wants = { command = "git-signing-key" }
