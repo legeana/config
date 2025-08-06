@@ -1,2 +1,5 @@
+xdg_config_prefix
+symlink_tree chrome-flags.d
+
 xdg_executable_prefix
 symlink chrome-launcher
