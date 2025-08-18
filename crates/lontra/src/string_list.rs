@@ -17,7 +17,7 @@ impl StringList {
             Self::List(v) => v,
         }
     }
-    pub(crate) fn iter(&self) -> std::slice::Iter<String> {
+    pub(crate) fn iter(&self) -> std::slice::Iter<'_, String> {
         self.as_slice().iter()
     }
     pub(crate) fn to_vec(&self) -> Vec<String> {

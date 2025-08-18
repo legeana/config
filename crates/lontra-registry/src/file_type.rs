@@ -54,7 +54,7 @@ pub type FilePathBuf = FileType<PathBuf>;
 
 impl Type {
     #[allow(dead_code)]
-    pub(crate) fn with_path(self, path: &Path) -> FilePath {
+    pub(crate) fn with_path(self, path: &Path) -> FilePath<'_> {
         match self {
             Self::Symlink => FilePath::Symlink(path),
             Self::Directory => FilePath::Directory(path),

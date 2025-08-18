@@ -6,7 +6,7 @@ use std::borrow::Cow;
 
 use shlex::Quoter;
 
-pub fn quote(in_str: &str) -> Cow<str> {
+pub fn quote(in_str: &str) -> Cow<'_, str> {
     Quoter::new().allow_nul(true).quote(in_str).unwrap()
 }
 
