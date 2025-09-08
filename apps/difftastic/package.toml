@@ -1,0 +1,9 @@
+has_contents = false
+
+[[system_dependencies]]
+pacman = "difftastic"
+wants = { command = "difft" }
+
+[[user_dependencies]]
+cargo = { crates = "difftastic", locked = true }
+wants = { command = "difft" }
