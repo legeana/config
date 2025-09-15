@@ -79,8 +79,7 @@ try_ssh_agent() {
 }
 
 add_ssh_agent() {
-    if [ -z "$SSH_AUTH_SOCK" -a \
-         -z "$SSH_TTY" -a \
+    if [ -z "$SSH_TTY" -a \
          -z "$SSH_CONNECTION" -a \
          -z "$SSH_CLIENT" -a \
          -z "$TMUX" ]; then
