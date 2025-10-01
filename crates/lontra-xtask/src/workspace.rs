@@ -51,8 +51,9 @@ fn verify_root(sh: &Shell, root: &Path) -> Result<()> {
     let manifest = sh
         .read_file(&workspace_manifest)
         .with_context(|| format!("failed to read {workspace_manifest:?}"))?;
-    if !manifest.contains("[workspace]\n") {
-        bail!("{root:?}: Cargo.toml doesn't contain [workspace] section");
+    let expected_entry = "[workspace]";
+    if !manifest.contains(expected_entry) {
+        bail!("{root:?}: Cargo.toml doesn't contain: {expected_entry}");
     }
     Ok(())
 }
