@@ -136,9 +136,7 @@ impl Arguments {
             0 => Ok(None),
             1 => Ok(Some(&args[0])),
             len => Err(anyhow!(
-                "{command} builder: want an optional argument, got {}: {:?}",
-                len,
-                args,
+                "{command} builder: want an optional argument, got {len}: {args:?}",
             )),
         }
     }
