@@ -2,7 +2,7 @@ has_contents = false
 
 [[system_dependencies]]
 pacman = "difftastic"
-winget = "difftastic"
+winget = "Wilfred.difftastic"
 wants = { command = "difft" }
 
 [[user_dependencies]]
