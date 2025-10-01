@@ -13,7 +13,7 @@ fn from_wide(b: u16) -> [u8; 2] {
 }
 
 fn to_wide_vec(b: &[u8]) -> Result<Vec<u16>> {
-    if b.len() % 2 != 0 {
+    if !b.len().is_multiple_of(2) {
         return Err(Error::OddNumberOfBytes);
     }
     let mut r = Vec::<u16>::with_capacity(b.len() / 2);
