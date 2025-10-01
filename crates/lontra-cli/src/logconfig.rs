@@ -10,7 +10,7 @@ pub fn init(quiet: bool, verbosity: u8) -> Result<()> {
             (false, 2) => log::LevelFilter::Info,
             (false, 3) => log::LevelFilter::Debug,
             (false, 4) => log::LevelFilter::Trace,
-            (false, 5..) => bail!("invalid log level: {}", verbosity),
+            (false, 5..) => bail!("invalid log level: {verbosity}"),
         })
         .default_format()
         .format_timestamp(None)
