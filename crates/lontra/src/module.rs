@@ -9,6 +9,7 @@ pub struct Rules {
     pub force_update: bool,
     pub force_reinstall: bool,
     pub keep_going: bool,
+    pub system_deps: bool,
     pub user_deps: bool,
 }
 
@@ -224,6 +225,26 @@ where
     T: Module + 'static,
 {
     Box::new(WrappedKeepGoing { modules })
+}
+
+struct WrappedSystemDeps<T>(T);
+
+impl<T: Module> WrappedSystemDeps<T> {
+    fn wrap<F>(&self, _method: &str, rules: &Rules, f: F) -> Result<()>
+    where
+        F: FnOnce() -> Result<()>,
+    {
+        if rules.system_deps { f() } else { Ok(()) }
+    }
+}
+
+impl_wrap!(WrappedSystemDeps, (self.wrap), (self.0));
+
+pub(crate) fn wrap_system_deps<T>(module: T) -> BoxedModule
+where
+    T: Module + 'static,
+{
+    Box::new(WrappedSystemDeps(module))
 }
 
 struct WrappedUserDeps<T>(T);

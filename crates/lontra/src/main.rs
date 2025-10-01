@@ -72,6 +72,7 @@ fn main() -> Result<()> {
                 force_update: false,
                 force_reinstall: false,
                 keep_going: args.keep_going,
+                system_deps: !args.no_system_deps,
                 user_deps: !args.no_user_deps,
             };
             install(&rules, &root).context("failed to install")?;
@@ -81,6 +82,7 @@ fn main() -> Result<()> {
                 force_update: true,
                 force_reinstall: false,
                 keep_going: args.keep_going,
+                system_deps: !args.no_system_deps,
                 user_deps: !args.no_user_deps,
             };
             install(&rules, &root).context("failed to install")?;
@@ -90,6 +92,7 @@ fn main() -> Result<()> {
                 force_update: true,
                 force_reinstall: true,
                 keep_going: args.keep_going,
+                system_deps: !args.no_system_deps,
                 user_deps: !args.no_user_deps,
             };
             install(&rules, &root).context("failed to install")?;
@@ -97,6 +100,8 @@ fn main() -> Result<()> {
         cli::Commands::SystemInstall => {
             let rules = Rules {
                 keep_going: args.keep_going,
+                // TODO: This is a bit weird but will be helpful for testing.
+                system_deps: !args.no_system_deps,
                 ..Default::default()
             };
             system_install(&rules, &root).context("failed to system_install")?;

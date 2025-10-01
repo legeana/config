@@ -22,6 +22,8 @@ pub struct Cli {
         help = "Don't interrupt installation process if a package fails"
     )]
     pub keep_going: bool,
+    #[clap(long, help = "Don't install system dependencies")]
+    pub no_system_deps: bool,
     #[clap(long, help = "Don't install user dependencies")]
     pub no_user_deps: bool,
 }
