@@ -29,6 +29,10 @@ fn install(rules: &Rules, root: &Path) -> Result<()> {
     // It's better to keep the old configuration than no configuration.
     let repos = layout::repositories(root)?;
     for repo in &repos {
+        repo.system_install(rules)
+            .with_context(|| format!("failed to system_install {}", repo.name()))?;
+    }
+    for repo in &repos {
         repo.pre_uninstall(rules)
             .with_context(|| format!("failed to pre-uninstall {}", repo.name()))?;
     }
@@ -52,6 +56,7 @@ fn install(rules: &Rules, root: &Path) -> Result<()> {
 }
 
 fn system_install(rules: &Rules, root: &Path) -> Result<()> {
+    log::warn!("system-install command is deprecated");
     let repos = layout::repositories(root)?;
     for repo in &repos {
         repo.system_install(rules)
@@ -100,7 +105,7 @@ fn main() -> Result<()> {
         cli::Commands::SystemInstall => {
             let rules = Rules {
                 keep_going: args.keep_going,
-                // TODO: This is a bit weird but will be helpful for testing.
+                // This is a bit weird but will be helpful for testing.
                 system_deps: !args.no_system_deps,
                 ..Default::default()
             };
