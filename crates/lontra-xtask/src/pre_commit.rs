@@ -31,7 +31,11 @@ pub fn install() -> Result<()> {
 }
 
 fn setup_pre_commit(sh: &Shell) -> Result<()> {
-    cmd!(sh, "./setup -d list").run()?;
+    if cfg!(windows) {
+        cmd!(sh, "./setup.bat -d list").run()?;
+    } else {
+        cmd!(sh, "./setup -d list").run()?;
+    }
     Ok(())
 }
 
