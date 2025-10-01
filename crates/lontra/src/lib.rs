@@ -1,6 +1,5 @@
 mod annotated_path;
 mod command;
-mod empty_struct;
 mod jinja;
 pub mod layout;
 pub mod module;
