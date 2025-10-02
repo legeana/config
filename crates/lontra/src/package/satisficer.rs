@@ -5,6 +5,7 @@ use lontra_process::cmd;
 use serde::Deserialize;
 
 use crate::command;
+use crate::package::command_output::CommandOutput;
 
 pub(super) trait Satisficer {
     fn is_satisfied(&self) -> Result<bool>;
@@ -32,6 +33,7 @@ pub(super) enum DependencySatisficer {
     AnyFile { any_file: Vec<PathBuf> },
     AllFiles { all_files: Vec<PathBuf> },
     PkgConfig { pkg_config: String },
+    CommandOutput { command_output: CommandOutput },
 }
 
 impl Satisficer for DependencySatisficer {
@@ -90,6 +92,7 @@ impl Satisficer for DependencySatisficer {
             Self::PkgConfig { pkg_config } => {
                 Ok(cmd!(["pkg-config", "--", pkg_config]).run().is_ok())
             }
+            Self::CommandOutput { command_output } => command_output.is_satisfied(),
         }
     }
 }

@@ -29,6 +29,7 @@ lontra-strings = { path = "../lontra-strings" }
 lontra-tags = { path = "../lontra-tags" }
 lontra-unarchiver = { path = "../lontra-unarchiver" }
 lontra-xdg = { path = "../lontra-xdg" }
+regex = "1.11.3"
 serde.workspace = true
 sha2 = "0.10.6"
 shellexpand = { version = "3.1", features = ["path"] }

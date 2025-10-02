@@ -1198,6 +1198,7 @@ dependencies = [
  "lontra-xdg",
  "minijinja",
  "pretty_assertions",
+ "regex",
  "serde",
  "sha2",
  "shellexpand",

@@ -1,3 +1,4 @@
+mod command_output;
 mod config;
 mod contents;
 mod installer;
