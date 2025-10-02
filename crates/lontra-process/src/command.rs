@@ -2,7 +2,7 @@ use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use std::process::Command as StdCommand;
 
-use anyhow::Result;
+use anyhow::{Context as _, Result};
 
 use crate::env::EnvOverlay;
 use crate::{Shell, process_utils};
@@ -21,6 +21,16 @@ impl Command {
             current_dir: None,
             env: EnvOverlay::new(),
         }
+    }
+    pub fn from_argv<I, S>(argv: I) -> Result<Self>
+    where
+        I: IntoIterator<Item = S>,
+        S: AsRef<OsStr>,
+    {
+        let mut it = argv.into_iter();
+        let program = it.next().context("empty argv")?;
+        let c = Self::new(program);
+        Ok(c.args(it))
     }
     #[must_use]
     pub fn arg(mut self, arg: impl AsRef<OsStr>) -> Self {
@@ -190,6 +200,26 @@ mod tests {
             std_cmd.get_args().collect::<Vec<_>>(),
             &["arg-1", "arg-2", "arg-3"],
         );
+    }
+
+    #[test]
+    fn test_from_argv_empty() {
+        let empty: &[&str] = &[];
+        let cmd = Command::from_argv(empty);
+
+        assert!(matches!(cmd, Result::Err(_)));
+    }
+
+    #[test_case(&["program"], "program", &[])]
+    #[test_case(&["program", "arg 1"], "program", &["arg 1"])]
+    #[test_case(&["program", "arg 1", "arg 2"], "program", &["arg 1", "arg 2"])]
+    fn test_from_argv(argv: &[&str], want_program: &str, want_args: &[&str]) {
+        let cmd = Command::from_argv(argv).expect("from_argv");
+
+        let std_cmd = finalise(cmd);
+
+        assert_eq!(std_cmd.get_program(), want_program);
+        assert_eq!(std_cmd.get_args().collect::<Vec<_>>(), want_args);
     }
 
     #[test]
