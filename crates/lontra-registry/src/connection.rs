@@ -93,6 +93,10 @@ fn default_options() -> SqliteConnectOptions {
     // https://www.sqlite.org/pragma.html#pragma_foreign_keys
     opts = opts.foreign_keys(true);
 
+    // https://www.sqlite.org/c3ref/open.html
+    // SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE
+    opts = opts.create_if_missing(true);
+
     opts
 }
 
