@@ -25,10 +25,7 @@ fn main() -> Result<()> {
     cli::logconfig::init(args.quiet, args.verbose)?;
     match args.command {
         Commands::InstallDevDependencies => xt::dependencies::install_dev(),
-        Commands::InstallGitHooks => {
-            xt::pre_commit::install()?;
-            Ok(())
-        }
+        Commands::InstallGitHooks => xt::pre_commit::install(),
         Commands::PreCommit => xt::pre_commit::run(),
         Commands::SqlxPrepare => xt::sqlx::prepare(),
     }
