@@ -11,6 +11,7 @@ workspace = true
 anyhow.workspace = true
 clap.workspace = true
 cli = { package = "lontra-cli", path = "../lontra-cli" }
+itertools = "0.14.0"
 log.workspace = true
 xshell = "0.2.7"
 

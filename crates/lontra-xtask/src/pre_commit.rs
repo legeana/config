@@ -1,6 +1,7 @@
 use anyhow::Context as _;
 use anyhow::Ok;
 use anyhow::Result;
+use anyhow::anyhow;
 use xshell::Shell;
 use xshell::cmd;
 
@@ -50,6 +51,31 @@ fn rust_targets(sh: &Shell) -> Result<Vec<String>> {
     Ok(targets.split_ascii_whitespace().map(String::from).collect())
 }
 
+fn argv_from_cmd<'a>(cmd: &'a str, args: &[&'a str]) -> impl Iterator<Item = &'a str> {
+    std::iter::once(cmd).chain(args.iter().copied())
+}
+
+fn find_wine(sh: &Shell) -> Result<String> {
+    const WINES: &[(&str, &[&str])] = &[
+        ("wine", &[]),
+        ("flatpak", &["run", "--filesystem=home", "org.winehq.Wine"]),
+    ];
+    for (wine, wine_args) in WINES {
+        let wine = *wine;
+        let wine_args = *wine_args;
+        let argv = argv_from_cmd(wine, wine_args);
+        if cmd!(sh, "{wine} {wine_args...} --version").run().is_ok() {
+            return Ok(itertools::join(argv, " "));
+        }
+    }
+    Err(anyhow!("wine not found"))
+}
+
+fn xwin_target_env(rust_target: &str) -> String {
+    let xwin_target = rust_target.to_uppercase().replace('-', "_");
+    format!("CARGO_TARGET_{xwin_target}_RUNNER")
+}
+
 fn rust_pre_commit(sh: &Shell) -> Result<()> {
     let cargo_args = ["--release", "--all-targets"];
     let cargo = sh.var_os("CARGO").context("failed to find CARGO")?;
@@ -59,7 +85,12 @@ fn rust_pre_commit(sh: &Shell) -> Result<()> {
         .run()
         .is_ok();
     if has_xwin {
+        let wine = find_wine(sh)?;
         for target in rust_targets(sh)? {
+            let sh = sh.clone();
+            if target.contains("-windows-") {
+                sh.set_var(xwin_target_env(&target), &wine);
+            }
             cmd!(sh, "{cargo} xwin check --target={target} {cargo_args...}").run()?;
             // Treat warnings as errors.
             cmd!(
