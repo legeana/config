@@ -1,0 +1,26 @@
+has_contents = false
+
+[[system_dependencies]]
+# https://monospacementor.com/wiki/Notes/Install+1Password+on+Fedora+Silverblue
+requires = 'distro=bazzite'
+bash = """
+set -xe
+
+KEY=https://downloads.1password.com/linux/keys/1password.asc
+KEY_FILE=/etc/pki/rpm-gpg/RPM-GPG-KEY-1password
+REPO_FILE=/etc/yum.repos.d/1password.repo
+
+curl -sS "$KEY" | sudo tee "$KEY_FILE" >/dev/null
+
+cat <<EOF | sudo tee "$REPO_FILE" >/dev/null
+[1password]
+name=1Password Stable Channel
+baseurl=https://downloads.1password.com/linux/rpm/stable/\\$basearch
+enabled=1
+gpgcheck=1
+repo_gpgcheck=0
+gpgkey=\"file://$KEY_FILE\"
+EOF
+
+rpm-ostree install --idempotent 1password 1password-cli
+"""
