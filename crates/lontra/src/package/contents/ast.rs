@@ -54,7 +54,7 @@ impl std::fmt::Display for Invocation {
 #[derive(Debug, PartialEq)]
 pub(super) enum Condition {
     Command(Invocation),
-    Not(Box<Condition>),
+    Not(Box<Self>),
 }
 
 #[derive(Debug, PartialEq)]
