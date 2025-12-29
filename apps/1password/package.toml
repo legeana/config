@@ -3,6 +3,10 @@ has_contents = false
 [[system_dependencies]]
 # https://monospacementor.com/wiki/Notes/Install+1Password+on+Fedora+Silverblue
 requires = 'distro=bazzite'
+wants = { all_files = [
+    '/etc/pki/rpm-gpg/RPM-GPG-KEY-1password',
+    '/etc/yum.repos.d/1password.repo',
+] }
 bash = """
 set -xe
 
