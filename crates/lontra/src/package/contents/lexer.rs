@@ -214,6 +214,7 @@ impl<'input> LalrpopLexer<'input> {
         }
     }
     /// Handles literal separation and `EndOfInput`.
+    /// See <https://github.com/maciejhirsz/logos/issues/328>.
     #[allow(clippy::needless_continue)]
     fn next_logos_tok(&mut self) -> Option<Result<Token, LexerError>> {
         if self.stop_iteration {
