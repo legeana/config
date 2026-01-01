@@ -1,0 +1,15 @@
+has_contents = false
+requires = 'distro=bazzite'
+
+[[system_dependencies]]
+wants = { file = '/etc/udev/rules.d/60-qemu-usb.rules' }
+bash = """
+set -xe
+
+cat <<EOF | sudo tee /etc/udev/rules.d/60-qemu-usb.rules >/dev/null
+SUBSYSTEM=="usb", GROUP="libvirt", MODE="0660"
+EOF
+
+sudo udevadm trigger
+sudo udevadm control --reload-rules
+"""
