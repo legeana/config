@@ -1,11 +1,36 @@
 has_contents = false
 
 [[system_dependencies]]
-requires = ["os=linux"]
+requires = ["os=linux", "distro_like!=debian"]
 bash = """
 sudo localectl set-locale en_IE.UTF-8
 sudo localectl set-x11-keymap gb,ru pc105 '' caps:escape,grp:win_space_toggle
 """
+[system_dependencies.wants.command_output]
+command = ["localectl", "status"]
+all_regexes = [
+    "System Locale: LANG=en_IE.UTF-8\n",
+    "X11 Layout: gb,ru\n",
+    "X11 Model: pc105\n",
+    "X11 Options: caps:escape,grp:win_space_toggle\n",
+]
+
+[[system_dependencies]]
+requires = ["os=linux", "distro_like=debian"]
+# https://bugs.launchpad.net/ubuntu/+source/cloud-init/+bug/2030788
+# https://manpages.ubuntu.com/manpages/lunar/en/man5/keyboard.5.html
+bash = """
+sedscript='
+s|^XKBLAYOUT=.*$|XKBLAYOUT="gb,ru"|;
+s|^XKBMODEL=.*$|XKBMODEL="pc105"|;
+s|^XKBOPTIONS=.*$|XKBOPTIONS="caps:escape,grp:win_space_toggle"|;
+s|^XKBVARIANT=.*$|XKBVARIANT=""|;
+'
+sudo update-locale LANG=en_IE.UTF-8
+sudo sed -r "$sedscript" -i /etc/default/keyboard
+sudo udevadm trigger --subsystem-match=input --action=change
+"""
+
 [system_dependencies.wants.command_output]
 command = ["localectl", "status"]
 all_regexes = [
