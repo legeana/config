@@ -43,7 +43,7 @@ pub struct LocationError {
 #[derive(Clone, Debug, Logos, PartialEq)]
 #[logos(error = LexerError)]
 #[logos(extras = LineTracker)]
-#[logos(skip r"#.*")] // comments
+#[logos(skip(r"#.*", allow_greedy = true))] // comments
 pub enum Token {
     EndOfInput,
     #[token("\\\n", |lex| lex.extras.record_line(lex.span().end))]
