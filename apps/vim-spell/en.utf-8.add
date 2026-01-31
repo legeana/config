@@ -60,6 +60,7 @@ asdict
 ast
 async
 asyncio
+atime
 attr
 attrs
 aur
@@ -78,6 +79,7 @@ autotools
 awaitable
 backend
 backends
+backoff
 base46
 base64
 basedir
@@ -89,14 +91,19 @@ bashrc
 batcat
 baz
 bazel
+bazzite
 bikeshedding
 bincode
 bindsym
 binutils
+birthtime
 blackbox
 blackhole
 bool
 bools
+borg
+borgbackup
+borgmatic
 branchless
 brightnessctl
 bsd
@@ -132,6 +139,7 @@ classmethods
 cli
 clippy
 clis
+cloudflare
 cls
 cmake
 cmakedefine
@@ -175,6 +183,7 @@ crl
 cronjob
 crosstool
 css
+ctime
 ctl
 ctor
 ctrl
@@ -264,6 +273,7 @@ enums
 env
 eof
 eoi
+epoll
 eq
 errorf
 esc
@@ -284,6 +294,7 @@ faqs
 fatalf
 fbdev
 fd
+fdopen
 fdpass
 fedex
 fedoraproject
@@ -470,6 +481,7 @@ jvm
 kdl
 keepalive
 keybase
+keyfile
 keygen
 keygrip
 keymap
@@ -484,6 +496,8 @@ kubernetes
 kwargs
 lalrpop
 lang
+ld
+ldconfig
 legeana
 len
 lesskey
@@ -494,6 +508,7 @@ lib
 libfuse
 libinput
 libsonnet
+libvirt
 lifecycle
 lineno
 linode
@@ -587,13 +602,16 @@ ne
 neovim
 nespresso
 netrwhist
+networkd
 newtype
 newtypes
 nginx
 nic
 nixpkgs
+nobackup
 noconfirm
 nodryrun
+nodump
 noexcept
 nofork
 nolint
@@ -658,6 +676,7 @@ params
 paren
 parens
 parseable
+passcommand
 passwd
 password
 pastebin
@@ -722,8 +741,11 @@ protobuf
 protoc
 protos
 prototext
+pthread
+pthreads
 ptr
 ptrs
+ptyxis
 pubkey
 puid
 punct
@@ -734,6 +756,7 @@ px
 py
 py3
 py3status
+pyc
 pycache
 pyflags
 pylint
@@ -748,6 +771,7 @@ rdiv
 re2
 readlink
 readonly
+readthedocs
 readwrite
 rebase
 rebased
@@ -760,10 +784,12 @@ refactorings
 regedit
 regen
 reloadall
+repokey
 repr
 req
 reqwest
 resizer
+resolvectl
 returncode
 rfc
 rfcs
@@ -798,9 +824,11 @@ rx
 safehtml
 saferepr
 sbin
+sched
 scrollback
 sdk
 sdks
+sdl
 sed
 selfhost
 selfhosted
@@ -837,6 +865,7 @@ skylib
 slackware
 smartstring
 socat
+sockaddr
 solarized
 spammy
 spanielbot
@@ -857,6 +886,7 @@ srv
 ssd
 sshargs
 sshtm
+ssl
 sso
 sstable
 stackoverflow
@@ -917,6 +947,7 @@ swe
 symlink
 sys
 syscalls
+sysconf
 sysfs
 sysinfo
 systemctl
