@@ -52,6 +52,9 @@ load_opt_path() {
     for path in ~/.local/opt/*; do
         add_to_path "$path"
     done
+    for path in ~/.local/opt/*/bin; do
+        add_to_path "$path"
+    done
 }
 
 load_cargo_path() {
