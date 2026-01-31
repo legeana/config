@@ -1,8 +1,5 @@
 #!/bin/sh -e
 
-X11_TERMINALS='alacritty kitty gnome-terminal konsole xterm'
-WAYLAND_TERMINALS='alacritty kitty foot gnome-terminal konsole'
-
 try_terminal() {
     if command -v "$1" >/dev/null 2>&1; then
         echo '$' "$@" >&2
@@ -11,13 +8,22 @@ try_terminal() {
 }
 
 if [ -n "$WAYLAND_DISPLAY" ]; then
-    for terminal in $WAYLAND_TERMINALS; do
-        try_terminal "$terminal" "$@"
-    done
+    try_terminal alacritty
+    try_terminal kitty
+    try_terminal foot
+    try_terminal ptyxis --new-window
+    try_terminal gnome-terminal
+    try_terminal konsole
+    echo Unable to find Wayland terminal, aborting >&2
 elif [ -n "$DISPLAY" ]; then
-    for terminal in $X11_TERMINALS; do
-        try_terminal "$terminal" "$@"
-    done
+    try_terminal alacritty
+    try_terminal kitty
+    try_terminal foot
+    try_terminal ptyxis --new-window
+    try_terminal gnome-terminal
+    try_terminal konsole
+    try_terminal xterm
+    echo Unable to find X11 terminal, aborting >&2
 else
-    echo Unable to find a terminal, aborting >&2
+    echo Unknown session type, aborting >&2
 fi
