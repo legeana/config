@@ -1,0 +1,17 @@
+has_contents = false
+
+[[system_dependencies]]
+requires = 'distro=bazzite'
+wants = { file = '/etc/yum.repos.d/mullvad.repo' }
+bash = """
+set -xe
+
+sudo dnf config-manager addrepo \
+    --overwrite \
+    --from-repofile=https://repository.mullvad.net/rpm/stable/mullvad.repo
+rpm-ostree install --idempotent mullvad-vpn
+
+set +x
+echo Run the following after reboot:
+echo '$' sudo systemctl enable --now mullvad-daemon
+"""
