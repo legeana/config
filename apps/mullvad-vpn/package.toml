@@ -1,6 +1,7 @@
 has_contents = false
 
 [[system_dependencies]]
+# https://mullvad.net/en/help/install-mullvad-app-linux
 requires = 'distro=bazzite'
 wants = { file = '/etc/yum.repos.d/mullvad.repo' }
 bash = """
@@ -14,4 +15,5 @@ rpm-ostree install --idempotent mullvad-vpn
 set +x
 echo Run the following after reboot:
 echo '$' sudo systemctl enable --now mullvad-daemon
+echo '$' sudo systemctl enable --now mullvad-early-boot-blocking
 """
