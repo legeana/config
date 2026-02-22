@@ -1,0 +1,2 @@
+prefix ~/.config/fish/plugins/moor/aliases
+symlink moor.fish

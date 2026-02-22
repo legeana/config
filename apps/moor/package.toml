@@ -1,0 +1,5 @@
+requires = 'os=linux'
+
+[[user_dependencies]]
+brew = 'moor'
+wants = { command = 'moor' }
