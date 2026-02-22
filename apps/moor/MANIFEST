@@ -1,2 +1,2 @@
-prefix ~/.config/fish/plugins/moor/aliases
+prefix ~/.config/fish/plugins/moor/conf.d
 symlink moor.fish
