@@ -486,6 +486,7 @@ js
 json
 jsonnet
 jsonstatus
+justfile
 jvm
 kdl
 keepalive
@@ -600,6 +601,7 @@ msvc
 mtime
 mtproto
 mtproxy
+mullvad
 multiline
 muppet
 musl
@@ -905,6 +907,7 @@ sshtm
 ssl
 sso
 sstable
+stackexchange
 stackoverflow
 startswith
 starttime
@@ -1127,6 +1130,7 @@ vimrc
 vimscript
 vlan
 vm
+vpn
 vscode
 vsync
 vulkan
@@ -1176,6 +1180,7 @@ xdg
 xhtml
 xinerama
 xkb
+xkbcommon
 xorg
 xrandr
 xsrf
