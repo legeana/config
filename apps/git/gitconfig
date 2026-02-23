@@ -35,3 +35,6 @@
 
 [url "ssh://aur@aur.archlinux.org/"]
     pushInsteadOf = https://aur.archlinux.org/
+
+[url "ssh://git@codeberg.org/"]
+    pushInsteadOf = https://codeberg.org/
