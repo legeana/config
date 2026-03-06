@@ -8,7 +8,7 @@ function is_local_filesystem -a path
         return 1
     end
     switch $fstype
-        case 'fuseblk'
+        case 'fuse*'
             return 1
         case '*'
             return 0
