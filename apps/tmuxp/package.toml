@@ -1,5 +1,6 @@
 requires = "family=unix"
 
 [[user_dependencies]]
+brew = "tmuxp"
 pipx = "tmuxp"
 wants = { command = "tmuxp" }
