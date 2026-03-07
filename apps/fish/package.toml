@@ -4,6 +4,7 @@ requires = "family=unix"
 names = [
     "bat",
     "fzf",
+    "jq",
     "ripgrep",
     "starship",
 ]

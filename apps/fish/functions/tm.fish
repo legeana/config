@@ -39,10 +39,14 @@ function _tm_tmuxp -a session
     if ! command -q tmuxp
         return 1
     end
-    if ! contains $session (tmuxp ls)
+    if ! contains $session (_tm_tmuxp_list)
         return 1
     end
     verbose-eval tmuxp load $session
+end
+
+function _tm_tmuxp_list
+    tmuxp ls --json | jq --raw-output '.workspaces[].name'
 end
 
 function _tm_tmux -a session
