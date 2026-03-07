@@ -29,6 +29,8 @@ any = "xdg-desktop-portal-wlr"
 wants = { file = "/usr/lib/systemd/user/xdg-desktop-portal-wlr.service" }
 
 # Screenshots.
+[[dependencies]]
+names = "jq"
 [[system_dependencies]]
 any = "grim"
 wants = { command = "grim" }
@@ -41,9 +43,6 @@ wants = { command = "convert" }
 [[system_dependencies]]
 any = "imv"
 wants = { command = "imv-wayland" }
-[[system_dependencies]]
-any = "jq"
-wants = { command = "jq" }
 [[system_dependencies]]
 any = "wl-clipboard"
 wants = { command = "wl-copy" }
