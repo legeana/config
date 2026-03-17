@@ -796,6 +796,7 @@ rebased
 rebasing
 reconstructors
 recv
+redir
 redis
 reenable
 refactorings
@@ -1030,6 +1031,7 @@ tools
 tpm
 tpope
 traceback
+traefik
 travis
 treesitter
 tt
@@ -1088,6 +1090,7 @@ unsynced
 unterminated
 updaters
 upsert
+upstreams
 ureq
 url
 urllib
@@ -1154,6 +1157,7 @@ whitelisted
 whitespace
 whitespaces
 whkd
+whoami
 wikipedia
 wildcard
 wildcards
