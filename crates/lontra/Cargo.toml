@@ -42,11 +42,11 @@ which = "8.0.0"
 # https://lalrpop.github.io/lalrpop/quick_start_guide.html
 # See also build.rs.
 [dependencies.lalrpop-util]
-version = "0.22.0"
+version = "0.23.1"
 default-features = false
 features = ["lexer", "unicode"]
 [build-dependencies.lalrpop]
-version = "0.22.0"
+version = "0.23.1"
 default-features = false
 features = ["lexer", "unicode"]
 
