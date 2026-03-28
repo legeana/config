@@ -32,7 +32,7 @@ impl Module for Render {
             .with_context(|| format!("failed to create a file {:?}", self.output))?;
         self.env
             .get_template(TEMPLATE_NAME)?
-            .render_to_write(self.ctx.as_ref(), &mut file)
+            .render_captured_to(self.ctx.as_ref(), &mut file)
             .with_context(|| format!("failed to render to file {:?}", self.output))?;
         file.sync_all()
             .with_context(|| format!("failed to flush {:?}", self.output))?;
