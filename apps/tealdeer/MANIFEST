@@ -1,0 +1,2 @@
+config_prefix tealdeer
+symlink config.toml
