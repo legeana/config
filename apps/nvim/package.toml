@@ -1,3 +1,7 @@
+[[user_dependencies]]
+brew = "neovim"
+wants = { command = "nvim" }
+
 [[system_dependencies]]
 any = "neovim"
 wants = { command = "nvim" }

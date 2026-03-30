@@ -1,6 +1,10 @@
 has_contents = false
 
 [[user_dependencies]]
+brew = "viu"
+wants = { command = "viu" }
+
+[[user_dependencies]]
 requires = "family=unix"
 cargo = "viu"
 wants = { command = "viu" }

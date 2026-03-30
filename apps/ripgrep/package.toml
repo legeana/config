@@ -1,6 +1,10 @@
 has_contents = false
 
 [[user_dependencies]]
+brew = "ripgrep"
+wants = { command = "rg" }
+
+[[user_dependencies]]
 cargo = "ripgrep"
 wants = { command = "rg" }
 

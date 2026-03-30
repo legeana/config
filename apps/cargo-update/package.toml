@@ -1,5 +1,9 @@
 has_contents = false
 
+[[user_dependencies]]
+brew = "cargo-update"
+wants = { command = "cargo-install-update" }
+
 [[system_dependencies]]
 apt = "libssl-dev"
 wants = { pkg_config = "libssl" }

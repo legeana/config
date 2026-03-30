@@ -6,5 +6,9 @@ winget = "Wilfred.difftastic"
 wants = { command = "difft" }
 
 [[user_dependencies]]
+brew = "difftastic"
+wants = { command = "difft" }
+
+[[user_dependencies]]
 cargo = { crates = "difftastic", locked = true }
 wants = { command = "difft" }

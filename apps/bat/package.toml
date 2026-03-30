@@ -1,6 +1,10 @@
 has_contents = false
 
 [[user_dependencies]]
+brew = "bat"
+wants = { command = "bat" }
+
+[[user_dependencies]]
 cargo = "bat"
 wants = { any_command = ["bat", "batcat"] }
 

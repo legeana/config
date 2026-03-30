@@ -1,6 +1,10 @@
 has_contents = false
 
 [[user_dependencies]]
+brew = "fd"
+wants = { command = "fd" }
+
+[[user_dependencies]]
 cargo = "fd-find"
 wants = { any_command = ["fd", "fdfind"] }
 

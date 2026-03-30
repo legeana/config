@@ -2,6 +2,10 @@ requires = "family=unix"
 has_contents = false
 
 [[user_dependencies]]
+brew = "eza"
+wants = { command = "eza" }
+
+[[user_dependencies]]
 cargo = "eza"
 wants = { command = "eza" }
 

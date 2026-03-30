@@ -1,4 +1,8 @@
 [[user_dependencies]]
+brew = "starship"
+wants = { command = "starship" }
+
+[[user_dependencies]]
 requires = "family=unix"
 cargo = "starship"
 wants = { command = "starship" }

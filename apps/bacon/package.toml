@@ -1,6 +1,10 @@
 has_contents = false
 
 [[user_dependencies]]
+brew = "bacon"
+wants = { command = "bacon" }
+
+[[user_dependencies]]
 cargo = "bacon"
 wants = { command = "bacon" }
 
