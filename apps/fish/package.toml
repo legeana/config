@@ -23,5 +23,10 @@ wants = { command = "sponge" }
 
 [[user_dependencies]]
 requires = "os=macos"
-wants = { command = "gecho" }
 brew = "coreutils"
+wants = { command = "gecho" }
+
+[[user_dependencies]]
+requires = "os=macos"
+brew = "fish"
+wants = { command = "fish" }
