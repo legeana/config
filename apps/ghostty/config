@@ -11,4 +11,4 @@ theme = Kitty Default
 
 # Bash is the original shell, fish is started later.
 shell-integration = none
-shell-integration-features = no-cursor
+shell-integration-features = no-cursor, ssh-env, ssh-terminfo
