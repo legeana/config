@@ -1,2 +1,5 @@
 xdg_config_prefix ghostty
 symlink config
+
+prefix ~/.config/fish/plugins/ghostty/conf.d
+symlink shell-integration.fish
