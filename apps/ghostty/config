@@ -1,2 +1,4 @@
 font-family = Hack Nerd Font
+right-click-action = copy
+scrollback-limit = 10000
 theme = Kitty Default
