@@ -1,5 +1,9 @@
 has_contents = false
 
+[[user_dependencies]]
+brew = "fzf"
+wants = { command = "fzf" }
+
 [[system_dependencies]]
 any = "fzf"
 wants = { command = "fzf" }
