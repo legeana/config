@@ -1,0 +1,11 @@
+# A starter template for [LazyVim](https://github.com/LazyVim/LazyVim).
+# Refer to the [documentation](https://lazyvim.github.io/installation) to get started.
+
+xdg_or_win_config_local_prefix lazy-vim
+symlink init.lua
+symlink stylua.toml
+symlink_tree lua
+
+prefix ~/.config/fish/plugins/lazy-vim/functions
+symlink lazy.fish
+symlink uninstall-lazy.fish
