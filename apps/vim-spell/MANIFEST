@@ -7,7 +7,7 @@ render vim-spell.vim
 xdg_or_win_config_local_prefix nvchad/pack/spell_config/start/spell_config/plugin
 render vim-spell.vim
 xdg_or_win_config_local_prefix nvchad/lua/plugins
-symlink vim-spell.lua
+symlink nvchad.lua
 
 xdg_or_win_config_local_prefix vim-spell/draft
 set_contents en.utf-8.add ""
