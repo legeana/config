@@ -9,6 +9,13 @@ render vim-spell.vim
 xdg_or_win_config_local_prefix nvchad/lua/plugins
 symlink nvchad.lua
 
+xdg_or_win_config_local_prefix lazy-vim/lua/plugins
+render vim-spell-spec.lua
+
+xdg_or_win_config_local_prefix vim-spell
+symlink lazy.lua
+symlink_tree lua
+
 xdg_or_win_config_local_prefix vim-spell/draft
 set_contents en.utf-8.add ""
 output_file en.utf-8.add.spl
