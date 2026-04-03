@@ -1,0 +1,3 @@
+[[user_dependencies]]
+brew = "ghostty"
+wants = { command = "ghostty" }
