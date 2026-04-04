@@ -8,6 +8,7 @@ try_terminal() {
 }
 
 if [ -n "$WAYLAND_DISPLAY" ]; then
+    try_terminal ghostty
     try_terminal alacritty
     try_terminal kitty
     try_terminal foot
@@ -16,6 +17,7 @@ if [ -n "$WAYLAND_DISPLAY" ]; then
     try_terminal konsole
     echo Unable to find Wayland terminal, aborting >&2
 elif [ -n "$DISPLAY" ]; then
+    try_terminal ghostty
     try_terminal alacritty
     try_terminal kitty
     try_terminal foot
