@@ -2,3 +2,18 @@
 requires = "os=macos"
 brew = "ghostty"
 wants = { command = "ghostty" }
+
+[[system_dependencies]]
+# https://ghostty.org/docs/install/binary#atomic-desktops-(silverblue)
+requires = 'distro=bazzite'
+wants = { file = '/etc/yum.repos.d/_copr:copr.fedorainfracloud.org:scottames:ghostty.repo' }
+bash = """
+set -xe
+
+source /etc/os-release
+URL="https://copr.fedorainfracloud.org/coprs/scottames/ghostty/repo/fedora-${VERSION_ID:?}/scottames-ghostty-fedora-${VERSION_ID:?}.repo"
+REPO_FILE=/etc/yum.repos.d/_copr:copr.fedorainfracloud.org:scottames:ghostty.repo
+
+curl -fsSL "${URL:?}" | sudo tee "${REPO_FILE:?}" >/dev/null
+rpm-ostree install --idempotent ghostty
+"""
