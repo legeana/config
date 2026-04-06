@@ -1,3 +1,0 @@
-prefix ~/.vim/pack/syntax_config/start/syntax_config
-symlink ftdetect
-symlink ftplugin

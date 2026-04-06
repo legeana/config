@@ -2,6 +2,8 @@ prefix ~
 symlink_to .vimrc vimrc
 
 prefix ~/.vim
+symlink_tree ftdetect
+symlink_tree ftplugin
 symlink plugin
 subdir third_party
 
