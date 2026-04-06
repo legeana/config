@@ -1,0 +1,5 @@
+xdg_config_prefix lazy-vim/lua/lib
+symlink require-dir.lua
+
+xdg_config_prefix nvchad/lua/lib
+symlink require-dir.lua
