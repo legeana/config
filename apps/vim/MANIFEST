@@ -4,7 +4,7 @@ symlink_to .vimrc vimrc
 prefix ~/.vim
 symlink_tree ftdetect
 symlink_tree ftplugin
-symlink plugin
+symlink_tree plugin
 subdir third_party
 
 subdir fish
