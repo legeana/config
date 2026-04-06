@@ -1,5 +1,5 @@
 prefix ~
-symlink .vimrc
+symlink_to .vimrc vimrc
 
 prefix ~/.vim
 symlink plugin
