@@ -1,5 +1,3 @@
-has_contents = false
-
 [[system_dependencies]]
 # https://monospacementor.com/wiki/Notes/Install+1Password+on+Fedora+Silverblue
 requires = 'distro=bazzite'

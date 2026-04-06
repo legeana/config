@@ -1,0 +1,6 @@
+if tags "distro!=bazzite" {
+    return
+}
+
+prefix ~/.config/plasma-workspace/env
+symlink 90_1password_ssh.sh
