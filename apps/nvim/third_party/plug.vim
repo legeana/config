@@ -12,12 +12,6 @@ Plug 'itchyny/lightline.vim'
 Plug 'dracula/vim', { 'as': 'dracula' }
 Plug 'rust-lang/rust.vim'
 Plug 'tpope/vim-commentary'
-
-if executable("node")
-    Plug 'neoclide/coc.nvim', {'branch': 'release'}
-    runtime! opt_plugin/coc.vim
-endif
-
 call plug#end()
 
 " Force tpope/vim-sensible to load now.
