@@ -1,7 +1,7 @@
 # {{header("#")}}
 
 [core]
-    editor = nvim
+    editor = vim
 
 [include]
     # path = ".gitconfig.d/*"

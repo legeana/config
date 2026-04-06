@@ -1,6 +1,1 @@
 xdg_or_win_config_local_prefix nvim
-
-symlink init.vim
-symlink plugin
-
-subdir third_party

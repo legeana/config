@@ -3,5 +3,6 @@ symlink_to .vimrc vimrc
 
 prefix ~/.vim
 symlink plugin
+subdir third_party
 
 subdir fish
