@@ -1,0 +1,3 @@
+[[user_dependencies]]
+brew = "stylua"
+wants = { command = "stylua" }
