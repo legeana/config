@@ -1,8 +1,8 @@
-xdg_or_win_config_local_prefix nvim/pack/spell_config/start/spell_config/plugin
-render vim-spell.vim
-
 prefix ~/.vim/pack/spell_config/start/spell_config/plugin
 render vim-spell.vim
+
+xdg_or_win_config_local_prefix nvim/lua/plugins
+render vim-spell-spec.lua
 
 xdg_or_win_config_local_prefix nvchad/lua/plugins
 render vim-spell-spec.lua

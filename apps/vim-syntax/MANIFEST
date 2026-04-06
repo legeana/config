@@ -1,7 +1,3 @@
 prefix ~/.vim/pack/syntax_config/start/syntax_config
 symlink ftdetect
 symlink ftplugin
-
-xdg_or_win_config_local_prefix nvim/pack/syntax_config/start/syntax_config
-symlink ftdetect
-symlink ftplugin
