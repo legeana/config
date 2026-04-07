@@ -1,5 +1,9 @@
 requires = "family=unix"
 
+[[user_dependencies]]
+brew = "htop"
+wants = { command = "htop" }
+
 [[system_dependencies]]
 any = "htop"
 wants = { command = "htop" }
