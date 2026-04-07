@@ -1323,6 +1323,7 @@ dependencies = [
  "log",
  "lontra-cli",
  "pretty_assertions",
+ "which",
  "xshell",
 ]
 

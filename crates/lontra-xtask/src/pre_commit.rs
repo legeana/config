@@ -4,6 +4,7 @@ use anyhow::Result;
 use xshell::Shell;
 use xshell::cmd;
 
+use crate::dependencies::install_dev;
 use crate::install::install_shim;
 use crate::workspace;
 
@@ -11,6 +12,7 @@ pub fn run() -> Result<()> {
     let sh = Shell::new()?;
     workspace::change_dir_to_root(&sh)?;
 
+    install_dev(&sh)?;
     setup_pre_commit(&sh)?;
     fmt_pre_commit(&sh)?;
     crate::sqlx::pre_commit(&sh)?;
