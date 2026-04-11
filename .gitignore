@@ -7,8 +7,9 @@
 /.state
 
 # Build.
+/Cross.toml
 /cargo-registry
-/cross-target
+/cross
 /target
 
 # Old Python build.
