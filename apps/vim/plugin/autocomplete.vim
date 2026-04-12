@@ -1,3 +1,7 @@
+if !exists('+autocomplete')
+    finish
+endif
+
 " Show autocomplete automatically.
 set autocomplete
 
