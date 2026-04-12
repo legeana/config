@@ -6,11 +6,5 @@
 /.install
 /.state
 
-# Build.
-/Cross.toml
-/cargo-registry
-/cross
-/target
-
 # Old Python build.
 __pycache__
