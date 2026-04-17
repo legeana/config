@@ -116,6 +116,7 @@ builtins
 buylist
 bytearray
 bytearrays
+bzip
 c99
 caddyfile
 canarying
@@ -151,6 +152,7 @@ cmd
 cmdline
 cmp
 coc
+codeberg
 codelab
 colorscheme
 commandline
@@ -251,6 +253,8 @@ dns
 docstring
 docstrings
 dotenvy
+dotfile
+dotfiles
 dracula
 dremel
 drun
@@ -324,6 +328,7 @@ fn
 fname
 fnameescape
 fns
+folke
 fontconfig
 foreach
 formatdoc
@@ -359,6 +364,7 @@ getvalue
 gflags
 gh
 ghcr
+ghostty
 gid
 gigasecond
 gitconfig
@@ -374,6 +380,7 @@ globbing
 glx
 gmailctl
 gmock
+gnupg
 gnutls
 golang
 googleapis
@@ -467,6 +474,7 @@ irc
 irssi
 iscsi
 isinstance
+iso
 isoformat
 isreadable
 isrecursive
@@ -490,6 +498,7 @@ jsonstatus
 justfile
 justfiles
 jvm
+kanidm
 kdl
 keepalive
 keybase
@@ -508,6 +517,8 @@ kubernetes
 kwargs
 lalrpop
 lang
+launchbadge
+lazyvim
 ld
 ldconfig
 legeana
@@ -528,6 +539,7 @@ linodes
 linter
 linters
 linux
+linuxbrew
 liri
 lisa
 livelock
@@ -729,12 +741,15 @@ playbook2
 playerctl
 plugins
 png
+podman
 pointwise
 polybar
 popen
 pos
 posix
 postexec
+postgres
+postgresql
 poweroff
 poweron
 powerpc
@@ -747,6 +762,7 @@ precalculated
 precompute
 preexec
 prefill
+prerelease
 presubmit
 printf
 probers
@@ -812,6 +828,7 @@ resizer
 resolvectl
 restartable
 ret
+retriable
 returncode
 rfc
 rfcs
@@ -831,6 +848,7 @@ rsplit
 rss
 rstest
 rstrip
+rtp
 runfiles
 runstates
 runtimepath
@@ -854,10 +872,14 @@ sdl
 sed
 selfhost
 selfhosted
+semver
 sendline
 sendmsg
 sep
 serde
+serialisable
+serialiser
+serialisers
 serializer
 serializers
 server
@@ -869,6 +891,7 @@ sha1
 sharded
 sharding
 shellexpand
+shiftwidth
 shlex
 shlexfmt
 shortlog
@@ -961,6 +984,7 @@ subtree
 subtrees
 subtyping
 sudo
+sudoers
 superclasses
 surrealdb
 suspendable
@@ -997,6 +1021,7 @@ tera
 termguicolors
 terminfo
 testdata
+testresult
 tetris
 textpb
 textproto
@@ -1024,6 +1049,7 @@ toc
 todo
 tok
 tokio
+tokyonight
 tombstoned
 toml
 toolchain
@@ -1205,3 +1231,4 @@ zoxide
 zsh
 zshenv
 zshrc
+zulip
