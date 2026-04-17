@@ -1,29 +1,28 @@
-# Colors (Dracula+)
+# Colours (Monokai Charcoal)
 
+# Default Colours
 [colors.primary]
-background = '#212121'
-foreground = '#F8F8F2'
+background = '#000000'
+foreground = '#FFFFFF'
 
-[colors.cursor]
-text = '#0E1415'
-cursor = '#ECEFF4'
-
+# Normal Colours
 [colors.normal]
-black = '#21222C'
-red = '#FF5555'
-green = '#50FA7B'
-yellow = '#FFCB6B'
-blue = '#82AAFF'
-magenta = '#C792EA'
-cyan = '#8BE9FD'
-white = '#F8F9F2'
+black   = '#1a1a1a'
+red     = '#f4005f'
+green   = '#98e024'
+yellow  = '#fa8419'
+blue    = '#9d65ff'
+magenta = '#f4005f'
+cyan    = '#58d1eb'
+white   = '#c4c5b5'
 
+# Bright Colours
 [colors.bright]
-black = '#545454'
-red = '#FF6E6E'
-green = '#69FF94'
-yellow = '#FFCB6B'
-blue = '#D6ACFF'
-magenta = '#FF92DF'
-cyan = '#A4FFFF'
-white = '#F8F8F2'
+black   = '#625e4c'
+red     = '#f4005f'
+green   = '#98e024'
+yellow  = '#e0d561'
+blue    = '#9d65ff'
+magenta = '#f4005f'
+cyan    = '#58d1eb'
+white   = '#f6f6ef'
