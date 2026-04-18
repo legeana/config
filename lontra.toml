@@ -1,2 +1,2 @@
 remote_url_template = "https://codeberg.org/liri/lontra/releases/download/{VERSION}/{TARGET}"
-required_version = "0.1.1"
+required_version = "0.1.2"
