@@ -1,0 +1,7 @@
+xdg_executable_prefix .
+
+npiperelay_exe = $(which npiperelay.exe)
+symlink_to npiperelay-wsl $npiperelay_exe
+
+prefix ~/.config/systemd/user
+symlink ssh-agent.service

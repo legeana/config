@@ -1,0 +1,14 @@
+prefix ~/.config/systemd/user
+symlink ssh-agent.service
+
+prefix ~/.config/sway/config.d
+symlink sway-ssh-agent.conf
+
+prefix ~/.config/i3/config.d
+symlink i3-ssh-agent.conf
+
+prefix ~/.config/plasma-workspace/env
+symlink 10_ssh_agent.sh
+
+prefix ~/.config/fish/plugins/ssh-agent/conf.d
+symlink ssh-agent.fish

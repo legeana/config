@@ -4,25 +4,12 @@ symlink_tree config.d
 
 if is_linux {
     if tags 'feature=wsl' {
-        xdg_executable_prefix .
-        npiperelay_exe = $(which npiperelay.exe)
-        symlink_to npiperelay-wsl $npiperelay_exe
-        prefix ~/.config/systemd/user
-        symlink_to ssh-agent.service ssh-agent-wsl.service
+        subdir wsl
     } else {
-        prefix ~/.config/systemd/user
-        symlink ssh-agent.service
+        subdir linux
     }
-
-    prefix ~/.config/fish/plugins/ssh-agent/conf.d
-    symlink ssh-agent.fish
-
-    prefix ~/.config/sway/config.d
-    symlink sway-ssh-agent.conf
-
-    prefix ~/.config/i3/config.d
-    symlink i3-ssh-agent.conf
-
-    prefix ~/.config/plasma-workspace/env
-    symlink 10_ssh_agent.sh
+} else if is_macos {
+    subdir macos
+} else if is_windows {
+    subdir windows
 }
