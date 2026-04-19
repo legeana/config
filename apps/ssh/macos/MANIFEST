@@ -1,0 +1,2 @@
+prefix ~/.config/fish/plugins/ssh-agent/conf.d
+symlink ssh-agent.fish
