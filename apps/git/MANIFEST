@@ -9,5 +9,11 @@ if is_windows {
     symlink_to editor gitconfig-editor-unspecified
 }
 
+# TODO: Figure out a better way to create a backup tool.
+xdg_executable_prefix
+if !is_command cargo {
+  symlink_to git-signing-key git-signing-key.py
+}
+
 prefix ~
 symlink_tree_to .gitconfig.keys gitconfig.keys
