@@ -1,0 +1,6 @@
+has_contents = false
+
+[[user_dependencies]]
+requires = "os=macos"
+brew = "coreutils"
+wants = { command = "gecho" }

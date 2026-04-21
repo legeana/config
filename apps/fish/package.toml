@@ -3,6 +3,7 @@ requires = "family=unix"
 [[dependencies]]
 names = [
     "bat",
+    "coreutils",
     "fzf",
     "jq",
     "ripgrep",
@@ -20,11 +21,6 @@ wants = { command = "curl" }
 [[system_dependencies]]
 any = "moreutils"
 wants = { command = "sponge" }
-
-[[user_dependencies]]
-requires = "os=macos"
-brew = "coreutils"
-wants = { command = "gecho" }
 
 [[user_dependencies]]
 requires = "os=macos"
