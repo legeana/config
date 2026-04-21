@@ -1,4 +1,5 @@
 must-have-command brew
 
 eval (brew shellenv)
-fish_add_path "$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin"
+set _list "$HOMEBREW_PREFIX/opt/"*/libexec/gnubin; add_to_path $_list
+set _list "$HOMEBREW_PREFIX/opt/"*/libexec/gnuman; add_to_manpath $_list
