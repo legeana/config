@@ -198,6 +198,7 @@ ctx
 ctypes
 curator
 cwd
+cyrillic
 darwin
 datacenter
 datacenters
@@ -664,7 +665,6 @@ nullptr
 num
 nushell
 nvchad
-nvchad
 nvidia
 nvim
 nyc
@@ -744,6 +744,7 @@ png
 podman
 pointwise
 polybar
+popd
 popen
 pos
 posix
@@ -784,6 +785,7 @@ ptyxis
 pubkey
 puid
 punct
+pushd
 pusheen
 pwd
 pwsh
