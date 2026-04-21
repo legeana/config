@@ -3,6 +3,5 @@ xdg_executable_prefix
 symlink debug-env
 symlink discord-emojification
 symlink git-new
-symlink gpg-batch
 symlink grub-update
 symlink swap
