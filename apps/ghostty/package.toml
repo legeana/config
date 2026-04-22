@@ -8,7 +8,7 @@ wants = { command = "ghostty" }
 requires = 'distro=bazzite'
 wants = { file = '/etc/yum.repos.d/_copr:copr.fedorainfracloud.org:scottames:ghostty.repo' }
 bash = """
-set -xe
+set -x
 
 source /etc/os-release
 URL="https://copr.fedorainfracloud.org/coprs/scottames/ghostty/repo/fedora-${VERSION_ID:?}/scottames-ghostty-fedora-${VERSION_ID:?}.repo"
