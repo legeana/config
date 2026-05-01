@@ -1,0 +1,2 @@
+prefix ~/.ssh/config.d
+symlink unraid

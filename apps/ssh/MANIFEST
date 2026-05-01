@@ -5,6 +5,8 @@ symlink_tree config.d
 if is_linux {
     if tags 'feature=wsl' {
         subdir wsl
+    } else if tags 'distro=unraid' {
+        subdir unraid
     } else {
         subdir linux
     }

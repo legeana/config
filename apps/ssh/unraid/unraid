@@ -1,0 +1,4 @@
+# /root/.ssh/known_hosts may not support hard links.
+# OpenSSH may use hard links to modify known_hosts.
+Host *
+    UserKnownHostsFile /mnt/user/workspace/ssh/known_hosts
