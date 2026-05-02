@@ -1,6 +1,13 @@
 prefix ~/.ssh
-symlink config
-symlink_tree config.d
+
+if tags 'distro!=unraid' {
+    symlink config
+    symlink_tree config.d
+} else {
+    raw_copy config
+    mkdir config.d
+    # TODO: config.d contents
+}
 
 if is_linux {
     if tags 'feature=wsl' {
