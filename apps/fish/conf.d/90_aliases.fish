@@ -1,1 +1,1 @@
-load_d ~/.config/fish/aliases
+load_d $__fish_config_dir/aliases

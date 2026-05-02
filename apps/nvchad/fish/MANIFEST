@@ -1,3 +1,3 @@
-prefix ~/.config/fish/plugins/nvchad/functions
+xdg_config_prefix fish/plugins/nvchad/functions
 symlink nv.fish
 symlink uninstall-nvchad.fish

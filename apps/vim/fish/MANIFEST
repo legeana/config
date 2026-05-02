@@ -1,2 +1,2 @@
-prefix ~/.config/fish/plugins/huge-vim/functions
+xdg_config_prefix fish/plugins/huge-vim/functions
 symlink bare-vim.fish

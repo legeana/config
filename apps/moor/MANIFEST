@@ -1,2 +1,2 @@
-prefix ~/.config/fish/plugins/moor/conf.d
+xdg_config_prefix fish/plugins/moor/conf.d
 symlink moor.fish

@@ -10,5 +10,5 @@ symlink i3-ssh-agent.conf
 prefix ~/.config/plasma-workspace/env
 symlink 10_ssh_agent.sh
 
-prefix ~/.config/fish/plugins/ssh-agent/conf.d
+xdg_config_prefix fish/plugins/ssh-agent/conf.d
 symlink ssh-agent.fish

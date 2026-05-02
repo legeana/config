@@ -1,1 +1,2 @@
-[[ -e ~/.config/fish/login.bash ]] && source ~/.config/fish/login.bash
+FISH_LOGIN_SCRIPT="${XDG_CONFIG_HOME:-$HOME/.config}/fish/login.bash"
+[[ -e "$FISH_LOGIN_SCRIPT" ]] && source "$FISH_LOGIN_SCRIPT"

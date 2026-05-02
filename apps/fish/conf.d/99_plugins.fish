@@ -1,1 +1,1 @@
-load_plugins ~/.config/fish/plugins
+load_plugins $__fish_config_dir/plugins

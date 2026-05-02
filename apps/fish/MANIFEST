@@ -1,4 +1,4 @@
-prefix ~/.config/fish
+xdg_config_prefix fish
 
 symlink aliases
 symlink completions
