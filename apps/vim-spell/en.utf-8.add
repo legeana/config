@@ -355,6 +355,7 @@ gc
 gcc
 gdb
 ge
+gentoo
 getattr
 gethostname
 getitem
@@ -453,6 +454,7 @@ immutabledict
 impl
 indoc
 inet
+infocmp
 ini
 init
 inlined
@@ -684,6 +686,7 @@ openai
 openpty
 opensource
 openssh
+openssl
 orgmode
 os
 ostream
@@ -1083,6 +1086,7 @@ uid
 uint
 ulimit
 ulong
+umask
 uname
 unanchored
 unarchiver
