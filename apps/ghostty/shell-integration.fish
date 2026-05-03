@@ -5,4 +5,4 @@ if ! set -q GHOSTTY_RESOURCES_DIR
     exit
 end
 
-load_d $GHOSTTY_RESOURCES_DIR/shell-integration/fish/vendor_conf.d
+source_d $GHOSTTY_RESOURCES_DIR/shell-integration/fish/vendor_conf.d

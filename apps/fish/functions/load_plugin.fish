@@ -7,11 +7,11 @@ function load_plugin
             add_to_complete_path $plugin/completions
         end
         if test -d $plugin/conf.d
-            load_d $plugin/conf.d
+            source_d $plugin/conf.d
         end
         if not test -d $plugin/functions
-           and not test -d $plugin/conf.d
-           and not test -d $plugin/config.d
+            and not test -d $plugin/conf.d
+            and not test -d $plugin/config.d
             add_to_function_path $plugin
         end
     end
