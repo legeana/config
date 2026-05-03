@@ -9,6 +9,10 @@ function load_plugin
         if test -d $plugin/conf.d
             source_d $plugin/conf.d
         end
+        # TODO: themes
+        # It is currently impossible to add themes from outside of
+        # $__fish_config_dir via a path variable.
+        # See <https://github.com/fish-shell/fish-shell/issues/9456>.
         if not test -d $plugin/functions
             and not test -d $plugin/conf.d
             and not test -d $plugin/config.d
