@@ -1,4 +1,4 @@
-function load_plugin
+function add_plugin -d 'Adds given plugin(s) to fish'
     for plugin in $argv
         if test -d $plugin/functions
             add_to_function_path $plugin/functions
