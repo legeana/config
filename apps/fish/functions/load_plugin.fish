@@ -15,7 +15,6 @@ function load_plugin
         # See <https://github.com/fish-shell/fish-shell/issues/9456>.
         if not test -d $plugin/functions
             and not test -d $plugin/conf.d
-            and not test -d $plugin/config.d
             add_to_function_path $plugin
         end
     end
